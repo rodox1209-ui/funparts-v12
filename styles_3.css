@@ -1,0 +1,4 @@
+
+          @keyframes aiSpin { to { transform: rotate(360deg); } }
+          @keyframes aiPulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+        

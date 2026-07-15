@@ -1,0 +1,1 @@
+#aiLoadingPopup .ai-spin{animation:aiSpin .9s linear infinite}@keyframes aiSpin{to{transform:rotate(360deg)}}

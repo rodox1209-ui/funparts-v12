@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><defs>
+  <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#f0f0f0"/><stop offset="25%" style="stop-color:#c8c8c8"/>
+    <stop offset="50%" style="stop-color:#ffffff"/><stop offset="75%" style="stop-color:#a0a0a0"/>
+    <stop offset="100%" style="stop-color:#d0d0d0"/>
+  </linearGradient>
+  <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.35"/>
+    <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.05"/>
+    <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/>
+  </linearGradient>
+  <clipPath id="clip"><rect x="9" y="9" width="282" height="182" rx="18"/></clipPath>
+</defs><rect x="3" y="3" width="294" height="194" rx="22" fill="url(#chrome)" stroke="#888" stroke-width="0.5"/><rect x="9.0" y="9" width="94.0" height="182" fill="#006847" clip-path="url(#clip)"/><rect x="103.0" y="9" width="94.0" height="182" fill="#ffffff" clip-path="url(#clip)"/><rect x="197.0" y="9" width="94.0" height="182" fill="#CE1126" clip-path="url(#clip)"/><rect x="9" y="9" width="282" height="182" rx="18" fill="url(#shine)" clip-path="url(#clip)"/></svg>

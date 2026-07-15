@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><defs>
+  <linearGradient id="chrome" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f0f0f0"/><stop offset="25%" style="stop-color:#c8c8c8"/><stop offset="50%" style="stop-color:#ffffff"/><stop offset="75%" style="stop-color:#a0a0a0"/><stop offset="100%" style="stop-color:#d0d0d0"/></linearGradient>
+  <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.35"/><stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.05"/><stop offset="100%" style="stop-color:#ffffff;stop-opacity:0"/></linearGradient>
+  <clipPath id="clip"><rect x="9" y="9" width="282" height="182" rx="18"/></clipPath>
+</defs>
+<rect x="3" y="3" width="294" height="194" rx="22" fill="url(#chrome)" stroke="#888" stroke-width="0.5"/>
+<rect x="9" y="9" width="282" height="182" fill="#DE2910" clip-path="url(#clip)"/>
+<polygon points="50,30 54,44 68,44 57,52 61,66 50,58 39,66 43,52 32,44 46,44" fill="#FFDE00" clip-path="url(#clip)"/>
+<polygon points="80,20 83,28 91,28 85,33 87,41 80,36 73,41 75,33 69,28 77,28" fill="#FFDE00" clip-path="url(#clip)"/>
+<polygon points="95,35 98,43 106,43 100,48 102,56 95,51 88,56 90,48 84,43 92,43" fill="#FFDE00" clip-path="url(#clip)"/>
+<polygon points="95,58 98,66 106,66 100,71 102,79 95,74 88,79 90,71 84,66 92,66" fill="#FFDE00" clip-path="url(#clip)"/>
+<polygon points="80,72 83,80 91,80 85,85 87,93 80,88 73,93 75,85 69,80 77,80" fill="#FFDE00" clip-path="url(#clip)"/>
+<rect x="9" y="9" width="282" height="182" rx="18" fill="url(#shine)" clip-path="url(#clip)"/>
+</svg>
