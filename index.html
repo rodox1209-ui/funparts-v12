@@ -94,7 +94,7 @@
       </div>
     </div>
     <div class="pi">
-      <div><div class="pn" id="pvMod">Ferrari SF24 F1</div><div class="pd" id="pvSpecDesc">53 × 83cm · LEGO Technic · 1:8</div></div>
+      <div><div class="pn" id="pvMod">Ferrari SF24 F1</div><div class="pd" id="pvSpecDesc">53 × 83cm · LEGO Technic · 1:8</div><div class="pd" id="pvCarColor" style="display:none;"></div></div>
       <div class="fa" id="fAtual">Bicolor Brilho
   </div>
     </div><!-- /pi -->
@@ -246,11 +246,11 @@
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:22px;">
         <div>
           <div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Marca do carro</div>
-          <input id="aiCarBrand" class="inp" placeholder="Ex: Ferrari, McLaren, Porsche..." style="width:100%;box-sizing:border-box;">
+          <input id="aiCarBrand" class="inp" placeholder="Ex: Ferrari, McLaren, Porsche..." oninput="if(typeof updateCarDesc==='function')updateCarDesc()" style="width:100%;box-sizing:border-box;">
         </div>
         <div>
           <div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Modelo do carro</div>
-          <input id="aiCarModel" class="inp" placeholder="Ex: 488 GTB, Senna, 911 Turbo S..." style="width:100%;box-sizing:border-box;">
+          <input id="aiCarModel" class="inp" placeholder="Ex: 488 GTB, Senna, 911 Turbo S..." oninput="if(typeof updateCarDesc==='function')updateCarDesc()" style="width:100%;box-sizing:border-box;">
         </div>
         <div>
           <div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Ano</div>
@@ -261,7 +261,7 @@
           <div id="aiColorPalette" style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:10px;"></div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
             <div style="color:#666;font-size:9px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Selecionada:</div>
-            <input id="aiCarColor" class="inp" placeholder="Selecione acima ou digite..." style="flex:1;box-sizing:border-box;font-size:12px;padding:8px 10px;">
+            <input id="aiCarColor" class="inp" placeholder="Selecione acima ou digite..." oninput="if(typeof updateCarDesc==='function')updateCarDesc()" style="flex:1;box-sizing:border-box;font-size:12px;padding:8px 10px;">
           </div>
         </div>
       </div>

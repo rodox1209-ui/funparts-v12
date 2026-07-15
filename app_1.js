@@ -1284,17 +1284,8 @@ function updateDetPreview(){
   brand=brand.trim(); model=model.trim(); year=year.trim(); color=color.trim();
   var carName=[brand,model,year].filter(Boolean).join(' ')||'Seu Carro';
 
-  // ── update title ──
-  var pvMod=document.getElementById('pvMod');
-  if(pvMod) pvMod.textContent=carName;
-
-  // ── update spec line ──
-  var pvSpec=document.getElementById('pvSpecDesc');
-  if(pvSpec){
-    var parts=[S.miniScale, S.quadroDim];
-    if(color) parts.push(color);
-    pvSpec.textContent=parts.filter(Boolean).join(' · ');
-  }
+  // ── descrição: Marca / Nome do carro / Cor (3 linhas, ao vivo) ──
+  updateCarDesc();
 
   // ── update frame appearance & preview image ──
   // Apply aspect-ratio directly to .quadro (no .frame-out in DOM)
@@ -1638,7 +1629,7 @@ function renderUvMiniOptions(){
   var el=document.getElementById('fundoLayoutOpts');
   if(!el)return;
   el.innerHTML='';
-  var tabs=[{k:'deg',l:'Degradê Central'},{k:'stripe',l:'Listra Central'},{k:'img',l:'Sua Imagem'}];
+  var tabs=[{k:'deg',l:'Degradê Central'},{k:'stripe',l:'Listra Central'},{k:'contorno',l:'Contorno Interno'},{k:'diagonal',l:'Diagonal Sport'},{k:'faixa',l:'Faixa Deslocada'},{k:'meio',l:'Meio a Meio'},{k:'img',l:'Sua Imagem'}];
   var tabsDiv=document.createElement('div');
   tabsDiv.style.cssText='display:flex;flex-direction:column;gap:6px;margin-bottom:14px;';
   tabs.forEach(function(t){
@@ -1659,9 +1650,9 @@ function renderUvMiniOptions(){
     return h+'</div>';
   };
   var strDiv=document.createElement('div');
-  strDiv.id='uvStripePanel';strDiv.style.display=S.uvLayoutType==='stripe'?'block':'none';
+  strDiv.id='uvStripePanel';strDiv.style.display=(['stripe','contorno','diagonal','faixa','meio'].indexOf(S.uvLayoutType)>=0)?'block':'none';
   _renderMiniPickerSection(strDiv,'uvStripeMain','#FF2200','Cor Principal','cpSwatch_uvMain');
-  _renderMiniPickerSection(strDiv,'uvStripeAccent','#0066FF','Cor da Listra','cpSwatch_uvAccent');
+  _renderMiniPickerSection(strDiv,'uvStripeAccent','#0066FF','Cor de Destaque','cpSwatch_uvAccent');
   el.appendChild(strDiv);
   var imgDiv=document.createElement('div');
   imgDiv.id='uvImgPanel';imgDiv.style.display=S.uvLayoutType==='img'?'flex':'none';imgDiv.style.flexDirection='column';imgDiv.style.alignItems='center';
@@ -1684,8 +1675,12 @@ function selUvLayout(type){
     b.style.color=a?'#fff':'rgba(255,255,255,0.4)';
     b.style.borderColor=a?'#e07b00':'rgba(255,255,255,0.12)';
   });
-  var panels={uvDegPanel:'deg',uvStripePanel:'stripe',uvImgPanel:'img'};
-  for(var id in panels){var el=document.getElementById(id);if(el)el.style.display=panels[id]===type?(id==='uvImgPanel'?'flex':'block'):'none';}
+  var _fam=['stripe','contorno','diagonal','faixa','meio'];
+  var dp=document.getElementById('uvDegPanel');if(dp)dp.style.display=type==='deg'?'block':'none';
+  var sp=document.getElementById('uvStripePanel');if(sp)sp.style.display=_fam.indexOf(type)>=0?'block':'none';
+  var ip=document.getElementById('uvImgPanel');if(ip)ip.style.display=type==='img'?'flex':'none';
+  var _lbls={deg:'Degradê Central',stripe:'Listra Central',contorno:'Contorno Interno',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
+  if(_lbls[type]&&typeof setEl==='function')setEl('fAtual',_lbls[type]);
   updateDetPvFundo();
 }
 function selUvStripeMain(el,hex){
@@ -1711,6 +1706,7 @@ function updateDetPvFundo(){
   ['detPvFundo','legoDetFundo'].forEach(function(elId){
     var el=document.getElementById(elId);
     if(!el)return;
+    el.style.boxShadow='';
     // LEGO: use selected layout preview as background
     if(elId==='legoDetFundo'&&S.fundoLayoutPreview){
       el.style.background='';
@@ -1720,7 +1716,16 @@ function updateDetPvFundo(){
       el.style.display='block';
       return;
     }
-    if(S.fundo==='f-uv'&&S.tipo==='mini'&&S.uvLayoutType==='stripe'){var _m=S.uvStripeMain||'#FF2200',_a=S.uvStripeAccent||'#FFFFFF';el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 42%,'+_a+' 42%,'+_a+' 58%,'+_m+' 58%,'+_m+' 100%)';el.style.backgroundSize='100% 100%';el.style.backgroundPosition='center';el.style.display='block';return;}
+    if(S.fundo==='f-uv'&&S.tipo==='mini'&&['stripe','contorno','diagonal','faixa','meio'].indexOf(S.uvLayoutType)>=0){
+      var _m=S.uvStripeMain||'#FF2200',_a=S.uvStripeAccent||'#FFFFFF';
+      el.style.background='';el.style.backgroundSize='100% 100%';el.style.backgroundPosition='center';
+      if(S.uvLayoutType==='stripe'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 42%,'+_a+' 42%,'+_a+' 58%,'+_m+' 58%,'+_m+' 100%)';}
+      else if(S.uvLayoutType==='diagonal'){el.style.backgroundImage='linear-gradient(125deg,'+_m+' 0%,'+_m+' 50%,'+_a+' 50%,'+_a+' 100%)';}
+      else if(S.uvLayoutType==='faixa'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 20%,'+_a+' 20%,'+_a+' 32%,'+_m+' 32%,'+_m+' 100%)';}
+      else if(S.uvLayoutType==='meio'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 50%,'+_a+' 50%,'+_a+' 100%)';}
+      else if(S.uvLayoutType==='contorno'){el.style.backgroundImage='none';el.style.background=_m;el.style.boxShadow='inset 0 0 0 7px '+_m+', inset 0 0 0 10px '+_a;}
+      el.style.display='block';return;
+    }
     if(S.fundo==='f-uv'&&S.tipo==='mini'&&S.uvLayoutType==='img'){if(S.uvImageDataUrl){el.style.backgroundImage='url('+S.uvImageDataUrl+')';el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.display='block';}return;}
     if(S.fundo==='f-uv'&&S.uvColor){
       var rgb=hexToRgb(S.uvColor);
@@ -1790,6 +1795,16 @@ function generateLogoAI(subject,type,targetElId){
   xhr.send(JSON.stringify({model:'gpt-image-1',prompt:prompt,n:1,size:'1024x1024',quality:'standard',background:'transparent',output_format:'png'}));
 }
 
+// ── Descrição do preview (Mini): Marca / Nome do carro / Cor — atualiza ao vivo ──
+function updateCarDesc(){
+  var b=((document.getElementById('aiCarBrand')||{}).value||'').trim();
+  var m=((document.getElementById('aiCarModel')||{}).value||'').trim();
+  var c=((document.getElementById('aiCarColor')||{}).value||'').trim();
+  var em=document.getElementById('pvMod'); if(em) em.textContent=b||'Seu Carro';
+  var es=document.getElementById('pvSpecDesc'); if(es) es.textContent=m||'';
+  var ec=document.getElementById('pvCarColor'); if(ec){ ec.textContent=c||''; ec.style.display=c?'':'none'; }
+}
+
 // ── STEP 6: ALTO-RELEVO ──
 function updateFixedRelevo(){
   const tlEl=document.getElementById('fixedTL');
@@ -1797,17 +1812,17 @@ function updateFixedRelevo(){
   // Mostra/oculta bloco de logo do modelo (exclusivo mini)
   var _mfbr=document.getElementById('miniFixedBR');
   if(_mfbr) _mfbr.style.display=S.tipo==='mini'?'flex':'none';
-  if(S.legoF1){
+  if(S.tipo!=='mini' && S.legoF1){
     tlEl.textContent='🏁 Logo Fórmula 1 — Canto superior esquerdo';
     updateBadgeTL('F1');
   } else if(S.tipo==='mini'){
-    // Mini: gera logos via IA para marca (TL) e modelo (BR)
-    const brand=S.miniBrand||'';
-    const model=S.miniModel||S.miniBrand||'';
-    tlEl.textContent='🏷️ Logotipo Marca';
+    // Mini: gera logo da MARCA do carro via IA (TL) e modelo (BR) — mesma marca usada na geração da imagem
+    const brand=((document.getElementById('aiCarBrand')||{}).value||'').trim()||S.miniBrand||'';
+    const model=((document.getElementById('aiCarModel')||{}).value||'').trim()||S.miniModel||S.miniBrand||'';
+    tlEl.textContent='🏷️ Logotipo com marca do carro';
     if(brand){
       var _lf=document.getElementById('logoF1');
-      if(_lf){_lf.style.width='20%';}
+      if(_lf){_lf.style.width='17%';}
       generateLogoAI(brand,'brand','logoF1');
     }
     var _brEl2=document.getElementById('fixedBR');
