@@ -1765,6 +1765,8 @@ function selFundo(card,cls,lbl){
   calcPrice();
 }
 
+// ── Biblioteca de logos reais por marca (Mini) — chave normalizada (minusculas, sem espacos/pontuacao) ──
+var BRAND_LOGOS={ 'porsche':'images/logo_porsche.png' };
 // ── AI LOGO GENERATION — mini step 6 ──
 var _aiLogoCache={};
 function generateLogoAI(subject,type,targetElId){
@@ -1823,7 +1825,17 @@ function updateFixedRelevo(){
     if(brand){
       var _lf=document.getElementById('logoF1');
       if(_lf){_lf.style.width='17%';}
-      generateLogoAI(brand,'brand','logoF1');
+      var _bkey=brand.toLowerCase().replace(/[^a-z0-9]/g,'');
+      var _brandLogo=(typeof BRAND_LOGOS!=='undefined')?BRAND_LOGOS[_bkey]:null;
+      if(_brandLogo&&_lf){
+        // logo real da marca (imagem fornecida) — cores originais, sem filtro de cor
+        _lf.src=_brandLogo;
+        _lf.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';
+        _lf.style.opacity='1';
+      } else {
+        // marca sem logo cadastrado -> gera via IA (reserva)
+        generateLogoAI(brand,'brand','logoF1');
+      }
     }
     var _brEl2=document.getElementById('fixedBR');
     if(_brEl2) _brEl2.textContent='🏎️ Logo do Modelo — Canto inferior direito';
