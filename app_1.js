@@ -109,8 +109,39 @@ const S = {
 };
 
 // ── NAVEGAÇÃO ──
-function showAiPopup(title,body){var defT='Fanático, você está prestes a criar<br>um quadro exclusivo!';var defB='Aguarde, estamos gerando a imagem da sua miniatura em alta resolução.';var p=document.getElementById('aiLoadingPopup');if(!p)return;var t=document.getElementById('aiPopupTitle');var b=document.getElementById('aiPopupBody');if(t)t.innerHTML=title||defT;if(b)b.innerHTML=body||defB;p.style.display='flex';}
-function hideAiPopup(){var p=document.getElementById('aiLoadingPopup');if(p)p.style.display='none';}
+function showAiPopup(title,body){var defT='Fanático, você está prestes a criar<br>um quadro exclusivo!';var defB='Aguarde, estamos gerando a imagem da sua miniatura em alta resolução.';var p=document.getElementById('aiLoadingPopup');if(!p)return;var t=document.getElementById('aiPopupTitle');var b=document.getElementById('aiPopupBody');if(t)t.innerHTML=title||defT;if(b)b.innerHTML=body||defB;p.style.display='flex';_aiProgStart(22);}
+function hideAiPopup(){var p=document.getElementById('aiLoadingPopup');_aiProgFinish();if(p)setTimeout(function(){p.style.display='none';},320);}
+
+// ── Barra de progresso da geração por IA ──
+// Estimativa: a API nao envia progresso real, entao usamos uma curva calibrada pelo tempo medio
+// medido (~19s em quality medium). A barra desacelera e trava em 95% ate a imagem chegar de fato.
+var _aiProgTimer=null;
+var _AI_STAGES=[[0,'Preparando o pedido…'],[14,'Analisando marca e modelo…'],[34,'Modelando a carroceria…'],[56,'Aplicando pintura e reflexos…'],[76,'Ajustando iluminação…'],[90,'Finalizando os detalhes…']];
+function _aiStageTxt(p){var t=_AI_STAGES[0][1];for(var i=0;i<_AI_STAGES.length;i++){if(p>=_AI_STAGES[i][0])t=_AI_STAGES[i][1];}return t;}
+function _aiProgStart(estSec){
+  var bar=document.getElementById('aiProgBar');
+  if(!bar)return;
+  var pct=document.getElementById('aiProgPct'), st=document.getElementById('aiProgStage');
+  clearInterval(_aiProgTimer);
+  bar.style.transition='width .35s ease'; bar.style.width='0%';
+  if(pct)pct.textContent='0%';
+  if(st)st.textContent=_AI_STAGES[0][1];
+  var t0=Date.now(), est=(estSec||19)*1000;
+  _aiProgTimer=setInterval(function(){
+    var p=95*(1-Math.exp(-2.2*(Date.now()-t0)/est));
+    if(p>95)p=95;
+    bar.style.width=p.toFixed(1)+'%';
+    if(pct)pct.textContent=Math.round(p)+'%';
+    if(st)st.textContent=_aiStageTxt(p);
+  },200);
+}
+function _aiProgFinish(){
+  clearInterval(_aiProgTimer);
+  var bar=document.getElementById('aiProgBar'), pct=document.getElementById('aiProgPct'), st=document.getElementById('aiProgStage');
+  if(bar)bar.style.width='100%';
+  if(pct)pct.textContent='100%';
+  if(st)st.textContent='Pronto!';
+}
 function goStep(n){
   // Restaurar resumo padrão se saindo do contexto incluso
   if(n!==6){
@@ -754,7 +785,7 @@ function generateCarImage(brand, model, year, color){
     };
     xhr.onerror=function(){reject(new Error('Erro de conexão com o servidor'));};
     xhr.ontimeout=function(){reject(new Error('Tempo esgotado. Tente novamente.'));};
-    xhr.send(JSON.stringify({model:'gpt-image-1',prompt:_prompt,n:1,size:'1536x1024',quality:'high'}));
+    xhr.send(JSON.stringify({model:'gpt-image-1',prompt:_prompt,n:1,size:'1536x1024',quality:'medium'}));
   });
 }
 
@@ -1021,13 +1052,36 @@ function getDetCarSize(scale,quadroDim){
 function generateTopViewPromise(carName,color){
   return new Promise(function(resolve,reject){
     var prompt=
-      'Exact overhead top-down bird\'s-eye view of a '+color+' '+carName+' die-cast scale miniature. '+
-      'Transparent background. ORIENTATION: FRONT bumper and hood at the TOP of the image, rear bumper and trunk at the BOTTOM. Car nose pointing UP, tail pointing DOWN. Perfectly centered horizontally. '+
-      'CRITICAL – preserve true real-world proportions: a typical car is 2.3× to 2.5× longer than it is wide. '+
-      'Do NOT stretch the car to fill the canvas width. Car body width ≈ 40% of canvas width; transparent space on both sides. '+
-      'Hyper-realistic ultra-detailed die-cast model: accurate metallic paint, alloy wheels, chrome trim, rubber tires, correct body lines. '+
-      'Photographed from directly above at 90°, flat orthographic projection, zero perspective distortion. '+
-      'No shadows outside the car silhouette. IMPORTANT: all car surfaces — body panels, windshield, side windows, roof glass — must be fully opaque solid materials (painted or tinted glass). No holes, no transparent or cut-out areas inside the car silhouette. Transparent background outside the car only. Studio product photography 8K.';
+      'Gere uma imagem de vista superior (top view) de uma miniatura colecionável diecast premium do carro '+carName+', na cor '+color+'.\n'+
+      'POSICIONAMENTO OBRIGATÓRIO DA CÂMERA:\n'+
+      'A câmera deve estar posicionada exatamente acima do centro do veículo, apontada verticalmente para baixo em um ângulo exato de 90 graus.\n'+
+      'A lente deve estar perfeitamente paralela ao plano horizontal do veículo.\n'+
+      'Não utilizar perspectiva fotográfica. Não utilizar lente grande-angular. Não utilizar visão isométrica. Não utilizar vista diagonal. Não utilizar vista 3/4.\n'+
+      'Não mostrar excessivamente as laterais, a dianteira ou a traseira do veículo.\n'+
+      'ALINHAMENTO OBRIGATÓRIO:\n'+
+      'O eixo longitudinal central do veículo deve estar perfeitamente reto e vertical na imagem.\n'+
+      'A dianteira do veículo deve estar apontada exatamente para cima. A traseira deve estar apontada exatamente para baixo.\n'+
+      'O centro do para-choque dianteiro, o centro do teto e o centro do para-choque traseiro devem formar uma única linha vertical reta.\n'+
+      'As rodas do lado esquerdo e direito devem permanecer perfeitamente alinhadas e simétricas.\n'+
+      'O veículo não pode estar rotacionado, inclinado ou posicionado diagonalmente.\n'+
+      'FIDELIDADE DO VEÍCULO:\n'+
+      'Preservar fielmente o modelo, carroceria, cor, proporções, teto, capô, vidros, aerofólio, entradas de ar, rodas e todos os detalhes visíveis da miniatura original.\n'+
+      'Não modificar o design do veículo. Não inventar peças. Não alterar o modelo das rodas.\n'+
+      'Não transformar a miniatura em um carro real em tamanho natural. Manter aparência hiper-realista de miniatura diecast premium.\n'+
+      'PROPORÇÕES REAIS (crítico): um carro é tipicamente 2,3 a 2,5 vezes mais comprido do que largo. Não esticar nem alargar o veículo para preencher a largura da imagem. A largura da carroceria deve ocupar aproximadamente 40% da largura da imagem, deixando espaço transparente nas laterais.\n'+
+      'COMPOSIÇÃO:\n'+
+      'Mostrar o veículo inteiro, sem cortar nenhuma parte. Centralizar perfeitamente o veículo na tela.\n'+
+      'Manter margens iguais nos quatro lados. Usar composição totalmente simétrica.\n'+
+      'Fundo transparente, uniforme e sem elementos adicionais. Não inserir piso, cenário, textos, logotipos adicionais ou objetos.\n'+
+      'OPACIDADE (crítico): todas as superfícies do veículo — carroceria, para-brisa, vidros laterais e teto — devem ser materiais sólidos e totalmente opacos (pintados ou vidro fumê). Nenhum furo, área vazada ou transparente dentro da silhueta do carro. A transparência deve existir apenas fora do contorno do veículo.\n'+
+      'ILUMINAÇÃO:\n'+
+      'Iluminação de estúdio suave e uniforme, distribuída igualmente pelos dois lados.\n'+
+      'Evitar sombras laterais fortes que prejudiquem a simetria.\n'+
+      'Utilizar apenas uma sombra muito suave e centralizada abaixo da miniatura, caso seja necessária para preservar o volume.\n'+
+      'RESULTADO FINAL:\n'+
+      'Imagem técnica, ortográfica, perfeitamente centralizada e simétrica, adequada para aplicação automática em um mockup digital.\n'+
+      'Vista superior pura. Top view exata. Câmera a 90 graus. Zero perspectiva. Zero rotação diagonal. Zero vista 3/4.\n'+
+      'Alta nitidez em todo o veículo. Fundo transparente.';
     var xhr=new XMLHttpRequest();
     xhr.open('POST','https://funparts-ai-proxy.rodox1209.workers.dev',true);
     xhr.setRequestHeader('Content-Type','application/json');
@@ -1052,7 +1106,7 @@ function generateTopViewPromise(carName,color){
       prompt:prompt,
       n:1,
       size:'1024x1536',
-      quality:'high',
+      quality:'medium',
       background:'transparent',
       output_format:'png'
     }));
