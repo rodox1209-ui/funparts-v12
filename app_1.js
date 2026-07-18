@@ -1897,12 +1897,15 @@ function brandOtherChanged(prefix){
 })();
 // ── AI LOGO GENERATION — mini step 6 ──
 var _aiLogoCache={};
-function generateLogoAI(subject,type,targetElId){
+function generateLogoAI(subject,type,targetElId,loaderId){
   if(!subject||!targetElId)return;
   var cKey=type+':'+subject;
   var el=document.getElementById(targetElId);
   if(!el)return;
-  if(_aiLogoCache[cKey]){el.src=_aiLogoCache[cKey];el.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';el.style.opacity='1';return;}
+  // indicador de carregamento no painel lateral enquanto a IA gera
+  function _load(on){var L=loaderId&&document.getElementById(loaderId);if(L)L.style.display=on?'block':'none';}
+  if(_aiLogoCache[cKey]){el.src=_aiLogoCache[cKey];el.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';el.style.opacity='1';_load(false);return;}
+  _load(true);
   el.style.opacity='0.35';
   var prompt=type==='brand'
     ?'Official "'+subject+'" car brand logo emblem, faithful and accurate, full color, iconic badge, transparent background, no extra text, high detail. PNG.'
@@ -1920,16 +1923,19 @@ function generateLogoAI(subject,type,targetElId){
       var e2=document.getElementById(targetElId);
       if(e2){e2.src=url;e2.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';e2.style.opacity='1';}
     }catch(e){}
+    _load(false);
   };
-  xhr.onerror=xhr.ontimeout=function(){var e2=document.getElementById(targetElId);if(e2)e2.style.opacity='1';};
+  xhr.onerror=xhr.ontimeout=function(){var e2=document.getElementById(targetElId);if(e2)e2.style.opacity='1';_load(false);};
   xhr.send(JSON.stringify({model:'gpt-image-1',prompt:prompt,n:1,size:'1024x1024',quality:'high',background:'transparent',output_format:'png'}));
 }
 
 // ── Descrição do preview (Mini): Marca / Nome do carro / Cor — atualiza ao vivo ──
 function updateCarDesc(){
-  var b=((document.getElementById('aiCarBrand')||{}).value||'').trim();
-  var m=((document.getElementById('aiCarModel')||{}).value||'').trim();
-  var c=((document.getElementById('aiCarColor')||{}).value||'').trim();
+  // le do formulario ativo: 'aiCar…' (quadro incluso) ou 'apenaCar…' (somente quadro)
+  function _v(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
+  var b=_v('aiCarBrand','apenaCarBrand');
+  var m=_v('aiCarModel','apenaCarModel');
+  var c=_v('aiCarColor','apenaCarColor');
   var em=document.getElementById('pvMod'); if(em) em.textContent=b||'Seu Carro';
   var es=document.getElementById('pvSpecDesc'); if(es) es.textContent=m||'';
   var ec=document.getElementById('pvCarColor'); if(ec){ ec.textContent=c||''; ec.style.display=c?'':'none'; }
@@ -1951,13 +1957,15 @@ function updateFixedRelevo(){
   // Mini: logo real da marca tem cores proprias -> esconde o seletor de cor do TL
   var _tlc=document.getElementById('tlColorWrap');
   if(_tlc) _tlc.style.display=(S.tipo==='mini')?'none':'';
+  // esconde indicadores de carregamento ao (re)entrar na etapa
+  ['fixedTLLoad','fixedBRLoad'].forEach(function(id){var L=document.getElementById(id);if(L)L.style.display='none';});
   if(S.tipo!=='mini' && S.legoF1){
     tlEl.textContent='🏁 Logo Fórmula 1 — Canto superior esquerdo';
     updateBadgeTL('F1');
   } else if(S.tipo==='mini'){
     // Mini: gera logo da MARCA do carro via IA (TL) e modelo (BR) — mesma marca usada na geração da imagem
-    const brand=((document.getElementById('aiCarBrand')||{}).value||'').trim()||S.miniBrand||'';
-    const model=((document.getElementById('aiCarModel')||{}).value||'').trim()||S.miniModel||S.miniBrand||'';
+    const brand=((document.getElementById('aiCarBrand')||{}).value||'').trim()||((document.getElementById('apenaCarBrand')||{}).value||'').trim()||S.miniBrand||'';
+    const model=((document.getElementById('aiCarModel')||{}).value||'').trim()||((document.getElementById('apenaCarModel')||{}).value||'').trim()||S.miniModel||S.miniBrand||'';
     tlEl.textContent='🏷️ Logotipo com marca do carro';
     // Mini: desloca o logo da marca um pouco para baixo e para a direita (padrao CSS: 7% / 9%)
     var _btlM=(_lfR&&_lfR.closest)?_lfR.closest('.b-tl'):null;
@@ -1972,15 +1980,19 @@ function updateFixedRelevo(){
         _entry=BRAND_LOGOS[brand];
         if(!_entry){ for(var _k in BRAND_LOGOS){ if(_k.toLowerCase().replace(/[^a-z0-9]/g,'')===_bkey){ _entry=BRAND_LOGOS[_k]; break; } } }
       }
+      var _tld=document.getElementById('fixedTLDesc');
       if(_entry&&_lf){
         // logo real da marca — cores originais, sem filtro de cor, largura calibrada
         _lf.src=(typeof _entry==='string')?_entry:_entry.src;
         _lf.style.width=(typeof _entry==='string')?'17%':(_entry.w||'17%');
         _lf.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';
         _lf.style.opacity='1';
+        var _tll=document.getElementById('fixedTLLoad'); if(_tll)_tll.style.display='none';
+        if(_tld)_tld.textContent='Logotipo oficial da marca selecionada';
       } else {
         // marca sem logo cadastrado -> gera via IA (reserva)
-        generateLogoAI(brand,'brand','logoF1');
+        if(_tld)_tld.textContent='Gerado com IA conforme marca selecionada';
+        generateLogoAI(brand,'brand','logoF1','fixedTLLoad');
       }
     }
     var _brEl2=document.getElementById('fixedBR');
@@ -1989,7 +2001,7 @@ function updateFixedRelevo(){
       var _lb=document.getElementById('logoBR');
       // Mini: aumenta o logo do modelo (o CSS .b-br img limita a 13%, entao destravamos aqui)
       if(_lb){_lb.style.width='20%';_lb.style.maxWidth='20%';}
-      generateLogoAI(model,'model','logoBR');
+      generateLogoAI(model,'model','logoBR','fixedBRLoad');
     }
     // Limpa texto dos badges (logo IA substitui)
     setEl('badgeTLtxt','');setEl('badgeBRtxt','');

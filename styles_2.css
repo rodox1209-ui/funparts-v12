@@ -1,1 +1,6 @@
 #aiLoadingPopup .ai-spin{animation:aiSpin .9s linear infinite}@keyframes aiSpin{to{transform:rotate(360deg)}}
+.relo-load{margin-top:8px}
+.relo-load-track{height:3px;background:rgba(255,255,255,.10);border-radius:99px;overflow:hidden}
+.relo-load-bar{height:100%;width:38%;border-radius:99px;background:linear-gradient(90deg,rgba(224,123,0,0),#e07b00,rgba(224,123,0,0));animation:reloSlide 1.15s ease-in-out infinite}
+@keyframes reloSlide{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+.relo-load-txt{font-size:8px;color:#e07b00;letter-spacing:.5px;margin-top:5px}

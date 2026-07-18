@@ -646,7 +646,11 @@
       <div style="padding:10px 14px;border:1px solid var(--border);border-radius:5px;background:var(--s2);display:flex;justify-content:space-between;align-items:center;">
         <div class="rrow-left">
           <div class="rrow-name" id="fixedTL">🏷️ Logotipo Marca</div>
-          <div class="rrow-desc">Gerado com IA conforme marca selecionada</div>
+          <div class="rrow-desc" id="fixedTLDesc">Gerado com IA conforme marca selecionada</div>
+          <div class="relo-load" id="fixedTLLoad" style="display:none;">
+            <div class="relo-load-track"><div class="relo-load-bar"></div></div>
+            <div class="relo-load-txt">Gerando o logo da marca com IA…</div>
+          </div>
         </div>
         <div id="tlColorWrap">
           <div class="sec-sub" style="margin-bottom:4px;font-size:9px;">Cor</div>
@@ -668,6 +672,10 @@
         <div class="rrow-left">
           <div class="rrow-name" id="fixedBR">🏎️ Logo do Modelo — Canto inferior direito</div>
           <div class="rrow-desc">Gerado com IA conforme modelo selecionado</div>
+          <div class="relo-load" id="fixedBRLoad" style="display:none;">
+            <div class="relo-load-track"><div class="relo-load-bar"></div></div>
+            <div class="relo-load-txt">Gerando o logo do modelo com IA…</div>
+          </div>
         </div>
       </div>
     </div>
