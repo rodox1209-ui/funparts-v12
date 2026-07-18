@@ -1766,6 +1766,7 @@ function selFundo(card,cls,lbl){
 }
 
 // ── Biblioteca de logos reais por marca (Mini) — chave normalizada (minusculas, sem espacos/pontuacao) ──
+// build: logos v2 (31 marcas) + IA de reserva corrigida
 // Chave = nome EXATO da marca no dropdown. w = largura calibrada pela proporcao do logo.
 var BRAND_LOGOS={
  'Fórmula 1':{src:'images/logo_formula1.png',w:'23.0%'},
