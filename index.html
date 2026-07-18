@@ -246,7 +246,9 @@
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:22px;">
         <div>
           <div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Marca do carro</div>
-          <input id="aiCarBrand" class="inp" placeholder="Ex: Ferrari, McLaren, Porsche..." oninput="if(typeof updateCarDesc==='function')updateCarDesc()" style="width:100%;box-sizing:border-box;">
+          <select id="aiCarBrandSelect" class="inp" onchange="brandSelectChanged('aiCar')" style="width:100%;box-sizing:border-box;cursor:pointer;"></select>
+          <input id="aiCarBrandOther" class="inp" placeholder="Digite a marca do carro..." oninput="brandOtherChanged('aiCar')" style="width:100%;box-sizing:border-box;margin-top:8px;display:none;">
+          <input id="aiCarBrand" type="hidden" value="">
         </div>
         <div>
           <div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Modelo do carro</div>
@@ -319,7 +321,7 @@
     <div style="margin-bottom:20px;">
       <div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">✦ Visualização gerada por Inteligência Artificial</div>
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:22px;">
-        <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Marca do carro</div><input id="apenaCarBrand" class="inp" placeholder="Ex: Ferrari, McLaren, Porsche..." style="width:100%;box-sizing:border-box;"></div>
+        <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Marca do carro</div><select id="apenaCarBrandSelect" class="inp" onchange="brandSelectChanged('apenaCar')" style="width:100%;box-sizing:border-box;cursor:pointer;"></select><input id="apenaCarBrandOther" class="inp" placeholder="Digite a marca do carro..." oninput="brandOtherChanged('apenaCar')" style="width:100%;box-sizing:border-box;margin-top:8px;display:none;"><input id="apenaCarBrand" type="hidden" value=""></div>
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Modelo do carro</div><input id="apenaCarModel" class="inp" placeholder="Ex: 488 GTB, Senna, 911 Turbo S..." style="width:100%;box-sizing:border-box;"></div>
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Ano</div><input id="apenaCarYear" class="inp" type="number" placeholder="Ex: 2023" min="1950" max="2030" style="width:100%;box-sizing:border-box;"></div>
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Cor</div><div id="apenaColorPalette" style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:10px;"></div><div style="display:flex;align-items:center;gap:8px;margin-top:4px;"><div style="color:#666;font-size:9px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Selecionada:</div><input id="apenaCarColor" class="inp" placeholder="Selecione acima ou digite..." style="flex:1;box-sizing:border-box;font-size:12px;padding:8px 10px;"></div></div>

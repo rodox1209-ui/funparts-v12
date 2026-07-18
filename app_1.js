@@ -1767,6 +1767,42 @@ function selFundo(card,cls,lbl){
 
 // ── Biblioteca de logos reais por marca (Mini) — chave normalizada (minusculas, sem espacos/pontuacao) ──
 var BRAND_LOGOS={ 'porsche':'images/logo_porsche.png' };
+
+// ── Dropdown de marcas (Mini) — controla exatamente quais marcas existem ──
+var MINI_BRANDS=['Fórmula 1','Ferrari','Porsche','Lamborghini','McLaren','Mercedes-Benz','BMW','Audi','Aston Martin','Bugatti','Nissan','Toyota','Ford','Chevrolet','Dodge','Honda','Bentley','Rolls-Royce','Maserati','Jaguar','Alfa Romeo','Koenigsegg','Pagani','Lotus','Subaru','Mitsubishi','Land Rover','Volkswagen','Mini','Tesla','Cadillac'];
+function populateBrandSelect(id){
+  var sel=document.getElementById(id);
+  if(!sel||sel.dataset.filled)return;
+  var html='<option value="" disabled selected>Selecione a marca...</option>';
+  MINI_BRANDS.forEach(function(b){ html+='<option value="'+b+'">'+b+'</option>'; });
+  html+='<option value="Outros">Outros (digitar)</option>';
+  sel.innerHTML=html; sel.dataset.filled='1';
+}
+// prefix = 'aiCar' ou 'apenaCar'. O input hidden (prefix+'Brand') continua a fonte da verdade lida pelo resto do codigo.
+function brandSelectChanged(prefix){
+  var sel=document.getElementById(prefix+'BrandSelect');
+  var other=document.getElementById(prefix+'BrandOther');
+  var hid=document.getElementById(prefix+'Brand');
+  if(!sel||!hid)return;
+  if(sel.value==='Outros'){
+    if(other){ other.style.display=''; try{other.focus();}catch(e){} }
+    hid.value=(other&&other.value.trim())||'';
+  } else {
+    if(other)other.style.display='none';
+    hid.value=sel.value||'';
+  }
+  if(typeof updateCarDesc==='function')updateCarDesc();
+}
+function brandOtherChanged(prefix){
+  var other=document.getElementById(prefix+'BrandOther');
+  var hid=document.getElementById(prefix+'Brand');
+  if(other&&hid)hid.value=other.value;
+  if(typeof updateCarDesc==='function')updateCarDesc();
+}
+(function(){
+  function _fillBrands(){ populateBrandSelect('aiCarBrandSelect'); populateBrandSelect('apenaCarBrandSelect'); }
+  if(document.readyState!=='loading'){ _fillBrands(); } else { document.addEventListener('DOMContentLoaded',_fillBrands); }
+})();
 // ── AI LOGO GENERATION — mini step 6 ──
 var _aiLogoCache={};
 function generateLogoAI(subject,type,targetElId){
