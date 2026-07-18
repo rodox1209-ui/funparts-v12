@@ -1766,7 +1766,40 @@ function selFundo(card,cls,lbl){
 }
 
 // ── Biblioteca de logos reais por marca (Mini) — chave normalizada (minusculas, sem espacos/pontuacao) ──
-var BRAND_LOGOS={ 'porsche':'images/logo_porsche.png' };
+// Chave = nome EXATO da marca no dropdown. w = largura calibrada pela proporcao do logo.
+var BRAND_LOGOS={
+ 'Fórmula 1':{src:'images/logo_formula1.png',w:'23.0%'},
+ 'Ferrari':{src:'images/logo_ferrari.png',w:'13.5%'},
+ 'Porsche':{src:'images/logo_porsche.png',w:'13.4%'},
+ 'Lamborghini':{src:'images/logo_lamborghini.png',w:'16.1%'},
+ 'McLaren':{src:'images/logo_mclaren.png',w:'24.0%'},
+ 'Mercedes-Benz':{src:'images/logo_mercedes.png',w:'14.9%'},
+ 'BMW':{src:'images/logo_bmw.png',w:'15.1%'},
+ 'Audi':{src:'images/logo_audi.png',w:'24.0%'},
+ 'Aston Martin':{src:'images/logo_astonmartin.png',w:'24.0%'},
+ 'Bugatti':{src:'images/logo_bugatti.png',w:'20.3%'},
+ 'Nissan':{src:'images/logo_nissan.png',w:'16.5%'},
+ 'Toyota':{src:'images/logo_toyota.png',w:'18.0%'},
+ 'Ford':{src:'images/logo_ford.png',w:'22.8%'},
+ 'Chevrolet':{src:'images/logo_chevrolet.png',w:'21.7%'},
+ 'Dodge':{src:'images/logo_dodge.png',w:'24.0%'},
+ 'Honda':{src:'images/logo_honda.png',w:'16.5%'},
+ 'Bentley':{src:'images/logo_bentley.png',w:'24.0%'},
+ 'Rolls-Royce':{src:'images/logo_rollsroyce.png',w:'11.7%'},
+ 'Maserati':{src:'images/logo_maserati.png',w:'15.9%'},
+ 'Jaguar':{src:'images/logo_jaguar.png',w:'23.8%'},
+ 'Alfa Romeo':{src:'images/logo_alfaromeo.png',w:'15.0%'},
+ 'Koenigsegg':{src:'images/logo_koenigsegg.png',w:'13.1%'},
+ 'Pagani':{src:'images/logo_pagani.png',w:'20.2%'},
+ 'Lotus':{src:'images/logo_lotus.png',w:'15.1%'},
+ 'Subaru':{src:'images/logo_subaru.png',w:'20.6%'},
+ 'Mitsubishi':{src:'images/logo_mitsubishi.png',w:'15.6%'},
+ 'Land Rover':{src:'images/logo_landrover.png',w:'20.0%'},
+ 'Volkswagen':{src:'images/logo_volkswagen.png',w:'15.1%'},
+ 'Mini':{src:'images/logo_mini.png',w:'21.8%'},
+ 'Tesla':{src:'images/logo_tesla.png',w:'15.3%'},
+ 'Cadillac':{src:'images/logo_cadillac.png',w:'23.0%'}
+};
 
 // ── Dropdown de marcas (Mini) — controla exatamente quais marcas existem ──
 var MINI_BRANDS=['Fórmula 1','Ferrari','Porsche','Lamborghini','McLaren','Mercedes-Benz','BMW','Audi','Aston Martin','Bugatti','Nissan','Toyota','Ford','Chevrolet','Dodge','Honda','Bentley','Rolls-Royce','Maserati','Jaguar','Alfa Romeo','Koenigsegg','Pagani','Lotus','Subaru','Mitsubishi','Land Rover','Volkswagen','Mini','Tesla','Cadillac'];
@@ -1861,11 +1894,17 @@ function updateFixedRelevo(){
     if(brand){
       var _lf=document.getElementById('logoF1');
       if(_lf){_lf.style.width='17%';}
+      // casa pelo nome EXATO da marca (dropdown); fallback normalizado p/ texto livre em "Outros"
       var _bkey=brand.toLowerCase().replace(/[^a-z0-9]/g,'');
-      var _brandLogo=(typeof BRAND_LOGOS!=='undefined')?BRAND_LOGOS[_bkey]:null;
-      if(_brandLogo&&_lf){
-        // logo real da marca (imagem fornecida) — cores originais, sem filtro de cor
-        _lf.src=_brandLogo;
+      var _entry=null;
+      if(typeof BRAND_LOGOS!=='undefined'){
+        _entry=BRAND_LOGOS[brand];
+        if(!_entry){ for(var _k in BRAND_LOGOS){ if(_k.toLowerCase().replace(/[^a-z0-9]/g,'')===_bkey){ _entry=BRAND_LOGOS[_k]; break; } } }
+      }
+      if(_entry&&_lf){
+        // logo real da marca — cores originais, sem filtro de cor, largura calibrada
+        _lf.src=(typeof _entry==='string')?_entry:_entry.src;
+        _lf.style.width=(typeof _entry==='string')?'17%':(_entry.w||'17%');
         _lf.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';
         _lf.style.opacity='1';
       } else {
