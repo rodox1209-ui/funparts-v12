@@ -1846,7 +1846,7 @@ function generateLogoAI(subject,type,targetElId){
   if(_aiLogoCache[cKey]){el.src=_aiLogoCache[cKey];el.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';el.style.opacity='1';return;}
   el.style.opacity='0.35';
   var prompt=type==='brand'
-    ?'Minimal automotive brand icon emblem for "'+subject+'". Pure white monochrome. 100% transparent background. No text. No background color. Simple iconic badge. PNG.'
+    ?'Official "'+subject+'" car brand logo emblem, faithful and accurate, full color, iconic badge, transparent background, no extra text, high detail. PNG.'
     :'"'+subject+'" car model nameplate badge. White. 100% transparent background. Clean automotive badge typography. Minimal. PNG.';
   var xhr=new XMLHttpRequest();
   xhr.open('POST','https://funparts-ai-proxy.rodox1209.workers.dev',true);
@@ -1863,7 +1863,7 @@ function generateLogoAI(subject,type,targetElId){
     }catch(e){}
   };
   xhr.onerror=xhr.ontimeout=function(){var e2=document.getElementById(targetElId);if(e2)e2.style.opacity='1';};
-  xhr.send(JSON.stringify({model:'gpt-image-1',prompt:prompt,n:1,size:'1024x1024',quality:'standard',background:'transparent',output_format:'png'}));
+  xhr.send(JSON.stringify({model:'gpt-image-1',prompt:prompt,n:1,size:'1024x1024',quality:'high',background:'transparent',output_format:'png'}));
 }
 
 // ── Descrição do preview (Mini): Marca / Nome do carro / Cor — atualiza ao vivo ──
