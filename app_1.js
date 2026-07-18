@@ -2508,6 +2508,8 @@ function addBandeira() {
   if(_bBot&&el) el.style.bottom=_bBot;
   var _bRight=(typeof MODEL_RELEVO_IMAGES!=='undefined')&&S.legoModel&&MODEL_RELEVO_IMAGES[S.legoModel]&&MODEL_RELEVO_IMAGES[S.legoModel].bandeira_right;
   if(_bRight&&el){el.style.right=_bRight;}
+  // Mini: desce a bandeira 18px (padrao do CSS inline e top:7%)
+  if(S.tipo==='mini'&&el){ el.style.top='calc(7% + 18px)'; }
   // campo mantido
 }
 
@@ -2557,6 +2559,8 @@ function addPiloto() {
       var _lr=document.getElementById('legoRelExtras');
       if(_lr&&_lr.lastElementChild)_lr.lastElementChild.classList.add('rel-piloto');
     }
+    // Mini: sobe o nome do piloto 9px (ancorado por baixo, entao aumentamos o bottom)
+    if(S.tipo==='mini'&&elP){ elP.style.bottom='calc(5% + 9px)'; }
   };
   try {
     var face = new FontFace('DesignerRegular', 'url(' + fontDataUrl + ')');
