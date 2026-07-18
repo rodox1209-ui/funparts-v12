@@ -1884,6 +1884,12 @@ function updateFixedRelevo(){
   // Mostra/oculta bloco de logo do modelo (exclusivo mini)
   var _mfbr=document.getElementById('miniFixedBR');
   if(_mfbr) _mfbr.style.display=S.tipo==='mini'?'flex':'none';
+  // RESET: garante que os ajustes exclusivos do Mini nao vazem para o LEGO (volta ao CSS padrao)
+  var _lfR=document.getElementById('logoF1');
+  var _btlR=(_lfR&&_lfR.closest)?_lfR.closest('.b-tl'):null;
+  if(_btlR){ _btlR.style.top=''; _btlR.style.left=''; }
+  var _lbR=document.getElementById('logoBR');
+  if(_lbR){ _lbR.style.maxWidth=''; }
   if(S.tipo!=='mini' && S.legoF1){
     tlEl.textContent='🏁 Logo Fórmula 1 — Canto superior esquerdo';
     updateBadgeTL('F1');
@@ -1892,6 +1898,9 @@ function updateFixedRelevo(){
     const brand=((document.getElementById('aiCarBrand')||{}).value||'').trim()||S.miniBrand||'';
     const model=((document.getElementById('aiCarModel')||{}).value||'').trim()||S.miniModel||S.miniBrand||'';
     tlEl.textContent='🏷️ Logotipo com marca do carro';
+    // Mini: desloca o logo da marca um pouco para baixo e para a direita (padrao CSS: 7% / 9%)
+    var _btlM=(_lfR&&_lfR.closest)?_lfR.closest('.b-tl'):null;
+    if(_btlM){ _btlM.style.top='11%'; _btlM.style.left='13%'; }
     if(brand){
       var _lf=document.getElementById('logoF1');
       if(_lf){_lf.style.width='17%';}
@@ -1917,7 +1926,8 @@ function updateFixedRelevo(){
     if(_brEl2) _brEl2.textContent='🏎️ Logo do Modelo — Canto inferior direito';
     if(model){
       var _lb=document.getElementById('logoBR');
-      if(_lb){_lb.style.width='20%';}
+      // Mini: aumenta o logo do modelo (o CSS .b-br img limita a 13%, entao destravamos aqui)
+      if(_lb){_lb.style.width='20%';_lb.style.maxWidth='20%';}
       generateLogoAI(model,'model','logoBR');
     }
     // Limpa texto dos badges (logo IA substitui)
@@ -2432,6 +2442,7 @@ function addBandeira() {
   const _bPos=(S.legoModel&&(typeof MODEL_RELEVO_IMAGES!=='undefined')&&MODEL_RELEVO_IMAGES[S.legoModel]&&MODEL_RELEVO_IMAGES[S.legoModel].bandeira_pos)||'top-right';
   var _qW=(document.getElementById('legoDetQuadro')||{offsetWidth:400}).offsetWidth;
   var _fW=Math.max(14,Math.round(_qW*0.06));
+  if(S.tipo==='mini') _fW=Math.round(_fW*2); // Mini: bandeira 100% maior
   const el=addRelevo(imgUrl, pais, _fW, Math.round(_fW*16/24), _bPos);
   if (el) {
     el.classList.add('rel-bandeira');
@@ -2467,7 +2478,7 @@ function addPiloto() {
   var tryRender = function(fontFamily) {
     var cvs = document.createElement('canvas');
     var c2d = cvs.getContext('2d');
-    var fSize = 13;
+    var fSize = (S.tipo === 'mini') ? 17 : 13; // Mini: fonte do piloto +30%
     cvs.height = fSize + 16;
     c2d.font = 'bold ' + fSize + 'px "' + fontFamily + '", Arial, sans-serif';
     c2d.letterSpacing = '3px';
