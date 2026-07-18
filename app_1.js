@@ -1060,7 +1060,10 @@ function generateTopViewPromise(carName,color){
       'Não mostrar excessivamente as laterais, a dianteira ou a traseira do veículo.\n'+
       'ALINHAMENTO OBRIGATÓRIO:\n'+
       'O eixo longitudinal central do veículo deve estar perfeitamente reto e vertical na imagem.\n'+
-      'A dianteira do veículo deve estar apontada exatamente para cima. A traseira deve estar apontada exatamente para baixo.\n'+
+      'ORIENTAÇÃO CRÍTICA — NÃO INVERTER: a DIANTEIRA do carro deve ficar na METADE SUPERIOR da imagem e a TRASEIRA na METADE INFERIOR.\n'+
+      'Na PARTE DE CIMA da imagem devem aparecer: capô, grade frontal, faróis dianteiros e para-choque dianteiro.\n'+
+      'Na PARTE DE BAIXO da imagem devem aparecer: porta-malas, aerofólio traseiro, lanternas traseiras e escapamento.\n'+
+      'O carro aponta para cima, como se estivesse avançando em direção ao topo da imagem.\n'+
       'O centro do para-choque dianteiro, o centro do teto e o centro do para-choque traseiro devem formar uma única linha vertical reta.\n'+
       'As rodas do lado esquerdo e direito devem permanecer perfeitamente alinhadas e simétricas.\n'+
       'O veículo não pode estar rotacionado, inclinado ou posicionado diagonalmente.\n'+
@@ -1081,7 +1084,8 @@ function generateTopViewPromise(carName,color){
       'RESULTADO FINAL:\n'+
       'Imagem técnica, ortográfica, perfeitamente centralizada e simétrica, adequada para aplicação automática em um mockup digital.\n'+
       'Vista superior pura. Top view exata. Câmera a 90 graus. Zero perspectiva. Zero rotação diagonal. Zero vista 3/4.\n'+
-      'Alta nitidez em todo o veículo. Fundo transparente.';
+      'Alta nitidez em todo o veículo. Fundo transparente.\n'+
+      'LEMBRETE FINAL DE ORIENTAÇÃO (obrigatório): o capô e os faróis dianteiros OBRIGATORIAMENTE na parte SUPERIOR da imagem; as lanternas traseiras na parte INFERIOR. Nunca inverter o carro.';
     var xhr=new XMLHttpRequest();
     xhr.open('POST','https://funparts-ai-proxy.rodox1209.workers.dev',true);
     xhr.setRequestHeader('Content-Type','application/json');
@@ -1944,6 +1948,9 @@ function updateFixedRelevo(){
   if(_btlR){ _btlR.style.top=''; _btlR.style.left=''; }
   var _lbR=document.getElementById('logoBR');
   if(_lbR){ _lbR.style.maxWidth=''; }
+  // Mini: logo real da marca tem cores proprias -> esconde o seletor de cor do TL
+  var _tlc=document.getElementById('tlColorWrap');
+  if(_tlc) _tlc.style.display=(S.tipo==='mini')?'none':'';
   if(S.tipo!=='mini' && S.legoF1){
     tlEl.textContent='🏁 Logo Fórmula 1 — Canto superior esquerdo';
     updateBadgeTL('F1');
@@ -2021,7 +2028,7 @@ function selRelColor(pos,dot,color){
     S.relTL=color;
     setStyle('badgeTLtxt','color',color);
     const logoF1=document.getElementById('logoF1');
-    if(logoF1) logoF1.style.filter=colorToFilter(color)+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
+    if(logoF1 && S.tipo!=='mini') logoF1.style.filter=colorToFilter(color)+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
     const legoLF1=document.getElementById('legoLogoF1');
     if(legoLF1) legoLF1.style.filter=colorToFilter(color)+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
   } else {
@@ -2064,7 +2071,8 @@ function updateBadgeTL(text){
   setEl('badgeTLtxt',text||'FUNPARTS');
   setStyle('badgeTLtxt','color',S.relTL||'#fff');
   const logoF1=document.getElementById('logoF1');
-  if(logoF1) logoF1.style.filter=colorToFilter(S.relTL||'#fff')+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
+  // Mini usa o logo REAL e colorido da marca: NAO aplicar filtro de cor (senao vira silhueta branca)
+  if(logoF1 && S.tipo!=='mini') logoF1.style.filter=colorToFilter(S.relTL||'#fff')+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
   // Mirror to LEGO preview
   setEl('legoBadgeTLtxt',text||'FUNPARTS');
   setStyle('legoBadgeTLtxt','color',S.relTL||'#fff');
