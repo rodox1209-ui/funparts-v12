@@ -257,10 +257,19 @@ function goStep(n){
         _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto';
         _mpwC.style.position='relative'; _mpwC.style.display='flex'; _mpwC.style.flexDirection='column';
         _mpwC.style.flex='0 0 32%'; _mpwC.style.maxWidth='32%'; _mpwC.style.marginLeft='16px'; _mpwC.style.height='auto';
+        // imagem de escala conforme a DIMENSAO do produto escolhido
         var _msiC=document.getElementById('miniScaleImg');
-        if(_msiC&&!_msiC.getAttribute('data-loaded')){
-          var _wImgC=document.querySelector('#wallModal img');
-          if(_wImgC&&_wImgC.src){_msiC.src=_wImgC.src;_msiC.setAttribute('data-loaded','1');}
+        var _dimC=(S.incProduto&&S.incProduto.dim)||'';
+        var _imgC=(typeof MINI_SCALE_IMGS!=='undefined')?MINI_SCALE_IMGS[_dimC]:null;
+        if(_msiC){
+          if(_imgC){
+            _msiC.style.display='block'; _msiC.src=_imgC;
+            var _wmC=document.querySelector('#wallModalBox img'); if(_wmC)_wmC.src=_imgC;
+            _mpwC.style.display='flex';
+          } else {
+            // sem referencia de escala para essa dimensao: nao mostrar proporcao errada
+            _mpwC.style.display='none';
+          }
         }
       }
     }
