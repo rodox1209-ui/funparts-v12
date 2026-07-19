@@ -164,6 +164,9 @@ function goStep(n){
     setEl('step2Title','Miniatura');
     setEl('step2Sub','Confirme que já possui a miniatura para montagem no quadro.');
   }
+  // catalogo (produto pronto): o aviso dos "dois caminhos" nao aparece daqui pra frente
+  var _smiG=document.getElementById('sidebarMiniInfo');
+  if(_smiG && typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso') _smiG.style.display='none';
   // Mini flow: mostrar/ocultar miniPreviewWrap + centralizar par via row flex
   var _mpw=document.getElementById('miniPreviewWrap');
   var _pvPanel=document.querySelector('.pv-panel');
@@ -947,6 +950,8 @@ function selMiniChoice(choice){
     // Modo incluso: mostrar seção de IA em vez de brand logos
     setStyle('miniSection','display','none');
     setStyle('miniInclusoAISection','display','block');
+    // o aviso dos "dois caminhos" so vale nas etapas anteriores
+    setStyle('sidebarMiniInfo','display','none');
     setStyle('step1NavBtns','display','none');
     S.incProduto=null;
     aplicarModoCatalogo(false);
