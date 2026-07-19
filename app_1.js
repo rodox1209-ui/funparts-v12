@@ -255,12 +255,13 @@ function goStep(n){
     if(_mh && typeof INCLUSO_FOTOS!=='undefined'){
       _mh.style.display='flex'; _mh.style.padding='20px'; _mh.style.background='#0d0d0d';
       _mh.setAttribute('data-cat','1');
-      _mh.innerHTML=_catGaleriaHTML();
+      var _mobC=window.innerWidth<=720;
+      // mobile na etapa Pedido: so a foto principal do produto (sem miniaturas)
+      _mh.innerHTML=_catGaleriaHTML(_mobC&&n===7);
       // painel lado a lado: galeria + imagem "homem + quadro" (mesma logica do passo 3 do mini)
       var _pvC=document.querySelector('.pv-panel');
       var _mpwC=document.getElementById('miniPreviewWrap');
       if(_pvC&&_mpwC){
-        var _mobC=window.innerWidth<=720;
         _pvC.style.justifyContent='center';
         _mpwC.style.position='relative'; _mpwC.style.display='flex'; _mpwC.style.flexDirection='column';
         if(_mobC){
@@ -271,6 +272,8 @@ function goStep(n){
           _mh.style.alignItems='flex-start'; _mh.style.padding='10px 12px';
           _mpwC.style.flex='0 0 auto'; _mpwC.style.maxWidth='100%'; _mpwC.style.width='100%';
           _mpwC.style.marginLeft='0'; _mpwC.style.marginTop='14px'; _mpwC.style.height='auto';
+          // na etapa Pedido o "homem + quadro" nao aparece no mobile
+          if(n===7)_mpwC.style.display='none';
         } else {
           _pvC.style.flexDirection='row'; _pvC.style.alignItems='center';
           _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto';
@@ -289,7 +292,7 @@ function goStep(n){
           if(_imgC){
             _msiC.style.display='block'; _msiC.src=_imgC;
             var _wmC=document.querySelector('#wallModalBox img'); if(_wmC)_wmC.src=_imgC;
-            _mpwC.style.display='flex';
+            _mpwC.style.display=(_mobC&&n===7)?'none':'flex';
           } else {
             // sem referencia de escala para essa dimensao: nao mostrar proporcao errada
             _mpwC.style.display='none';
@@ -2390,9 +2393,9 @@ function trocarFotoIncluso(k){
 }
 
 // monta a galeria do produto pronto dentro da area de preview
-function _catGaleriaHTML(){
+function _catGaleriaHTML(soFoto){
   var idx=S.incFotoIdx||0;
-  var thumbs=INCLUSO_FOTOS.map(function(f,k){
+  var thumbs=soFoto?'':INCLUSO_FOTOS.map(function(f,k){
     return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:74px;height:58px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===idx?'#e07b00':'transparent')+';">';
   }).join('');
   var _mobG=window.innerWidth<=720;
@@ -2921,6 +2924,17 @@ function mobNext(){
   var cur=-1;
   secs.forEach(function(s,i){if(s.classList.contains('active'))cur=i;});
   if(cur<0)cur=_mobStep;
+  // catalogo: sem modelo escolhido nao avanca
+  if(typeof S!=='undefined'&&S.tipo==='mini'&&S.miniChoice==='incluso'&&!S.incProduto&&cur===1){
+    var _lst=document.getElementById('inclusoModels');
+    if(_lst&&_lst.children.length){
+      _lst.scrollIntoView({behavior:'smooth',block:'center'});
+      _lst.style.transition='box-shadow .25s';
+      _lst.style.boxShadow='0 0 0 2px rgba(224,123,0,.75)';
+      setTimeout(function(){_lst.style.boxShadow='';},1100);
+    }
+    return;
+  }
   var nxt=cur+1;
   if(_catModo()&&cur===2)nxt=7; // produto -> pedido (pula as etapas ocultas)
   else if(nxt===2&&typeof S!=='undefined'&&S.tipo==='mini')nxt=3;
