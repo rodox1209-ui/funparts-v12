@@ -280,7 +280,7 @@ function goStep(n){
   var _cfundo=document.querySelector('#livePv .c-fundo');
   if(_cfundo) _cfundo.style.display=(n>=3&&n<7)?'none':'';
   if(n===3){initDetalhamento();if(S.tipo==='mini'){triggerDetTopView();}}
-  else if(n===4){updateDetPreview();updateDetPvFundo();if(S.tipo==='mini'){renderUvMiniOptions();}else{renderFundoLayouts(S.fundo);}if(S.tipo==='mini'&&_detTopViewUrl)setTimeout(applyDetCarOverlay,80);}
+  else if(n===4){updateDetPreview();updateDetPvFundo();if(S.tipo==='mini'){renderUvMiniOptions();}else{renderFundoLayouts(S.fundo);}updateFundoLayoutsVisibility();if(S.tipo==='mini'&&_detTopViewUrl)setTimeout(applyDetCarOverlay,80);}
   else if(n>=5&&n<7){updateDetPreview();updateDetPvFundo();if(S.tipo==='mini'&&_detTopViewUrl)setTimeout(applyDetCarOverlay,80);if(n===6&&typeof updateFixedRelevo==='function'){
     updateFixedRelevo();
     // Step 6: restore visibility de logo IA para relevo preview
@@ -1697,7 +1697,7 @@ function renderUvMiniOptions(){
   var el=document.getElementById('fundoLayoutOpts');
   if(!el)return;
   el.innerHTML='';
-  var tabs=[{k:'deg',l:'Degradê Central'},{k:'stripe',l:'Listra Central'},{k:'contorno',l:'Contorno Interno'},{k:'diagonal',l:'Diagonal Sport'},{k:'faixa',l:'Faixa Deslocada'},{k:'meio',l:'Meio a Meio'},{k:'img',l:'Sua Imagem'}];
+  var tabs=[{k:'deg',l:'Degradê Central'},{k:'stripe',l:'Listra Central'},{k:'diagonal',l:'Diagonal Sport'},{k:'faixa',l:'Faixa Deslocada'},{k:'meio',l:'Meio a Meio'},{k:'img',l:'Sua Imagem'}];
   var tabsDiv=document.createElement('div');
   tabsDiv.style.cssText='display:flex;flex-direction:column;gap:6px;margin-bottom:14px;';
   tabs.forEach(function(t){
@@ -1718,7 +1718,7 @@ function renderUvMiniOptions(){
     return h+'</div>';
   };
   var strDiv=document.createElement('div');
-  strDiv.id='uvStripePanel';strDiv.style.display=(['stripe','contorno','diagonal','faixa','meio'].indexOf(S.uvLayoutType)>=0)?'block':'none';
+  strDiv.id='uvStripePanel';strDiv.style.display=(['stripe','diagonal','faixa','meio'].indexOf(S.uvLayoutType)>=0)?'block':'none';
   _renderMiniPickerSection(strDiv,'uvStripeMain','#FF2200','Cor Principal','cpSwatch_uvMain');
   _renderMiniPickerSection(strDiv,'uvStripeAccent','#0066FF','Cor de Destaque','cpSwatch_uvAccent');
   el.appendChild(strDiv);
@@ -1743,11 +1743,11 @@ function selUvLayout(type){
     b.style.color=a?'#fff':'rgba(255,255,255,0.4)';
     b.style.borderColor=a?'#e07b00':'rgba(255,255,255,0.12)';
   });
-  var _fam=['stripe','contorno','diagonal','faixa','meio'];
+  var _fam=['stripe','diagonal','faixa','meio'];
   var dp=document.getElementById('uvDegPanel');if(dp)dp.style.display=type==='deg'?'block':'none';
   var sp=document.getElementById('uvStripePanel');if(sp)sp.style.display=_fam.indexOf(type)>=0?'block':'none';
   var ip=document.getElementById('uvImgPanel');if(ip)ip.style.display=type==='img'?'flex':'none';
-  var _lbls={deg:'Degradê Central',stripe:'Listra Central',contorno:'Contorno Interno',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
+  var _lbls={deg:'Degradê Central',stripe:'Listra Central',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
   if(_lbls[type]&&typeof setEl==='function')setEl('fAtual',_lbls[type]);
   updateDetPvFundo();
 }
@@ -1784,14 +1784,13 @@ function updateDetPvFundo(){
       el.style.display='block';
       return;
     }
-    if(S.fundo==='f-uv'&&S.tipo==='mini'&&['stripe','contorno','diagonal','faixa','meio'].indexOf(S.uvLayoutType)>=0){
+    if(S.fundo==='f-uv'&&S.tipo==='mini'&&['stripe','diagonal','faixa','meio'].indexOf(S.uvLayoutType)>=0){
       var _m=S.uvStripeMain||'#FF2200',_a=S.uvStripeAccent||'#FFFFFF';
       el.style.background='';el.style.backgroundSize='100% 100%';el.style.backgroundPosition='center';
       if(S.uvLayoutType==='stripe'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 42%,'+_a+' 42%,'+_a+' 58%,'+_m+' 58%,'+_m+' 100%)';}
       else if(S.uvLayoutType==='diagonal'){el.style.backgroundImage='linear-gradient(125deg,'+_m+' 0%,'+_m+' 50%,'+_a+' 50%,'+_a+' 100%)';}
       else if(S.uvLayoutType==='faixa'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 20%,'+_a+' 20%,'+_a+' 32%,'+_m+' 32%,'+_m+' 100%)';}
       else if(S.uvLayoutType==='meio'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 50%,'+_a+' 50%,'+_a+' 100%)';}
-      else if(S.uvLayoutType==='contorno'){el.style.backgroundImage='none';el.style.background=_m;el.style.boxShadow='inset 0 0 0 7px '+_m+', inset 0 0 0 10px '+_a;}
       el.style.display='block';return;
     }
     if(S.fundo==='f-uv'&&S.tipo==='mini'&&S.uvLayoutType==='img'){if(S.uvImageDataUrl){el.style.backgroundImage='url('+S.uvImageDataUrl+')';el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.display='block';}return;}
@@ -1817,6 +1816,14 @@ function updateDetPvFundo(){
   });
 }
 
+// Mini: o menu "Modelo do Layout" so faz sentido no Acrilico UV (a Fibra nao aceita layout)
+function updateFundoLayoutsVisibility(){
+  var el=document.getElementById('fundoLayouts');
+  if(!el)return;
+  var mostra=(S.tipo!=='mini')||(S.fundo==='f-uv');
+  el.style.display=mostra?'':'none';
+}
+
 function selFundo(card,cls,lbl){
   document.querySelectorAll('#step-4 .ocard').forEach(c=>{c.classList.remove('sel');c.querySelector('.ochk').textContent='';});
   card.classList.add('sel');card.querySelector('.ochk').textContent='✓';
@@ -1829,6 +1836,7 @@ function selFundo(card,cls,lbl){
     iFund.src=(_mf&&_mf[_fk])||(typeof F!=='undefined'&&_fk&&F[_fk])||iFund.src;
   }
   if(cls==='f-uv'){if(S.tipo==='lego'){renderFundoLayouts(cls);}else{renderUvMiniOptions();}}else{if(S.tipo!=='mini'){renderFundoLayouts(cls);}}
+  updateFundoLayoutsVisibility();
   updateDetPvFundo();
   calcPrice();
 }
