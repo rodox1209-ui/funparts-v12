@@ -4,3 +4,5 @@
 .relo-load-bar{height:100%;width:38%;border-radius:99px;background:linear-gradient(90deg,rgba(224,123,0,0),#e07b00,rgba(224,123,0,0));animation:reloSlide 1.15s ease-in-out infinite}
 @keyframes reloSlide{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
 .relo-load-txt{font-size:8px;color:#e07b00;letter-spacing:.5px;margin-top:5px}
+/* spinner no proprio preview, na posicao do logo que esta sendo gerado */
+.logo-load{width:20px;height:20px;border:2px solid rgba(224,123,0,.22);border-top-color:#e07b00;border-radius:50%;animation:aiSpin .8s linear infinite;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}

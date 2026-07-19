@@ -1915,16 +1915,23 @@ function brandOtherChanged(prefix){
 })();
 // ── AI LOGO GENERATION — mini step 6 ──
 var _aiLogoCache={};
-function generateLogoAI(subject,type,targetElId,loaderId){
+function generateLogoAI(subject,type,targetElId,loaderId,pvLoaderId){
   if(!subject||!targetElId)return;
   var cKey=type+':'+subject;
   var el=document.getElementById(targetElId);
   if(!el)return;
-  // indicador de carregamento no painel lateral enquanto a IA gera
+  // indicador no painel lateral + spinner no proprio preview
   function _load(on){var L=loaderId&&document.getElementById(loaderId);if(L)L.style.display=on?'block':'none';}
-  if(_aiLogoCache[cKey]){el.src=_aiLogoCache[cKey];el.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';el.style.opacity='1';_load(false);return;}
+  // enquanto gera: esconde o logo anterior (evita mostrar a imagem padrao de outra marca) e mostra o spinner
+  function _pv(on){
+    var P=pvLoaderId&&document.getElementById(pvLoaderId);
+    if(P)P.style.display=on?'block':'none';
+    el.style.display=on?'none':'';
+    el.style.opacity='1';
+  }
+  if(_aiLogoCache[cKey]){el.src=_aiLogoCache[cKey];el.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';_pv(false);_load(false);return;}
   _load(true);
-  el.style.opacity='0.35';
+  _pv(true);
   var prompt=type==='brand'
     ?'Official "'+subject+'" car brand logo emblem, faithful and accurate, full color, iconic badge, transparent background, no extra text, high detail. PNG.'
     :'"'+subject+'" car model nameplate badge. White. 100% transparent background. Clean automotive badge typography. Minimal. PNG.';
@@ -1939,11 +1946,11 @@ function generateLogoAI(subject,type,targetElId,loaderId){
       var url=item.b64_json?'data:image/png;base64,'+item.b64_json:item.url;
       _aiLogoCache[cKey]=url;
       var e2=document.getElementById(targetElId);
-      if(e2){e2.src=url;e2.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';e2.style.opacity='1';}
+      if(e2){e2.src=url;e2.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';}
     }catch(e){}
-    _load(false);
+    _pv(false); _load(false);
   };
-  xhr.onerror=xhr.ontimeout=function(){var e2=document.getElementById(targetElId);if(e2)e2.style.opacity='1';_load(false);};
+  xhr.onerror=xhr.ontimeout=function(){_pv(false);_load(false);};
   xhr.send(JSON.stringify({model:'gpt-image-1',prompt:prompt,n:1,size:'1024x1024',quality:'high',background:'transparent',output_format:'png'}));
 }
 
@@ -1979,7 +1986,8 @@ function updateFixedRelevo(){
   var _tlc=document.getElementById('tlColorWrap');
   if(_tlc) _tlc.style.display=(S.tipo==='mini')?'none':'';
   // esconde indicadores de carregamento ao (re)entrar na etapa
-  ['fixedTLLoad','fixedBRLoad'].forEach(function(id){var L=document.getElementById(id);if(L)L.style.display='none';});
+  ['fixedTLLoad','fixedBRLoad','logoTLLoad','logoBRLoad'].forEach(function(id){var L=document.getElementById(id);if(L)L.style.display='none';});
+  ['logoF1','logoBR'].forEach(function(id){var I=document.getElementById(id);if(I){I.style.display='';I.style.opacity='1';}});
   if(S.tipo!=='mini' && S.legoF1){
     tlEl.textContent='🏁 Logo Fórmula 1 — Canto superior esquerdo';
     updateBadgeTL('F1');
@@ -2013,7 +2021,7 @@ function updateFixedRelevo(){
       } else {
         // marca sem logo cadastrado -> gera via IA (reserva)
         if(_tld)_tld.textContent='Gerado com IA conforme marca selecionada';
-        generateLogoAI(brand,'brand','logoF1','fixedTLLoad');
+        generateLogoAI(brand,'brand','logoF1','fixedTLLoad','logoTLLoad');
       }
     }
     var _brEl2=document.getElementById('fixedBR');
@@ -2022,7 +2030,7 @@ function updateFixedRelevo(){
       var _lb=document.getElementById('logoBR');
       // Mini: aumenta o logo do modelo (o CSS .b-br img limita a 13%, entao destravamos aqui)
       if(_lb){_lb.style.width='20%';_lb.style.maxWidth='20%';}
-      generateLogoAI(model,'model','logoBR','fixedBRLoad');
+      generateLogoAI(model,'model','logoBR','fixedBRLoad','logoBRLoad');
     }
     // Limpa texto dos badges (logo IA substitui)
     setEl('badgeTLtxt','');setEl('badgeBRtxt','');
