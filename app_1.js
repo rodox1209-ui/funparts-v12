@@ -1218,6 +1218,15 @@ function removeImageBackground(dataUrl){
   });
 }
 
+// Correcao deterministica de orientacao: se a IA gerar o carro invertido, o giro resolve na hora.
+function toggleCarFlip(){ S.carFlip=!S.carFlip; applyCarFlip(); }
+function applyCarFlip(){
+  var el=document.getElementById('detPvCar');
+  if(el) el.style.transform=S.carFlip?'rotate(180deg)':'';
+  var b=document.getElementById('btnFlipCar');
+  if(b) b.style.display=(S.tipo==='mini'&&_detTopViewUrl)?'inline-block':'none';
+}
+
 function applyDetCarOverlay(){
   var el=document.getElementById('detPvCar');
   if(!el||!_detTopViewUrl||!S.miniScale||!S.quadroDim){if(el)el.style.display='none';return;}
@@ -1238,6 +1247,7 @@ function applyDetCarOverlay(){
   el.style.left=left+'px';
   el.style.top=top+'px';
   el.style.display='block';
+  applyCarFlip();
 }
 
 async function triggerDetTopView(){
