@@ -203,7 +203,9 @@ function goStep(n){
     if(S.miniChoice==='apenas'){
       var _aImg=document.getElementById('apenaGeneratedImg');
       var _mH=document.getElementById('miniHeroImg');
-      if(_aImg&&_aImg.src&&_aImg.src.length>10&&_mH){
+      // usar o ATRIBUTO src: a propriedade .src resolve para a URL da pagina quando vazio
+      var _aSrc=_aImg?(_aImg.getAttribute('src')||''):'';
+      if(_aSrc.length>10&&_mH){
         _mH.style.padding='0';_mH.style.background='#0d0d0d';
         _mH.innerHTML='<img src="'+_aImg.src+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
       }
