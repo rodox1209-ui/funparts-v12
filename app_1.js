@@ -1869,7 +1869,7 @@ function updateDetPvFundo(){
       el.style.background='';el.style.backgroundSize='100% 100%';el.style.backgroundPosition='center';
       if(S.uvLayoutType==='stripe'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 42%,'+_a+' 42%,'+_a+' 58%,'+_m+' 58%,'+_m+' 100%)';}
       else if(S.uvLayoutType==='diagonal'){el.style.backgroundImage='linear-gradient(125deg,'+_m+' 0%,'+_m+' 50%,'+_a+' 50%,'+_a+' 100%)';}
-      else if(S.uvLayoutType==='faixa'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 20%,'+_a+' 20%,'+_a+' 32%,'+_m+' 32%,'+_m+' 100%)';}
+      else if(S.uvLayoutType==='faixa'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' calc(20% - 23px),'+_a+' calc(20% - 23px),'+_a+' calc(32% - 23px),'+_m+' calc(32% - 23px),'+_m+' 100%)';}
       else if(S.uvLayoutType==='meio'){el.style.backgroundImage='linear-gradient(to right,'+_m+' 0%,'+_m+' 50%,'+_a+' 50%,'+_a+' 100%)';}
       el.style.display='block';return;
     }
