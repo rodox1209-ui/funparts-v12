@@ -381,7 +381,9 @@ function selectTipo(t){
   var _tab2=document.getElementById('tabStep2');
   if(_tab2)_tab2.style.display=t==='mini'?'none':'';
   var _smi=document.getElementById('sidebarMiniInfo');
-  if(_smi)_smi.style.display=t==='mini'?'block':'none';;
+  if(_smi)_smi.style.display=t==='mini'?'block':'none';
+  var _sli=document.getElementById('sidebarLegoInfo');
+  if(_sli)_sli.style.display=t==='mini'?'none':'block';
 }
 
 // ── LEGO BRAND ──
