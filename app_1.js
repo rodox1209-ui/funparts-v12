@@ -234,6 +234,16 @@ function goStep(n){
     var legoWrap=document.getElementById('legoPreviewWrap');
     if(legoWrap) legoWrap.style.display=(n>=3&&isLegoFlow)?'flex':'none';
   }
+  // Produto pronto do catalogo: o preview e a FOTO do produto, nao o quadro montado
+  if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
+    var _lv=document.getElementById('livePv'); if(_lv)_lv.style.display='none';
+    var _lw=document.getElementById('legoPreviewWrap'); if(_lw)_lw.style.display='none';
+    var _mh=document.getElementById('miniHeroImg');
+    if(_mh && typeof INCLUSO_FOTOS!=='undefined'){
+      _mh.style.display='flex'; _mh.style.padding='0'; _mh.style.background='#0d0d0d';
+      _mh.innerHTML='<img src="'+INCLUSO_FOTOS[0]+'" style="width:100%;height:100%;object-fit:contain;display:block;">';
+    }
+  }
   // Mini-only mode on step 2
   var q=document.querySelector('.quadro');
   var pv=document.getElementById('livePv');
