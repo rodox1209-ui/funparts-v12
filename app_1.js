@@ -384,6 +384,9 @@ function selectTipo(t){
   if(_smi)_smi.style.display=t==='mini'?'block':'none';
   var _sli=document.getElementById('sidebarLegoInfo');
   if(_sli)_sli.style.display=t==='mini'?'none':'block';
+  // na tela TIPO volta a mostrar os "dois caminhos" (e nao o aviso da imagem por IA)
+  var _ip0=document.getElementById('miniInfoPaths'); if(_ip0)_ip0.style.display='block';
+  var _ia0=document.getElementById('miniInfoAI');    if(_ia0)_ia0.style.display='none';
 }
 
 // ── LEGO BRAND ──
@@ -579,8 +582,13 @@ function backToInclusoBrands(){
 
 function selInclusoModel(model){
   S.inclusoModel=model;
-  S.incBrand=S.miniBrand||'';
+  // marca vem do que o cliente escolheu no dropdown (form ativo), nao de um valor fixo
+  var _fb=((document.getElementById('aiCarBrand')||{}).value||'').trim()||((document.getElementById('apenaCarBrand')||{}).value||'').trim();
+  S.incBrand=_fb||S.miniBrand||'';
   S.miniChoice='incluso';
+  // nesta tela o aviso e sobre a imagem gerada por IA (nao sobre os dois caminhos)
+  var _ip=document.getElementById('miniInfoPaths'); if(_ip)_ip.style.display='none';
+  var _ia=document.getElementById('miniInfoAI');    if(_ia)_ia.style.display='block';
 
   // Renomear tab e título do step-2
   setEl('tabStep2Lbl','Produto');
@@ -1938,6 +1946,9 @@ function updateCarDesc(){
   var b=_v('aiCarBrand','apenaCarBrand');
   var m=_v('aiCarModel','apenaCarModel');
   var c=_v('aiCarColor','apenaCarColor');
+  // mantem o estado sincronizado com o que o cliente escolheu (usado no titulo/marca do produto)
+  if(b) S.miniBrand=b;
+  if(m) S.miniModel=m;
   var em=document.getElementById('pvMod'); if(em) em.textContent=b||'Seu Carro';
   var es=document.getElementById('pvSpecDesc'); if(es) es.textContent=m||'';
   var ec=document.getElementById('pvCarColor'); if(ec){ ec.textContent=c||''; ec.style.display=c?'':'none'; }
