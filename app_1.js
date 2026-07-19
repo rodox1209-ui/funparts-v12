@@ -667,7 +667,7 @@ function confirmarInclusoModel(){
   }
 
   // Preencher sum-block com dados do produto incluso
-  setEl('sumCat','Quadro com Miniatura');
+  setEl('sumCat','Quadro para Miniaturas');
   setEl('sumMod', brand + (m.name ? ' — ' + m.name : ''));
   setEl('sumDim', m.dim||'—');
   setEl('sumMold','—');
@@ -885,7 +885,7 @@ function selMiniChoice(choice){
   S.miniChoice=choice;
   setStyle('miniChoiceSection','display','none');
   setStyle('miniSection','display','block');
-  setEl('step1Title','QUADRO COM MINIATURA');
+  setEl('step1Title','QUADRO PARA MINIATURAS');
   setEl('step1Sub','Selecione o quadro da sua preferência');
   setStyle('step1Title','display','');
   setStyle('step1Sub','display','');
