@@ -939,6 +939,8 @@ function backToMiniChoice(){
 
 function selMiniChoice(choice){
   S.miniChoice=choice;
+  // fora do catalogo o aviso lateral volta ao normal
+  if(choice!=='incluso') setStyle('sidebarMiniInfo','display','block');
   setStyle('miniChoiceSection','display','none');
   setStyle('miniSection','display','block');
   setEl('step1Title','QUADRO PARA MINIATURAS');
