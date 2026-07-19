@@ -241,11 +241,26 @@ function goStep(n){
     var _lv=document.getElementById('livePv'); if(_lv)_lv.style.display='none';
     var _lw=document.getElementById('legoPreviewWrap'); if(_lw)_lw.style.display='none';
     if(_mh && typeof INCLUSO_FOTOS!=='undefined'){
-      _mh.style.display='flex'; _mh.style.padding='0'; _mh.style.background='#0d0d0d';
+      _mh.style.display='flex'; _mh.style.padding='20px'; _mh.style.background='#0d0d0d';
       _mh.setAttribute('data-cat','1');
-      _mh.innerHTML='<img src="'+INCLUSO_FOTOS[0]+'" style="width:100%;height:100%;object-fit:contain;display:block;">';
+      _mh.innerHTML=_catGaleriaHTML();
+      // painel lado a lado: galeria + imagem "homem + quadro" (mesma logica do passo 3 do mini)
+      var _pvC=document.querySelector('.pv-panel');
+      var _mpwC=document.getElementById('miniPreviewWrap');
+      if(_pvC&&_mpwC){
+        _pvC.style.flexDirection='row'; _pvC.style.justifyContent='center'; _pvC.style.alignItems='center';
+        _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto';
+        _mpwC.style.position='relative'; _mpwC.style.display='flex'; _mpwC.style.flexDirection='column';
+        _mpwC.style.flex='0 0 32%'; _mpwC.style.maxWidth='32%'; _mpwC.style.marginLeft='16px'; _mpwC.style.height='auto';
+        var _msiC=document.getElementById('miniScaleImg');
+        if(_msiC&&!_msiC.getAttribute('data-loaded')){
+          var _wImgC=document.querySelector('#wallModal img');
+          if(_wImgC&&_wImgC.src){_msiC.src=_wImgC.src;_msiC.setAttribute('data-loaded','1');}
+        }
+      }
     }
   } else if(_mh && _mh.getAttribute('data-cat')==='1'){
+    _mh.style.flex=''; _mh.style.minWidth=''; _mh.style.width='100%';
     // restaura o hero original do fluxo normal
     _mh.removeAttribute('data-cat');
     _mh.innerHTML=_MINI_HERO_ORIG.h; _mh.style.padding=_MINI_HERO_ORIG.p; _mh.style.background=_MINI_HERO_ORIG.b;
@@ -2322,10 +2337,25 @@ function selInclusoBrand(b){
 }
 
 function trocarFotoIncluso(k){
-  var m=document.getElementById('ip2MainPhoto'); if(m)m.src=INCLUSO_FOTOS[k];
-  document.querySelectorAll('#ip2Thumbs img').forEach(function(t){
+  k=parseInt(k,10); S.incFotoIdx=k;
+  var m=document.getElementById('catMainPhoto'); if(m)m.src=INCLUSO_FOTOS[k];
+  document.querySelectorAll('#catThumbs img').forEach(function(t){
     t.style.borderColor=(parseInt(t.getAttribute('data-th'),10)===k)?'#e07b00':'transparent';
   });
+}
+
+// monta a galeria do produto pronto dentro da area de preview
+function _catGaleriaHTML(){
+  var idx=S.incFotoIdx||0;
+  var thumbs=INCLUSO_FOTOS.map(function(f,k){
+    return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:74px;height:58px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===idx?'#e07b00':'transparent')+';">';
+  }).join('');
+  return '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">'
+    +'<div style="flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;">'
+    +'<img id="catMainPhoto" src="'+INCLUSO_FOTOS[idx]+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;">'
+    +'</div>'
+    +'<div id="catThumbs" style="display:flex;flex-direction:row;gap:8px;flex-shrink:0;">'+thumbs+'</div>'
+    +'</div>';
 }
 
 // Produto pronto: sem personalizacao -> esconde as etapas 3..6 e mostra a aba Produto
@@ -2350,16 +2380,11 @@ function selInclusoProduto(i){
   setEl('step2Sub', b);
   setStyle('step2Title','display','');
   setStyle('step2Sub','display','');
-  // galeria de fotos do produto
-  var wrapO=document.getElementById('ip2MainImgWrap'), main=document.getElementById('ip2MainImg'), th=document.getElementById('ip2Thumbs');
-  if(wrapO)wrapO.style.display='';
-  if(main)main.innerHTML='<img id="ip2MainPhoto" src="'+INCLUSO_FOTOS[0]+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
-  if(th){
-    th.style.display='flex';
-    th.innerHTML=INCLUSO_FOTOS.map(function(f,k){
-      return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:66px;height:52px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===0?'#e07b00':'transparent')+';">';
-    }).join('');
-  }
+  // galeria de fotos vai para a AREA DO PREVIEW (nao na coluna da direita)
+  S.incFotoIdx=0;
+  var wrapO=document.getElementById('ip2MainImgWrap'), th=document.getElementById('ip2Thumbs');
+  if(wrapO)wrapO.style.display='none';
+  if(th)th.style.display='none';
   // ficha tecnica
   var d=document.getElementById('ip2Desc');
   if(d){
