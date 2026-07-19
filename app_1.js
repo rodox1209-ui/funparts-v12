@@ -460,6 +460,7 @@ function selLegoBrand(card,brand){
 function renderLegoModels(brand){
   const models=LEGO_CATALOG[brand]||[];
   const el=document.getElementById('legoModels');
+  if(!el)return; // sem o elemento, nao aborta o resto de selectTipo()
   el.innerHTML='';
   models.forEach(m=>{
     const d=document.createElement('div');
