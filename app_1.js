@@ -2426,6 +2426,21 @@ function selInclusoProduto(i){
   calcPrice();
 }
 
+// "Editar configuracao" do resumo: catalogo volta pro produto, demais fluxos pro alto-relevo
+function editarConfiguracao(){
+  if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
+    setStyle('miniInclusoAISection','display','none');
+    setStyle('step2RegularContent','display','none');
+    setStyle('inclusoProdutoSection','display','block');
+    aplicarModoCatalogo(true);
+    goStep(2);
+    setStyle('inclusoProdutoSection','display','block');
+    setStyle('step2RegularContent','display','none');
+    return;
+  }
+  goStep(6);
+}
+
 function voltarInclusoCatalogo(){
   S.incProduto=null;
   aplicarModoCatalogo(false);
