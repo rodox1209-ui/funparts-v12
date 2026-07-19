@@ -264,19 +264,24 @@ function goStep(n){
         _pvC.style.justifyContent='center';
         _mpwC.style.position='relative'; _mpwC.style.display='flex'; _mpwC.style.flexDirection='column';
         if(_mobC){
-          // mobile: galeria em cima (foto maior) e "homem + quadro" embaixo, sem sobreposicao
+          // mobile: galeria em cima (altura natural, colada no topo) e "homem + quadro" embaixo
           _pvC.style.flexDirection='column'; _pvC.style.alignItems='stretch';
           _mh.style.flex='0 0 auto'; _mh.style.minWidth='0'; _mh.style.width='100%';
-          _mh.style.minHeight='50vh'; _mh.style.padding='12px';
+          _mh.style.height='auto'; _mh.style.minHeight='0';
+          _mh.style.alignItems='flex-start'; _mh.style.padding='10px 12px';
           _mpwC.style.flex='0 0 auto'; _mpwC.style.maxWidth='100%'; _mpwC.style.width='100%';
-          _mpwC.style.marginLeft='0'; _mpwC.style.marginTop='18px'; _mpwC.style.height='auto';
+          _mpwC.style.marginLeft='0'; _mpwC.style.marginTop='14px'; _mpwC.style.height='auto';
         } else {
           _pvC.style.flexDirection='row'; _pvC.style.alignItems='center';
-          _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto'; _mh.style.minHeight='';
+          _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto';
+          _mh.style.height='100%'; _mh.style.minHeight='';
+          _mh.style.alignItems='center';
           _mpwC.style.flex='0 0 32%'; _mpwC.style.maxWidth='32%'; _mpwC.style.width='';
           _mpwC.style.marginLeft='16px'; _mpwC.style.marginTop=''; _mpwC.style.height='auto';
         }
         // imagem de escala conforme a DIMENSAO do produto escolhido
+        // sincroniza a barra inferior do mobile com o fluxo curto do catalogo
+        if(typeof _mobUpdateNav==='function'){ _mobStep=n; _mobUpdateNav(); }
         var _msiC=document.getElementById('miniScaleImg');
         var _dimC=(S.incProduto&&S.incProduto.dim)||'';
         var _imgC=(typeof MINI_SCALE_IMGS!=='undefined')?MINI_SCALE_IMGS[_dimC]:null;
@@ -294,6 +299,7 @@ function goStep(n){
     }
   } else if(_mh && _mh.getAttribute('data-cat')==='1'){
     _mh.style.flex=''; _mh.style.minWidth=''; _mh.style.width='100%'; _mh.style.minHeight='';
+    _mh.style.height='100%'; _mh.style.alignItems='center';
     // restaura o hero original do fluxo normal
     _mh.removeAttribute('data-cat');
     _mh.innerHTML=_MINI_HERO_ORIG.h; _mh.style.padding=_MINI_HERO_ORIG.p; _mh.style.background=_MINI_HERO_ORIG.b;
@@ -2389,9 +2395,20 @@ function _catGaleriaHTML(){
   var thumbs=INCLUSO_FOTOS.map(function(f,k){
     return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:74px;height:58px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===idx?'#e07b00':'transparent')+';">';
   }).join('');
-  return '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">'
-    +'<div style="flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;">'
-    +'<img id="catMainPhoto" src="'+INCLUSO_FOTOS[idx]+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;">'
+  var _mobG=window.innerWidth<=720;
+  // mobile: altura natural (sem esticar) para a foto colar no topo e as miniaturas logo abaixo
+  var _wrap=_mobG
+    ? 'width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;'
+    : 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+  var _box=_mobG
+    ? 'width:100%;display:flex;align-items:flex-start;justify-content:center;'
+    : 'flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;';
+  var _img=_mobG
+    ? 'width:100%;max-height:46vh;object-fit:contain;border-radius:10px;display:block;'
+    : 'max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;';
+  return '<div style="'+_wrap+'">'
+    +'<div style="'+_box+'">'
+    +'<img id="catMainPhoto" src="'+INCLUSO_FOTOS[idx]+'" style="'+_img+'">'
     +'</div>'
     +'<div id="catThumbs" style="display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;flex-shrink:0;width:100%;">'+thumbs+'</div>'
     +'</div>';
@@ -2895,13 +2912,18 @@ function addPiloto() {
   } catch(e) { tryRender('Arial'); }
 }
 var _mobStep=0;
+// catalogo de produto pronto: fluxo curto (Tipo > Modelo > Produto > Pedido)
+function _catModo(){
+  return (typeof S!=='undefined'&&S.tipo==='mini'&&S.miniChoice==='incluso'&&!!S.incProduto);
+}
 function mobNext(){
   var secs=document.querySelectorAll('.cfg-sec');
   var cur=-1;
   secs.forEach(function(s,i){if(s.classList.contains('active'))cur=i;});
   if(cur<0)cur=_mobStep;
   var nxt=cur+1;
-  if(nxt===2&&typeof S!=='undefined'&&S.tipo==='mini')nxt=3;
+  if(_catModo()&&cur===2)nxt=7; // produto -> pedido (pula as etapas ocultas)
+  else if(nxt===2&&typeof S!=='undefined'&&S.tipo==='mini')nxt=3;
   if(nxt>=secs.length)return;
   goStep(nxt);
   _mobStep=nxt;
@@ -2913,13 +2935,28 @@ function mobBack(){
   secs.forEach(function(s,i){if(s.classList.contains('active'))cur=i;});
   if(cur<0)cur=_mobStep;
   var prv=cur-1;
-  if(prv===2&&typeof S!=='undefined'&&S.tipo==='mini')prv=1;
+  if(_catModo()&&cur===7)prv=2; // pedido -> produto
+  else if(prv===2&&typeof S!=='undefined'&&S.tipo==='mini')prv=1;
   if(prv<0)return;
   goStep(prv);
   _mobStep=prv;
   _mobUpdateNav();
 }
 function _mobUpdateNav(){
+  if(_catModo()){
+    var btnC=document.getElementById('mobBtnNext');
+    var bckC=document.getElementById('mobBtnBack');
+    if(btnC){
+      if(_mobStep>=7){btnC.style.display='none';}
+      else{btnC.style.display='';btnC.textContent='Ver Resumo →';}
+    }
+    if(bckC)bckC.style.display=_mobStep>0?'':'none';
+    var passo={0:1,1:2,2:3,7:4}[_mobStep]||3;
+    var bsC=document.getElementById('mobBarStep'); if(bsC)bsC.textContent='Passo '+passo+' de 4';
+    var btC=document.getElementById('mobBarTitle');
+    if(btC)btC.textContent=(_mobStep>=7)?'Pedido':(S.incProduto&&S.incProduto.n)||'Produto';
+    return;
+  }
   var isLego=(typeof S!=='undefined'&&S.tipo==='lego');
   var labels=['Modelo','Dimensão','Detalhamento','Fundo','Moldura + LED','Alto-relevo','Ver Resumo',''];
   if(!isLego)labels[1]='Miniatura';
