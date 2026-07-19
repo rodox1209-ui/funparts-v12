@@ -260,10 +260,22 @@ function goStep(n){
       var _pvC=document.querySelector('.pv-panel');
       var _mpwC=document.getElementById('miniPreviewWrap');
       if(_pvC&&_mpwC){
-        _pvC.style.flexDirection='row'; _pvC.style.justifyContent='center'; _pvC.style.alignItems='center';
-        _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto';
+        var _mobC=window.innerWidth<=720;
+        _pvC.style.justifyContent='center';
         _mpwC.style.position='relative'; _mpwC.style.display='flex'; _mpwC.style.flexDirection='column';
-        _mpwC.style.flex='0 0 32%'; _mpwC.style.maxWidth='32%'; _mpwC.style.marginLeft='16px'; _mpwC.style.height='auto';
+        if(_mobC){
+          // mobile: galeria em cima (foto maior) e "homem + quadro" embaixo, sem sobreposicao
+          _pvC.style.flexDirection='column'; _pvC.style.alignItems='stretch';
+          _mh.style.flex='0 0 auto'; _mh.style.minWidth='0'; _mh.style.width='100%';
+          _mh.style.minHeight='50vh'; _mh.style.padding='12px';
+          _mpwC.style.flex='0 0 auto'; _mpwC.style.maxWidth='100%'; _mpwC.style.width='100%';
+          _mpwC.style.marginLeft='0'; _mpwC.style.marginTop='18px'; _mpwC.style.height='auto';
+        } else {
+          _pvC.style.flexDirection='row'; _pvC.style.alignItems='center';
+          _mh.style.flex='1 1 0'; _mh.style.minWidth='0'; _mh.style.width='auto'; _mh.style.minHeight='';
+          _mpwC.style.flex='0 0 32%'; _mpwC.style.maxWidth='32%'; _mpwC.style.width='';
+          _mpwC.style.marginLeft='16px'; _mpwC.style.marginTop=''; _mpwC.style.height='auto';
+        }
         // imagem de escala conforme a DIMENSAO do produto escolhido
         var _msiC=document.getElementById('miniScaleImg');
         var _dimC=(S.incProduto&&S.incProduto.dim)||'';
@@ -281,7 +293,7 @@ function goStep(n){
       }
     }
   } else if(_mh && _mh.getAttribute('data-cat')==='1'){
-    _mh.style.flex=''; _mh.style.minWidth=''; _mh.style.width='100%';
+    _mh.style.flex=''; _mh.style.minWidth=''; _mh.style.width='100%'; _mh.style.minHeight='';
     // restaura o hero original do fluxo normal
     _mh.removeAttribute('data-cat');
     _mh.innerHTML=_MINI_HERO_ORIG.h; _mh.style.padding=_MINI_HERO_ORIG.p; _mh.style.background=_MINI_HERO_ORIG.b;
@@ -2381,7 +2393,7 @@ function _catGaleriaHTML(){
     +'<div style="flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;">'
     +'<img id="catMainPhoto" src="'+INCLUSO_FOTOS[idx]+'" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;">'
     +'</div>'
-    +'<div id="catThumbs" style="display:flex;flex-direction:row;gap:8px;flex-shrink:0;">'+thumbs+'</div>'
+    +'<div id="catThumbs" style="display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;flex-shrink:0;width:100%;">'+thumbs+'</div>'
     +'</div>';
 }
 
@@ -2433,6 +2445,17 @@ function selInclusoProduto(i){
   setStyle('step2RegularContent','display','none');
   calcPrice();
 }
+
+// ao girar o celular, refaz o layout da galeria do catalogo
+window.addEventListener('resize',function(){
+  if(typeof S==='undefined'||S.tipo!=='mini'||S.miniChoice!=='incluso'||!S.incProduto)return;
+  clearTimeout(window._catRsz);
+  window._catRsz=setTimeout(function(){
+    var at=document.querySelector('.stab.active');
+    var n=at?parseInt(at.getAttribute('data-step'),10):NaN;
+    if(!isNaN(n)&&typeof goStep==='function')goStep(n);
+  },180);
+});
 
 // "Editar configuracao" do resumo: catalogo volta pro produto, demais fluxos pro alto-relevo
 function editarConfiguracao(){
