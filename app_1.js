@@ -367,6 +367,9 @@ function restoreSumItem(type, key, label){
 // ── STEP 1: TIPO ──
 function selectTipo(t){
   S.tipo=t;
+  // sair do modo catalogo logo no inicio (garante reset mesmo se algo abaixo falhar)
+  S.incProduto=null;
+  if(typeof aplicarModoCatalogo==='function')aplicarModoCatalogo(false);
   document.getElementById('tLego').classList.toggle('sel',t==='lego');
   document.getElementById('tMini').classList.toggle('sel',t==='mini');
   var _fc=document.getElementById('fundoFoscoCard');if(_fc)_fc.style.display=t==='mini'?'none':'';
