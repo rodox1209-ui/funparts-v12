@@ -243,20 +243,23 @@ function goStep(n){
   if(pv){n===5?pv.classList.add('moldura-only-pv'):pv.classList.remove('moldura-only-pv');}
   if(q){n===4?q.classList.add('fundo-only'):q.classList.remove('fundo-only');}
   // Detalhamento step: show frame photo on carbon-fiber bg; hide car/relevo/logos
+  // Mini: o preview montado do quadro continua valendo no resumo (n=7). LEGO mantem a regra original (n<7).
+  var _isMiniFlow=(typeof S!=='undefined'&&S.tipo==='mini');
+  var _pvAtivo=(n>=3&&(n<7||_isMiniFlow));
   var _dpf=document.getElementById('detPvFrame');
-  if(_dpf) _dpf.style.display=(n>=3&&n<7)?'block':'none';
+  if(_dpf) _dpf.style.display=_pvAtivo?'block':'none';
   var _dpfundo=document.getElementById('detPvFundo');
-  if(_dpfundo) _dpfundo.style.display=(n>=3&&n<7)?'block':'none';
+  if(_dpfundo) _dpfundo.style.display=_pvAtivo?'block':'none';
   var _dpc=document.getElementById('detPvCar');
   if(_dpc){
-    _dpc.style.display=(n>=3&&n<7&&_detTopViewUrl&&S.tipo==='mini')?'block':'none';
+    _dpc.style.display=(_pvAtivo&&_detTopViewUrl&&S.tipo==='mini')?'block':'none';
     _dpc.style.zIndex=(n===3)?'10':'5';
   }
   var _dpcl=document.getElementById('detPvCarLoader');
   if(_dpcl&&(n!==3||S.tipo!=='mini')) _dpcl.style.display='none';
   var _qd=document.querySelector('#livePv .quadro');
   if(_qd){
-    if(n>=3&&n<7){
+    if(_pvAtivo){
       if(S.tipo==='lego'&&S.legoDim){
         var _lr=_legoLegacyRatio(S.legoDim);
         if(_lr){_qd.style.aspectRatio=_lr;_qd.style.overflow='hidden';}
@@ -274,14 +277,14 @@ function goStep(n){
   // ledDark/ledGlow mantidos visíveis no mini step 5 para preview LED funcionar
   _detVis.forEach(function(id){
     var el=document.getElementById(id);
-    if(el) el.style.visibility=(n>=3&&n<7)?'hidden':'';
+    if(el) el.style.visibility=_pvAtivo?'hidden':'';
   });
   // Remove .c-fundo from layout so aspect-ratio controls .quadro height
   var _cfundo=document.querySelector('#livePv .c-fundo');
-  if(_cfundo) _cfundo.style.display=(n>=3&&n<7)?'none':'';
+  if(_cfundo) _cfundo.style.display=_pvAtivo?'none':'';
   if(n===3){initDetalhamento();if(S.tipo==='mini'){triggerDetTopView();}}
   else if(n===4){updateDetPreview();updateDetPvFundo();if(S.tipo==='mini'){renderUvMiniOptions();}else{renderFundoLayouts(S.fundo);}updateFundoLayoutsVisibility();if(S.tipo==='mini'&&_detTopViewUrl)setTimeout(applyDetCarOverlay,80);}
-  else if(n>=5&&n<7){updateDetPreview();updateDetPvFundo();if(S.tipo==='mini'&&_detTopViewUrl)setTimeout(applyDetCarOverlay,80);if(n===6&&typeof updateFixedRelevo==='function'){
+  else if(n>=5&&(n<7||_isMiniFlow)){updateDetPreview();updateDetPvFundo();if(S.tipo==='mini'&&_detTopViewUrl)setTimeout(applyDetCarOverlay,80);if((n===6||n===7)&&typeof updateFixedRelevo==='function'){
     updateFixedRelevo();
     // Step 6: restore visibility de logo IA para relevo preview
     if(S.tipo==='mini'){['logoF1','logoBR','relExtras'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.visibility='';});}
@@ -2227,7 +2230,11 @@ function calcPrice(){
 // ── SUMÁRIO ──
 function buildSummary(){
   const cat=S.tipo==='lego'?'LEGO Technic / Creator / Icons':'Miniatura Die-cast / 3D';
-  const mod=S.tipo==='lego'?(S.legoModel||'—'):(S.miniBrand+(S.miniModel?' — '+S.miniModel:''));
+  // Mini: le marca/modelo do formulario ativo (mesma fonte da descricao), com o estado como reserva
+  function _fv(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
+  const _mB=(S.tipo==='lego')?'':(_fv('aiCarBrand','apenaCarBrand')||S.miniBrand||'');
+  const _mM=(S.tipo==='lego')?'':(_fv('aiCarModel','apenaCarModel')||S.miniModel||'');
+  const mod=S.tipo==='lego'?(S.legoModel||'—'):((_mB||'—')+(_mM?' — '+_mM:''));
   const dim=S.tipo==='lego'?S.legoDim:S.miniDim;
   setEl('sumCat',cat);
   setEl('sumMod',mod);
