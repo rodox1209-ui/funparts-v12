@@ -1089,7 +1089,8 @@ var MINI_MOLDURA_IMAGES={
 var MINI_SCALE_IMGS={
   '25x35cm':  'images/img_046.jpg',
   '49x49cm':  'images/img_047.jpg',
-  '40x66,5cm':'images/img_048.jpg'
+  '40x66,5cm':'images/img_048.jpg',
+  '66,5x40cm':'images/img_049.jpg'
 };
 function updateMiniRefImg(){
   var el=document.getElementById('miniScaleImg');
