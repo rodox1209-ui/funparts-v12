@@ -387,6 +387,8 @@ function selectTipo(t){
   if(_smi)_smi.style.display=t==='mini'?'block':'none';
   var _sli=document.getElementById('sidebarLegoInfo');
   if(_sli)_sli.style.display=t==='mini'?'none':'block';
+  S.incProduto=null;
+  if(typeof aplicarModoCatalogo==='function')aplicarModoCatalogo(false);
   // na tela TIPO volta a mostrar os "dois caminhos" (e nao o aviso da imagem por IA)
   var _ip0=document.getElementById('miniInfoPaths'); if(_ip0)_ip0.style.display='block';
   var _ia0=document.getElementById('miniInfoAI');    if(_ia0)_ia0.style.display='none';
@@ -891,6 +893,8 @@ function backToMiniChoice(){
   setStyle('miniInclusoAISection','display','none');
   setStyle('miniApenasSection','display','none');
   setStyle('miniChoiceSection','display','block');
+  S.incProduto=null;
+  if(typeof aplicarModoCatalogo==='function')aplicarModoCatalogo(false);
   setStyle('step1NavBtns','display','none');
 }
 
@@ -908,7 +912,9 @@ function selMiniChoice(choice){
     setStyle('miniSection','display','none');
     setStyle('miniInclusoAISection','display','block');
     setStyle('step1NavBtns','display','none');
-    setTimeout(initColorPalette,50);
+    S.incProduto=null;
+    aplicarModoCatalogo(false);
+    renderInclusoBrands();
 
   } else {
     // Modo apenas: formulário AI
@@ -2201,6 +2207,15 @@ var LEGO_MODEL_SKU={
   'Ford Mustang GT 1960':'FP-032',
 };
 function calcPrice(){
+  // Produto pronto do catalogo: o preco e o do proprio produto
+  if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
+    S._total=S.incProduto.p;
+    var _f=_brl(S.incProduto.p);
+    setEl('pvPrice',_f);
+    var _mb=document.getElementById('mobBarPrice'); if(_mb)_mb.textContent=_f;
+    var _db=document.getElementById('deskBarPrice'); if(_db)_db.textContent=_f;
+    return;
+  }
   // 1. Base pelo produto (Medida × Fundo para LEGO, Escala × Medida para Mini)
   const LEGO_PRICE={
     '53×83cm':{c:689,f:589},'83×53cm':{c:689,f:589},
@@ -2237,8 +2252,144 @@ function calcPrice(){
   if(desk) desk.textContent=fmtd;
 }
 
+
+// ══════ CATÁLOGO DE PRODUTOS PRONTOS — "Quadro incluso miniatura" (somente Mini) ══════
+var INCLUSO_CATALOG={
+ "Ferrari":{logo:'images/logo_ferrari.png',itens:[{n:"Ferrari 296 GTB listras amarelas",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari 458 Speciale vermelha",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari 499P Lemans",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Ferrari 499P Lemans",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari Coleção Burago",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:299},{n:"Ferrari F1 SF24",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Ferrari F1 SF24 - Hamilton",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari F50",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari FXXK",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari LaFerrari",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari SF24 - Mini",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399}]},
+ "Fórmula 1":{logo:'images/logo_formula1.png',itens:[{n:"Red Bull F1 RB21",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Redbull F1 RB20 - Max Verstappen",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari SF25 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"McLaren MCL39 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"McLaren Senna",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:4350},{n:"Mercedes W16 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Red Bull RB21 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Set Mercedes F1 - 7 carros",esc:"1:43",dim:"66,5x40cm",mol:"Fibra de carbono",p:2250},{n:"Set Red Bull F1 - 7 carros",esc:"1:43",dim:"66,5x40cm",mol:"Fibra de carbono",p:2250}]},
+ "Porsche":{logo:'images/logo_porsche.png',itens:[{n:"Porsche 911 GT3 - Azul",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Porsche 911 GT3 - Azul Tiffany",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 911 GT3 - Laranja",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 911 GT3 - Preta",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Porsche 911 RSR Martini",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 963 Lemans",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche GT2rs Fibra - Amarela",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 911 Carrera RS - Branca",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990}]},
+ "BMW":{logo:'images/logo_bmw.png',itens:[{n:"BMW GS1250",esc:"1:9",dim:"66,5x40cm",mol:"Fibra de carbono",p:1990},{n:"BMW M2 Azul",esc:"1:18",dim:"40x66,5cm",mol:"Laca Preto",p:1990},{n:"BMW M3",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"BMW M6 GT3 - Azul",esc:"1:32",dim:"49x49cm",mol:"Fibra de carbono",p:399}]},
+ "Chevrolet":{logo:'images/logo_chevrolet.png',itens:[{n:"Opala Chevrolet - Amarelo",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290},{n:"Opala Chevrolet - Bege",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290},{n:"Opala Chevrolet - Laranja",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290}]},
+ "Corvette":{logo:'',itens:[{n:"Corvette Branca",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Corvette Rosa",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Corvette Vermelha",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]},
+ "Ford":{logo:'images/logo_ford.png',itens:[{n:"Ford GT Gulf",esc:"1:32",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"FordGT Vermelho",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Mustang Shelby Branco listras azuis",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]},
+ "Ducati":{logo:'',itens:[{n:"Moto Ducati 1199 Panigale - Vermelha",esc:"1:12",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Moto Ducati GP",esc:"1:6",dim:"66,5x40cm",mol:"Fibra de carbono",p:1990}]},
+ "Lamborghini":{logo:'images/logo_lamborghini.png',itens:[{n:"Lamborghini Huracan Performante Vermelha",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Lamborghini Countach Laranja",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990}]},
+ "Volkswagen":{logo:'images/logo_volkswagen.png',itens:[{n:"Gol GTI Volkswagen",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290},{n:"Fusca Volkswagen 1955 - Creme",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]},
+ "Audi":{logo:'images/logo_audi.png',itens:[{n:"Audi R8 Preto Fosco",esc:"1:18",dim:"49x49cm",mol:"Laca Preto",p:1290}]},
+ "Filmes":{logo:'',itens:[{n:"Relâmpago McQueen",esc:"1:24",dim:"25x35cm",mol:"Fibra de carbono",p:299}]},
+ "Harley Davidson":{logo:'',itens:[{n:"Moto Harley Davidson Street Glide - Preta",esc:"1:12",dim:"25x35cm",mol:"Laca Preto",p:399}]},
+ "McLaren":{logo:'images/logo_mclaren.png',itens:[{n:"Mclaren MCL35",esc:"1:12",dim:"40x66,5cm",mol:"Fibra de carbono",p:2360}]},
+ "Mercedes-Benz":{logo:'images/logo_mercedes.png',itens:[{n:"Mercedes W14",esc:"1:12",dim:"40x66,5cm",mol:"Fibra de carbono",p:2360}]},
+ "Mitsubishi":{logo:'images/logo_mitsubishi.png',itens:[{n:"Lancer Evo Amarelo",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]},
+ "Nissan":{logo:'images/logo_nissan.png',itens:[{n:"GTR Nissan LibertyWalk",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]}
+};
+var INCLUSO_FOTOS=["images/produto_1.jpg","images/produto_2.jpg","images/produto_3.jpg","images/produto_4.jpg"];
+
+function _brl(v){return 'R$ '+Number(v).toLocaleString('pt-BR');}
+function _linProd(k,v){return '<div style="display:flex;justify-content:space-between;gap:12px;"><span style="color:#888;">'+k+'</span><span style="color:#ddd;text-align:right;">'+v+'</span></div>';}
+
+function renderInclusoBrands(){
+  var el=document.getElementById('inclusoBrands'); if(!el)return;
+  var h='';
+  Object.keys(INCLUSO_CATALOG).forEach(function(b){
+    var c=INCLUSO_CATALOG[b];
+    var ico=c.logo?('<img src="'+c.logo+'" alt="">'):'<span style="font-size:16px;">\uD83C\uDFC1</span>';
+    h+='<div class="bcard" data-ib="'+b+'" onclick="selInclusoBrand(this.getAttribute(\'data-ib\'))"><div class="bico">'+ico+'</div><div class="bnm">'+b+'</div></div>';
+  });
+  el.innerHTML=h;
+  var w=document.getElementById('inclusoModelsWrap'); if(w)w.style.display='none';
+}
+
+function selInclusoBrand(b){
+  S.incBrandSel=b;
+  document.querySelectorAll('#inclusoBrands .bcard').forEach(function(c){c.classList.toggle('sel',c.getAttribute('data-ib')===b);});
+  var its=((INCLUSO_CATALOG[b]||{}).itens)||[];
+  var w=document.getElementById('inclusoModelsWrap'); if(w)w.style.display='block';
+  var cnt=document.getElementById('inclusoModelsCount'); if(cnt)cnt.textContent='('+its.length+')';
+  var lst=document.getElementById('inclusoModels'); if(!lst)return;
+  lst.innerHTML=its.map(function(it,i){
+    return '<div class="mrow" data-ii="'+i+'" onclick="selInclusoProduto(this.getAttribute(\'data-ii\'))"><span>'+it.n+'</span><span class="mrow-tag">'+it.esc+' \u00b7 '+_brl(it.p)+'</span></div>';
+  }).join('');
+}
+
+function trocarFotoIncluso(k){
+  var m=document.getElementById('ip2MainPhoto'); if(m)m.src=INCLUSO_FOTOS[k];
+  document.querySelectorAll('#ip2Thumbs img').forEach(function(t){
+    t.style.borderColor=(parseInt(t.getAttribute('data-th'),10)===k)?'#e07b00':'transparent';
+  });
+}
+
+// Produto pronto: sem personalizacao -> esconde as etapas 3..6 e mostra a aba Produto
+function aplicarModoCatalogo(on){
+  [3,4,5,6].forEach(function(st){
+    var t=document.querySelector('.stab[data-step="'+st+'"]');
+    if(t)t.style.display=on?'none':'';
+  });
+  var t2=document.getElementById('tabStep2');
+  if(t2)t2.style.display=on?'':(S.tipo==='mini'?'none':'');
+  var nav=document.getElementById('step2NavBtns');
+  if(nav)nav.style.display=on?'none':'';
+}
+
+function selInclusoProduto(i){
+  i=parseInt(i,10);
+  var b=S.incBrandSel, it=(((INCLUSO_CATALOG[b]||{}).itens)||[])[i];
+  if(!it)return;
+  S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
+  setEl('tabStep2Lbl','Produto');
+  setEl('step2Title', it.n);
+  setEl('step2Sub', b);
+  setStyle('step2Title','display','');
+  setStyle('step2Sub','display','');
+  // galeria de fotos do produto
+  var wrapO=document.getElementById('ip2MainImgWrap'), main=document.getElementById('ip2MainImg'), th=document.getElementById('ip2Thumbs');
+  if(wrapO)wrapO.style.display='';
+  if(main)main.innerHTML='<img id="ip2MainPhoto" src="'+INCLUSO_FOTOS[0]+'" style="width:100%;height:100%;object-fit:cover;display:block;">';
+  if(th){
+    th.style.display='flex';
+    th.innerHTML=INCLUSO_FOTOS.map(function(f,k){
+      return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:66px;height:52px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===0?'#e07b00':'transparent')+';">';
+    }).join('');
+  }
+  // ficha tecnica
+  var d=document.getElementById('ip2Desc');
+  if(d){
+    d.innerHTML='<div style="display:flex;flex-direction:column;gap:7px;">'
+      +_linProd('Marca',b)
+      +_linProd('Dimens\u00e3o do quadro',it.dim)
+      +_linProd('Escala da miniatura',it.esc)
+      +_linProd('Moldura',it.mol)
+      +_linProd('Fundo','Acr\u00edlico Brilho com Impress\u00e3o UV')
+      +_linProd('Miniatura','<span style="color:#7bd67b;">Inclusa</span>')
+      +'</div>';
+  }
+  setStyle('miniInclusoAISection','display','none');
+  setStyle('step2RegularContent','display','none');
+  setStyle('inclusoProdutoSection','display','block');
+  aplicarModoCatalogo(true);
+  goStep(2);
+  setStyle('inclusoProdutoSection','display','block');
+  setStyle('step2RegularContent','display','none');
+  calcPrice();
+}
+
+function voltarInclusoCatalogo(){
+  S.incProduto=null;
+  aplicarModoCatalogo(false);
+  setStyle('inclusoProdutoSection','display','none');
+  goStep(1);
+  setStyle('miniSection','display','none');
+  setStyle('miniInclusoAISection','display','block');
+  calcPrice();
+}
+
 // ── SUMÁRIO ──
 function buildSummary(){
+  // Produto pronto do catalogo: resumo com todos os dados para cobranca
+  if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
+    var _it=S.incProduto;
+    setEl('sumCat','Quadro para Miniaturas \u2014 Produto pronto');
+    setEl('sumMod',(S.incBrand?S.incBrand+' \u2014 ':'')+_it.n);
+    setEl('sumDim',_it.dim);
+    setEl('sumMold',_it.mol);
+    setEl('sumFund','Acr\u00edlico Brilho com Impress\u00e3o UV');
+    setEl('sumLed','Sem LED');
+    setEl('sumMini','Inclusa');
+    setEl('sumRel','Incluso');
+    setEl('pvSku',_it.esc+' / '+_it.dim);
+    setEl('sumTotal',_brl(_it.p));
+    return;
+  }
   const cat=S.tipo==='lego'?'LEGO Technic / Creator / Icons':'Miniatura Die-cast / 3D';
   // Mini: le marca/modelo do formulario ativo (mesma fonte da descricao), com o estado como reserva
   function _fv(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
