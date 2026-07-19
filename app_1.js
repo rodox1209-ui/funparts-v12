@@ -245,6 +245,13 @@ function goStep(n){
   if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
     var _lv=document.getElementById('livePv'); if(_lv)_lv.style.display='none';
     var _lw=document.getElementById('legoPreviewWrap'); if(_lw)_lw.style.display='none';
+    // manter o titulo do produto escolhido (nao recair para "Miniatura")
+    if(n===2){
+      setEl('tabStep2Lbl','Produto');
+      setEl('step2Title', S.incProduto.n);
+      setEl('step2Sub', S.incBrand||S.incBrandSel||'');
+      setStyle('step2Title','display',''); setStyle('step2Sub','display','');
+    }
     if(_mh && typeof INCLUSO_FOTOS!=='undefined'){
       _mh.style.display='flex'; _mh.style.padding='20px'; _mh.style.background='#0d0d0d';
       _mh.setAttribute('data-cat','1');
