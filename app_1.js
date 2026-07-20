@@ -3251,7 +3251,9 @@ function fecharPedidoWpp(){
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
                preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null,
-               preview:i.preview||null, resumo:i.resumo||[] };
+               preview:i.preview||null,
+               previewHtml:(i.preview&&i.preview.html)||'',   // compatibilidade com o Worker antigo
+               resumo:i.resumo||[] };
     })
   };
 
