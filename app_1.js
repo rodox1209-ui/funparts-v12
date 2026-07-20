@@ -3566,9 +3566,19 @@ function _capturaResumo(){
     ['Miniatura','sumMini'],['Alto-relevo extra','sumRel'],['SKU','pvSku']
   ];
   var out=[];
+  // o texto do resumo carrega botoes e selos; limpa para ficar legivel na producao
+  function _limpa(t){
+    return String(t||'')
+      .replace(/[\u00d7\u2715\u2716\u274c]/g,' ')   // x de remover
+      .replace(/\s*\+\s*R\$\s*/g,' (+R$ ')          // preco colado
+      .replace(/\(\+R\$ ([\d.,]+)/g,'(+R$ $1)')
+      .replace(/\s+/g,' ')
+      .replace(/\s+\)/g,')')
+      .trim();
+  }
   campos.forEach(function(p){
     var e=document.getElementById(p[1]);
-    var v=e?e.textContent.trim():'';
+    var v=e?_limpa(e.textContent):'';
     if(v&&v!=='—')out.push({k:p[0],v:v});
   });
   // detalhes que nao aparecem no resumo mas a producao precisa
