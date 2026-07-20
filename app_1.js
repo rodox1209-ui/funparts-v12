@@ -3045,7 +3045,7 @@ function _cartMontaItem(){
       linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(typeof INCLUSO_FOTOS!=='undefined'?INCLUSO_FOTOS[0]:''),
-      preview:null,
+      preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
       resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
       cfg:{ marca:(S.incBrand||S.incBrandSel||''), produto:p.n, escala:p.esc,
             dim:p.dim, moldura:p.mol, preco:p.p }
