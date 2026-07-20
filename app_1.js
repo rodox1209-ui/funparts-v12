@@ -3531,14 +3531,13 @@ function _absUrl(u){
 
 function _capturaPreview(){
   try{
-    // pega SO a peca (o quadro), nao a moldura da interface
+    // pega SO a peca (o quadro), nunca o painel da interface.
+    // LEGO usa #legoDetQuadro; Miniaturas usam #livePv .quadro.
     var alvo=null;
-    var cands=[
-      document.querySelector('#legoPreviewWrap .quadro'),
-      document.querySelector('#livePv .quadro'),
-      document.querySelector('#legoPreviewWrap'),
-      document.getElementById('livePv')
-    ];
+    var _ehLego=(typeof S!=='undefined' && S.tipo==='lego');
+    var cands=_ehLego
+      ? [document.getElementById('legoDetQuadro'), document.querySelector('#livePv .quadro')]
+      : [document.querySelector('#livePv .quadro'), document.getElementById('legoDetQuadro')];
     for(var k=0;k<cands.length;k++){
       var c=cands[k];
       if(c && c.offsetWidth>40 && c.offsetHeight>40){ alvo=c; break; }
@@ -3548,6 +3547,33 @@ function _capturaPreview(){
     var W=alvo.offsetWidth, H=alvo.offsetHeight;
     var c2=alvo.cloneNode(true);
     c2.removeAttribute('id');
+
+    // trava a peca no tamanho medido. sem isso o clone herda regras do
+    // painel (width:280px, aspect-ratio, height:100%) que nao existem no
+    // iframe do pedido -- era o que deformava o preview.
+    c2.style.width=W+'px';
+    c2.style.height=H+'px';
+    c2.style.position='relative';
+    c2.style.margin='0';
+    c2.style.padding='0';
+    c2.style.flex='0 0 auto';
+    c2.style.minWidth='0';
+    c2.style.minHeight='0';
+    c2.style.maxWidth='none';
+    c2.style.maxHeight='none';
+    c2.style.aspectRatio='auto';
+    c2.style.overflow='hidden';
+
+    // .c-fundo define a altura do quadro por imagem em fluxo; como a altura
+    // agora e fixa, ela passa a preencher a peca exatamente.
+    var _cf=c2.querySelector('.c-fundo');
+    if(_cf){
+      _cf.style.position='absolute';
+      _cf.style.top='0'; _cf.style.left='0';
+      _cf.style.width='100%'; _cf.style.height='100%';
+      var _cfi=_cf.querySelector('img');
+      if(_cfi){ _cfi.style.width='100%'; _cfi.style.height='100%'; _cfi.style.objectFit='fill'; }
+    }
 
     c2.querySelectorAll('img').forEach(function(im){
       var sr=im.getAttribute('src')||'';
@@ -3561,7 +3587,8 @@ function _capturaPreview(){
           return 'url('+q+_absUrl(u)+q+')';
         });
       }
-      el.removeAttribute('id');
+      // os ids ficam: o preview roda num iframe isolado, nao ha colisao,
+      // e o CSS do site depende deles (#ledDark, #relExtras, etc).
     });
     var h=c2.outerHTML;
     if(h.length>60000)return null;
