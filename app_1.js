@@ -3034,6 +3034,25 @@ function _cartThumb(src,cb){
 }
 
 // monta o item a partir do estado atual S
+// item de catalogo guardado no carrinho antes da correcao veio sem preview.
+// como e sempre a foto do produto, da para remontar na hora de fechar.
+function _pvCatalogo(){
+  if(typeof INCLUSO_FOTOS==='undefined')return null;
+  var f=INCLUSO_FOTOS[0];
+  if(!f)return null;
+  return {
+    html:'<div style="width:520px;height:520px;display:flex;align-items:center;justify-content:center;background:#0d0d0d;">'
+         +'<img src="'+_absUrl(f)+'" style="max-width:100%;max-height:100%;object-fit:contain;display:block;">'
+         +'</div>',
+    w:520, h:520
+  };
+}
+function _pvDoItem(i){
+  if(i.preview&&i.preview.html)return i.preview;
+  if(i.via==='catalogo')return _pvCatalogo();
+  return null;
+}
+
 function _cartMontaItem(){
   var catalogo=(S.tipo==='mini'&&S.miniChoice==='incluso'&&S.incProduto);
   if(catalogo){
@@ -3273,8 +3292,8 @@ function fecharPedidoWpp(){
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
                preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
-               preview:i.preview||null,
-               previewHtml:(i.preview&&i.preview.html)||'',   // compatibilidade com o Worker antigo
+               preview:_pvDoItem(i),
+               previewHtml:(_pvDoItem(i)||{}).html||'',   // compatibilidade com o Worker antigo
                resumo:i.resumo||[] };
     })
   };
@@ -3735,8 +3754,8 @@ function _rascEnvia(){
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
                preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
-               preview:i.preview||null,
-               previewHtml:(i.preview&&i.preview.html)||'',
+               preview:_pvDoItem(i),
+               previewHtml:(_pvDoItem(i)||{}).html||'',
                resumo:i.resumo||[] };
     })
   };
