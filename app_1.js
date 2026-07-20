@@ -214,6 +214,7 @@ function goStep(n){
       }
     }
   }
+  if(n!==7 && typeof _botoesResumo==='function')_botoesResumo(false);
   var _sn=1;document.querySelectorAll('.stab').forEach((t,i)=>{
     t.classList.remove('active','done');
     if(i===n)t.classList.add('active');
@@ -3092,6 +3093,7 @@ function adicionarAoCarrinho(){
   _cartRender();
   _cartPulse();
   _cartToast(it.titulo);
+  if(typeof _botoesResumo==='function')_botoesResumo(true);
   _cartThumb(src,function(thumb){
     if(!thumb)return;
     var alvo=CART.filter(function(x){return x.id===it.id;})[0];
@@ -3481,4 +3483,26 @@ function carrinhoPasso(n){
     if(tit)tit.textContent='Seu carrinho';
     if(volta)volta.style.display='none';
   }
+}
+
+// ═══ botoes da etapa de resumo: adicionar -> finalizar (verde) + continuar ═══
+function _botoesResumo(adicionado){
+  [['btnAddCart','btnContinuar'],['btnAddCartInc','btnContinuarInc']].forEach(function(par){
+    var add=document.getElementById(par[0]);
+    var cont=document.getElementById(par[1]);
+    if(add){
+      add.classList.toggle('finalizar',!!adicionado);
+      add.textContent=adicionado?'Finalizar pedido →':'Adicionar ao carrinho →';
+      add.onclick=adicionado?finalizarPeloResumo:adicionarAoCarrinho;
+    }
+    if(cont)cont.style.display=adicionado?'':'none';
+  });
+}
+function finalizarPeloResumo(){
+  abrirCarrinho();
+  carrinhoPasso(2);
+}
+function continuarComprando(){
+  _botoesResumo(false);
+  goStep(0);
 }

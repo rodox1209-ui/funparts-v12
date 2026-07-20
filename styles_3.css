@@ -156,6 +156,16 @@
   transition:background .18s;
 }
 .btn-add-cart:hover{background:#f08c10;}
+/* apos adicionar: o mesmo botao vira FINALIZAR PEDIDO, em verde */
+.btn-add-cart.finalizar{background:#1e9e4a;}
+.btn-add-cart.finalizar:hover{background:#23b455;}
+.btn-continuar{
+  width:100%;padding:13px;margin-bottom:10px;background:transparent;
+  border:1px solid rgba(255,255,255,.22);border-radius:8px;color:#ddd;
+  font-family:'Barlow Condensed',Arial,sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.18s;
+}
+.btn-continuar:hover{border-color:rgba(255,255,255,.45);color:#fff;background:rgba(255,255,255,.04);}
 
 @media(max-width:720px){
   .cart-btn{right:14px;padding:7px 12px;font-size:10px;}
