@@ -3162,6 +3162,7 @@ function _esc(s){
 
 function abrirCarrinho(){
   _cartRender();
+  if(typeof carrinhoPasso==='function')carrinhoPasso(1);
   var p=document.getElementById('cartPanel'), o=document.getElementById('cartOv');
   if(p)p.classList.add('open');
   if(o)o.classList.add('open');
@@ -3173,17 +3174,36 @@ function fecharCarrinho(){
   if(o)o.classList.remove('open');
 }
 
-// provisorio: no bloco 4 isto passa a gravar o pedido e enviar so o codigo
 function fecharPedidoWpp(){
   if(!CART.length)return;
-  var linhas=CART.map(function(i,k){
+  var aviso=document.getElementById('frmAviso');
+  if(!_frmValidaTudo(true)){
+    if(aviso)aviso.textContent='Confira os campos destacados antes de continuar.';
+    var ruim=FRM_CAMPOS.map(function(c){return document.getElementById(c.id);})
+                       .filter(function(e){return e&&e.classList.contains('erro');})[0];
+    if(ruim){ ruim.focus(); ruim.scrollIntoView({behavior:'smooth',block:'center'}); }
+    return;
+  }
+  if(aviso)aviso.textContent='';
+  _cliSalva();
+  var c=dadosCliente();
+  var itens=CART.map(function(i,k){
     return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
-         +'\n   '+i.linhas.join(' · ')
+         +'\n   '+i.linhas.join(' \u00b7 ')
          +'\n   '+_brlCart(i.preco);
   }).join('\n');
   var msg=encodeURIComponent(
-    'Olá! Quero fechar meu pedido na Funparts:\n\n'+linhas+
-    '\n\nTOTAL: '+_brlCart(_cartTotal())+'\n\nPodemos seguir?'
+    'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n'+
+    '*ITENS*\n'+itens+'\n\n'+
+    '*TOTAL:* '+_brlCart(_cartTotal())+'\n\n'+
+    '*MEUS DADOS*\n'+
+    'Nome: '+c.nome+'\n'+
+    'CPF: '+_mascCpf(c.cpf)+'\n'+
+    'WhatsApp: '+_mascTel(c.whatsapp)+'\n'+
+    'E-mail: '+c.email+'\n'+
+    'Endere\u00e7o: '+c.rua+', '+c.numero+(c.complemento?' - '+c.complemento:'')+'\n'+
+    c.bairro+' - '+c.cidade+'/'+c.uf+'\n'+
+    'CEP: '+_mascCep(c.cep)
   );
   window.open('https://wa.me/5511910646157?text='+msg,'_blank');
 }
@@ -3191,3 +3211,205 @@ function fecharPedidoWpp(){
 document.addEventListener('keydown',function(e){ if(e.key==='Escape')fecharCarrinho(); });
 _cartLoad();
 _cartRender();
+
+// ═══════════════════════════════════════════════════════════
+//  DADOS DO CLIENTE — passo 2 do carrinho
+// ═══════════════════════════════════════════════════════════
+var CLI_KEY='funparts_cliente_v1';
+
+function _so(v){ return String(v||'').replace(/\D/g,''); }
+
+// ── mascaras ──
+function _mascCpf(v){
+  v=_so(v).slice(0,11);
+  if(v.length>9) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
+  if(v.length>6) return v.replace(/(\d{3})(\d{3})(\d{1,3})/,'$1.$2.$3');
+  if(v.length>3) return v.replace(/(\d{3})(\d{1,3})/,'$1.$2');
+  return v;
+}
+function _mascCep(v){
+  v=_so(v).slice(0,8);
+  return v.length>5 ? v.replace(/(\d{5})(\d{1,3})/,'$1-$2') : v;
+}
+function _mascTel(v){
+  v=_so(v).slice(0,11);
+  if(v.length>10) return v.replace(/(\d{2})(\d{5})(\d{1,4})/,'($1) $2-$3');
+  if(v.length>6)  return v.replace(/(\d{2})(\d{4})(\d{1,4})/,'($1) $2-$3');
+  if(v.length>2)  return v.replace(/(\d{2})(\d{1,5})/,'($1) $2');
+  if(v.length)    return '('+v;
+  return v;
+}
+
+// ── validacao de CPF (digitos verificadores) ──
+function _cpfValido(cpf){
+  cpf=_so(cpf);
+  if(cpf.length!==11)return false;
+  if(/^(\d)\1{10}$/.test(cpf))return false; // 111.111.111-11 etc
+  var s=0,i,r;
+  for(i=0;i<9;i++) s+=parseInt(cpf.charAt(i),10)*(10-i);
+  r=(s*10)%11; if(r===10||r===11)r=0;
+  if(r!==parseInt(cpf.charAt(9),10))return false;
+  s=0;
+  for(i=0;i<10;i++) s+=parseInt(cpf.charAt(i),10)*(11-i);
+  r=(s*10)%11; if(r===10||r===11)r=0;
+  return r===parseInt(cpf.charAt(10),10);
+}
+function _emailValido(e){
+  return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(String(e||'').trim());
+}
+
+// ── regras de cada campo ──
+var FRM_CAMPOS=[
+  {id:'fNome',  err:'eNome',   obrig:true,  chk:function(v){ return v.trim().split(/\s+/).length>=2 || 'Informe nome e sobrenome'; }},
+  {id:'fCpf',   err:'eCpf',    obrig:true,  chk:function(v){ return _cpfValido(v) || 'CPF inválido'; }},
+  {id:'fZap',   err:'eZap',    obrig:true,  chk:function(v){ var d=_so(v); return (d.length===10||d.length===11) || 'Telefone incompleto'; }},
+  {id:'fCep',   err:'eCep',    obrig:true,  chk:function(v){ return _so(v).length===8 || 'CEP incompleto'; }},
+  {id:'fEmail', err:'eEmail',  obrig:true,  chk:function(v){ return _emailValido(v) || 'E-mail inválido'; }},
+  {id:'fRua',   err:'eRua',    obrig:true,  chk:function(v){ return v.trim().length>2 || 'Informe o endereço'; }},
+  {id:'fNum',   err:'eNum',    obrig:true,  chk:function(v){ return v.trim().length>0 || 'Informe o número'; }},
+  {id:'fBairro',err:'eBairro', obrig:true,  chk:function(v){ return v.trim().length>1 || 'Informe o bairro'; }},
+  {id:'fCidade',err:'eCidade', obrig:true,  chk:function(v){ return v.trim().length>1 || 'Informe a cidade'; }},
+  {id:'fUf',    err:'eUf',     obrig:true,  chk:function(v){ return /^[A-Za-z]{2}$/.test(v.trim()) || 'UF'; }},
+  {id:'fCompl', err:null,      obrig:false, chk:function(){ return true; }}
+];
+
+function _frmVal(id){ var e=document.getElementById(id); return e?e.value:''; }
+
+function _frmValidaCampo(c,mostrar){
+  var el=document.getElementById(c.id); if(!el)return true;
+  var v=el.value||'';
+  var vazio=!v.trim();
+  var ok, msg='';
+  if(vazio){ ok=!c.obrig; if(!ok)msg='Campo obrigatório'; }
+  else { var r=c.chk(v); ok=(r===true); if(!ok)msg=r; }
+  if(mostrar){
+    el.classList.toggle('erro',!ok);
+    el.classList.toggle('ok',ok&&!vazio);
+    var e=c.err&&document.getElementById(c.err);
+    if(e)e.textContent=ok?'':msg;
+  }
+  return ok;
+}
+
+function _frmValidaTudo(mostrar){
+  var ok=true;
+  FRM_CAMPOS.forEach(function(c){ if(!_frmValidaCampo(c,mostrar))ok=false; });
+  var btn=document.getElementById('btnFecharPedido');
+  if(btn)btn.disabled=!ok;
+  return ok;
+}
+
+// ── busca de endereco pelo CEP (ViaCEP) ──
+var _cepUltimo='';
+function _buscaCep(){
+  var cep=_so(_frmVal('fCep'));
+  if(cep.length!==8 || cep===_cepUltimo)return;
+  _cepUltimo=cep;
+  var e=document.getElementById('eCep');
+  if(e){ e.textContent='Buscando endereço…'; e.style.color='#e07b00'; }
+  var t=setTimeout(function(){ if(e){e.textContent='';e.style.color='';} },9000);
+  fetch('https://viacep.com.br/ws/'+cep+'/json/')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      clearTimeout(t);
+      if(e){ e.textContent=''; e.style.color=''; }
+      if(!d || d.erro){ if(e)e.textContent='CEP não encontrado'; return; }
+      function _set(id,val){
+        var el=document.getElementById(id);
+        if(el && val && !el.value.trim()){ el.value=val; }
+      }
+      _set('fRua',d.logradouro); _set('fBairro',d.bairro);
+      _set('fCidade',d.localidade); _set('fUf',d.uf);
+      var n=document.getElementById('fNum');
+      if(n && !n.value.trim())n.focus();
+      _frmValidaTudo(false);
+    })
+    .catch(function(){
+      clearTimeout(t);
+      if(e){ e.textContent=''; e.style.color=''; }
+      // sem internet ou servico fora: o cliente preenche na mao, sem travar
+    });
+}
+
+// ── liga mascaras e validacao aos campos ──
+var _frmLigado=false;
+function _frmLiga(){
+  if(_frmLigado)return; _frmLigado=true;
+  var masc={ fCpf:_mascCpf, fCep:_mascCep, fZap:_mascTel };
+  FRM_CAMPOS.forEach(function(c){
+    var el=document.getElementById(c.id); if(!el)return;
+    el.addEventListener('input',function(){
+      if(masc[c.id]){
+        var p=el.selectionStart, antes=el.value.length;
+        el.value=masc[c.id](el.value);
+        if(p!==null && p<antes) el.setSelectionRange(p,p);
+      }
+      if(c.id==='fUf')el.value=el.value.toUpperCase().replace(/[^A-Za-z]/g,'');
+      if(el.classList.contains('erro'))_frmValidaCampo(c,true);
+      _frmValidaTudo(false);
+      _cliSalva();
+    });
+    el.addEventListener('blur',function(){
+      _frmValidaCampo(c,true);
+      _frmValidaTudo(false);
+      if(c.id==='fCep')_buscaCep();
+    });
+  });
+  var cep=document.getElementById('fCep');
+  if(cep)cep.addEventListener('input',function(){ if(_so(cep.value).length===8)_buscaCep(); });
+}
+
+// ── guarda os dados para o cliente nao redigitar ──
+function _cliSalva(){
+  try{
+    var d={};
+    FRM_CAMPOS.forEach(function(c){ d[c.id]=_frmVal(c.id); });
+    localStorage.setItem(CLI_KEY,JSON.stringify(d));
+  }catch(e){}
+}
+function _cliCarrega(){
+  try{
+    var d=JSON.parse(localStorage.getItem(CLI_KEY)||'{}');
+    FRM_CAMPOS.forEach(function(c){
+      var el=document.getElementById(c.id);
+      if(el && d[c.id])el.value=d[c.id];
+    });
+  }catch(e){}
+}
+function dadosCliente(){
+  return {
+    nome:_frmVal('fNome').trim(), cpf:_so(_frmVal('fCpf')),
+    whatsapp:_so(_frmVal('fZap')), email:_frmVal('fEmail').trim(),
+    cep:_so(_frmVal('fCep')), rua:_frmVal('fRua').trim(),
+    numero:_frmVal('fNum').trim(), complemento:_frmVal('fCompl').trim(),
+    bairro:_frmVal('fBairro').trim(), cidade:_frmVal('fCidade').trim(),
+    uf:_frmVal('fUf').trim().toUpperCase()
+  };
+}
+
+// ── navegacao entre os dois passos do painel ──
+function carrinhoPasso(n){
+  if(n===2 && !CART.length)return;
+  var body=document.getElementById('cartBody'), form=document.getElementById('cartForm');
+  var f1=document.getElementById('cartFoot'), f2=document.getElementById('cartFoot2');
+  var tit=document.getElementById('cartTitulo'), volta=document.getElementById('cartVoltar');
+  if(n===2){
+    if(body)body.style.display='none';
+    if(form)form.style.display='';
+    if(f1)f1.style.display='none';
+    if(f2)f2.style.display='';
+    if(tit)tit.textContent='Seus dados';
+    if(volta)volta.style.display='';
+    var t2=document.getElementById('cartTotal2');
+    if(t2)t2.textContent=_brlCart(_cartTotal());
+    _frmLiga(); _cliCarrega(); _frmValidaTudo(false);
+    var fm=document.getElementById('cartForm'); if(fm)fm.scrollTop=0;
+  } else {
+    if(body)body.style.display='';
+    if(form)form.style.display='none';
+    if(f1)f1.style.display=CART.length?'':'none';
+    if(f2)f2.style.display='none';
+    if(tit)tit.textContent='Seu carrinho';
+    if(volta)volta.style.display='none';
+  }
+}

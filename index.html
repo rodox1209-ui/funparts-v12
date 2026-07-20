@@ -43,9 +43,12 @@
 <div class="cart-ov" id="cartOv" onclick="fecharCarrinho()"></div>
 <aside class="cart-panel" id="cartPanel" aria-label="Carrinho de compras">
   <div class="cart-head">
-    <h3>Seu carrinho</h3>
+    <button class="cart-voltar" id="cartVoltar" onclick="carrinhoPasso(1)" style="display:none;" aria-label="Voltar">&#8592;</button>
+    <h3 id="cartTitulo">Seu carrinho</h3>
     <button class="cart-close" onclick="fecharCarrinho()" aria-label="Fechar">&#10005;</button>
   </div>
+
+  <!-- PASSO 1: itens -->
   <div class="cart-body" id="cartBody"></div>
   <div class="cart-foot" id="cartFoot" style="display:none;">
     <div class="cart-tot">
@@ -53,8 +56,93 @@
       <div class="cart-tot-v" id="cartTotal">R$ 0</div>
     </div>
     <div class="cart-note">Sem frete · Combinamos o envio pelo WhatsApp</div>
-    <button class="btn-cart-go" onclick="fecharPedidoWpp()">Fechar pedido via WhatsApp</button>
+    <button class="btn-cart-go" onclick="carrinhoPasso(2)">Fechar pedido &rarr;</button>
     <button class="btn-cart-more" onclick="fecharCarrinho()">Continuar comprando</button>
+  </div>
+
+  <!-- PASSO 2: dados do cliente -->
+  <div class="cart-body" id="cartForm" style="display:none;">
+    <div class="frm-intro">Precisamos desses dados para emitir a nota e combinar a entrega.</div>
+
+    <div class="frm-g">
+      <label for="fNome">Nome completo</label>
+      <input id="fNome" type="text" autocomplete="name" placeholder="Como no documento">
+      <div class="frm-err" id="eNome"></div>
+    </div>
+
+    <div class="frm-g">
+      <label for="fCpf">CPF</label>
+      <input id="fCpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14">
+      <div class="frm-err" id="eCpf"></div>
+    </div>
+
+    <div class="frm-row">
+      <div class="frm-g">
+        <label for="fZap">WhatsApp</label>
+        <input id="fZap" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15">
+        <div class="frm-err" id="eZap"></div>
+      </div>
+      <div class="frm-g">
+        <label for="fCep">CEP</label>
+        <input id="fCep" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9">
+        <div class="frm-err" id="eCep"></div>
+      </div>
+    </div>
+
+    <div class="frm-g">
+      <label for="fEmail">E-mail</label>
+      <input id="fEmail" type="email" autocomplete="email" placeholder="voce@email.com">
+      <div class="frm-err" id="eEmail"></div>
+    </div>
+
+    <div class="frm-g">
+      <label for="fRua">Endereço</label>
+      <input id="fRua" type="text" autocomplete="address-line1" placeholder="Rua, avenida…">
+      <div class="frm-err" id="eRua"></div>
+    </div>
+
+    <div class="frm-row">
+      <div class="frm-g" style="flex:0 0 34%;">
+        <label for="fNum">Número</label>
+        <input id="fNum" type="text" inputmode="numeric" placeholder="123">
+        <div class="frm-err" id="eNum"></div>
+      </div>
+      <div class="frm-g">
+        <label for="fCompl">Complemento <span class="opt">(opcional)</span></label>
+        <input id="fCompl" type="text" autocomplete="address-line2" placeholder="Apto, bloco…">
+      </div>
+    </div>
+
+    <div class="frm-g">
+      <label for="fBairro">Bairro</label>
+      <input id="fBairro" type="text" placeholder="Bairro">
+      <div class="frm-err" id="eBairro"></div>
+    </div>
+
+    <div class="frm-row">
+      <div class="frm-g">
+        <label for="fCidade">Cidade</label>
+        <input id="fCidade" type="text" autocomplete="address-level2" placeholder="Cidade">
+        <div class="frm-err" id="eCidade"></div>
+      </div>
+      <div class="frm-g" style="flex:0 0 26%;">
+        <label for="fUf">UF</label>
+        <input id="fUf" type="text" autocomplete="address-level1" placeholder="SP" maxlength="2">
+        <div class="frm-err" id="eUf"></div>
+      </div>
+    </div>
+
+    <div class="frm-lgpd">Seus dados são usados apenas para emitir a nota fiscal e realizar a entrega.</div>
+  </div>
+
+  <div class="cart-foot" id="cartFoot2" style="display:none;">
+    <div class="cart-tot">
+      <div class="cart-tot-l">Total</div>
+      <div class="cart-tot-v" id="cartTotal2">R$ 0</div>
+    </div>
+    <div class="frm-aviso" id="frmAviso"></div>
+    <button class="btn-cart-go" id="btnFecharPedido" onclick="fecharPedidoWpp()">Fechar pedido via WhatsApp</button>
+    <button class="btn-cart-more" onclick="carrinhoPasso(1)">&larr; Voltar aos itens</button>
   </div>
 </aside>
 <div class="cart-toast" id="cartToast">

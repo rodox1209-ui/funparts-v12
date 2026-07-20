@@ -116,6 +116,39 @@
   white-space:nowrap;
 }
 
+/* ── formulario de dados ── */
+.cart-voltar{
+  background:none;border:none;color:#888;font-size:19px;cursor:pointer;
+  line-height:1;padding:0 10px 0 0;transition:color .15s;
+}
+.cart-voltar:hover{color:#fff;}
+.frm-intro{font-size:11.5px;color:#999;line-height:1.6;margin-bottom:16px;}
+.frm-g{margin-bottom:13px;flex:1;min-width:0;}
+.frm-row{display:flex;gap:10px;}
+.frm-g label{
+  display:block;font-size:10px;color:#999;letter-spacing:1.2px;
+  text-transform:uppercase;margin-bottom:5px;
+}
+.frm-g label .opt{text-transform:none;letter-spacing:0;color:#666;font-size:9.5px;}
+.frm-g input{
+  width:100%;box-sizing:border-box;padding:11px 12px;background:#1a1a1a;
+  border:1px solid rgba(255,255,255,.12);border-radius:7px;color:#fff;
+  font-family:inherit;font-size:13px;transition:border-color .15s,background .15s;
+}
+.frm-g input:focus{outline:none;border-color:#e07b00;background:#1f1f1f;}
+.frm-g input::placeholder{color:#555;}
+.frm-g input.erro{border-color:#c0392b;}
+.frm-g input.ok{border-color:rgba(30,122,58,.65);}
+.frm-err{font-size:10px;color:#e2645a;margin-top:4px;min-height:12px;line-height:1.3;}
+.frm-lgpd{
+  font-size:10px;color:#666;line-height:1.6;margin-top:6px;padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.frm-aviso{font-size:10.5px;color:#e2645a;margin-bottom:9px;min-height:13px;line-height:1.4;}
+.btn-cart-go[disabled]{opacity:.45;cursor:not-allowed;}
+.btn-cart-go[disabled]:hover{background:#e07b00;}
+.cep-carregando{font-size:10px;color:#e07b00;margin-top:4px;}
+
 .btn-add-cart{
   width:100%;padding:15px;background:#e07b00;border:none;border-radius:8px;color:#fff;
   font-family:'Barlow Condensed',Arial,sans-serif;font-size:16px;font-weight:700;
