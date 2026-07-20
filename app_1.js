@@ -3042,6 +3042,8 @@ function _cartMontaItem(){
       linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(typeof INCLUSO_FOTOS!=='undefined'?INCLUSO_FOTOS[0]:''),
+      previewHtml:'',
+      resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
       cfg:{ marca:(S.incBrand||S.incBrandSel||''), produto:p.n, escala:p.esc,
             dim:p.dim, moldura:p.mol, preco:p.p }
     };
@@ -3070,6 +3072,8 @@ function _cartMontaItem(){
     titulo:titulo, sub:(ehLego?'Quadro para LEGO':'Quadro para Miniatura'),
     linhas:linhas, preco:S._total,
     imgSrc:src,
+    previewHtml:(typeof _capturaPreview==='function'?_capturaPreview():''),
+    resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
     cfg:{ tipo:S.tipo, legoBrand:S.legoBrand, legoModel:S.legoModel, legoDim:S.legoDim,
           miniBrand:S.miniBrand, miniModel:S.miniModel, miniSize:S.miniSize, miniDim:S.miniDim,
           miniOpt:S.miniOpt, disp:S.disp,
@@ -3246,7 +3250,8 @@ function fecharPedidoWpp(){
     cliente:c,
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
-               preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null };
+               preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null,
+               previewHtml:i.previewHtml||'', resumo:i.resumo||[] };
     })
   };
 
@@ -3505,4 +3510,90 @@ function finalizarPeloResumo(){
 function continuarComprando(){
   _botoesResumo(false);
   goStep(0);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CAPTURA DO PREVIEW — copia o HTML real da composicao
+//  para reconstruir o quadro exatamente na pagina do pedido
+// ═══════════════════════════════════════════════════════════
+var SITE_BASE='https://funparts-v12.pages.dev/';
+
+function _absUrl(u){
+  if(!u)return u;
+  if(/^(https?:|data:)/.test(u))return u;
+  return SITE_BASE+String(u).replace(/^\.?\//,'');
+}
+
+function _capturaPreview(){
+  try{
+    var alvo=null;
+    var lp=document.getElementById('legoPreviewWrap');
+    var mp=document.getElementById('livePv');
+    if(lp&&getComputedStyle(lp).display!=='none')alvo=lp;
+    else if(mp&&getComputedStyle(mp).display!=='none')alvo=mp;
+    if(!alvo)return '';
+
+    var c=alvo.cloneNode(true);
+    c.removeAttribute('id');
+    c.style.display='flex';
+
+    // imagens: caminho relativo vira absoluto; imagem de IA sai e volta na pagina do pedido
+    c.querySelectorAll('img').forEach(function(im){
+      var s=im.getAttribute('src')||'';
+      if(s.indexOf('data:')===0){ im.removeAttribute('src'); im.setAttribute('data-ai','1'); }
+      else if(s){ im.setAttribute('src',_absUrl(s)); }
+    });
+    // fundos aplicados por style inline
+    c.querySelectorAll('*').forEach(function(el){
+      var bi=el.style&&el.style.backgroundImage;
+      if(bi&&bi.indexOf('url(')>-1&&bi.indexOf('data:')===-1){
+        el.style.backgroundImage=bi.replace(/url\((['"]?)([^'")]+)\1\)/g,function(_,q,u){
+          return 'url('+q+_absUrl(u)+q+')';
+        });
+      }
+      el.removeAttribute('id');
+    });
+    var h=c.outerHTML;
+    return h.length>60000?'':h;   // trava de seguranca
+  }catch(e){ return ''; }
+}
+
+// copia fiel das linhas do resumo, como o cliente viu
+function _capturaResumo(){
+  var campos=[
+    ['Categoria','sumCat'],['Modelo','sumMod'],['Dimensão','sumDim'],
+    ['Moldura','sumMold'],['Fundo','sumFund'],['LED','sumLed'],
+    ['Miniatura','sumMini'],['Alto-relevo extra','sumRel'],['SKU','pvSku']
+  ];
+  var out=[];
+  campos.forEach(function(p){
+    var e=document.getElementById(p[1]);
+    var v=e?e.textContent.trim():'';
+    if(v&&v!=='—')out.push({k:p[0],v:v});
+  });
+  // detalhes que nao aparecem no resumo mas a producao precisa
+  try{
+    if(S.tipo==='mini'&&S.miniChoice!=='incluso'){
+      function _v(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
+      var m=_v('aiCarBrand','apenaCarBrand'), mo=_v('aiCarModel','apenaCarModel');
+      var an=_v('aiCarYear','apenaCarYear'), cor=_v('aiCarColor','apenaCarColor');
+      if(m)out.push({k:'Marca do carro',v:m});
+      if(mo)out.push({k:'Modelo do carro',v:mo});
+      if(an)out.push({k:'Ano',v:an});
+      if(cor)out.push({k:'Cor',v:cor});
+    }
+    if(S.fundo==='f-uv'){
+      var lbl={deg:'Degradê Central',stripe:'Listra Central',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
+      if(S.uvLayoutType)out.push({k:'Layout do fundo',v:lbl[S.uvLayoutType]||S.uvLayoutType});
+      if(S.uvStripeMain)out.push({k:'Cor principal',v:S.uvStripeMain});
+      if(S.uvStripeAccent)out.push({k:'Cor de destaque',v:S.uvStripeAccent});
+      if(S.uvColor&&S.uvLayoutType==='deg')out.push({k:'Cor do fundo',v:S.uvColor});
+    }
+    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' · '+(S.ledFio==='sem'?'sem fio':'com fio')});
+    var pil=(document.getElementById('relPilotoNome')||{}).value;
+    if(pil&&pil.trim())out.push({k:'Nome do piloto',v:pil.trim()});
+    if(S.relTL)out.push({k:'Cor do relevo superior',v:S.relTL});
+    if(S.relBR)out.push({k:'Cor do relevo inferior',v:S.relBR});
+  }catch(e){}
+  return out;
 }
