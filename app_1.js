@@ -3247,6 +3247,7 @@ function fecharPedidoWpp(){
   }
 
   var corpo={
+    rascunhoToken:(typeof _rascToken==='function'?_rascToken():'')||undefined,
     cliente:c,
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
@@ -3277,6 +3278,7 @@ function fecharPedidoWpp(){
       '*Total:* '+_brlCart(d.total||_cartTotal())+'\n\n'+
       'Detalhes e imagens:\n'+d.url
     );
+    if(typeof _rascLimpa==='function')_rascLimpa();
     CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
   })
   .catch(function(){
@@ -3426,6 +3428,7 @@ function _frmLiga(){
       if(el.classList.contains('erro'))_frmValidaCampo(c,true);
       _frmValidaTudo(false);
       _cliSalva();
+      if(typeof _rascAgenda==='function')_rascAgenda();
     });
     el.addEventListener('blur',function(){
       _frmValidaCampo(c,true);
@@ -3614,4 +3617,49 @@ function _capturaResumo(){
     if(S.relBR)out.push({k:'Cor do relevo inferior',v:S.relBR});
   }catch(e){}
   return out;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RASCUNHO — grava quem preencheu os dados e nao fechou.
+//  Vira lista de recuperacao de venda no painel.
+// ═══════════════════════════════════════════════════════════
+var RASC_KEY='funparts_rascunho_v1';
+var _rascTimer=null, _rascEnviando=false;
+
+function _rascToken(){ try{ return localStorage.getItem(RASC_KEY)||''; }catch(e){ return ''; } }
+function _rascGuarda(t){ try{ if(t)localStorage.setItem(RASC_KEY,t); }catch(e){} }
+function _rascLimpa(){ try{ localStorage.removeItem(RASC_KEY); }catch(e){} }
+
+function _rascAgenda(){
+  if(!CART.length)return;
+  var zap=_so(_frmVal('fZap'));
+  if(zap.length<10)return;              // sem contato nao adianta gravar
+  clearTimeout(_rascTimer);
+  _rascTimer=setTimeout(_rascEnvia,4000);
+}
+
+function _rascEnvia(){
+  if(_rascEnviando||!CART.length)return;
+  var c=dadosCliente();
+  if(_so(c.whatsapp).length<10)return;
+  _rascEnviando=true;
+  var corpo={
+    rascunho:true,
+    rascunhoToken:_rascToken()||undefined,
+    cliente:c,
+    itens:CART.map(function(i){
+      return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
+               preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null,
+               preview:i.preview||null,
+               previewHtml:(i.preview&&i.preview.html)||'',
+               resumo:i.resumo||[] };
+    })
+  };
+  fetch(API_FUNPARTS+'/pedido',{
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(corpo)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){ if(d&&d.token)_rascGuarda(d.token); })
+  .catch(function(){})
+  .then(function(){ _rascEnviando=false; });
 }
