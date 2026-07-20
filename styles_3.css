@@ -12,6 +12,8 @@
   transition:background .18s,border-color .18s;
 }
 .cart-btn:hover{background:rgba(224,123,0,.16);border-color:rgba(224,123,0,.5);}
+/* reserva o espaco do botao para o texto do cabecalho nao passar por baixo */
+#headerSub{margin-right:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cart-btn svg{width:17px;height:17px;flex-shrink:0;}
 .cart-count{
   min-width:19px;height:19px;border-radius:999px;background:#e07b00;color:#fff;
@@ -125,6 +127,7 @@
 @media(max-width:720px){
   .cart-btn{right:14px;padding:7px 12px;font-size:10px;}
   .cart-btn .lbl{display:none;}
+  #headerSub{margin-right:92px;}
   .cart-panel{width:100%;max-width:100%;}
   .cart-foot{padding-bottom:26px;}
   .cart-toast{bottom:96px;flex-direction:column;align-items:stretch;text-align:center;}
