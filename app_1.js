@@ -243,7 +243,10 @@ function goStep(n){
   // Produto pronto do catalogo: o preview e a FOTO do produto, nao o quadro montado
   var _mh=document.getElementById('miniHeroImg');
   if(_mh && typeof _MINI_HERO_ORIG==='undefined'){ window._MINI_HERO_ORIG={h:_mh.innerHTML,p:_mh.style.padding,b:_mh.style.background}; }
-  if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
+  // n>=2: nas etapas Tipo e Modelo o painel volta a ser o hero da home.
+  // sem essa guarda, o produto que ficou em S remontava a galeria e a imagem
+  // de escala no meio da tela inicial ao clicar em "continuar comprando".
+  if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto && n>=2){
     var _lv=document.getElementById('livePv'); if(_lv)_lv.style.display='none';
     var _lw=document.getElementById('legoPreviewWrap'); if(_lw)_lw.style.display='none';
     // manter o titulo do produto escolhido (nao recair para "Miniatura")
