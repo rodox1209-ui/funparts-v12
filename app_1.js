@@ -3042,7 +3042,7 @@ function _cartMontaItem(){
       linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(typeof INCLUSO_FOTOS!=='undefined'?INCLUSO_FOTOS[0]:''),
-      previewHtml:'',
+      preview:null,
       resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
       cfg:{ marca:(S.incBrand||S.incBrandSel||''), produto:p.n, escala:p.esc,
             dim:p.dim, moldura:p.mol, preco:p.p }
@@ -3072,7 +3072,7 @@ function _cartMontaItem(){
     titulo:titulo, sub:(ehLego?'Quadro para LEGO':'Quadro para Miniatura'),
     linhas:linhas, preco:S._total,
     imgSrc:src,
-    previewHtml:(typeof _capturaPreview==='function'?_capturaPreview():''),
+    preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
     resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
     cfg:{ tipo:S.tipo, legoBrand:S.legoBrand, legoModel:S.legoModel, legoDim:S.legoDim,
           miniBrand:S.miniBrand, miniModel:S.miniModel, miniSize:S.miniSize, miniDim:S.miniDim,
@@ -3251,7 +3251,7 @@ function fecharPedidoWpp(){
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
                preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null,
-               previewHtml:i.previewHtml||'', resumo:i.resumo||[] };
+               preview:i.preview||null, resumo:i.resumo||[] };
     })
   };
 
@@ -3526,25 +3526,30 @@ function _absUrl(u){
 
 function _capturaPreview(){
   try{
+    // pega SO a peca (o quadro), nao a moldura da interface
     var alvo=null;
-    var lp=document.getElementById('legoPreviewWrap');
-    var mp=document.getElementById('livePv');
-    if(lp&&getComputedStyle(lp).display!=='none')alvo=lp;
-    else if(mp&&getComputedStyle(mp).display!=='none')alvo=mp;
-    if(!alvo)return '';
+    var cands=[
+      document.querySelector('#legoPreviewWrap .quadro'),
+      document.querySelector('#livePv .quadro'),
+      document.querySelector('#legoPreviewWrap'),
+      document.getElementById('livePv')
+    ];
+    for(var k=0;k<cands.length;k++){
+      var c=cands[k];
+      if(c && c.offsetWidth>40 && c.offsetHeight>40){ alvo=c; break; }
+    }
+    if(!alvo)return null;
 
-    var c=alvo.cloneNode(true);
-    c.removeAttribute('id');
-    c.style.display='flex';
+    var W=alvo.offsetWidth, H=alvo.offsetHeight;
+    var c2=alvo.cloneNode(true);
+    c2.removeAttribute('id');
 
-    // imagens: caminho relativo vira absoluto; imagem de IA sai e volta na pagina do pedido
-    c.querySelectorAll('img').forEach(function(im){
-      var s=im.getAttribute('src')||'';
-      if(s.indexOf('data:')===0){ im.removeAttribute('src'); im.setAttribute('data-ai','1'); }
-      else if(s){ im.setAttribute('src',_absUrl(s)); }
+    c2.querySelectorAll('img').forEach(function(im){
+      var sr=im.getAttribute('src')||'';
+      if(sr.indexOf('data:')===0){ im.removeAttribute('src'); im.setAttribute('data-ai','1'); }
+      else if(sr){ im.setAttribute('src',_absUrl(sr)); }
     });
-    // fundos aplicados por style inline
-    c.querySelectorAll('*').forEach(function(el){
+    c2.querySelectorAll('*').forEach(function(el){
       var bi=el.style&&el.style.backgroundImage;
       if(bi&&bi.indexOf('url(')>-1&&bi.indexOf('data:')===-1){
         el.style.backgroundImage=bi.replace(/url\((['"]?)([^'")]+)\1\)/g,function(_,q,u){
@@ -3553,9 +3558,10 @@ function _capturaPreview(){
       }
       el.removeAttribute('id');
     });
-    var h=c.outerHTML;
-    return h.length>60000?'':h;   // trava de seguranca
-  }catch(e){ return ''; }
+    var h=c2.outerHTML;
+    if(h.length>60000)return null;
+    return { html:h, w:W, h:H };
+  }catch(e){ return null; }
 }
 
 // copia fiel das linhas do resumo, como o cliente viu
