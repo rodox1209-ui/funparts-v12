@@ -3100,6 +3100,35 @@ function adicionarAoCarrinho(){
     _cartSave();
     _cartRender();
   });
+  // imagem gerada por IA: sobe para o servidor e guarda so a chave.
+  // e isso que permite a imagem chegar ate voce no pedido.
+  if(it.via!=='catalogo' && src && src.indexOf('data:')===0){
+    _subirImagemItem(src,function(chave){
+      if(!chave)return;
+      var alvo=CART.filter(function(x){return x.id===it.id;})[0];
+      if(!alvo)return;
+      alvo.imgKey=chave;
+      _cartSave();
+    });
+  }
+}
+
+var API_FUNPARTS='https://funparts-ai-proxy.rodox1209.workers.dev';
+
+function _subirImagemItem(dataUrl,cb){
+  try{
+    var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+    var to=setTimeout(function(){ if(ctrl)ctrl.abort(); },25000);
+    fetch(API_FUNPARTS+'/img-item',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({b64:dataUrl}),
+      signal:ctrl?ctrl.signal:undefined
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ clearTimeout(to); cb(d&&d.chave?d.chave:''); })
+    .catch(function(){ clearTimeout(to); cb(''); });
+  }catch(e){ cb(''); }
 }
 
 function removerDoCarrinho(id){
@@ -3177,6 +3206,7 @@ function fecharCarrinho(){
 function fecharPedidoWpp(){
   if(!CART.length)return;
   var aviso=document.getElementById('frmAviso');
+  var btn=document.getElementById('btnFecharPedido');
   if(!_frmValidaTudo(true)){
     if(aviso)aviso.textContent='Confira os campos destacados antes de continuar.';
     var ruim=FRM_CAMPOS.map(function(c){return document.getElementById(c.id);})
@@ -3187,25 +3217,64 @@ function fecharPedidoWpp(){
   if(aviso)aviso.textContent='';
   _cliSalva();
   var c=dadosCliente();
-  var itens=CART.map(function(i,k){
-    return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
-         +'\n   '+i.linhas.join(' \u00b7 ')
-         +'\n   '+_brlCart(i.preco);
-  }).join('\n');
-  var msg=encodeURIComponent(
-    'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n'+
-    '*ITENS*\n'+itens+'\n\n'+
-    '*TOTAL:* '+_brlCart(_cartTotal())+'\n\n'+
-    '*MEUS DADOS*\n'+
-    'Nome: '+c.nome+'\n'+
-    'CPF: '+_mascCpf(c.cpf)+'\n'+
-    'WhatsApp: '+_mascTel(c.whatsapp)+'\n'+
-    'E-mail: '+c.email+'\n'+
-    'Endere\u00e7o: '+c.rua+', '+c.numero+(c.complemento?' - '+c.complemento:'')+'\n'+
-    c.bairro+' - '+c.cidade+'/'+c.uf+'\n'+
-    'CEP: '+_mascCep(c.cep)
-  );
-  window.open('https://wa.me/5511910646157?text='+msg,'_blank');
+
+  // abre a aba JA, no clique, senao o navegador bloqueia como popup
+  var aba=window.open('','_blank');
+  if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+
+  function _abrirZap(txt){
+    var url='https://wa.me/5511910646157?text='+encodeURIComponent(txt);
+    if(aba && !aba.closed){ aba.location.href=url; } else { window.open(url,'_blank'); }
+    if(btn){ btn.disabled=false; btn.textContent='Fechar pedido via WhatsApp'; }
+  }
+  function _resumoLongo(){
+    var itens=CART.map(function(i,k){
+      return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
+           +'\n   '+i.linhas.join(' \u00b7 ')+'\n   '+_brlCart(i.preco);
+    }).join('\n');
+    return 'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n*ITENS*\n'+itens+
+           '\n\n*TOTAL:* '+_brlCart(_cartTotal())+'\n\n*MEUS DADOS*\n'+
+           'Nome: '+c.nome+'\nCPF: '+_mascCpf(c.cpf)+'\nWhatsApp: '+_mascTel(c.whatsapp)+
+           '\nE-mail: '+c.email+'\nEndere\u00e7o: '+c.rua+', '+c.numero+
+           (c.complemento?' - '+c.complemento:'')+'\n'+c.bairro+' - '+c.cidade+'/'+c.uf+
+           '\nCEP: '+_mascCep(c.cep);
+  }
+
+  var corpo={
+    cliente:c,
+    itens:CART.map(function(i){
+      return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
+               preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null };
+    })
+  };
+
+  var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var to=setTimeout(function(){ if(ctrl)ctrl.abort(); },15000);
+
+  fetch(API_FUNPARTS+'/pedido',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(corpo), signal:ctrl?ctrl.signal:undefined
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    clearTimeout(to);
+    if(!d||!d.ok||!d.codigo)throw new Error('resposta invalida');
+    // pedido gravado: mensagem curta + link com a imagem e a ficha completa
+    _abrirZap(
+      'Ol\u00e1! Fechei meu pedido na Funparts.\n\n'+
+      '*Pedido:* '+d.codigo+'\n'+
+      '*Cliente:* '+c.nome+'\n'+
+      '*Itens:* '+CART.length+'\n'+
+      '*Total:* '+_brlCart(d.total||_cartTotal())+'\n\n'+
+      'Detalhes e imagens:\n'+d.url
+    );
+    CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
+  })
+  .catch(function(){
+    clearTimeout(to);
+    // servidor fora do ar nao pode impedir a venda: manda o resumo completo no texto
+    _abrirZap(_resumoLongo());
+  });
 }
 
 document.addEventListener('keydown',function(e){ if(e.key==='Escape')fecharCarrinho(); });
