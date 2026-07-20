@@ -3093,6 +3093,10 @@ function adicionarAoCarrinho(){
   var it=_cartMontaItem();
   var src=it.imgSrc; delete it.imgSrc;
   it.thumb='';
+  // as imagens em base64 saem do item antes de ser guardado: elas sobem
+  // para o servidor a parte, senao estouram o localStorage e o pedido
+  var _lista=(it.preview&&it.preview.imgs)||[];
+  if(it.preview)delete it.preview.imgs;
   // o item entra na hora; a miniatura chega depois, se chegar.
   // nunca deixar o cliente clicar e nada acontecer.
   CART.push(it);
@@ -3118,6 +3122,20 @@ function adicionarAoCarrinho(){
       if(!alvo)return;
       alvo.imgKey=chave;
       _cartSave();
+    });
+  }
+  // cada imagem do preview (carro, logo da marca, logo do modelo) sobe com
+  // chave propria, na mesma ordem em que foi marcada na captura
+  if(_lista.length){
+    it.imgKeys=new Array(_lista.length);
+    _lista.forEach(function(d,idx){
+      _subirImagemItem(d,function(chave){
+        var alvo=CART.filter(function(x){return x.id===it.id;})[0];
+        if(!alvo||!chave)return;
+        if(!alvo.imgKeys)alvo.imgKeys=new Array(_lista.length);
+        alvo.imgKeys[idx]=chave;
+        _cartSave();
+      });
     });
   }
 }
@@ -3254,7 +3272,7 @@ function fecharPedidoWpp(){
     cliente:c,
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
-               preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null,
+               preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
                preview:i.preview||null,
                previewHtml:(i.preview&&i.preview.html)||'',   // compatibilidade com o Worker antigo
                resumo:i.resumo||[] };
@@ -3518,6 +3536,12 @@ function finalizarPeloResumo(){
 function continuarComprando(){
   _botoesResumo(false);
   goStep(0);
+  // a home nao deve carregar resquicio do produto anterior
+  var _hs=document.getElementById('headerSub');
+  if(_hs)_hs.textContent='Visualizador';
+  ['sumTotal','deskBarPrice','mobBarPrice'].forEach(function(id){
+    var e=document.getElementById(id); if(e)e.textContent='—';
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3534,6 +3558,17 @@ function _absUrl(u){
 
 function _capturaPreview(){
   try{
+    // produto pronto do catalogo: nao existe quadro montado, o preview e a foto
+    if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto
+       && typeof INCLUSO_FOTOS!=='undefined'){
+      var _f=INCLUSO_FOTOS[S.incFotoIdx||0]||INCLUSO_FOTOS[0];
+      return {
+        html:'<div style="width:520px;height:520px;display:flex;align-items:center;justify-content:center;background:#0d0d0d;">'
+             +'<img src="'+_absUrl(_f)+'" style="max-width:100%;max-height:100%;object-fit:contain;display:block;">'
+             +'</div>',
+        w:520, h:520, imgs:[]
+      };
+    }
     // pega SO a peca (o quadro), nunca o painel da interface.
     // LEGO usa #legoDetQuadro; Miniaturas usam #livePv .quadro.
     var alvo=null;
@@ -3578,24 +3613,44 @@ function _capturaPreview(){
       if(_cfi){ _cfi.style.width='100%'; _cfi.style.height='100%'; _cfi.style.objectFit='fill'; }
     }
 
+    // cada imagem gerada por IA (carro, logo da marca, logo do modelo) ganha
+    // um indice proprio. antes todas recebiam data-ai="1" e o servidor
+    // trocava as tres pela mesma foto do carro.
+    var _ai=[];
     c2.querySelectorAll('img').forEach(function(im){
       var sr=im.getAttribute('src')||'';
-      if(sr.indexOf('data:')===0){ im.removeAttribute('src'); im.setAttribute('data-ai','1'); }
+      if(sr.indexOf('data:')===0){
+        im.removeAttribute('src');
+        // indice comeca em 1: a primeira imagem e sempre a do carro, que e a
+        // mesma que o Worker antigo espera em data-ai="1". assim o pedido nao
+        // piora enquanto o servidor nao for atualizado.
+        im.setAttribute('data-ai',String(_ai.length+1));
+        _ai.push(sr);
+      }
       else if(sr){ im.setAttribute('src',_absUrl(sr)); }
     });
     c2.querySelectorAll('*').forEach(function(el){
       var bi=el.style&&el.style.backgroundImage;
-      if(bi&&bi.indexOf('url(')>-1&&bi.indexOf('data:')===-1){
-        el.style.backgroundImage=bi.replace(/url\((['"]?)([^'")]+)\1\)/g,function(_,q,u){
-          return 'url('+q+_absUrl(u)+q+')';
-        });
+      if(!bi||bi.indexOf('url(')===-1)return;
+      if(bi.indexOf('data:')>-1){
+        // fundo enviado pelo cliente: sobe junto, senao o HTML estoura o limite
+        var mm=bi.match(/url\((['"]?)(data:[^'")]+)\1\)/);
+        if(mm){
+          el.setAttribute('data-aibg',String(_ai.length+1));
+          _ai.push(mm[2]);
+          el.style.backgroundImage='';
+        }
+        return;
       }
+      el.style.backgroundImage=bi.replace(/url\((['"]?)([^'")]+)\1\)/g,function(_,q,u){
+        return 'url('+q+_absUrl(u)+q+')';
+      });
       // os ids ficam: o preview roda num iframe isolado, nao ha colisao,
       // e o CSS do site depende deles (#ledDark, #relExtras, etc).
     });
     var h=c2.outerHTML;
     if(h.length>60000)return null;
-    return { html:h, w:W, h:H };
+    return { html:h, w:W, h:H, imgs:_ai };
   }catch(e){ return null; }
 }
 
@@ -3679,7 +3734,7 @@ function _rascEnvia(){
     cliente:c,
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
-               preco:i.preco, imgKey:i.imgKey||null, cfg:i.cfg||null,
+               preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
                preview:i.preview||null,
                previewHtml:(i.preview&&i.preview.html)||'',
                resumo:i.resumo||[] };
