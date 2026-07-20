@@ -2983,3 +2983,200 @@ function _mobUpdateNav(){
   }
   if(bck){bck.style.display=_mobStep>0?'':'none';}
 }
+
+// ═══════════════════════════════════════════════════════════
+//  CARRINHO DE COMPRAS
+//  Guarda a CONFIGURACAO de cada item, nunca a imagem cheia.
+//  A miniatura visual e uma thumb de ~10KB gerada por canvas.
+// ═══════════════════════════════════════════════════════════
+var CART_KEY='funparts_cart_v1';
+var CART=[];
+
+function _cartLoad(){
+  try{ CART=JSON.parse(localStorage.getItem(CART_KEY)||'[]'); }
+  catch(e){ CART=[]; }
+  if(!Array.isArray(CART))CART=[];
+}
+function _cartSave(){
+  try{ localStorage.setItem(CART_KEY,JSON.stringify(CART)); }
+  catch(e){ /* cota estourada: segue sem persistir */ }
+}
+function _cartTotal(){
+  return CART.reduce(function(s,i){ return s+(Number(i.preco)||0); },0);
+}
+function _brlCart(v){ return 'R$ '+Number(v||0).toLocaleString('pt-BR'); }
+
+// gera uma miniatura pequena a partir de uma imagem ja carregada
+function _cartThumb(src,cb){
+  if(!src){ cb(''); return; }
+  try{
+    var im=new Image();
+    im.onload=function(){
+      try{
+        var L=160, c=document.createElement('canvas');
+        var r=Math.min(L/im.width,L/im.height,1);
+        c.width=Math.max(1,Math.round(im.width*r));
+        c.height=Math.max(1,Math.round(im.height*r));
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        cb(c.toDataURL('image/jpeg',0.72));
+      }catch(e){ cb(''); }
+    };
+    im.onerror=function(){ cb(''); };
+    im.src=src;
+  }catch(e){ cb(''); }
+}
+
+// monta o item a partir do estado atual S
+function _cartMontaItem(){
+  var catalogo=(S.tipo==='mini'&&S.miniChoice==='incluso'&&S.incProduto);
+  if(catalogo){
+    var p=S.incProduto;
+    return {
+      id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
+      via:'catalogo', tipo:'mini',
+      titulo:p.n, sub:(S.incBrand||S.incBrandSel||''),
+      linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
+      preco:p.p,
+      imgSrc:(typeof INCLUSO_FOTOS!=='undefined'?INCLUSO_FOTOS[0]:''),
+      cfg:{ marca:(S.incBrand||S.incBrandSel||''), produto:p.n, escala:p.esc,
+            dim:p.dim, moldura:p.mol, preco:p.p }
+    };
+  }
+  var ehLego=(S.tipo==='lego');
+  var titulo = ehLego
+    ? (S.legoModel||S.legoBrand||'Quadro LEGO')
+    : (function(){
+        function _v(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
+        var m=_v('aiCarBrand','apenaCarBrand'), mo=_v('aiCarModel','apenaCarModel');
+        return (m||S.miniBrand||'')+(mo?' '+mo:'') || 'Quadro para Miniatura';
+      })();
+  var linhas=[];
+  linhas.push(ehLego?S.legoDim:S.miniDim);
+  linhas.push('Moldura '+(S.molduraLbl||'—'));
+  linhas.push('Fundo '+(S.fundoLbl||'—'));
+  if(S.led)linhas.push('Com LED');
+  if(S.relOpts&&S.relOpts.length)linhas.push('Relevos: '+S.relOpts.join(', '));
+  // imagem que melhor representa o item
+  var el=document.getElementById('detPvCar');
+  var src=(el&&el.getAttribute('src'))||'';
+  if(!src){ var f=document.getElementById('iFundo'); src=(f&&f.getAttribute('src'))||''; }
+  return {
+    id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
+    via:'custom', tipo:S.tipo,
+    titulo:titulo, sub:(ehLego?'Quadro para LEGO':'Quadro para Miniatura'),
+    linhas:linhas, preco:S._total,
+    imgSrc:src,
+    cfg:{ tipo:S.tipo, legoBrand:S.legoBrand, legoModel:S.legoModel, legoDim:S.legoDim,
+          miniBrand:S.miniBrand, miniModel:S.miniModel, miniSize:S.miniSize, miniDim:S.miniDim,
+          miniOpt:S.miniOpt, disp:S.disp,
+          moldura:S.moldura, molduraLbl:S.molduraLbl,
+          fundo:S.fundo, fundoLbl:S.fundoLbl, uvLayoutType:S.uvLayoutType,
+          uvColor:S.uvColor, uvStripeMain:S.uvStripeMain, uvStripeAccent:S.uvStripeAccent,
+          led:S.led, ledTipo:S.ledTipo, ledFio:S.ledFio,
+          relOpts:(S.relOpts||[]).slice(), relOptsExtra:S.relOptsExtra,
+          customExtra:S.customExtra, total:S._total }
+  };
+}
+
+function adicionarAoCarrinho(){
+  var it=_cartMontaItem();
+  var src=it.imgSrc; delete it.imgSrc;
+  _cartThumb(src,function(thumb){
+    it.thumb=thumb||'';
+    CART.push(it);
+    _cartSave();
+    _cartRender();
+    _cartPulse();
+    _cartToast(it.titulo);
+  });
+}
+
+function removerDoCarrinho(id){
+  CART=CART.filter(function(i){return i.id!==id;});
+  _cartSave(); _cartRender();
+  if(!CART.length)fecharCarrinho();
+}
+
+function _cartPulse(){
+  var b=document.getElementById('cartBtn'); if(!b)return;
+  b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
+}
+function _cartToast(nome){
+  var t=document.getElementById('cartToast'); if(!t)return;
+  var tx=document.getElementById('cartToastTx');
+  if(tx)tx.textContent=(nome?('"'+nome+'" adicionado'):'Item adicionado ao carrinho');
+  t.classList.add('on');
+  clearTimeout(window._cartToastT);
+  window._cartToastT=setTimeout(function(){ t.classList.remove('on'); },4200);
+}
+
+function _cartRender(){
+  var n=CART.length;
+  var c=document.getElementById('cartCount');
+  if(c){ c.textContent=n; c.classList.toggle('on',n>0); }
+  var body=document.getElementById('cartBody');
+  var foot=document.getElementById('cartFoot');
+  if(!body)return;
+  if(!n){
+    body.innerHTML='<div class="cart-empty">Seu carrinho está vazio.<br>Monte um quadro e adicione aqui.</div>';
+    if(foot)foot.style.display='none';
+    return;
+  }
+  body.innerHTML=CART.map(function(i){
+    var img=i.thumb
+      ? '<img src="'+i.thumb+'" alt="">'
+      : '<div class="ph">'+(i.tipo==='lego'?'🧱':'🏎️')+'</div>';
+    return '<div class="cart-item">'
+      +'<div class="cart-thumb">'+img+'</div>'
+      +'<div class="cart-info">'
+        +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
+        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
+        +'<div class="cart-foot-row">'
+          +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
+          +'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">remover</button>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  if(foot)foot.style.display='';
+  var t=document.getElementById('cartTotal');
+  if(t)t.textContent=_brlCart(_cartTotal());
+}
+
+function _esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function abrirCarrinho(){
+  _cartRender();
+  var p=document.getElementById('cartPanel'), o=document.getElementById('cartOv');
+  if(p)p.classList.add('open');
+  if(o)o.classList.add('open');
+  var t=document.getElementById('cartToast'); if(t)t.classList.remove('on');
+}
+function fecharCarrinho(){
+  var p=document.getElementById('cartPanel'), o=document.getElementById('cartOv');
+  if(p)p.classList.remove('open');
+  if(o)o.classList.remove('open');
+}
+
+// provisorio: no bloco 4 isto passa a gravar o pedido e enviar so o codigo
+function fecharPedidoWpp(){
+  if(!CART.length)return;
+  var linhas=CART.map(function(i,k){
+    return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
+         +'\n   '+i.linhas.join(' · ')
+         +'\n   '+_brlCart(i.preco);
+  }).join('\n');
+  var msg=encodeURIComponent(
+    'Olá! Quero fechar meu pedido na Funparts:\n\n'+linhas+
+    '\n\nTOTAL: '+_brlCart(_cartTotal())+'\n\nPodemos seguir?'
+  );
+  window.open('https://wa.me/5511910646157?text='+msg,'_blank');
+}
+
+document.addEventListener('keydown',function(e){ if(e.key==='Escape')fecharCarrinho(); });
+_cartLoad();
+_cartRender();
