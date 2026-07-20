@@ -3011,6 +3011,9 @@ function _cartThumb(src,cb){
   if(!src){ cb(''); return; }
   try{
     var im=new Image();
+    var pronto=false;
+    var fim=function(v){ if(pronto)return; pronto=true; cb(v); };
+    setTimeout(function(){ fim(''); },8000); // nunca pendurar para sempre
     im.onload=function(){
       try{
         var L=160, c=document.createElement('canvas');
@@ -3018,10 +3021,10 @@ function _cartThumb(src,cb){
         c.width=Math.max(1,Math.round(im.width*r));
         c.height=Math.max(1,Math.round(im.height*r));
         c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-        cb(c.toDataURL('image/jpeg',0.72));
-      }catch(e){ cb(''); }
+        fim(c.toDataURL('image/jpeg',0.72));
+      }catch(e){ fim(''); }
     };
-    im.onerror=function(){ cb(''); };
+    im.onerror=function(){ fim(''); };
     im.src=src;
   }catch(e){ cb(''); }
 }
@@ -3081,13 +3084,21 @@ function _cartMontaItem(){
 function adicionarAoCarrinho(){
   var it=_cartMontaItem();
   var src=it.imgSrc; delete it.imgSrc;
+  it.thumb='';
+  // o item entra na hora; a miniatura chega depois, se chegar.
+  // nunca deixar o cliente clicar e nada acontecer.
+  CART.push(it);
+  _cartSave();
+  _cartRender();
+  _cartPulse();
+  _cartToast(it.titulo);
   _cartThumb(src,function(thumb){
-    it.thumb=thumb||'';
-    CART.push(it);
+    if(!thumb)return;
+    var alvo=CART.filter(function(x){return x.id===it.id;})[0];
+    if(!alvo)return;
+    alvo.thumb=thumb;
     _cartSave();
     _cartRender();
-    _cartPulse();
-    _cartToast(it.titulo);
   });
 }
 
