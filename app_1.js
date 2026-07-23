@@ -2361,6 +2361,42 @@ var INCLUSO_CATALOG={
 };
 var INCLUSO_FOTOS=["images/produto_1.jpg","images/produto_2.jpg","images/produto_3.jpg","images/produto_4.jpg"];
 
+/* ═══════════ CATÁLOGO VINDO DO BANCO (Fase 2) ═══════════ */
+/* O site tenta ler o catálogo do banco. Se conseguir, substitui o embutido.  */
+/* Se falhar (rede, banco fora), mantém o embutido — o site NUNCA quebra.     */
+var CAT_PRECOS=null; // preços do banco, guardados para uso futuro (Fase 3)
+function _aplicaCatalogoBanco(c){
+  if(!c) return;
+  if(c.lego && Object.keys(c.lego).length){
+    Object.keys(LEGO_CATALOG).forEach(function(k){ delete LEGO_CATALOG[k]; });
+    Object.keys(c.lego).forEach(function(k){ LEGO_CATALOG[k]=c.lego[k]; });
+  }
+  if(c.mini && Object.keys(c.mini).length){
+    Object.keys(INCLUSO_CATALOG).forEach(function(k){ delete INCLUSO_CATALOG[k]; });
+    Object.keys(c.mini).forEach(function(k){ INCLUSO_CATALOG[k]=c.mini[k]; });
+  }
+  if(c.precos) CAT_PRECOS=c.precos;
+  // se alguma lista já estiver na tela, atualiza sem exigir novo clique
+  try{
+    var lm=document.getElementById('legoModels');
+    if(lm && lm.children.length && typeof renderLegoModels==='function' && S && S.legoBrand) renderLegoModels(S.legoBrand);
+    var ib=document.getElementById('inclusoBrands');
+    if(ib && ib.children.length && typeof renderInclusoBrands==='function') renderInclusoBrands();
+  }catch(e){}
+}
+function carregarCatalogoDoBanco(){
+  try{
+    fetch('https://funparts-ai-proxy.rodox1209.workers.dev/catalogo',{cache:'no-store'})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(c){ if(c && !c.erro) _aplicaCatalogoBanco(c); })
+      .catch(function(){}); // falhou: fica com o embutido
+  }catch(e){}
+}
+(function(){
+  if(document.readyState!=='loading'){ carregarCatalogoDoBanco(); }
+  else { document.addEventListener('DOMContentLoaded', carregarCatalogoDoBanco); }
+})();
+
 function _brl(v){return 'R$ '+Number(v).toLocaleString('pt-BR');}
 function _linProd(k,v){return '<div style="display:flex;justify-content:space-between;gap:12px;"><span style="color:#888;">'+k+'</span><span style="color:#ddd;text-align:right;">'+v+'</span></div>';}
 
