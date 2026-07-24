@@ -1677,9 +1677,18 @@ function _imgSrc(s){
   return 'data:image/jpeg;base64,'+s;
 }
 function renderFundoLayouts(fundo){
+  // Fase 4: fundos do modelo vindos do banco têm prioridade
+  var _dbOpts=null;
+  if(S.tipo==='lego' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[S.legoModel]){
+    var _tipoMap={'f-carbono':'carbono','f-uv':'brilho','f-fosco':'fosco'};
+    var _grp=LEGO_FUNDOS_DB[S.legoModel][_tipoMap[fundo]];
+    if(_grp && _grp.length){
+      _dbOpts=_grp.map(function(e){ var u=_fotoUrl(e.img); return {name:e.nome||'Fundo', img:u, preview:u}; });
+    }
+  }
   const _mfl=typeof MODEL_FUNDO_LAYOUTS!=='undefined'&&MODEL_FUNDO_LAYOUTS[S.legoModel];
   const _lfl=(S.tipo==='lego')&&typeof LEGO_FUNDO_LAYOUTS!=='undefined'&&LEGO_FUNDO_LAYOUTS[fundo];
-  const opts = (_mfl&&_mfl[fundo]) || _lfl || FUNDO_LAYOUTS[fundo] || [];
+  const opts = _dbOpts || (_mfl&&_mfl[fundo]) || _lfl || FUNDO_LAYOUTS[fundo] || [];
   const el = document.getElementById('fundoLayoutOpts');
   if(!el) return;
   el.innerHTML = '';
@@ -2381,6 +2390,7 @@ function _catFotos(){
 /* O site tenta ler o catálogo do banco. Se conseguir, substitui o embutido.  */
 /* Se falhar (rede, banco fora), mantém o embutido — o site NUNCA quebra.     */
 var CAT_PRECOS=null; // preços do banco (editáveis no painel)
+var LEGO_FUNDOS_DB=null; // fundos LEGO por modelo, vindos do banco (Fase 4)
 // preço de uma chave do banco, com valor de reserva se o banco não respondeu
 function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT_PRECOS[chave] : fb; }
 function _aplicaCatalogoBanco(c){
@@ -2394,6 +2404,7 @@ function _aplicaCatalogoBanco(c){
     Object.keys(c.mini).forEach(function(k){ INCLUSO_CATALOG[k]=c.mini[k]; });
   }
   if(c.precos) CAT_PRECOS=c.precos;
+  if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
   // se alguma lista já estiver na tela, atualiza sem exigir novo clique
   try{
     var lm=document.getElementById('legoModels');
