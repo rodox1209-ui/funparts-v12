@@ -2360,6 +2360,18 @@ var INCLUSO_CATALOG={
  "Nissan":{logo:'images/logo_nissan.png',itens:[{n:"GTR Nissan LibertyWalk",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]}
 };
 var INCLUSO_FOTOS=["images/produto_1.jpg","images/produto_2.jpg","images/produto_3.jpg","images/produto_4.jpg"];
+// resolve a foto de um produto: caminho local, URL, data: ou chave no servidor (R2)
+function _fotoUrl(f){
+  if(!f) return f;
+  if(/^(https?:|data:|images\/)/.test(f)) return f;
+  return 'https://funparts-ai-proxy.rodox1209.workers.dev/img/'+encodeURIComponent(f);
+}
+// fotos do produto atual (do banco); se nao houver, usa as 4 padrao
+function _catFotos(){
+  var p=(typeof S!=='undefined')?S.incProduto:null;
+  if(p && p.fotos && p.fotos.length) return p.fotos.map(_fotoUrl);
+  return INCLUSO_FOTOS;
+}
 
 /* ═══════════ CATÁLOGO VINDO DO BANCO (Fase 2) ═══════════ */
 /* O site tenta ler o catálogo do banco. Se conseguir, substitui o embutido.  */
@@ -2426,7 +2438,8 @@ function selInclusoBrand(b){
 
 function trocarFotoIncluso(k){
   k=parseInt(k,10); S.incFotoIdx=k;
-  var m=document.getElementById('catMainPhoto'); if(m)m.src=INCLUSO_FOTOS[k];
+  var F=_catFotos();
+  var m=document.getElementById('catMainPhoto'); if(m)m.src=F[k];
   document.querySelectorAll('#catThumbs img').forEach(function(t){
     t.style.borderColor=(parseInt(t.getAttribute('data-th'),10)===k)?'#e07b00':'transparent';
   });
@@ -2435,7 +2448,8 @@ function trocarFotoIncluso(k){
 // monta a galeria do produto pronto dentro da area de preview
 function _catGaleriaHTML(soFoto){
   var idx=S.incFotoIdx||0;
-  var thumbs=soFoto?'':INCLUSO_FOTOS.map(function(f,k){
+  var _F=_catFotos();
+  var thumbs=soFoto?'':_F.map(function(f,k){
     return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:74px;height:58px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===idx?'#e07b00':'transparent')+';">';
   }).join('');
   var _mobG=window.innerWidth<=720;
@@ -2451,7 +2465,7 @@ function _catGaleriaHTML(soFoto){
     : 'max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;';
   return '<div style="'+_wrap+'">'
     +'<div style="'+_box+'">'
-    +'<img id="catMainPhoto" src="'+INCLUSO_FOTOS[idx]+'" style="'+_img+'">'
+    +'<img id="catMainPhoto" src="'+(_F[idx]||_F[0])+'" style="'+_img+'">'
     +'</div>'
     +'<div id="catThumbs" style="display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;flex-shrink:0;width:100%;">'+thumbs+'</div>'
     +'</div>';
@@ -3074,7 +3088,8 @@ function _cartThumb(src,cb){
 // como e sempre a foto do produto, da para remontar na hora de fechar.
 function _pvCatalogo(){
   if(typeof INCLUSO_FOTOS==='undefined')return null;
-  var f=INCLUSO_FOTOS[0];
+  var _arr=_catFotos();
+  var f=_arr[(typeof S!=='undefined'&&S.incFotoIdx)||0]||_arr[0];
   if(!f)return null;
   return {
     html:'<div style="width:520px;height:520px;display:flex;align-items:center;justify-content:center;background:#0d0d0d;">'
@@ -3099,7 +3114,7 @@ function _cartMontaItem(){
       titulo:p.n, sub:(S.incBrand||S.incBrandSel||''),
       linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
-      imgSrc:(typeof INCLUSO_FOTOS!=='undefined'?INCLUSO_FOTOS[0]:''),
+      imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
       resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
       cfg:{ marca:(S.incBrand||S.incBrandSel||''), produto:p.n, escala:p.esc,
@@ -3616,7 +3631,8 @@ function _capturaPreview(){
     // produto pronto do catalogo: nao existe quadro montado, o preview e a foto
     if(typeof S!=='undefined' && S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto
        && typeof INCLUSO_FOTOS!=='undefined'){
-      var _f=INCLUSO_FOTOS[S.incFotoIdx||0]||INCLUSO_FOTOS[0];
+      var _fa=_catFotos();
+      var _f=_fa[S.incFotoIdx||0]||_fa[0];
       return {
         html:'<div style="width:520px;height:520px;display:flex;align-items:center;justify-content:center;background:#0d0d0d;">'
              +'<img src="'+_absUrl(_f)+'" style="max-width:100%;max-height:100%;object-fit:contain;display:block;">'
