@@ -556,6 +556,12 @@ function selLegoModel(row,model){
   }
   var iMiniHero=document.getElementById('iMiniHero');
   if(iMiniHero)iMiniHero.src=MODEL_MINI_IMAGES[model.name]||DEFAULT_MINI_SRC;
+  // imagens do modelo vindas do banco (foto do produto / top-view) têm prioridade
+  if(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[model.name]){
+    var _dbM=LEGO_FUNDOS_DB[model.name];
+    if(_dbM.produto && _dbM.produto.length && iMiniHero) iMiniHero.src=_fotoUrl(_dbM.produto[0].img);
+    if(_dbM.topview && _dbM.topview.length && iCarro) iCarro.src=_fotoUrl(_dbM.topview[0].img);
+  }
   var logoBR=document.getElementById('logoBR');
   if(logoBR){
     const _hasModelLogo=!!MODEL_LOGO_BR[model.name];
@@ -1409,10 +1415,11 @@ function updateDetPreview(){
       ldfr.src=_LEGO_FRAMES[_fk];
       ldfr.style.display='block';
     }
-    // Car image - LEGO SF24 on top of background
+    // Car image - top-view sobre o fundo. Banco (por modelo) tem prioridade.
     var lcar=document.getElementById('legoDetCar');
     if(lcar){
-      lcar.src='https://lh3.googleusercontent.com/d/1e50Ft2Ixks4Rh0jOTcBfnhMCa9GSrh95';
+      var _lctv=(typeof LEGO_FUNDOS_DB!=='undefined'&&LEGO_FUNDOS_DB&&LEGO_FUNDOS_DB[S.legoModel]&&LEGO_FUNDOS_DB[S.legoModel].topview)||[];
+      lcar.src=_lctv.length?_fotoUrl(_lctv[0].img):'https://lh3.googleusercontent.com/d/1e50Ft2Ixks4Rh0jOTcBfnhMCa9GSrh95';
       lcar.style.display='block';
     }
     // Quadro aspect-ratio
