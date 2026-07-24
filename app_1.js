@@ -2185,6 +2185,9 @@ function selRelColor(pos,dot,color){
   }
 }
 function togRelevoOpt(row,key,label,price){
+  // preço do banco tem prioridade sobre o valor fixo do HTML
+  if(/Bandeira/i.test(label)) price=_preco('opt_relevo_bandeira', price);
+  else if(/Piloto/i.test(label)) price=_preco('opt_relevo_piloto', price);
   row.classList.toggle('sel');
   const on=row.classList.contains('sel');
   const badge=row.querySelector('.rbadge');
@@ -2313,20 +2316,21 @@ function calcPrice(){
   let base=479;
   if(S.tipo==='lego'){
     const tier=LEGO_PRICE[S.legoDim]||{c:479,f:365};
-    base=(S.fundo==='f-fosco')?tier.f:tier.c;
+    base=(S.fundo==='f-fosco')?_preco('lego_base_fosco',tier.f):_preco('lego_base_carbono',tier.c);
   } else if(S.tipo==='mini'){
     const sz=MINI_SIZES.find(s=>s.id===S.miniSize);
-    base=sz?sz.base:1990;
+    base=_preco('mini_base_'+S.miniSize, sz?sz.base:1990);
   }
-  // 2. Upgrades
-  if(S.moldura==='m-fibra')base+=75;
+  // 2. Upgrades (preços vindos do banco, com reserva)
+  if(S.moldura==='m-fibra')base+=_preco('opt_moldura_fibra',75);
   if(S.led){
     const rgb=(S.ledTipo==='rgb');
     const sem=(S.ledFio==='sem');
-    base+=rgb?(sem?589:489):(sem?489:389);
+    const _lk=rgb?(sem?'opt_led_rgb_sem':'opt_led_rgb_com'):(sem?'opt_led_warm_sem':'opt_led_warm_com');
+    base+=_preco(_lk, rgb?(sem?589:489):(sem?489:389));
   }
-  if(S.miniOpt==='buy')base+=250;
-  if(S.disp==='3d'&&S.miniOpt==='buy')base+=180;
+  if(S.miniOpt==='buy')base+=_preco('opt_mini_comprar',250);
+  if(S.disp==='3d'&&S.miniOpt==='buy')base+=_preco('opt_disp_3d',180);
   base+=S.relOptsExtra+S.customExtra;
   S._total=base;
   const fmtd='R$ '+base.toLocaleString('pt-BR');
@@ -2376,7 +2380,9 @@ function _catFotos(){
 /* ═══════════ CATÁLOGO VINDO DO BANCO (Fase 2) ═══════════ */
 /* O site tenta ler o catálogo do banco. Se conseguir, substitui o embutido.  */
 /* Se falhar (rede, banco fora), mantém o embutido — o site NUNCA quebra.     */
-var CAT_PRECOS=null; // preços do banco, guardados para uso futuro (Fase 3)
+var CAT_PRECOS=null; // preços do banco (editáveis no painel)
+// preço de uma chave do banco, com valor de reserva se o banco não respondeu
+function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT_PRECOS[chave] : fb; }
 function _aplicaCatalogoBanco(c){
   if(!c) return;
   if(c.lego && Object.keys(c.lego).length){
