@@ -2285,8 +2285,8 @@ function _aplicaRelevoLego(){
   } else {
     // modo 'padrao' (ou 'imagem' sem img): restaura o logo F1 padrao (images/img_008.svg),
     // desfazendo uma imagem personalizada que tenha vazado de OUTRO modelo.
+    // Obs.: o texto do badge (legoBadgeTLtxt) tem display:none por padrao no HTML, entao NAO reexibimos.
     [lf1,llf1].forEach(function(e){ if(e){ if((e.getAttribute('src')||'')!=='images/img_008.svg') e.src='images/img_008.svg'; e.style.display=''; } });
-    [txtLive,txtLego].forEach(function(t){ if(t)t.style.display=''; }); // reexibe o texto que a imagem havia escondido
   }
 }
 // Oculta opcionais (bandeira / nome do piloto) por modelo LEGO, do banco.
