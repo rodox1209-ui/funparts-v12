@@ -635,6 +635,7 @@ function selLegoModel(row,model){
   setEl('pvMod',model.name);
   setEl('carLbl',model.name);
   updateBadgeTL(model.f1?'F1':'Logo '+model.name.split(' ')[0]);
+  if(typeof _aplicaRelevoLego==='function')_aplicaRelevoLego();
   renderFundoLayouts(S.fundo);
   calcPrice();
 }
@@ -2238,21 +2239,29 @@ function togRelevoOpt(row,key,label,price){
 }
 
 function updateBadgeTL(text){
+  // imagem personalizada do relevo (LEGO): não aplicar filtro de cor, senão vira silhueta
+  var _imgRelevo=(typeof _relevoModoLego==='function' && S.tipo==='lego' && _relevoModoLego()==='imagem');
   setEl('badgeTLtxt',text||'FUNPARTS');
   setStyle('badgeTLtxt','color',S.relTL||'#fff');
   const logoF1=document.getElementById('logoF1');
   // Mini usa o logo REAL e colorido da marca: NAO aplicar filtro de cor (senao vira silhueta branca)
-  if(logoF1 && S.tipo!=='mini') logoF1.style.filter=colorToFilter(S.relTL||'#fff')+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
+  if(logoF1 && S.tipo!=='mini' && !_imgRelevo) logoF1.style.filter=colorToFilter(S.relTL||'#fff')+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
   // Mirror to LEGO preview
   setEl('legoBadgeTLtxt',text||'FUNPARTS');
   setStyle('legoBadgeTLtxt','color',S.relTL||'#fff');
   const lf1=document.getElementById('legoLogoF1');
   if(lf1){
     if(!lf1.src||lf1.src===window.location.href){var _s=document.getElementById('logoF1');if(_s)lf1.src=_s.src;}
-    lf1.style.filter=colorToFilter(S.relTL||'#fff')+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
+    if(!_imgRelevo) lf1.style.filter=colorToFilter(S.relTL||'#fff')+' drop-shadow(1px 2px 2px rgba(0,0,0,0.45))';
   }
 }
 
+// modo do alto-relevo do topo do modelo LEGO atual: 'padrao' | 'imagem' | 'nenhum'
+function _relevoModoLego(){
+  var g=(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && typeof S!=='undefined'
+         && LEGO_FUNDOS_DB[S.legoModel] && LEGO_FUNDOS_DB[S.legoModel].relevo) || null;
+  return (g && g.length) ? (g[0].nome||'padrao') : 'padrao';
+}
 // Alto-relevo do topo por modelo LEGO (do banco): padrao | imagem | nenhum
 function _aplicaRelevoLego(){
   if(typeof S==='undefined' || S.tipo!=='lego') return;
@@ -2339,22 +2348,21 @@ function _relevoStep7Layout(){
     msg.textContent='Este produto não contém a opção de alto relevo.';
     flexCol.parentElement.insertBefore(msg, flexCol.nextSibling);
   }
-  // caixa de relevo fixo some quando topo = nenhum
-  if(topoModo==='nenhum'){
-    if(card)card.style.display='none';
-    if(fixedLabel)fixedLabel.style.display='none';
-  } else {
-    if(card)card.style.display='';
-    if(fixedLabel)fixedLabel.style.display='';
-  }
+  // a caixa editável (logo + cor) só aparece no modo Padrão
+  var ehPadrao=(topoModo==='padrao');
+  if(card)card.style.display=ehPadrao?'':'none';
+  if(fixedLabel)fixedLabel.style.display=ehPadrao?'':'none';
   // opcionais realmente visíveis agora
   function _vis(sel){ var e=document.querySelector(sel); return !!(e && getComputedStyle(e).display!=='none'); }
   var algumaOpc=_vis('.rrow[onclick*="\'bandeira\'"]')||_vis('.rrow[data-rel="piloto"]')||_vis('.rrow[data-rel="placa"]')||_vis('.rrow[data-rel="tracado"]');
   var opcLabel=_achaOpcLabel();
   if(opcLabel)opcLabel.style.display=algumaOpc?'':'none';
-  // a frase aparece quando NÃO há nenhum relevo (nem fixo nem opcional)
-  var temAlgum=(topoModo!=='nenhum')||algumaOpc;
-  if(msg)msg.style.display=temAlgum?'none':'';
+  // frase conforme o modo:
+  // imagem -> não há edição do relevo; nenhum sem opcionais -> não há relevo
+  var frase='';
+  if(topoModo==='imagem') frase='Este produto não contém a opção de edição para o alto relevo.';
+  else if(topoModo==='nenhum' && !algumaOpc) frase='Este produto não contém a opção de alto relevo.';
+  if(msg){ if(frase){ msg.textContent=frase; msg.style.display=''; } else { msg.style.display='none'; } }
 }
 function updateBadgeBR(text,color){
   const marca=text||(S.tipo==='lego'?S.legoBrand:S.miniBrand)||'FUNPARTS';
