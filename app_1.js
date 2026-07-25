@@ -375,6 +375,7 @@ function goStep(n){
     // Re-apply current relOpts to legoRelExtras
     if(typeof updateBadgeTL==='function')updateBadgeTL(null);
     if(typeof updateBadgeBR==='function')updateBadgeBR(null,null);
+    if(typeof _aplicaRelevoLego==='function')_aplicaRelevoLego();
   }}
   if(n===7){_sumRemoved={moldura:false,led:false,rel:[]};buildSummary();}
   calcPrice();
@@ -605,6 +606,7 @@ function selLegoModel(row,model){
   S.legoF1=model.f1;
   S.legoDim=model.dim;
   updateFixedRelevo();
+  if(typeof _aplicaRelevoLego==='function')_aplicaRelevoLego();
   // Mostrar/ocultar rrows de relevo por modelo
   (function(){
     var _mr=(typeof MODEL_RELEVO_IMAGES!=='undefined')&&MODEL_RELEVO_IMAGES[model.name];
@@ -2248,6 +2250,29 @@ function updateBadgeTL(text){
   }
 }
 
+// Alto-relevo do topo por modelo LEGO (do banco): padrao | imagem | nenhum
+function _aplicaRelevoLego(){
+  if(typeof S==='undefined' || S.tipo!=='lego') return;
+  var cfg=(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[S.legoModel]
+           && LEGO_FUNDOS_DB[S.legoModel].relevo && LEGO_FUNDOS_DB[S.legoModel].relevo[0]) || null;
+  var modo = cfg ? (cfg.nome||'padrao') : 'padrao';
+  var img  = cfg ? (cfg.img||'') : '';
+  var lf1=document.getElementById('logoF1');
+  var llf1=document.getElementById('legoLogoF1');
+  var btlLive = lf1 && lf1.closest ? lf1.closest('.b-tl') : null;
+  var btlLego = document.getElementById('legoBTL');
+  var txtLive=document.getElementById('badgeTLtxt');
+  var txtLego=document.getElementById('legoBadgeTLtxt');
+  function _mostraWrap(v){ [btlLive,btlLego].forEach(function(w){ if(w)w.style.display=v?'':'none'; }); }
+  if(modo==='nenhum'){ _mostraWrap(false); return; }
+  _mostraWrap(true); // desfaz um eventual "nenhum" anterior
+  if(modo==='imagem' && img){
+    var u=_fotoUrl(img);
+    [lf1,llf1].forEach(function(e){ if(e){ e.src=u; e.style.display=''; e.style.width=e.style.width||'17%'; e.style.filter='drop-shadow(1px 2px 2px rgba(0,0,0,0.45))'; } });
+    [txtLive,txtLego].forEach(function(t){ if(t)t.style.display='none'; }); // imagem substitui o texto
+  }
+  // modo 'padrao' (ou 'imagem' sem img): mantém o comportamento atual
+}
 function updateBadgeBR(text,color){
   const marca=text||(S.tipo==='lego'?S.legoBrand:S.miniBrand)||'FUNPARTS';
   setEl('badgeBRtxt',marca.toUpperCase());
