@@ -2282,8 +2282,12 @@ function _aplicaRelevoLego(){
     var u=_fotoUrl(img);
     [lf1,llf1].forEach(function(e){ if(e){ e.src=u; e.style.display=''; e.style.width=e.style.width||'17%'; e.style.filter='drop-shadow(1px 2px 2px rgba(0,0,0,0.45))'; } });
     [txtLive,txtLego].forEach(function(t){ if(t)t.style.display='none'; }); // imagem substitui o texto
+  } else {
+    // modo 'padrao' (ou 'imagem' sem img): restaura o logo F1 padrao (images/img_008.svg),
+    // desfazendo uma imagem personalizada que tenha vazado de OUTRO modelo.
+    [lf1,llf1].forEach(function(e){ if(e){ if((e.getAttribute('src')||'')!=='images/img_008.svg') e.src='images/img_008.svg'; e.style.display=''; } });
+    [txtLive,txtLego].forEach(function(t){ if(t)t.style.display=''; }); // reexibe o texto que a imagem havia escondido
   }
-  // modo 'padrao' (ou 'imagem' sem img): mantém o comportamento atual
 }
 // Oculta opcionais (bandeira / nome do piloto) por modelo LEGO, do banco.
 // Some da etapa Alto-relevo E do preview (desmarcando se estava selecionado). Só LEGO.
