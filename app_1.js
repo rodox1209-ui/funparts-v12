@@ -2502,6 +2502,63 @@ function _fotoUrl(f){
   if(/^(https?:|data:|images\/)/.test(f)) return f;
   return 'https://funparts-ai-proxy.rodox1209.workers.dev/img/'+encodeURIComponent(f);
 }
+// ═══════════ AJUDA "?" POR OPÇÃO (do banco) ═══════════
+function _ajudaSeletores(){
+  return {
+    fundo_carbono:'.ocard[onclick*="f-carbono"]',
+    fundo_uv:'.ocard[onclick*="f-uv"]',
+    fundo_fosco:'#fundoFoscoCard',
+    moldura_fibra:'.ocard[onclick*="m-fibra"]',
+    moldura_laca:'.ocard[onclick*="m-laca"]',
+    led_warm:'#ledCardWarm',
+    led_rgb:'#ledCardRgb',
+    led_comfio:'#ledFioCom',
+    led_semfio:'#ledFioSem',
+    relevo_bandeira:'.rrow[onclick*="\'bandeira\'"]',
+    relevo_piloto:'.rrow[data-rel="piloto"]'
+  };
+}
+var _AJUDA_TITULOS={fundo_carbono:'Fibra de Carbono',fundo_uv:'Acrílico Brilho — UV',fundo_fosco:'Fosco',moldura_laca:'Moldura Laca Preto',moldura_fibra:'Moldura Fibra de Carbono',led_warm:'LED Neutro',led_rgb:'LED RGB',led_comfio:'LED com fio',led_semfio:'LED sem fio',relevo_bandeira:'Bandeira do país',relevo_piloto:'Nome do piloto'};
+function _injetaAjuda(){
+  if(!INFOS) return;
+  var sels=_ajudaSeletores();
+  Object.keys(sels).forEach(function(chave){
+    if(!INFOS[chave]) return;
+    var els=document.querySelectorAll(sels[chave]);
+    Array.prototype.forEach.call(els,function(el){
+      if(el.querySelector('.ajuda-q')) return; // já injetado
+      if(getComputedStyle(el).position==='static') el.style.position='relative';
+      var b=document.createElement('button');
+      b.className='ajuda-q'; b.type='button'; b.textContent='?'; b.title='Saiba mais';
+      b.style.cssText='position:absolute;top:8px;right:8px;width:21px;height:21px;border-radius:50%;border:1px solid rgba(224,123,0,.85);background:rgba(224,123,0,.16);color:#f0a640;font-size:12px;font-weight:700;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;z-index:6;padding:0;font-family:inherit;';
+      b.onclick=function(e){ e.stopPropagation(); e.preventDefault(); abreAjuda(chave); };
+      el.appendChild(b);
+    });
+  });
+}
+function abreAjuda(chave){
+  var info=INFOS && INFOS[chave]; if(!info) return;
+  var ov=document.getElementById('ajudaOverlay');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='ajudaOverlay';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100000;display:none;align-items:center;justify-content:center;padding:20px;';
+    ov.innerHTML='<div style="background:#141414;border:1px solid #2c2c2c;border-radius:14px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:24px;display:flex;gap:22px;flex-wrap:wrap;">'
+      +'<img id="ajudaImg" alt="" style="width:320px;max-width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:#0d0d0d;display:none;">'
+      +'<div style="flex:1;min-width:220px;"><div id="ajudaTit" style="font-family:\'Barlow Condensed\',sans-serif;font-size:21px;letter-spacing:1.6px;text-transform:uppercase;color:#e07b00;margin-bottom:12px;"></div>'
+      +'<div id="ajudaTxt" style="font-size:14px;color:#ddd;line-height:1.7;white-space:pre-wrap;"></div>'
+      +'<div style="text-align:right;margin-top:20px;"><button type="button" onclick="fechaAjuda()" style="background:#e07b00;border:none;color:#fff;border-radius:8px;padding:10px 22px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;">Fechar</button></div>'
+      +'</div></div>';
+    ov.addEventListener('click',function(e){ if(e.target===ov) fechaAjuda(); });
+    document.body.appendChild(ov);
+  }
+  var img=document.getElementById('ajudaImg');
+  if(info.img){ img.src=_fotoUrl(info.img); img.style.display=''; } else { img.style.display='none'; }
+  document.getElementById('ajudaTit').textContent=_AJUDA_TITULOS[chave]||'Informação';
+  document.getElementById('ajudaTxt').textContent=info.texto||'';
+  ov.style.display='flex';
+}
+function fechaAjuda(){ var ov=document.getElementById('ajudaOverlay'); if(ov)ov.style.display='none'; }
+
 // fotos do produto atual (do banco); se nao houver, usa as 4 padrao
 function _catFotos(){
   var p=(typeof S!=='undefined')?S.incProduto:null;
@@ -2514,6 +2571,7 @@ function _catFotos(){
 /* Se falhar (rede, banco fora), mantém o embutido — o site NUNCA quebra.     */
 var CAT_PRECOS=null; // preços do banco (editáveis no painel)
 var LEGO_FUNDOS_DB=null; // fundos LEGO por modelo, vindos do banco (Fase 4)
+var INFOS=null; // textos/imagens de ajuda ("?") por opção, do banco
 // preço de uma chave do banco, com valor de reserva se o banco não respondeu
 function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT_PRECOS[chave] : fb; }
 function _aplicaCatalogoBanco(c){
@@ -2528,6 +2586,7 @@ function _aplicaCatalogoBanco(c){
   }
   if(c.precos) CAT_PRECOS=c.precos;
   if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
+  if(c.infos){ INFOS=c.infos; if(typeof _injetaAjuda==='function') setTimeout(_injetaAjuda,60); }
   // se alguma lista já estiver na tela, atualiza sem exigir novo clique
   try{
     var lm=document.getElementById('legoModels');
