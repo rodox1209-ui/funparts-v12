@@ -376,6 +376,7 @@ function goStep(n){
     if(typeof updateBadgeTL==='function')updateBadgeTL(null);
     if(typeof updateBadgeBR==='function')updateBadgeBR(null,null);
     if(typeof _aplicaRelevoLego==='function')_aplicaRelevoLego();
+    if(typeof _aplicaRelevoOcultosLego==='function')_aplicaRelevoOcultosLego();
   }}
   if(n===7){_sumRemoved={moldura:false,led:false,rel:[]};buildSummary();}
   calcPrice();
@@ -629,6 +630,7 @@ function selLegoModel(row,model){
     if(_rPlaca&&!_hasPlaca) _rPlaca.classList.remove('sel');
     if(_rTracado&&!_hasTracado) _rTracado.classList.remove('sel');
   })();
+  if(typeof _aplicaRelevoOcultosLego==='function')_aplicaRelevoOcultosLego();
   setEl('pvMod',model.name);
   setEl('carLbl',model.name);
   updateBadgeTL(model.f1?'F1':'Logo '+model.name.split(' ')[0]);
@@ -2272,6 +2274,30 @@ function _aplicaRelevoLego(){
     [txtLive,txtLego].forEach(function(t){ if(t)t.style.display='none'; }); // imagem substitui o texto
   }
   // modo 'padrao' (ou 'imagem' sem img): mantém o comportamento atual
+}
+// Oculta opcionais (bandeira / nome do piloto) por modelo LEGO, do banco.
+// Some da etapa Alto-relevo E do preview (desmarcando se estava selecionado). Só LEGO.
+function _aplicaRelevoOcultosLego(){
+  if(typeof S==='undefined' || S.tipo!=='lego') return;
+  var cfg=(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[S.legoModel]) || null;
+  function _oculto(chave){ var g=cfg&&cfg[chave]; return !!(g && g.length && g[0].nome==='oculto'); }
+  var ocBand=_oculto('op_bandeira');
+  var ocPil=_oculto('op_piloto');
+  var rBand=document.querySelector('.rrow[onclick*="\'bandeira\'"]');
+  var rPil=document.querySelector('.rrow[data-rel="piloto"]');
+  if(rBand){
+    if(ocBand){
+      if(rBand.classList.contains('sel')){ try{ togRelevoOpt(rBand,null,'Bandeira do País',0); }catch(e){} }
+      rBand.style.display='none';
+      var _bi=document.getElementById('bandeiraInput'); if(_bi)_bi.style.display='none';
+    } else { rBand.style.display=''; }
+  }
+  if(rPil && ocPil){
+    if(rPil.classList.contains('sel')){ try{ togRelevoOpt(rPil,null,'Nome do Piloto',0); }catch(e){} }
+    rPil.style.display='none';
+    var _pi=document.getElementById('pilotoInput'); if(_pi)_pi.style.display='none';
+  }
+  // se não oculto, quem decide a visibilidade do piloto é a regra de placa (já existente)
 }
 function updateBadgeBR(text,color){
   const marca=text||(S.tipo==='lego'?S.legoBrand:S.miniBrand)||'FUNPARTS';
