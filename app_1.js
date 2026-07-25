@@ -2530,7 +2530,7 @@ function _injetaAjuda(){
       if(getComputedStyle(el).position==='static') el.style.position='relative';
       var b=document.createElement('button');
       b.className='ajuda-q'; b.type='button'; b.textContent='?'; b.title='Saiba mais';
-      b.style.cssText='position:absolute;top:8px;right:8px;width:21px;height:21px;border-radius:50%;border:1px solid rgba(224,123,0,.85);background:rgba(224,123,0,.16);color:#f0a640;font-size:12px;font-weight:700;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;z-index:6;padding:0;font-family:inherit;';
+      b.style.cssText='position:absolute;bottom:8px;right:8px;width:21px;height:21px;border-radius:50%;border:1px solid rgba(224,123,0,.85);background:rgba(224,123,0,.16);color:#f0a640;font-size:12px;font-weight:700;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;z-index:6;padding:0;font-family:inherit;';
       b.onclick=function(e){ e.stopPropagation(); e.preventDefault(); abreAjuda(chave); };
       el.appendChild(b);
     });
