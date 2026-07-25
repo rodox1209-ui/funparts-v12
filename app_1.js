@@ -2305,6 +2305,12 @@ function _aplicaRelevoOcultosLego(){
 // é "nenhum", esconde o rótulo de opcionais quando não há opção, e mostra a frase
 // "Este produto não contém a opção de alto relevo" quando não sobra nenhum relevo.
 function _relevoStep7Layout(){
+  // acha o rótulo "Relevos opcionais" pelo texto (a ordem no DOM não é confiável)
+  function _achaOpcLabel(){
+    var r=null;
+    document.querySelectorAll('.sec-sub').forEach(function(e){ if(!r && e.textContent.trim().toLowerCase().indexOf('relevos opcionais')===0) r=e; });
+    return r;
+  }
   var fx=document.getElementById('fixedTL');
   if(!fx) return;
   var card=fx.closest('.rrow-left')?fx.closest('.rrow-left').parentElement:null;
@@ -2317,8 +2323,7 @@ function _relevoStep7Layout(){
     if(card)card.style.display='';
     if(fixedLabel)fixedLabel.style.display='';
     if(msgEx)msgEx.style.display='none';
-    var _rowsM=document.querySelector('.relevo-rows');
-    var _opcM=_rowsM?_rowsM.previousElementSibling:null;
+    var _opcM=_achaOpcLabel();
     if(_opcM)_opcM.style.display='';
     return;
   }
@@ -2345,8 +2350,7 @@ function _relevoStep7Layout(){
   // opcionais realmente visíveis agora
   function _vis(sel){ var e=document.querySelector(sel); return !!(e && getComputedStyle(e).display!=='none'); }
   var algumaOpc=_vis('.rrow[onclick*="\'bandeira\'"]')||_vis('.rrow[data-rel="piloto"]')||_vis('.rrow[data-rel="placa"]')||_vis('.rrow[data-rel="tracado"]');
-  var rows=document.querySelector('.relevo-rows');
-  var opcLabel=rows?rows.previousElementSibling:null;
+  var opcLabel=_achaOpcLabel();
   if(opcLabel)opcLabel.style.display=algumaOpc?'':'none';
   // a frase aparece quando NÃO há nenhum relevo (nem fixo nem opcional)
   var temAlgum=(topoModo!=='nenhum')||algumaOpc;
