@@ -377,6 +377,7 @@ function goStep(n){
     if(typeof updateBadgeBR==='function')updateBadgeBR(null,null);
     if(typeof _aplicaRelevoLego==='function')_aplicaRelevoLego();
     if(typeof _aplicaRelevoOcultosLego==='function')_aplicaRelevoOcultosLego();
+    if(typeof _relevoStep7Layout==='function')_relevoStep7Layout();
   }}
   if(n===7){_sumRemoved={moldura:false,led:false,rel:[]};buildSummary();}
   calcPrice();
@@ -2298,6 +2299,58 @@ function _aplicaRelevoOcultosLego(){
     var _pi=document.getElementById('pilotoInput'); if(_pi)_pi.style.display='none';
   }
   // se não oculto, quem decide a visibilidade do piloto é a regra de placa (já existente)
+  if(typeof _relevoStep7Layout==='function')_relevoStep7Layout();
+}
+// Ajusta a ETAPA Alto-relevo (LEGO): esconde a caixa de relevo fixo quando o topo
+// é "nenhum", esconde o rótulo de opcionais quando não há opção, e mostra a frase
+// "Este produto não contém a opção de alto relevo" quando não sobra nenhum relevo.
+function _relevoStep7Layout(){
+  var fx=document.getElementById('fixedTL');
+  if(!fx) return;
+  var card=fx.closest('.rrow-left')?fx.closest('.rrow-left').parentElement:null;
+  if(!card) return;
+  var flexCol=card.parentElement;
+  var fixedLabel=flexCol?flexCol.previousElementSibling:null;
+  var msgEx=document.getElementById('relevoNenhumMsg');
+  // fora do LEGO: garante tudo visível e sem a frase (evita resíduo ao trocar de categoria)
+  if(typeof S==='undefined' || S.tipo!=='lego'){
+    if(card)card.style.display='';
+    if(fixedLabel)fixedLabel.style.display='';
+    if(msgEx)msgEx.style.display='none';
+    var _rowsM=document.querySelector('.relevo-rows');
+    var _opcM=_rowsM?_rowsM.previousElementSibling:null;
+    if(_opcM)_opcM.style.display='';
+    return;
+  }
+  var cfg=(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[S.legoModel]) || null;
+  function _val(chave){ var g=cfg&&cfg[chave]; return (g&&g.length)?g[0].nome:null; }
+  var topoModo=_val('relevo')||'padrao';
+  // frase (criada uma vez)
+  var msg=document.getElementById('relevoNenhumMsg');
+  if(!msg && flexCol && flexCol.parentElement){
+    msg=document.createElement('div');
+    msg.id='relevoNenhumMsg';
+    msg.style.cssText='padding:12px 14px;border:1px solid var(--border,#2c2c2c);border-radius:5px;background:var(--s2,#1a1a1a);color:var(--t2,#aaa);font-size:12px;line-height:1.5;';
+    msg.textContent='Este produto não contém a opção de alto relevo.';
+    flexCol.parentElement.insertBefore(msg, flexCol.nextSibling);
+  }
+  // caixa de relevo fixo some quando topo = nenhum
+  if(topoModo==='nenhum'){
+    if(card)card.style.display='none';
+    if(fixedLabel)fixedLabel.style.display='none';
+  } else {
+    if(card)card.style.display='';
+    if(fixedLabel)fixedLabel.style.display='';
+  }
+  // opcionais realmente visíveis agora
+  function _vis(sel){ var e=document.querySelector(sel); return !!(e && getComputedStyle(e).display!=='none'); }
+  var algumaOpc=_vis('.rrow[onclick*="\'bandeira\'"]')||_vis('.rrow[data-rel="piloto"]')||_vis('.rrow[data-rel="placa"]')||_vis('.rrow[data-rel="tracado"]');
+  var rows=document.querySelector('.relevo-rows');
+  var opcLabel=rows?rows.previousElementSibling:null;
+  if(opcLabel)opcLabel.style.display=algumaOpc?'':'none';
+  // a frase aparece quando NÃO há nenhum relevo (nem fixo nem opcional)
+  var temAlgum=(topoModo!=='nenhum')||algumaOpc;
+  if(msg)msg.style.display=temAlgum?'none':'';
 }
 function updateBadgeBR(text,color){
   const marca=text||(S.tipo==='lego'?S.legoBrand:S.miniBrand)||'FUNPARTS';
