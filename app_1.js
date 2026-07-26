@@ -1419,14 +1419,17 @@ function updateDetPreview(){
     // por object-fit:fill num quadro quadrado, afinava as bordas de cima/baixo.
     // Usa as molduras QUADRADAS do fluxo Miniatura (fibra/laca) só nessa dimensão.
     var _LEGO_FRAMES_49={'fibra':'https://lh3.googleusercontent.com/d/1SZLlOB6U2IKWYTr2CWC2G6craO8LgGv7','laca':'https://lh3.googleusercontent.com/d/1OXb1ET16x7qKrN5mxB8WTTPfKEFzpSbv'};
+    var _is4949=/^49\s*[×x]\s*49/.test(S.legoDim||'');
     var ldfr=document.getElementById('legoDetFrame');
     if(ldfr){
       var _fk=(S.moldura==='m-fibra')?'fibra':'laca';
-      var _is4949=/^49\s*[×x]\s*49/.test(S.legoDim||'');
       ldfr.src=(_is4949?_LEGO_FRAMES_49:_LEGO_FRAMES)[_fk];
       ldfr.style.display='block';
       ldfr.style.height=''; ldfr.style.top=''; // moldura quadrada já fica proporcional; sem hack de +5px
     }
+    // 49×49cm: encolhe o fundo 2px na altura para não vazar por baixo da moldura quadrada.
+    var _lfu=document.getElementById('legoDetFundo');
+    if(_lfu){ _lfu.style.height=_is4949?'calc(100% - 2px)':''; }
     // Car image - top-view sobre o fundo. Banco (por modelo) tem prioridade.
     var lcar=document.getElementById('legoDetCar');
     if(lcar){
