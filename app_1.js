@@ -1420,6 +1420,11 @@ function updateDetPreview(){
       var _fk=(S.moldura==='m-fibra')?'fibra':'laca';
       ldfr.src=_LEGO_FRAMES[_fk];
       ldfr.style.display='block';
+      // 49×49cm: a arte da moldura fica levemente achatada na altura (object-fit:fill
+      // dentro de um quadro quadrado). Compensa +5px de altura, centralizado. SÓ nessa dimensão.
+      var _is4949=/^49\s*[×x]\s*49/.test(S.legoDim||'');
+      ldfr.style.height=_is4949?'calc(100% + 5px)':'';
+      ldfr.style.top=_is4949?'-2.5px':'';
     }
     // Car image - top-view sobre o fundo. Banco (por modelo) tem prioridade.
     var lcar=document.getElementById('legoDetCar');
