@@ -958,3 +958,13 @@
   </div>
 </div>
 <script src="app_2.js"></script>
+<script>
+/* Reset da personalização (fallback inline, garante disponibilidade mesmo com cache do app_1.js).
+   Recarrega a página: zera o estado S (em memória) e volta à etapa TIPO;
+   o carrinho fica salvo no localStorage e é preservado. */
+if(typeof window.iniciarNovaPersonalizacao!=='function'){
+  window.iniciarNovaPersonalizacao=function(){
+    try{ location.reload(); }catch(e){ location.href=location.pathname+location.search; }
+  };
+}
+</script>
