@@ -1174,6 +1174,29 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     };
   }
 
+  // Mobile: manter a barra inferior (avançar/voltar) sincronizada com a etapa REAL.
+  // Bug: "continuar comprando" e cliques no menu do topo trocam de etapa via goStep,
+  // mas a barra mobile só era atualizada pelos botões avançar/voltar -> sumia o "avançar".
+  var _origMobUpd = window._mobUpdateNav;
+  if(typeof _origMobUpd==='function'){
+    window._mobUpdateNav = function(){
+      try{
+        var secs=document.querySelectorAll('.cfg-sec'); var cur=-1;
+        secs.forEach(function(s,i){ if(s.classList.contains('active'))cur=i; });
+        if(cur>=0) window._mobStep=cur;
+      }catch(e){}
+      return _origMobUpd.apply(this, arguments);
+    };
+  }
+  var _origGoStepNav = window.goStep;
+  if(typeof _origGoStepNav==='function'){
+    window.goStep = function(){
+      var r=_origGoStepNav.apply(this, arguments);
+      try{ if(typeof _mobUpdateNav==='function') _mobUpdateNav(); }catch(e){}
+      return r;
+    };
+  }
+
   // re-render inicial: aplica o botao "editar" em itens ja no carrinho
   if(typeof _cartRender==='function'){ try{ _cartRender(); }catch(e){} }
 })();
