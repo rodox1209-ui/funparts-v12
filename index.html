@@ -973,6 +973,8 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 .cart-acts{display:flex;align-items:center;gap:13px;}
 .cart-ed{background:none;border:none;color:#e07b00;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
 .cart-ed:hover{color:#ff9d2a;}
+/* Mobile: quadro LEGO 49x49 quadrado e contido (evita o fundo/carro vazarem por baixo da moldura) */
+@media(max-width:720px){ #legoDetQuadro.dim4949{ width:100%!important; height:auto!important; } }
 </style>
 <script>
 /* ── EDITAR PRODUTO NO CARRINHO (recarrega a personalizacao salva e atualiza o item) ──
@@ -1155,6 +1157,22 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(typeof _botoesResumo==='function')_botoesResumo(true);
     if(typeof abrirCarrinho==='function')abrirCarrinho();
   };
+
+  // Mobile: marca o quadro LEGO 49x49 p/ o CSS deixá-lo quadrado e contido (igual desktop)
+  var _origUpd = window.updateDetPreview;
+  if(typeof _origUpd==='function'){
+    window.updateDetPreview = function(){
+      var r = _origUpd.apply(this, arguments);
+      try{
+        var q=document.getElementById('legoDetQuadro');
+        if(q){
+          var is4949 = (typeof S!=='undefined' && S.tipo==='lego') && /^49\s*[×x]\s*49/.test((S.legoDim)||'');
+          q.classList.toggle('dim4949', !!is4949);
+        }
+      }catch(e){}
+      return r;
+    };
+  }
 
   // re-render inicial: aplica o botao "editar" em itens ja no carrinho
   if(typeof _cartRender==='function'){ try{ _cartRender(); }catch(e){} }
