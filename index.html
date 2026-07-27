@@ -996,7 +996,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     }
     body.innerHTML=CART.map(function(i){
       var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'🧱':'🏎️')+'</div>';
-      var editavel=(i.cfg && i.tipo==='lego' && i.via!=='catalogo');
+      var editavel=(i.cfg && i.via!=='catalogo' && (i.tipo==='lego' || (i.tipo==='mini' && i.cfg.miniScale!==undefined)));
       var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">editar produto</button>' : '';
       return '<div class="cart-item">'
         +'<div class="cart-thumb">'+img+'</div>'
@@ -1028,25 +1028,8 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(typeof _origBotoes==='function') _origBotoes(adicionado);
   };
 
-  // Recarrega um item salvo de volta na personalizacao (LEGO) e vai ao resumo
-  window.editarProduto = function(id){
-    var item=null,k; for(k=0;k<CART.length;k++){ if(CART[k].id===id){ item=CART[k]; break; } }
-    if(!item||!item.cfg){ return; }
-    var cfg=item.cfg;
-    if(cfg.tipo!=='lego'){
-      alert('No momento a edição está disponível para os quadros LEGO. Para miniaturas, remova o item e monte novamente.');
-      return;
-    }
-    window._editandoId=id;
-    if(typeof fecharCarrinho==='function')fecharCarrinho();
-    selectTipo('lego');
-    if(typeof renderLegoModels==='function')renderLegoModels(cfg.legoBrand);
-    S.legoBrand=cfg.legoBrand;
-    var bcards=document.querySelectorAll('#legoBrands .bcard');
-    [].forEach.call(bcards,function(b){ b.classList.toggle('sel',(b.textContent||'').trim()===cfg.legoBrand); });
-    var rows=document.querySelectorAll('#legoModels .mrow'), alvo=null;
-    [].forEach.call(rows,function(r){ var s=r.querySelector('span'); if(s && s.textContent.trim()===cfg.legoModel) alvo=r; });
-    if(alvo)alvo.click();
+  // Restauracao compartilhada (moldura, fundo, LED, relevos)
+  function _restauraComuns(cfg){
     var mc=document.querySelector('#step-5 .ocard[onclick*="'+cfg.moldura+'"]');
     if(mc && typeof selMoldura==='function')selMoldura(mc,cfg.moldura,cfg.molduraLbl||'');
     if(cfg.uvColor!==undefined)S.uvColor=cfg.uvColor;
@@ -1069,10 +1052,84 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       var t=rrows.filter(function(r){ return (r.getAttribute('onclick')||'').indexOf("'"+lbl+"'")>-1; })[0];
       if(t && !t.classList.contains('sel'))t.click();
     });
+  }
+
+  function _editarLego(item,cfg){
+    window._editandoId=item.id;
+    if(typeof fecharCarrinho==='function')fecharCarrinho();
+    selectTipo('lego');
+    if(typeof renderLegoModels==='function')renderLegoModels(cfg.legoBrand);
+    S.legoBrand=cfg.legoBrand;
+    [].forEach.call(document.querySelectorAll('#legoBrands .bcard'),function(b){ b.classList.toggle('sel',(b.textContent||'').trim()===cfg.legoBrand); });
+    var rows=document.querySelectorAll('#legoModels .mrow'), alvo=null;
+    [].forEach.call(rows,function(r){ var s=r.querySelector('span'); if(s && s.textContent.trim()===cfg.legoModel) alvo=r; });
+    if(alvo)alvo.click();
+    _restauraComuns(cfg);
     if(typeof calcPrice==='function')calcPrice();
     if(typeof goStep==='function')goStep(7);
     setTimeout(function(){ if(typeof _botoesResumo==='function')_botoesResumo(false); },40);
+  }
+
+  function _editarMini(item,cfg){
+    window._editandoId=item.id;
+    if(typeof fecharCarrinho==='function')fecharCarrinho();
+    selectTipo('mini');
+    if(typeof selMiniChoice==='function')selMiniChoice(cfg.miniChoice||'apenas');
+    var setV=function(idv,v){ var e=document.getElementById(idv); if(e && v!=null && v!==''){ e.value=v; try{e.dispatchEvent(new Event('input'));e.dispatchEvent(new Event('change'));}catch(_){} } };
+    setV('apenaCarBrand',cfg.aiBrand); setV('apenaCarModel',cfg.aiModel); setV('apenaCarColor',cfg.aiColor); setV('apenaCarYear',cfg.aiYear);
+    setV('apenaCarBrandSelect',cfg.aiBrand); setV('apenaCarModelInput',cfg.aiModel);
+    setV('aiCarBrand',cfg.aiBrand); setV('aiCarModel',cfg.aiModel); setV('aiCarColor',cfg.aiColor); setV('aiCarYear',cfg.aiYear);
+    S.miniBrand=cfg.miniBrand||cfg.aiBrand||''; S.miniModel=cfg.miniModel||cfg.aiModel||'';
+    if(cfg.miniSize!==undefined)S.miniSize=cfg.miniSize;
+    if(cfg.miniDim!==undefined)S.miniDim=cfg.miniDim;
+    S.miniScale=cfg.miniScale; S.quadroDim=cfg.quadroDim;
+    if(cfg.miniOpt!==undefined)S.miniOpt=cfg.miniOpt;
+    if(cfg.disp!==undefined)S.disp=cfg.disp;
+    S.aiCarColor=cfg.aiColor||'';
+    var carUrl = (item.imgKey ? _fotoUrl(item.imgKey) : (cfg.carImg||''));
+    if(carUrl && typeof _detTopViewUrl!=='undefined'){ _detTopViewUrl=carUrl; if(typeof _detTopViewKey!=='undefined')_detTopViewKey='edit:'+item.id; }
+    _restauraComuns(cfg);
+    if(typeof renderFrameCards==='function')renderFrameCards();
+    if(typeof calcPrice==='function')calcPrice();
+    if(typeof goStep==='function')goStep(7);
+    setTimeout(function(){
+      if(carUrl){ var d=document.getElementById('detPvCar'); if(d){ d.src=carUrl; d.style.display='block'; } }
+      if(typeof updateDetPreview==='function')updateDetPreview();
+      if(typeof applyDetCarOverlay==='function')applyDetCarOverlay();
+      if(typeof _botoesResumo==='function')_botoesResumo(false);
+    },70);
+  }
+
+  // Dispatcher: recarrega item salvo (LEGO ou Miniatura / Somente Quadro) e vai ao resumo
+  window.editarProduto = function(id){
+    var item=null,k; for(k=0;k<CART.length;k++){ if(CART[k].id===id){ item=CART[k]; break; } }
+    if(!item||!item.cfg){ return; }
+    var cfg=item.cfg;
+    if(cfg.tipo==='lego'){ _editarLego(item,cfg); return; }
+    if(cfg.tipo==='mini' && cfg.miniScale!==undefined){ _editarMini(item,cfg); return; }
+    alert('Este item foi adicionado antes desta atualização e não guardou os dados necessários para edição. Remova e monte novamente para poder editá-lo.');
   };
+
+  // Enriquece o cfg dos itens Miniatura (escala, dimensão, carro, cores) p/ permitir edicao
+  var _origMonta = window._cartMontaItem;
+  if(typeof _origMonta==='function'){
+    window._cartMontaItem = function(){
+      var it=_origMonta();
+      if(it && it.cfg && it.tipo==='mini'){
+        var g=function(a,b){ var e=document.getElementById(a)||document.getElementById(b); return e?(e.value||''):''; };
+        it.cfg.miniChoice = S.miniChoice||'apenas';
+        it.cfg.miniScale  = S.miniScale||'';
+        it.cfg.quadroDim  = S.quadroDim||'';
+        it.cfg.aiBrand = g('aiCarBrand','apenaCarBrand')||S.miniBrand||'';
+        it.cfg.aiModel = g('aiCarModel','apenaCarModel')||S.miniModel||'';
+        it.cfg.aiColor = g('aiCarColor','apenaCarColor')||S.aiCarColor||'';
+        it.cfg.aiYear  = g('aiCarYear','apenaCarYear')||'';
+        var cimg=(typeof _detTopViewUrl!=='undefined')?(_detTopViewUrl||''):'';
+        it.cfg.carImg = (cimg && cimg.indexOf('data:')!==0)?cimg:'';
+      }
+      return it;
+    };
+  }
 
   // Substitui o item editado no carrinho (mesmo id, sem duplicar)
   window.atualizarPedido = function(){
