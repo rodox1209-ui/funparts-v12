@@ -968,3 +968,138 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   };
 }
 </script>
+
+<style>
+.cart-acts{display:flex;align-items:center;gap:13px;}
+.cart-ed{background:none;border:none;color:#e07b00;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
+.cart-ed:hover{color:#ff9d2a;}
+</style>
+<script>
+/* ── EDITAR PRODUTO NO CARRINHO (recarrega a personalizacao salva e atualiza o item) ──
+   Implementado aqui inline para nao depender de novo deploy do app_1.js.
+   Cada item guarda cfg com a configuracao completa; restauramos e voltamos ao resumo. */
+(function(){
+  window._editandoId = window._editandoId || null;
+
+  // Carrinho: adiciona "editar produto" nos itens LEGO personalizados
+  window._cartRender = function(){
+    var n=CART.length;
+    var c=document.getElementById('cartCount');
+    if(c){ c.textContent=n; c.classList.toggle('on',n>0); }
+    var body=document.getElementById('cartBody');
+    var foot=document.getElementById('cartFoot');
+    if(!body)return;
+    if(!n){
+      body.innerHTML='<div class="cart-empty">Seu carrinho está vazio.<br>Monte um quadro e adicione aqui.</div>';
+      if(foot)foot.style.display='none';
+      return;
+    }
+    body.innerHTML=CART.map(function(i){
+      var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'🧱':'🏎️')+'</div>';
+      var editavel=(i.cfg && i.tipo==='lego' && i.via!=='catalogo');
+      var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">editar produto</button>' : '';
+      return '<div class="cart-item">'
+        +'<div class="cart-thumb">'+img+'</div>'
+        +'<div class="cart-info">'
+          +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
+          +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
+          +'<div class="cart-foot-row">'
+            +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
+            +'<div class="cart-acts">'+edBtn+'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">remover</button></div>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+    if(foot)foot.style.display='';
+    var t=document.getElementById('cartTotal');
+    if(t)t.textContent=_brlCart(_cartTotal());
+  };
+
+  // Resumo: em modo edicao o botao vira "Atualizar pedido"
+  var _origBotoes = window._botoesResumo;
+  window._botoesResumo = function(adicionado){
+    if(window._editandoId){
+      var add=document.getElementById('btnAddCart');
+      var cont=document.getElementById('btnContinuar');
+      if(add){ add.classList.add('finalizar'); add.textContent='Atualizar pedido ✓'; add.onclick=window.atualizarPedido; }
+      if(cont)cont.style.display='none';
+      return;
+    }
+    if(typeof _origBotoes==='function') _origBotoes(adicionado);
+  };
+
+  // Recarrega um item salvo de volta na personalizacao (LEGO) e vai ao resumo
+  window.editarProduto = function(id){
+    var item=null,k; for(k=0;k<CART.length;k++){ if(CART[k].id===id){ item=CART[k]; break; } }
+    if(!item||!item.cfg){ return; }
+    var cfg=item.cfg;
+    if(cfg.tipo!=='lego'){
+      alert('No momento a edição está disponível para os quadros LEGO. Para miniaturas, remova o item e monte novamente.');
+      return;
+    }
+    window._editandoId=id;
+    if(typeof fecharCarrinho==='function')fecharCarrinho();
+    selectTipo('lego');
+    if(typeof renderLegoModels==='function')renderLegoModels(cfg.legoBrand);
+    S.legoBrand=cfg.legoBrand;
+    var bcards=document.querySelectorAll('#legoBrands .bcard');
+    [].forEach.call(bcards,function(b){ b.classList.toggle('sel',(b.textContent||'').trim()===cfg.legoBrand); });
+    var rows=document.querySelectorAll('#legoModels .mrow'), alvo=null;
+    [].forEach.call(rows,function(r){ var s=r.querySelector('span'); if(s && s.textContent.trim()===cfg.legoModel) alvo=r; });
+    if(alvo)alvo.click();
+    var mc=document.querySelector('#step-5 .ocard[onclick*="'+cfg.moldura+'"]');
+    if(mc && typeof selMoldura==='function')selMoldura(mc,cfg.moldura,cfg.molduraLbl||'');
+    if(cfg.uvColor!==undefined)S.uvColor=cfg.uvColor;
+    if(cfg.uvLayoutType!==undefined)S.uvLayoutType=cfg.uvLayoutType;
+    if(cfg.uvStripeMain!==undefined)S.uvStripeMain=cfg.uvStripeMain;
+    if(cfg.uvStripeAccent!==undefined)S.uvStripeAccent=cfg.uvStripeAccent;
+    var fc=document.querySelector('.ocard[onclick*="'+cfg.fundo+'"]');
+    if(fc && typeof selFundo==='function')selFundo(fc,cfg.fundo,cfg.fundoLbl||'');
+    if(cfg.led && !S.led && typeof togLED==='function')togLED();
+    else if(!cfg.led && S.led && typeof togLED==='function')togLED();
+    if(cfg.led){
+      S.ledTipo=cfg.ledTipo||'warm'; S.ledFio=cfg.ledFio||'com';
+      var lc=document.getElementById(S.ledTipo==='rgb'?'ledCardRgb':'ledCardWarm');
+      if(lc && typeof setLED==='function')setLED(lc,S.ledTipo);
+      if(typeof selLedFio==='function')selLedFio(S.ledFio);
+    }
+    var rrows=[].slice.call(document.querySelectorAll('.rrow'));
+    rrows.forEach(function(r){ if(r.classList.contains('sel'))r.click(); });
+    (cfg.relOpts||[]).forEach(function(lbl){
+      var t=rrows.filter(function(r){ return (r.getAttribute('onclick')||'').indexOf("'"+lbl+"'")>-1; })[0];
+      if(t && !t.classList.contains('sel'))t.click();
+    });
+    if(typeof calcPrice==='function')calcPrice();
+    if(typeof goStep==='function')goStep(7);
+    setTimeout(function(){ if(typeof _botoesResumo==='function')_botoesResumo(false); },40);
+  };
+
+  // Substitui o item editado no carrinho (mesmo id, sem duplicar)
+  window.atualizarPedido = function(){
+    if(!window._editandoId)return;
+    var idx=-1,k; for(k=0;k<CART.length;k++){ if(CART[k].id===window._editandoId){ idx=k; break; } }
+    if(idx<0){ window._editandoId=null; return; }
+    var novo=_cartMontaItem();
+    var src=novo.imgSrc; delete novo.imgSrc;
+    novo.thumb=CART[idx].thumb||'';
+    var _lista=(novo.preview&&novo.preview.imgs)||[]; if(novo.preview)delete novo.preview.imgs;
+    novo.id=window._editandoId;
+    CART[idx]=novo;
+    _cartSave(); _cartRender();
+    if(typeof _cartThumb==='function')_cartThumb(src,function(thumb){ if(!thumb)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){a.thumb=thumb;_cartSave();_cartRender();} });
+    if(novo.via!=='catalogo' && src && src.indexOf('data:')===0 && typeof _subirImagemItem==='function'){
+      _subirImagemItem(src,function(ch){ if(!ch)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){a.imgKey=ch;_cartSave();} });
+    }
+    if(_lista.length && typeof _subirImagemItem==='function'){
+      novo.imgKeys=new Array(_lista.length);
+      _lista.forEach(function(d,i2){ _subirImagemItem(d,function(ch){ var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(!a||!ch)return; if(!a.imgKeys)a.imgKeys=new Array(_lista.length); a.imgKeys[i2]=ch; _cartSave(); }); });
+    }
+    window._editandoId=null;
+    if(typeof _botoesResumo==='function')_botoesResumo(true);
+    if(typeof abrirCarrinho==='function')abrirCarrinho();
+  };
+
+  // re-render inicial: aplica o botao "editar" em itens ja no carrinho
+  if(typeof _cartRender==='function'){ try{ _cartRender(); }catch(e){} }
+})();
+</script>
