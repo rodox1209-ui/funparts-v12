@@ -920,7 +920,11 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     // Previews de altura fixa (fluxo LEGO/Miniatura) encostavam a imagem no centro do painel.
     // Com height:auto o container "abraça" a imagem e o .pv-panel (flex-start) o cola no topo.
     // O texto sobreposto do #legoHeroImg (top:50%) passa a centralizar na própria imagem.
-    + '#legoHeroImg,#miniHeroImg,#miniStep1HeroImg{height:auto!important;align-items:flex-start!important;}';
+    + '#legoHeroImg,#miniHeroImg,#miniStep1HeroImg{height:auto!important;align-items:flex-start!important;}'
+    // Pares de preview (catálogo Produto e "somente quadro" Detalhamento): o app coloca o
+    // .pv-panel em row com align-items:center, o que centralizava verticalmente o bloco
+    // "homem + quadro". No modo row: centraliza na HORIZONTAL e ancora no TOPO (junto ao menu).
+    + '.pv-panel[style*="flex-direction: row"]{justify-content:center!important;align-items:flex-start!important;}';
   var st=document.createElement('style');
   st.setAttribute('data-fp','anchor-top');
   st.textContent=css;
