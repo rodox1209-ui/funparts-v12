@@ -860,3 +860,35 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   st.textContent='.stab{cursor:default!important;}';
   (document.head||document.documentElement).appendChild(st);
 })();
+
+/* ══ Galeria do produto (Quadro com miniatura): 4 miniaturas SEMPRE coladas à imagem principal ══
+   Antes o box da imagem "esticava" (flex:1) e centralizava a foto numa área alta, deixando as
+   miniaturas grudadas na base (vão grande em telas maiores). Agora imagem + miniaturas viram um
+   bloco único, centralizado, com as fotinhas logo abaixo — igual em qualquer resolução. */
+(function(){
+  if(typeof window._catGaleriaHTML!=='function')return;
+  window._catGaleriaHTML=function(soFoto){
+    var idx=(window.S&&S.incFotoIdx)||0;
+    var _F=(typeof _catFotos==='function')?_catFotos():[];
+    var thumbs=soFoto?'':_F.map(function(f,k){
+      return '<img src="'+f+'" data-th="'+k+'" onclick="trocarFotoIncluso('+k+')" style="width:74px;height:58px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:2px solid '+(k===idx?'#e07b00':'transparent')+';">';
+    }).join('');
+    var _mobG=window.innerWidth<=720;
+    var _wrap=_mobG
+      ? 'width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;'
+      : 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+    // box da imagem NÃO cresce (flex:0) -> a foto encosta nas miniaturas e o bloco fica centralizado
+    var _box=_mobG
+      ? 'width:100%;display:flex;align-items:flex-start;justify-content:center;'
+      : 'flex:0 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;';
+    var _img=_mobG
+      ? 'width:100%;max-height:46vh;object-fit:contain;border-radius:10px;display:block;'
+      : 'max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;';
+    return '<div style="'+_wrap+'">'
+      +'<div style="'+_box+'">'
+      +'<img id="catMainPhoto" src="'+(_F[idx]||_F[0]||'')+'" style="'+_img+'">'
+      +'</div>'
+      +'<div id="catThumbs" style="display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;flex-shrink:0;width:100%;">'+thumbs+'</div>'
+      +'</div>';
+  };
+})();
