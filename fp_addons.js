@@ -8,6 +8,17 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   };
 }
 
+/* "Continuar comprando" (botão que aparece depois de adicionar o item ao carrinho) deve
+   REINICIAR a personalização por completo — exatamente como "Iniciar nova personalização" —,
+   e não apenas voltar à etapa 1 mantendo as configurações do item anterior gravadas no estado S.
+   O carrinho é preservado (fica salvo no localStorage e é relido ao recarregar). */
+(function(){
+  window.continuarComprando=function(){
+    if(typeof window.iniciarNovaPersonalizacao==='function'){ window.iniciarNovaPersonalizacao(); return; }
+    try{ location.reload(); }catch(e){ location.href=location.pathname+location.search; }
+  };
+})();
+
 /* ── EDITAR PRODUTO NO CARRINHO (recarrega a personalizacao salva e atualiza o item) ──
    Implementado aqui inline para nao depender de novo deploy do app_1.js.
    Cada item guarda cfg com a configuracao completa; restauramos e voltamos ao resumo. */
