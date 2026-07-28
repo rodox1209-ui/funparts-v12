@@ -1238,6 +1238,21 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 .fp-frete-msg{font-size:11.5px;color:#8a8a8a;margin-top:8px;}
 .fp-frete-tot{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#fff;font-weight:700;margin-top:9px;padding-top:9px;border-top:1px dashed #333;}
 .fp-frete-note{font-size:9.5px;color:#666;margin-top:7px;font-style:italic;}
+.fp-cup{border-top:1px solid #262626;margin:10px 0 0;padding-top:12px;}
+.fp-cup-h{font-size:11px;font-weight:700;letter-spacing:.5px;color:#e07b00;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.fp-cup-row{display:flex;gap:8px;}
+.fp-cup-row input{flex:1;min-width:0;background:#101010;border:1px solid #2c2c2c;color:#eee;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;letter-spacing:.5px;}
+.fp-cup-row input:focus{outline:none;border-color:#e07b00;}
+.fp-cup-row button{background:#e07b00;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:12px;padding:0 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:filter .15s;}
+.fp-cup-row button:hover{filter:brightness(1.08);}
+.fp-cup-row button:disabled{opacity:.5;cursor:default;}
+.fp-cup-msg{font-size:11px;color:#8a8a8a;margin-top:7px;}
+.fp-cup-applied{display:flex;align-items:center;gap:10px;background:#12180f;border:1px solid #3f6b45;border-radius:8px;padding:9px 11px;}
+.fp-cup-tag{flex:1;min-width:0;font-size:12.5px;color:#8fd39b;font-weight:700;letter-spacing:.3px;}
+.fp-cup-tag em{font-style:normal;color:#c7a24f;font-weight:600;font-size:11px;}
+.fp-cup-val{font-size:13px;color:#fff;font-weight:700;white-space:nowrap;}
+.fp-cup-rm{background:transparent;border:none;color:#9a9a9a;font-family:inherit;font-size:11px;cursor:pointer;text-decoration:underline;padding:0;}
+.fp-cup-rm:hover{color:#e2837a;}
 </style>
 <script>
 (function(){
@@ -1408,5 +1423,126 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     }).catch(function(){});
   }
   if(document.readyState!=='loading')init(); else document.addEventListener('DOMContentLoaded',init);
+})();
+</script>
+
+<script>
+/* ══════════════ CUPOM DE DESCONTO (carrinho) ══════════════
+   Inline para não depender de novo deploy do app_1.js.
+   Valida no Worker (/cupom), aplica o desconto no total (fonte única = _cartTotal)
+   e injeta o código no POST /pedido para o servidor recalcular e contar o uso. */
+(function(){
+  var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
+  var LS='fp_cupom_v1';
+  window._cupom=null;
+  var L={
+    pt:{title:'Cupom de desconto',ph:'Digite seu cupom',apply:'Aplicar',remove:'remover',applied:'aplicado',freeship:'+ frete grátis',invalid:'Cupom inválido',checking:'Verificando…',empty:'Informe um cupom'},
+    en:{title:'Discount coupon',ph:'Enter your coupon',apply:'Apply',remove:'remove',applied:'applied',freeship:'+ free shipping',invalid:'Invalid coupon',checking:'Checking…',empty:'Enter a coupon'}
+  };
+  function lg(k){var l=(window.FP&&FP.lang==='en')?'en':'pt';return (L[l]&&L[l][k])||L.pt[k];}
+  function sym(){return (window.CFG&&window.FP&&CFG[FP.region])?CFG[FP.region].symbol:'R$';}
+  function fmt(v){var l=(window.FP&&FP.lang==='en')?'en-US':'pt-BR';return Number(v||0).toLocaleString(l,{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+  var _subOrig=window._cartTotal;                 // total ORIGINAL (sem desconto)
+  function subtotalBruto(){ return (typeof _subOrig==='function')?(Number(_subOrig())||0):0; }
+  function descontoDe(sub){
+    if(!window._cupom)return 0;
+    var c=window._cupom;
+    var d=(c.tipo==='fixo')?Math.min(Number(c.valor)||0,sub):(sub*(Number(c.valor)||0)/100);
+    d=Math.round(d*100)/100; if(d>sub)d=sub; if(d<0)d=0; return d;
+  }
+  // a partir daqui _cartTotal é o total COM desconto (o site inteiro passa a usar este)
+  window._cartTotal=function(){ var s=subtotalBruto(); return Math.max(0,Math.round((s-descontoDe(s))*100)/100); };
+  window._cupomDesconto=function(){ return descontoDe(subtotalBruto()); };
+
+  function salvar(){ try{ if(window._cupom)localStorage.setItem(LS,JSON.stringify(window._cupom)); else localStorage.removeItem(LS);}catch(e){} }
+
+  function boxHTML(){
+    if(window._cupom){
+      var c=window._cupom, desc=descontoDe(subtotalBruto());
+      return '<div class="fp-cup-h"><span>🎟️</span> '+lg('title')+'</div>'
+        +'<div class="fp-cup-applied"><div class="fp-cup-tag">'+esc(c.codigo)+' '+lg('applied')
+          +(c.frete_gratis?' <em>'+lg('freeship')+'</em>':'')+'</div>'
+          +'<div class="fp-cup-val">− '+sym()+' '+fmt(desc)+'</div>'
+          +'<button type="button" class="fp-cup-rm" id="fpCupRm">'+lg('remove')+'</button></div>';
+    }
+    return '<div class="fp-cup-h"><span>🎟️</span> '+lg('title')+'</div>'
+      +'<div class="fp-cup-row"><input id="fpCupIn" autocomplete="off" placeholder="'+esc(lg('ph'))+'" style="text-transform:uppercase"><button type="button" id="fpCupBtn">'+lg('apply')+'</button></div>'
+      +'<div class="fp-cup-msg" id="fpCupMsg"></div>';
+  }
+  function montaBox(){
+    var foot=document.getElementById('cartFoot'); if(!foot)return null;
+    var box=document.getElementById('fpCup');
+    if(!box){ box=document.createElement('div'); box.className='fp-cup'; box.id='fpCup';
+      var fre=document.getElementById('fpFrete'), note=foot.querySelector('.cart-note');
+      var ref=fre||note; if(ref)foot.insertBefore(box,ref); else foot.appendChild(box);
+    }
+    return box;
+  }
+  function bind(){
+    var b=document.getElementById('fpCupBtn'); if(b)b.onclick=aplicar;
+    var inp=document.getElementById('fpCupIn'); if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();aplicar();}});
+    var rm=document.getElementById('fpCupRm'); if(rm)rm.onclick=remover;
+  }
+  function render(){
+    var box=montaBox(); if(!box)return;
+    if(!window.CART||!CART.length){ box.style.display='none'; return; }
+    box.style.display=''; box.innerHTML=boxHTML(); bind();
+  }
+  window._renderCupomBox=render;
+  function msg(txt,cor){ var m=document.getElementById('fpCupMsg'); if(m){m.textContent=txt||'';m.style.color=cor||'#8a8a8a';} }
+
+  function aplicar(){
+    var inp=document.getElementById('fpCupIn'); if(!inp)return;
+    var cod=(inp.value||'').trim(); if(!cod){msg(lg('empty'),'#d98a82');return;}
+    var btn=document.getElementById('fpCupBtn'); if(btn)btn.disabled=true; msg(lg('checking'));
+    fetch(API+'/cupom',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo:cod,subtotal:subtotalBruto()})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(btn)btn.disabled=false;
+        if(d&&d.ok){ window._cupom={codigo:d.codigo,tipo:d.tipo,valor:d.valor,frete_gratis:!!d.frete_gratis}; salvar(); atualizaTudo(); }
+        else { msg((d&&d.erro)||lg('invalid'),'#d98a82'); }
+      }).catch(function(){ if(btn)btn.disabled=false; msg(lg('invalid'),'#d98a82'); });
+  }
+  function remover(){ window._cupom=null; salvar(); atualizaTudo(); }
+
+  function atualizaTudo(){
+    render();
+    if(typeof window._cartRender==='function')window._cartRender();
+    var t2=document.getElementById('cartTotal2'); if(t2&&typeof _brlCart==='function')t2.textContent=_brlCart(_cartTotal());
+    var sel=document.querySelector('#fpFreteOpts .fp-frete-opt.on'); if(sel)sel.click(); // recomputa "Total com frete"
+  }
+
+  // re-renderiza a caixa sempre que o carrinho é redesenhado
+  var _cr=window._cartRender;
+  window._cartRender=function(){ if(typeof _cr==='function')_cr.apply(this,arguments); render(); };
+
+  // injeta o cupom no POST /pedido (o app_1.js não conhece o cupom)
+  var _of=window.fetch;
+  window.fetch=function(input,init){
+    try{
+      var u=(typeof input==='string')?input:(input&&input.url)||'';
+      if(window._cupom&&init&&init.method&&String(init.method).toUpperCase()==='POST'&&init.body&&u.indexOf('/pedido')>=0){
+        var b=JSON.parse(init.body);
+        if(b&&Array.isArray(b.itens)){ b.cupom=window._cupom.codigo; init=Object.assign({},init,{body:JSON.stringify(b)}); }
+      }
+    }catch(e){}
+    return _of.call(this,input,init);
+  };
+
+  function revalida(cod){
+    fetch(API+'/cupom',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo:cod,subtotal:subtotalBruto()})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d&&d.ok){ window._cupom={codigo:d.codigo,tipo:d.tipo,valor:d.valor,frete_gratis:!!d.frete_gratis}; }
+        else { window._cupom=null; salvar(); }
+        atualizaTudo();
+      }).catch(function(){});
+  }
+  function init(){
+    try{ var s=localStorage.getItem(LS); if(s){ var c=JSON.parse(s); if(c&&c.codigo){ window._cupom=c; revalida(c.codigo); } } }catch(e){}
+    render();
+  }
+  if(document.readyState!=='loading')setTimeout(init,250); else document.addEventListener('DOMContentLoaded',function(){setTimeout(init,250);});
 })();
 </script>
