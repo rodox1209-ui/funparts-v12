@@ -1456,6 +1456,14 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   window._cartTotal=function(){ var s=subtotalBruto(); return Math.max(0,Math.round((s-descontoDe(s))*100)/100); };
   window._cupomDesconto=function(){ return descontoDe(subtotalBruto()); };
 
+  // acabamento: valores inteiros ficam limpos (R$ 689); com desconto fracionado mostra 2 casas (R$ 620,10)
+  var _obrl=window._brlCart;
+  window._brlCart=function(v){
+    var n=Number(v||0);
+    if(Number.isInteger(n)) return (typeof _obrl==='function')?_obrl(n):('R$ '+n.toLocaleString('pt-BR'));
+    return 'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  };
+
   function salvar(){ try{ if(window._cupom)localStorage.setItem(LS,JSON.stringify(window._cupom)); else localStorage.removeItem(LS);}catch(e){} }
 
   function boxHTML(){
