@@ -916,7 +916,11 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 (function(){
   var css=''
     + '.pv-panel{justify-content:flex-start!important;}'
-    + '#cartForm.cart-body{flex:0 1 auto!important;}';
+    + '#cartForm.cart-body{flex:0 1 auto!important;}'
+    // Previews de altura fixa (fluxo LEGO/Miniatura) encostavam a imagem no centro do painel.
+    // Com height:auto o container "abraça" a imagem e o .pv-panel (flex-start) o cola no topo.
+    // O texto sobreposto do #legoHeroImg (top:50%) passa a centralizar na própria imagem.
+    + '#legoHeroImg,#miniHeroImg,#miniStep1HeroImg{height:auto!important;align-items:flex-start!important;}';
   var st=document.createElement('style');
   st.setAttribute('data-fp','anchor-top');
   st.textContent=css;
