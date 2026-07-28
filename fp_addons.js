@@ -1,0 +1,862 @@
+/* Funparts — módulos add-on (carregados após app_1.js/app_2.js) */
+/* Reset da personalização (fallback inline, garante disponibilidade mesmo com cache do app_1.js).
+   Recarrega a página: zera o estado S (em memória) e volta à etapa TIPO;
+   o carrinho fica salvo no localStorage e é preservado. */
+if(typeof window.iniciarNovaPersonalizacao!=='function'){
+  window.iniciarNovaPersonalizacao=function(){
+    try{ location.reload(); }catch(e){ location.href=location.pathname+location.search; }
+  };
+}
+
+/* ── EDITAR PRODUTO NO CARRINHO (recarrega a personalizacao salva e atualiza o item) ──
+   Implementado aqui inline para nao depender de novo deploy do app_1.js.
+   Cada item guarda cfg com a configuracao completa; restauramos e voltamos ao resumo. */
+(function(){
+  window._editandoId = window._editandoId || null;
+
+  // Carrinho: adiciona "editar produto" nos itens LEGO personalizados
+  window._cartRender = function(){
+    var n=CART.length;
+    var c=document.getElementById('cartCount');
+    if(c){ c.textContent=n; c.classList.toggle('on',n>0); }
+    var body=document.getElementById('cartBody');
+    var foot=document.getElementById('cartFoot');
+    if(!body)return;
+    var _T=function(k,fb){return (window.FP&&FP.t)?FP.t(k):fb;};
+    if(!n){
+      body.innerHTML='<div class="cart-empty">'+_T('cart.empty','Seu carrinho está vazio.')+'<br>'+_T('cart.emptyHint','Monte um quadro e adicione aqui.')+'</div>';
+      if(foot)foot.style.display='none';
+      return;
+    }
+    body.innerHTML=CART.map(function(i){
+      var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'🧱':'🏎️')+'</div>';
+      var editavel=(i.cfg && i.via!=='catalogo' && (i.tipo==='lego' || (i.tipo==='mini' && i.cfg.miniScale!==undefined)));
+      var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">'+_T('cart.edit','editar produto')+'</button>' : '';
+      return '<div class="cart-item">'
+        +'<div class="cart-thumb">'+img+'</div>'
+        +'<div class="cart-info">'
+          +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
+          +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
+          +'<div class="cart-foot-row">'
+            +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
+            +'<div class="cart-acts">'+edBtn+'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">'+_T('cart.remove','remover')+'</button></div>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+    if(foot)foot.style.display='';
+    var t=document.getElementById('cartTotal');
+    if(t)t.textContent=_brlCart(_cartTotal());
+  };
+
+  // Resumo: em modo edicao o botao vira "Atualizar pedido"
+  var _origBotoes = window._botoesResumo;
+  window._botoesResumo = function(adicionado){
+    if(window._editandoId){
+      var add=document.getElementById('btnAddCart');
+      var cont=document.getElementById('btnContinuar');
+      if(add){ add.classList.add('finalizar'); add.textContent='Atualizar pedido ✓'; add.onclick=window.atualizarPedido; }
+      if(cont)cont.style.display='none';
+      return;
+    }
+    if(typeof _origBotoes==='function') _origBotoes(adicionado);
+  };
+
+  // Restauracao compartilhada (moldura, fundo, LED, relevos)
+  function _restauraComuns(cfg){
+    var mc=document.querySelector('#step-5 .ocard[onclick*="'+cfg.moldura+'"]');
+    if(mc && typeof selMoldura==='function')selMoldura(mc,cfg.moldura,cfg.molduraLbl||'');
+    if(cfg.uvColor!==undefined)S.uvColor=cfg.uvColor;
+    if(cfg.uvLayoutType!==undefined)S.uvLayoutType=cfg.uvLayoutType;
+    if(cfg.uvStripeMain!==undefined)S.uvStripeMain=cfg.uvStripeMain;
+    if(cfg.uvStripeAccent!==undefined)S.uvStripeAccent=cfg.uvStripeAccent;
+    var fc=document.querySelector('.ocard[onclick*="'+cfg.fundo+'"]');
+    if(fc && typeof selFundo==='function')selFundo(fc,cfg.fundo,cfg.fundoLbl||'');
+    if(cfg.led && !S.led && typeof togLED==='function')togLED();
+    else if(!cfg.led && S.led && typeof togLED==='function')togLED();
+    if(cfg.led){
+      S.ledTipo=cfg.ledTipo||'warm'; S.ledFio=cfg.ledFio||'com';
+      var lc=document.getElementById(S.ledTipo==='rgb'?'ledCardRgb':'ledCardWarm');
+      if(lc && typeof setLED==='function')setLED(lc,S.ledTipo);
+      if(typeof selLedFio==='function')selLedFio(S.ledFio);
+    }
+    var rrows=[].slice.call(document.querySelectorAll('.rrow'));
+    rrows.forEach(function(r){ if(r.classList.contains('sel'))r.click(); });
+    (cfg.relOpts||[]).forEach(function(lbl){
+      var t=rrows.filter(function(r){ return (r.getAttribute('onclick')||'').indexOf("'"+lbl+"'")>-1; })[0];
+      if(t && !t.classList.contains('sel'))t.click();
+    });
+  }
+
+  function _editarLego(item,cfg){
+    window._editandoId=item.id;
+    if(typeof fecharCarrinho==='function')fecharCarrinho();
+    selectTipo('lego');
+    if(typeof renderLegoModels==='function')renderLegoModels(cfg.legoBrand);
+    S.legoBrand=cfg.legoBrand;
+    [].forEach.call(document.querySelectorAll('#legoBrands .bcard'),function(b){ b.classList.toggle('sel',(b.textContent||'').trim()===cfg.legoBrand); });
+    var rows=document.querySelectorAll('#legoModels .mrow'), alvo=null;
+    [].forEach.call(rows,function(r){ var s=r.querySelector('span'); if(s && s.textContent.trim()===cfg.legoModel) alvo=r; });
+    if(alvo)alvo.click();
+    _restauraComuns(cfg);
+    if(typeof calcPrice==='function')calcPrice();
+    if(typeof goStep==='function')goStep(7);
+    setTimeout(function(){ if(typeof _botoesResumo==='function')_botoesResumo(false); },40);
+  }
+
+  function _editarMini(item,cfg){
+    window._editandoId=item.id;
+    if(typeof fecharCarrinho==='function')fecharCarrinho();
+    selectTipo('mini');
+    if(typeof selMiniChoice==='function')selMiniChoice(cfg.miniChoice||'apenas');
+    var setV=function(idv,v){ var e=document.getElementById(idv); if(e && v!=null && v!==''){ e.value=v; try{e.dispatchEvent(new Event('input'));e.dispatchEvent(new Event('change'));}catch(_){} } };
+    setV('apenaCarBrand',cfg.aiBrand); setV('apenaCarModel',cfg.aiModel); setV('apenaCarColor',cfg.aiColor); setV('apenaCarYear',cfg.aiYear);
+    setV('apenaCarBrandSelect',cfg.aiBrand); setV('apenaCarModelInput',cfg.aiModel);
+    setV('aiCarBrand',cfg.aiBrand); setV('aiCarModel',cfg.aiModel); setV('aiCarColor',cfg.aiColor); setV('aiCarYear',cfg.aiYear);
+    S.miniBrand=cfg.miniBrand||cfg.aiBrand||''; S.miniModel=cfg.miniModel||cfg.aiModel||'';
+    if(cfg.miniSize!==undefined)S.miniSize=cfg.miniSize;
+    if(cfg.miniDim!==undefined)S.miniDim=cfg.miniDim;
+    S.miniScale=cfg.miniScale; S.quadroDim=cfg.quadroDim;
+    if(cfg.miniOpt!==undefined)S.miniOpt=cfg.miniOpt;
+    if(cfg.disp!==undefined)S.disp=cfg.disp;
+    S.aiCarColor=cfg.aiColor||'';
+    var carUrl = (item.imgKey ? _fotoUrl(item.imgKey) : (cfg.carImg||''));
+    if(carUrl && typeof _detTopViewUrl!=='undefined'){ _detTopViewUrl=carUrl; if(typeof _detTopViewKey!=='undefined')_detTopViewKey='edit:'+item.id; }
+    _restauraComuns(cfg);
+    if(typeof renderFrameCards==='function')renderFrameCards();
+    if(typeof calcPrice==='function')calcPrice();
+    if(typeof goStep==='function')goStep(7);
+    setTimeout(function(){
+      if(carUrl){ var d=document.getElementById('detPvCar'); if(d){ d.src=carUrl; d.style.display='block'; } }
+      if(typeof updateDetPreview==='function')updateDetPreview();
+      if(typeof applyDetCarOverlay==='function')applyDetCarOverlay();
+      if(typeof _botoesResumo==='function')_botoesResumo(false);
+    },70);
+  }
+
+  // Dispatcher: recarrega item salvo (LEGO ou Miniatura / Somente Quadro) e vai ao resumo
+  window.editarProduto = function(id){
+    var item=null,k; for(k=0;k<CART.length;k++){ if(CART[k].id===id){ item=CART[k]; break; } }
+    if(!item||!item.cfg){ return; }
+    var cfg=item.cfg;
+    if(cfg.tipo==='lego'){ _editarLego(item,cfg); return; }
+    if(cfg.tipo==='mini' && cfg.miniScale!==undefined){ _editarMini(item,cfg); return; }
+    alert('Este item foi adicionado antes desta atualização e não guardou os dados necessários para edição. Remova e monte novamente para poder editá-lo.');
+  };
+
+  // Enriquece o cfg dos itens Miniatura (escala, dimensão, carro, cores) p/ permitir edicao
+  var _origMonta = window._cartMontaItem;
+  if(typeof _origMonta==='function'){
+    window._cartMontaItem = function(){
+      var it=_origMonta();
+      if(it && it.cfg && it.tipo==='mini'){
+        var g=function(a,b){ var e=document.getElementById(a)||document.getElementById(b); return e?(e.value||''):''; };
+        it.cfg.miniChoice = S.miniChoice||'apenas';
+        it.cfg.miniScale  = S.miniScale||'';
+        it.cfg.quadroDim  = S.quadroDim||'';
+        it.cfg.aiBrand = g('aiCarBrand','apenaCarBrand')||S.miniBrand||'';
+        it.cfg.aiModel = g('aiCarModel','apenaCarModel')||S.miniModel||'';
+        it.cfg.aiColor = g('aiCarColor','apenaCarColor')||S.aiCarColor||'';
+        it.cfg.aiYear  = g('aiCarYear','apenaCarYear')||'';
+        var cimg=(typeof _detTopViewUrl!=='undefined')?(_detTopViewUrl||''):'';
+        it.cfg.carImg = (cimg && cimg.indexOf('data:')!==0)?cimg:'';
+      }
+      return it;
+    };
+  }
+
+  // Substitui o item editado no carrinho (mesmo id, sem duplicar)
+  window.atualizarPedido = function(){
+    if(!window._editandoId)return;
+    var idx=-1,k; for(k=0;k<CART.length;k++){ if(CART[k].id===window._editandoId){ idx=k; break; } }
+    if(idx<0){ window._editandoId=null; return; }
+    var novo=_cartMontaItem();
+    var src=novo.imgSrc; delete novo.imgSrc;
+    novo.thumb=CART[idx].thumb||'';
+    var _lista=(novo.preview&&novo.preview.imgs)||[]; if(novo.preview)delete novo.preview.imgs;
+    novo.id=window._editandoId;
+    CART[idx]=novo;
+    _cartSave(); _cartRender();
+    if(typeof _cartThumb==='function')_cartThumb(src,function(thumb){ if(!thumb)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){a.thumb=thumb;_cartSave();_cartRender();} });
+    if(novo.via!=='catalogo' && src && src.indexOf('data:')===0 && typeof _subirImagemItem==='function'){
+      _subirImagemItem(src,function(ch){ if(!ch)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){a.imgKey=ch;_cartSave();} });
+    }
+    if(_lista.length && typeof _subirImagemItem==='function'){
+      novo.imgKeys=new Array(_lista.length);
+      _lista.forEach(function(d,i2){ _subirImagemItem(d,function(ch){ var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(!a||!ch)return; if(!a.imgKeys)a.imgKeys=new Array(_lista.length); a.imgKeys[i2]=ch; _cartSave(); }); });
+    }
+    window._editandoId=null;
+    if(typeof _botoesResumo==='function')_botoesResumo(true);
+    if(typeof abrirCarrinho==='function')abrirCarrinho();
+  };
+
+  // Mobile: marca o quadro LEGO 49x49 p/ o CSS deixá-lo quadrado e contido (igual desktop)
+  var _origUpd = window.updateDetPreview;
+  if(typeof _origUpd==='function'){
+    window.updateDetPreview = function(){
+      var r = _origUpd.apply(this, arguments);
+      try{
+        var q=document.getElementById('legoDetQuadro');
+        if(q){
+          var is4949 = (typeof S!=='undefined' && S.tipo==='lego') && /^49\s*[×x]\s*49/.test((S.legoDim)||'');
+          q.classList.toggle('dim4949', !!is4949);
+        }
+      }catch(e){}
+      return r;
+    };
+  }
+
+  // Mobile: manter a barra inferior (avançar/voltar) sincronizada com a etapa REAL.
+  // Bug: "continuar comprando" e cliques no menu do topo trocam de etapa via goStep,
+  // mas a barra mobile só era atualizada pelos botões avançar/voltar -> sumia o "avançar".
+  var _origMobUpd = window._mobUpdateNav;
+  if(typeof _origMobUpd==='function'){
+    window._mobUpdateNav = function(){
+      try{
+        var secs=document.querySelectorAll('.cfg-sec'); var cur=-1;
+        secs.forEach(function(s,i){ if(s.classList.contains('active'))cur=i; });
+        if(cur>=0) window._mobStep=cur;
+      }catch(e){}
+      return _origMobUpd.apply(this, arguments);
+    };
+  }
+  var _origGoStepNav = window.goStep;
+  if(typeof _origGoStepNav==='function'){
+    window.goStep = function(){
+      var r=_origGoStepNav.apply(this, arguments);
+      try{ if(typeof _mobUpdateNav==='function') _mobUpdateNav(); }catch(e){}
+      return r;
+    };
+  }
+
+  // re-render inicial: aplica o botao "editar" em itens ja no carrinho
+  if(typeof _cartRender==='function'){ try{ _cartRender(); }catch(e){} }
+})();
+
+(function(){
+  var CFG={
+    BR:{lang:'pt',currency:'BRL',symbol:'R$',frete:'superfrete',gateway:'pagarme',flag:'🇧🇷',reg:{pt:'Brasil',en:'Brazil'}},
+    EU:{lang:'en',currency:'EUR',symbol:'€',frete:'sendcloud',gateway:'stripe',flag:'🇪🇺',reg:{pt:'Europa',en:'Europe'}},
+    US:{lang:'en',currency:'USD',symbol:'$',frete:'sendcloud',gateway:'stripe',flag:'🇺🇸',reg:{pt:'EUA',en:'USA'}}
+  };
+  var EUcc=['PT','ES','FR','DE','IT','BE','NL','LU','IE','AT','FI','GR','CY','MT','EE','LV','LT','SK','SI','HR','PL','CZ','HU','RO','BG','DK','SE','GB','CH','NO','IS'];
+  function regiaoDe(cc){cc=(cc||'').toUpperCase();if(cc==='BR')return'BR';if(cc==='US')return'US';if(EUcc.indexOf(cc)>-1)return'EU';return'BR';}
+
+  // Bandeiras em SVG (renderizam iguais em qualquer sistema, inclusive Windows)
+  function euStars(){var a=[[14,3.8],[17.1,4.63],[19.37,6.9],[20.2,10],[19.37,13.1],[17.1,15.37],[14,16.2],[10.9,15.37],[8.63,13.1],[7.8,10],[8.63,6.9],[10.9,4.63]];return a.map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r=".85"/>';}).join('');}
+  function flagSVG(code){
+    var a='width="18" height="13" viewBox="0 0 28 20" style="border-radius:2px;display:block;flex-shrink:0"';
+    if(code==='BR')return '<svg '+a+'><rect width="28" height="20" fill="#009c3b"/><path d="M14 2.5 25.5 10 14 17.5 2.5 10Z" fill="#ffdf00"/><circle cx="14" cy="10" r="4" fill="#002776"/></svg>';
+    if(code==='GB')return '<svg '+a+'><rect width="28" height="20" fill="#012169"/><path d="M0 0L28 20M28 0L0 20" stroke="#fff" stroke-width="4"/><path d="M0 0L28 20M28 0L0 20" stroke="#c8102e" stroke-width="2"/><path d="M14 0V20M0 10H28" stroke="#fff" stroke-width="6"/><path d="M14 0V20M0 10H28" stroke="#c8102e" stroke-width="3.4"/></svg>';
+    if(code==='US')return '<svg '+a+'><rect width="28" height="20" fill="#fff"/><g fill="#b22234"><rect width="28" height="2"/><rect y="4" width="28" height="2"/><rect y="8" width="28" height="2"/><rect y="12" width="28" height="2"/><rect y="16" width="28" height="2"/></g><rect width="12" height="10" fill="#3c3b6e"/><g fill="#fff"><circle cx="2.4" cy="2.2" r=".75"/><circle cx="6" cy="2.2" r=".75"/><circle cx="9.6" cy="2.2" r=".75"/><circle cx="4.2" cy="5" r=".75"/><circle cx="7.8" cy="5" r=".75"/><circle cx="2.4" cy="7.8" r=".75"/><circle cx="6" cy="7.8" r=".75"/><circle cx="9.6" cy="7.8" r=".75"/></g></svg>';
+    if(code==='EU')return '<svg '+a+'><rect width="28" height="20" fill="#003399"/><g fill="#ffcc00">'+euStars()+'</g></svg>';
+    if(code==='ES')return '<svg '+a+'><rect width="28" height="20" fill="#c60b1e"/><rect y="5" width="28" height="10" fill="#ffc400"/></svg>';
+    if(code==='FR')return '<svg '+a+'><rect width="28" height="20" fill="#fff"/><rect width="9.34" height="20" fill="#0055a4"/><rect x="18.66" width="9.34" height="20" fill="#ef4135"/></svg>';
+    return '';
+  }
+
+  var DICT={
+    pt:{
+      'nav.newCustom':'Iniciar nova personalização','nav.cart':'Carrinho',
+      'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Produto','step.detalhe':'Detalhamento','step.fundo':'Fundo','step.moldura':'Moldura + LED','step.relevo':'Alto-relevo','step.pedido':'Pedido',
+      'cart.title':'Seu carrinho','cart.total':'Total','cart.note':'Sem frete · Combinamos o envio pelo WhatsApp','cart.checkout':'Fechar pedido →','cart.more':'Continuar comprando',
+      'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho está vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.',
+      'frete.title':'Frete / Entrega','frete.cep':'Digite seu CEP','frete.calc':'Calcular','frete.calculating':'Calculando…','frete.eco':'Econômico','frete.exp':'Expresso','frete.days':'dias úteis','frete.invalid':'Informe um CEP válido','frete.totalShip':'Total com frete','frete.mock':'','frete.none':'Nenhuma opção de frete para este endereço.','frete.fail':'Não foi possível calcular o frete agora. Tente novamente.','frete.emptyCart':'Adicione um item ao carrinho para calcular o frete.'
+    },
+    en:{
+      'nav.newCustom':'Start new customization','nav.cart':'Cart',
+      'step.tipo':'Type','step.modelo':'Model','step.produto':'Product','step.detalhe':'Details','step.fundo':'Background','step.moldura':'Frame + LED','step.relevo':'Relief','step.pedido':'Order',
+      'cart.title':'Your cart','cart.total':'Total','cart.note':'Shipping calculated at checkout','cart.checkout':'Checkout →','cart.more':'Continue shopping',
+      'cart.remove':'remove','cart.edit':'edit product','cart.empty':'Your cart is empty.','cart.emptyHint':'Build a frame and add it here.',
+      'frete.title':'Shipping / Delivery','frete.cep':'Enter your postal code','frete.calc':'Calculate','frete.calculating':'Calculating…','frete.eco':'Standard','frete.exp':'Express','frete.days':'business days','frete.invalid':'Enter a valid postal code','frete.totalShip':'Total with shipping','frete.mock':'','frete.none':'No shipping options for this address.','frete.fail':'Could not calculate shipping right now. Please try again.','frete.emptyCart':'Add an item to the cart to calculate shipping.'
+    },
+    es:{
+      'nav.newCustom':'Iniciar nueva personalización','nav.cart':'Carrito',
+      'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Producto','step.detalhe':'Detalles','step.fundo':'Fondo','step.moldura':'Marco + LED','step.relevo':'Relieve','step.pedido':'Pedido',
+      'cart.title':'Tu carrito','cart.total':'Total','cart.note':'Envío calculado al finalizar la compra','cart.checkout':'Finalizar pedido →','cart.more':'Seguir comprando',
+      'cart.remove':'quitar','cart.edit':'editar producto','cart.empty':'Tu carrito está vacío.','cart.emptyHint':'Crea un cuadro y agrégalo aquí.',
+      'frete.title':'Envío / Entrega','frete.cep':'Ingresa tu código postal','frete.calc':'Calcular','frete.calculating':'Calculando…','frete.eco':'Estándar','frete.exp':'Exprés','frete.days':'días hábiles','frete.invalid':'Ingresa un código postal válido','frete.totalShip':'Total con envío','frete.mock':'','frete.none':'No hay opciones de envío para esta dirección.','frete.fail':'No se pudo calcular el envío ahora. Inténtalo de nuevo.','frete.emptyCart':'Agrega un artículo al carrito para calcular el envío.'
+    },
+    fr:{
+      'nav.newCustom':'Nouvelle personnalisation','nav.cart':'Panier',
+      'step.tipo':'Type','step.modelo':'Modèle','step.produto':'Produit','step.detalhe':'Détails','step.fundo':'Fond','step.moldura':'Cadre + LED','step.relevo':'Relief','step.pedido':'Commande',
+      'cart.title':'Votre panier','cart.total':'Total','cart.note':'Livraison calculée au paiement','cart.checkout':'Finaliser la commande →','cart.more':'Continuer les achats',
+      'cart.remove':'retirer','cart.edit':'modifier le produit','cart.empty':'Votre panier est vide.','cart.emptyHint':'Créez un cadre et ajoutez-le ici.',
+      'frete.title':'Livraison','frete.cep':'Saisissez votre code postal','frete.calc':'Calculer','frete.calculating':'Calcul…','frete.eco':'Standard','frete.exp':'Express','frete.days':'jours ouvrés','frete.invalid':'Saisissez un code postal valide','frete.totalShip':'Total avec livraison','frete.mock':'','frete.none':'Aucune option de livraison pour cette adresse.','frete.fail':'Impossible de calculer la livraison pour le moment. Réessayez.','frete.emptyCart':'Ajoutez un article au panier pour calculer la livraison.'
+    }
+  };
+
+  var FP={lang:'pt',region:'BR',cfg:CFG,geoCountry:null};
+  FP.t=function(k){var d=DICT[FP.lang]||DICT.pt;return (d[k]!=null)?d[k]:((DICT.pt[k]!=null)?DICT.pt[k]:k);};
+  function save(){try{localStorage.setItem('fp_lang',FP.lang);localStorage.setItem('fp_region',FP.region);}catch(e){}}
+
+  // ══════════ TRADUÇÃO COMPLETA DO SITE (PT/EN/ES/FR) ══════════
+  var FULL={};
+  function T(pt,en,es,fr){FULL[pt]={en:en,es:es,fr:fr};}
+  // Cabeçalho / navegação / carrinho / checkout
+  T("Total:","Total:","Total:","Total :");
+  T("Iniciar nova personalização","Start new customization","Iniciar nueva personalización","Nouvelle personnalisation");
+  T("Seu carrinho","Your cart","Tu carrito","Votre panier");
+  T("Sem frete · Combinamos o envio pelo WhatsApp","Shipping arranged via WhatsApp","Envío coordinado por WhatsApp","Livraison convenue via WhatsApp");
+  T("Fechar pedido →","Checkout →","Finalizar pedido →","Finaliser la commande →");
+  T("Continuar comprando","Continue shopping","Seguir comprando","Continuer les achats");
+  T("Precisamos desses dados para emitir a nota e combinar a entrega.","We need this information to issue the invoice and arrange delivery.","Necesitamos estos datos para emitir la factura y coordinar la entrega.","Nous avons besoin de ces informations pour émettre la facture et organiser la livraison.");
+  T("Nome completo","Full name","Nombre completo","Nom complet");
+  T("WhatsApp","WhatsApp","WhatsApp","WhatsApp");
+  T("E-mail","Email","Correo electrónico","E-mail");
+  T("Endereço","Address","Dirección","Adresse");
+  T("Número","Number","Número","Numéro");
+  T("Complemento","Address line 2","Complemento","Complément");
+  T("(opcional)","(optional)","(opcional)","(facultatif)");
+  T("Bairro","District","Barrio","Quartier");
+  T("Cidade","City","Ciudad","Ville");
+  T("Seus dados são usados apenas para emitir a nota fiscal e realizar a entrega.","Your data is used only to issue the invoice and complete delivery.","Tus datos se usan solo para emitir la factura y realizar la entrega.","Vos données servent uniquement à émettre la facture et à effectuer la livraison.");
+  T("Fechar pedido via WhatsApp","Checkout via WhatsApp","Finalizar pedido por WhatsApp","Finaliser via WhatsApp");
+  T("← Voltar aos itens","← Back to items","← Volver a los artículos","← Retour aux articles");
+  T("Item adicionado ao carrinho","Item added to cart","Artículo añadido al carrito","Article ajouté au panier");
+  T("Ver carrinho","View cart","Ver carrito","Voir le panier");
+  // Home / etapa Tipo
+  T("CHEGOU A HORA","IT'S TIME","LLEGÓ EL MOMENTO","C'EST LE MOMENT");
+  T("DE PERSONALIZAR","TO CUSTOMIZE","DE PERSONALIZAR","DE PERSONNALISER");
+  T("SEU QUADRO","YOUR FRAME","TU CUADRO","VOTRE CADRE");
+  T("SIGA AS ORIENTAÇÕES","FOLLOW THE STEPS","SIGUE LAS INSTRUCCIONES","SUIVEZ LES INDICATIONS");
+  T("DO MENU ABAIXO","IN THE MENU BELOW","DEL MENÚ DE ABAJO","DU MENU CI-DESSOUS");
+  T("Preview em tempo real","Real-time preview","Vista previa en tiempo real","Aperçu en temps réel");
+  T("Gerando top-view…","Generating top view…","Generando vista superior…","Génération de la vue de dessus…");
+  T("⟲ Girar carro 180°","⟲ Rotate car 180°","⟲ Girar coche 180°","⟲ Pivoter la voiture 180°");
+  T("PREVIEW EM TEMPO REAL","REAL-TIME PREVIEW","VISTA PREVIA EN TIEMPO REAL","APERÇU EN TEMPS RÉEL");
+  T("VEJA O EXEMPLO DA PROPORÇÃO (DIMENSÃO) DO QUADRO","SEE AN EXAMPLE OF THE FRAME PROPORTION (SIZE)","MIRA UN EJEMPLO DE LA PROPORCIÓN (TAMAÑO) DEL CUADRO","VOYEZ UN EXEMPLE DE LA PROPORTION (TAILLE) DU CADRE");
+  T("A partir do exemplo acima, você conseguirá ter a noção geral da dimensão do quadro comparado a dimensão de uma pessoa com 1,75m de altura","From the example above, you can get a general sense of the frame size compared to a person 1.75 m tall","Con el ejemplo de arriba podrás hacerte una idea del tamaño del cuadro comparado con una persona de 1,75 m de altura","À partir de l'exemple ci-dessus, vous aurez une idée générale de la taille du cadre par rapport à une personne d'1,75 m");
+  T("Fanático, você está prestes a criar","Fan, you're about to create","Fanático, estás a punto de crear","Passionné, vous êtes sur le point de créer");
+  T("um quadro exclusivo!","an exclusive frame!","¡un cuadro exclusivo!","un cadre exclusif !");
+  T("Aguarde, estamos gerando a imagem da sua miniatura em alta resolução.","Please wait, we're generating your model image in high resolution.","Espera, estamos generando la imagen de tu miniatura en alta resolución.","Veuillez patienter, nous générons l'image de votre miniature en haute résolution.");
+  T("Preparando…","Preparing…","Preparando…","Préparation…");
+  T("Qual é o seu colecionável? Tudo começa aqui.","What's your collectible? It all starts here.","¿Cuál es tu coleccionable? Todo empieza aquí.","Quel est votre objet de collection ? Tout commence ici.");
+  T("QUADROS PARA LEGO","FRAMES FOR LEGO","CUADROS PARA LEGO","CADRES POUR LEGO");
+  T("Quadros para sets LEGO Technic, Creator, Icons e F1","Frames for LEGO Technic, Creator, Icons and F1 sets","Cuadros para sets LEGO Technic, Creator, Icons y F1","Cadres pour sets LEGO Technic, Creator, Icons et F1");
+  T("Quadros para Miniaturas","Frames for Models","Cuadros para Miniaturas","Cadres pour Miniatures");
+  T("Die-cast em escalas 1:12, 1:18, 1:24 e 1:43","Die-cast in 1:12, 1:18, 1:24 and 1:43 scales","Die-cast en escalas 1:12, 1:18, 1:24 y 1:43","Die-cast aux échelles 1:12, 1:18, 1:24 et 1:43");
+  T("Próximo: Escolher Modelo →","Next: Choose Model →","Siguiente: Elegir modelo →","Suivant : Choisir le modèle →");
+  // etapa Modelo
+  T("Modelo LEGO","LEGO Model","Modelo LEGO","Modèle LEGO");
+  T("Selecione a marca e depois o modelo específico","Select the brand and then the specific model","Selecciona la marca y luego el modelo específico","Sélectionnez la marque puis le modèle précis");
+  T("Com ou Sem Miniatura?","With or Without Model?","¿Con o sin miniatura?","Avec ou sans miniature ?");
+  T("SOMENTE QUADRO","FRAME ONLY","SOLO CUADRO","CADRE SEUL");
+  T("Nessa opção você terá a oportunidade de personalizar um quadro para a sua miniatura especial","In this option you can customize a frame for your special model","En esta opción podrás personalizar un cuadro para tu miniatura especial","Dans cette option, vous pourrez personnaliser un cadre pour votre miniature");
+  T("QUADRO INCLUSO MINIATURA","FRAME WITH MODEL INCLUDED","CUADRO CON MINIATURA INCLUIDA","CADRE AVEC MINIATURE INCLUSE");
+  T("Nessa opção você encontrará quadros que já são vendidos completos. Contendo o quadro e a miniatura","In this option you'll find frames sold complete, including the frame and the model","En esta opción encontrarás cuadros que se venden completos: el cuadro y la miniatura","Dans cette option, vous trouverez des cadres vendus complets, avec le cadre et la miniature");
+  T("← Voltar","← Back","← Volver","← Retour");
+  T("Modelos disponíveis","Available models","Modelos disponibles","Modèles disponibles");
+  T("Foto em breve","Photo coming soon","Foto próximamente","Photo bientôt");
+  T("✓ CONCLUIR ESCOLHA","✓ CONFIRM CHOICE","✓ CONFIRMAR ELECCIÓN","✓ VALIDER LE CHOIX");
+  T("Escolha a marca","Choose the brand","Elige la marca","Choisissez la marque");
+  T("Marca / Categoria","Brand / Category","Marca / Categoría","Marque / Catégorie");
+  T("Outros","Others","Otros","Autres");
+  T("✦ Visualização gerada por Inteligência Artificial","✦ Preview generated by Artificial Intelligence","✦ Vista previa generada por Inteligencia Artificial","✦ Aperçu généré par Intelligence Artificielle");
+  T("Marca do carro","Car brand","Marca del coche","Marque de la voiture");
+  T("Modelo do carro","Car model","Modelo del coche","Modèle de la voiture");
+  T("Ano","Year","Año","Année");
+  T("Cor","Color","Color","Couleur");
+  T("Selecionada:","Selected:","Seleccionada:","Sélectionnée :");
+  T("✦ GERAR VISUALIZAÇÃO COM IA","✦ GENERATE AI PREVIEW","✦ GENERAR VISTA PREVIA CON IA","✦ GÉNÉRER L'APERÇU PAR IA");
+  T("Gerando sua visualização...","Generating your preview...","Generando tu vista previa...","Génération de votre aperçu...");
+  T("A IA está criando uma imagem exclusiva do seu carro","AI is creating an exclusive image of your car","La IA está creando una imagen exclusiva de tu coche","L'IA crée une image exclusive de votre voiture");
+  T("✦ Sua miniatura — visualização gerada","✦ Your model — generated preview","✦ Tu miniatura — vista previa generada","✦ Votre miniature — aperçu généré");
+  T("↻ GERAR NOVA VARIAÇÃO","↻ GENERATE NEW VARIATION","↻ GENERAR NUEVA VARIACIÓN","↻ GÉNÉRER UNE NOUVELLE VARIANTE");
+  T("Geramos a imagem da sua miniatura com inteligência Artificial, para que confirme o modelo e consiga personalizar seu quadro o mais próximo da realidade possível.","We generated your model image with Artificial Intelligence so you can confirm the model and customize your frame as close to reality as possible.","Generamos la imagen de tu miniatura con Inteligencia Artificial para que confirmes el modelo y personalices tu cuadro lo más fiel posible.","Nous avons généré l'image de votre miniature par Intelligence Artificielle afin que vous confirmiez le modèle et personnalisiez votre cadre au plus près de la réalité.");
+  T("PERSONALIZAR QUADRO →","CUSTOMIZE FRAME →","PERSONALIZAR CUADRO →","PERSONNALISER LE CADRE →");
+  T("Marca do veículo","Vehicle brand","Marca del vehículo","Marque du véhicule");
+  T("Outra","Other","Otra","Autre");
+  T("Modelo exato","Exact model","Modelo exacto","Modèle exact");
+  T("Tamanho do quadro (sincronizado com a escala)","Frame size (synced with scale)","Tamaño del cuadro (sincronizado con la escala)","Taille du cadre (synchronisée avec l'échelle)");
+  T("Próximo: Miniatura →","Next: Model →","Siguiente: Miniatura →","Suivant : Miniature →");
+  // etapa Produto / miniatura
+  T("Confirme que já possui a miniatura para montagem no quadro.","Confirm you already own the model to mount in the frame.","Confirma que ya tienes la miniatura para montarla en el cuadro.","Confirmez que vous possédez déjà la miniature à monter dans le cadre.");
+  T("FOTOS EM BREVE","PHOTOS COMING SOON","FOTOS PRÓXIMAMENTE","PHOTOS BIENTÔT");
+  T("Descrição do produto","Product description","Descripción del producto","Description du produit");
+  T("Descrição em breve...","Description coming soon...","Descripción próximamente...","Description bientôt...");
+  T("Ver resumo →","View summary →","Ver resumen →","Voir le résumé →");
+  T("EU JÁ TENHO A MINIATURA","I ALREADY HAVE THE MODEL","YA TENGO LA MINIATURA","J'AI DÉJÀ LA MINIATURE");
+  T("Confirmo que já tenho a miniatura e gostaria de comprar apenas o quadro.","I confirm I already have the model and would like to buy only the frame.","Confirmo que ya tengo la miniatura y deseo comprar solo el cuadro.","Je confirme avoir déjà la miniature et souhaite acheter uniquement le cadre.");
+  T("Próximo: Detalhamento →","Next: Details →","Siguiente: Detalles →","Suivant : Détails →");
+  T("Miniatura compacta","Compact model","Miniatura compacta","Miniature compacte");
+  T("Tamanho médio","Medium size","Tamaño mediano","Taille moyenne");
+  T("Tamanho grande","Large size","Tamaño grande","Grande taille");
+  T("Extra grande","Extra large","Extra grande","Très grande");
+  T("Próximo: Fundo →","Next: Background →","Siguiente: Fondo →","Suivant : Fond →");
+  // etapa Fundo
+  T("Fundo do Quadro","Frame Background","Fondo del cuadro","Fond du cadre");
+  T("Material que reveste o interior do quadro, ao redor da miniatura","Material lining the inside of the frame, around the model","Material que reviste el interior del cuadro, alrededor de la miniatura","Matériau qui habille l'intérieur du cadre, autour de la miniature");
+  T("Fibra de Carbono","Carbon Fiber","Fibra de carbono","Fibre de carbone");
+  T("Revestimento em vinil texturizado. Visual esportivo profundo.","Textured vinyl finish. Deep sporty look.","Revestimiento de vinilo texturizado. Aspecto deportivo profundo.","Revêtement en vinyle texturé. Allure sportive profonde.");
+  T("Acrílico Brilho — UV","Glossy Acrylic — UV","Acrílico brillo — UV","Acrylique brillant — UV");
+  T("Impressão UV em acrílico de alto brilho. Cores profundas, acabamento espelhado.","UV printing on high-gloss acrylic. Deep colors, mirror finish.","Impresión UV en acrílico de alto brillo. Colores profundos, acabado espejado.","Impression UV sur acrylique très brillant. Couleurs profondes, finition miroir.");
+  T("Fosco","Matte","Mate","Mat");
+  T("Acabamento fosco com layouts exclusivos. Visual elegante e sofisticado.","Matte finish with exclusive layouts. Elegant, sophisticated look.","Acabado mate con diseños exclusivos. Aspecto elegante y sofisticado.","Finition mate avec des motifs exclusifs. Allure élégante et raffinée.");
+  T("Modelo do Layout","Layout Style","Diseño del layout","Style de motif");
+  T("Próximo: Moldura + LED →","Next: Frame + LED →","Siguiente: Marco + LED →","Suivant : Cadre + LED →");
+  // etapa Moldura + LED
+  T("Acabamento da estrutura externa do quadro","Finish of the frame's outer structure","Acabado de la estructura externa del cuadro","Finition de la structure externe du cadre");
+  T("Moldura revestida com vinil texturizado de fibra de carbono. Acabamento esportivo premium.","Frame wrapped in textured carbon-fiber vinyl. Premium sporty finish.","Marco revestido con vinilo texturizado de fibra de carbono. Acabado deportivo premium.","Cadre habillé de vinyle texturé fibre de carbone. Finition sportive premium.");
+  T("Laca Preto","Black Lacquer","Laca negra","Laque noire");
+  T("Revestimento em laca preta. Acabamento liso, sofisticado e atemporal.","Black lacquer finish. Smooth, sophisticated and timeless.","Revestimiento en laca negra. Acabado liso, sofisticado y atemporal.","Revêtement en laque noire. Finition lisse, raffinée et intemporelle.");
+  T("Incluso","Included","Incluido","Inclus");
+  T("Iluminação LED","LED Lighting","Iluminación LED","Éclairage LED");
+  T("💡 Iluminação LED interna","💡 Internal LED lighting","💡 Iluminación LED interna","💡 Éclairage LED intérieur");
+  T("Selecione o tipo abaixo","Select the type below","Selecciona el tipo abajo","Choisissez le type ci-dessous");
+  T("Retroiluminação no interior do quadro — efeito espetacular no ambiente","Backlighting inside the frame — a stunning effect in the room","Retroiluminación en el interior del cuadro — efecto espectacular en el ambiente","Rétroéclairage à l'intérieur du cadre — effet spectaculaire dans la pièce");
+  T("Sem LED","No LED","Sin LED","Sans LED");
+  T("Tipo de LED","LED Type","Tipo de LED","Type de LED");
+  T("🔌 Com Fio","🔌 Wired","🔌 Con cable","🔌 Filaire");
+  T("🔋 Sem Fio","🔋 Wireless","🔋 Inalámbrico","🔋 Sans fil");
+  T("Neutro","Neutral","Neutro","Neutre");
+  T("Luz 3000K","3000K light","Luz 3000K","Lumière 3000K");
+  T("RGB","RGB","RGB","RGB");
+  T("Multicolor","Multicolor","Multicolor","Multicolore");
+  T("Próximo: Alto-relevo →","Next: Relief →","Siguiente: Relieve →","Suivant : Relief →");
+  // etapa Alto-relevo
+  T("Elementos em alto relevo aplicados no quadro","Raised relief elements applied to the frame","Elementos en altorrelieve aplicados al cuadro","Éléments en relief appliqués au cadre");
+  T("Relevos fixos","Fixed reliefs","Relieves fijos","Reliefs fixes");
+  T("(sempre incluídos)","(always included)","(siempre incluidos)","(toujours inclus)");
+  T("🏷️ Logotipo Marca","🏷️ Brand Logo","🏷️ Logotipo de la marca","🏷️ Logo de la marque");
+  T("Gerado com IA conforme marca selecionada","AI-generated based on the selected brand","Generado con IA según la marca seleccionada","Généré par IA selon la marque choisie");
+  T("Gerando o logo da marca com IA…","Generating the brand logo with AI…","Generando el logo de la marca con IA…","Génération du logo de la marque par IA…");
+  T("Branco","White","Blanco","Blanc");
+  T("Preto","Black","Negro","Noir");
+  T("Vermelho","Red","Rojo","Rouge");
+  T("Escolher cor","Choose color","Elegir color","Choisir la couleur");
+  T("🏎️ Logo do Modelo — Canto inferior direito","🏎️ Model Logo — Bottom right corner","🏎️ Logo del modelo — Esquina inferior derecha","🏎️ Logo du modèle — Coin inférieur droit");
+  T("Gerado com IA conforme modelo selecionado","AI-generated based on the selected model","Generado con IA según el modelo seleccionado","Généré par IA selon le modèle choisi");
+  T("Gerando o logo do modelo com IA…","Generating the model logo with AI…","Generando el logo del modelo con IA…","Génération du logo du modèle par IA…");
+  T("Relevos opcionais","Optional reliefs","Relieves opcionales","Reliefs optionnels");
+  T("🏴 Bandeira do País","🏴 Country Flag","🏴 Bandera del país","🏴 Drapeau du pays");
+  T("Canto superior direito — bandeira do piloto ou escuderia em relevo","Top right corner — driver or team flag in relief","Esquina superior derecha — bandera del piloto o escudería en relieve","Coin supérieur droit — drapeau du pilote ou de l'écurie en relief");
+  T("👤 Nome do Piloto","👤 Driver Name","👤 Nombre del piloto","👤 Nom du pilote");
+  T("Canto inferior esquerdo — até 20 caracteres gravados em relevo","Bottom left corner — up to 20 characters engraved in relief","Esquina inferior izquierda — hasta 20 caracteres grabados en relieve","Coin inférieur gauche — jusqu'à 20 caractères gravés en relief");
+  T("📋 Placa com informações do Carro","📋 Plate with Car information","📋 Placa con información del coche","📋 Plaque avec informations de la voiture");
+  T("Placa técnica em alto relevo com dados do veículo","Technical plate in relief with the vehicle's data","Placa técnica en altorrelieve con los datos del vehículo","Plaque technique en relief avec les données du véhicule");
+  T("🗺️ Traçado do circuito","🗺️ Circuit Layout","🗺️ Trazado del circuito","🗺️ Tracé du circuit");
+  T("Mapa em alto relevo do circuito oficial do modelo","Relief map of the model's official circuit","Mapa en altorrelieve del circuito oficial del modelo","Carte en relief du circuit officiel du modèle");
+  T("COR DO NOME:","NAME COLOR:","COLOR DEL NOMBRE:","COULEUR DU NOM :");
+  T("Ver Resumo →","View Summary →","Ver resumen →","Voir le résumé →");
+  // etapa Pedido / resumo
+  T("Seu Quadro","Your Frame","Tu cuadro","Votre cadre");
+  T("Revise a configuração e finalize o pedido","Review your setup and complete the order","Revisa la configuración y finaliza el pedido","Vérifiez la configuration et finalisez la commande");
+  T("Foto","Photo","Foto","Photo");
+  T("Quadro completo com miniatura","Complete frame with model","Cuadro completo con miniatura","Cadre complet avec miniature");
+  T("Adicionar ao carrinho →","Add to cart →","Añadir al carrito →","Ajouter au panier →");
+  T("Tirar dúvidas no WhatsApp","Questions on WhatsApp","Consultas por WhatsApp","Questions sur WhatsApp");
+  T("← Voltar ao produto","← Back to product","← Volver al producto","← Retour au produit");
+  T("Categoria","Category","Categoría","Catégorie");
+  T("Dimensão","Dimensions","Dimensión","Dimensions");
+  T("Moldura","Frame","Marco","Cadre");
+  T("LED","LED","LED","LED");
+  T("Alto-relevo extra","Extra relief","Relieve extra","Relief supplémentaire");
+  T("Nenhum","None","Ninguno","Aucun");
+  T("SKU","SKU","SKU","SKU");
+  T("Total estimado","Estimated total","Total estimado","Total estimé");
+  T("📦 Embalagem Premium","📦 Premium Packaging","📦 Embalaje premium","📦 Emballage premium");
+  T("← Editar configuração","← Edit configuration","← Editar configuración","← Modifier la configuration");
+  T("Sem frete • Preço pode variar","Shipping not included • Price may vary","Envío no incluido • El precio puede variar","Livraison non incluse • Le prix peut varier");
+  T("novo","new","nuevo","nouveau");
+  T("atual","current","actual","actuel");
+  T("Cancelar","Cancel","Cancelar","Annuler");
+  T("OK","OK","OK","OK");
+  // placeholders
+  T("Como no documento","As on your ID","Como en el documento","Comme sur le document");
+  T("voce@email.com","you@email.com","tu@email.com","vous@email.com");
+  T("Rua, avenida…","Street, avenue…","Calle, avenida…","Rue, avenue…");
+  T("Apto, bloco…","Apt, block…","Depto, bloque…","Appt, bâtiment…");
+  T("Digite a marca do carro...","Type the car brand...","Escribe la marca del coche...","Saisissez la marque de la voiture...");
+  T("Selecione acima ou digite...","Select above or type...","Selecciona arriba o escribe...","Sélectionnez ci-dessus ou saisissez...");
+  T("Digite o país (ex: Brasil, Itália, Reino Unido...)","Type the country (e.g. Brazil, Italy, UK...)","Escribe el país (ej: Brasil, Italia, Reino Unido...)","Saisissez le pays (ex : Brésil, Italie, Royaume-Uni...)");
+  T("Nome do piloto (máx. 20 caracteres)","Driver name (max. 20 characters)","Nombre del piloto (máx. 20 caracteres)","Nom du pilote (max. 20 caractères)");
+  T("Começar uma personalização do zero (mantém o carrinho)","Start a customization from scratch (keeps the cart)","Empezar una personalización desde cero (mantiene el carrito)","Démarrer une personnalisation de zéro (conserve le panier)");
+  T("Se o carro vier de cabeça para baixo, clique para corrigir","If the car appears upside down, click to fix","Si el coche aparece al revés, haz clic para corregir","Si la voiture est à l'envers, cliquez pour corriger");
+
+  var _traduzindo=false, _mo=null;
+  function traduzTudo(lang){
+    var body=document.body; if(!body)return;
+    _traduzindo=true;
+    var alvo=(lang&&lang!=='pt')?lang:null;
+    var w=document.createTreeWalker(body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      if(!n.nodeValue||!n.nodeValue.trim())return NodeFilter.FILTER_REJECT;
+      var p=n.parentNode; if(!p)return NodeFilter.FILTER_REJECT;
+      var tag=p.nodeName; if(tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='OPTION')return NodeFilter.FILTER_REJECT;
+      if(p.closest&&p.closest('#fpLang'))return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }});
+    var nodes=[],nn; while(nn=w.nextNode())nodes.push(nn);
+    nodes.forEach(function(n){
+      var cur=n.nodeValue, curT=cur.trim();
+      if(n.__pt===undefined)n.__pt=cur;
+      var baseT=n.__pt.trim();
+      if(!alvo){ if(n.__tr){ if(n.nodeValue!==n.__pt)n.nodeValue=n.__pt; n.__tr=false; } return; }
+      var tr=FULL[baseT]||FULL[curT];
+      if(tr&&tr[alvo]){ var src=FULL[baseT]?n.__pt:cur; var lead=src.match(/^\s*/)[0],tail=src.match(/\s*$/)[0]; var v=lead+tr[alvo]+tail; if(n.nodeValue!==v)n.nodeValue=v; n.__tr=true; return; }
+      var m=curT.match(/^Passo (\d+) de (\d+)$/); if(m){ var pw={en:'Step %1 of %2',es:'Paso %1 de %2',fr:'Étape %1 sur %2'}[alvo]; n.nodeValue=cur.replace(curT,pw.replace('%1',m[1]).replace('%2',m[2])); }
+    });
+    document.querySelectorAll('[placeholder]').forEach(function(el){
+      if(el.closest('#fpLang'))return;
+      if(el.__ptph===undefined)el.__ptph=el.getAttribute('placeholder');
+      var tr=FULL[el.__ptph]; var val=(alvo&&tr&&tr[alvo])?tr[alvo]:el.__ptph;
+      if(el.getAttribute('placeholder')!==val)el.setAttribute('placeholder',val);
+    });
+    _traduzindo=false;
+  }
+  window.FP_traduzTudo=traduzTudo;
+  function iniObserverI18n(){
+    if(_mo||!document.body)return;
+    _mo=new MutationObserver(function(){ if(_traduzindo||FP.lang==='pt')return; clearTimeout(window.__i18nT); window.__i18nT=setTimeout(function(){traduzTudo(FP.lang);},140); });
+    _mo.observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState!=='loading')setTimeout(iniObserverI18n,300); else document.addEventListener('DOMContentLoaded',function(){setTimeout(iniObserverI18n,300);});
+
+  function aplicar(){
+    var t=FP.t, q=function(s){return document.querySelector(s);}, el;
+    traduzTudo(FP.lang);
+    el=q('.novaPersona-btn span'); if(el)el.textContent=t('nav.newCustom');
+    el=q('.cart-btn .lbl'); if(el)el.textContent=t('nav.cart');
+    var order=['step.tipo','step.modelo','step.produto','step.detalhe','step.fundo','step.moldura','step.relevo','step.pedido'];
+    document.querySelectorAll('.stab .slbl').forEach(function(e,i){ if(order[i])e.textContent=t(order[i]); });
+    el=q('#cartTitulo'); if(el)el.textContent=t('cart.title');
+    document.querySelectorAll('.cart-tot-l').forEach(function(e){e.textContent=t('cart.total');});
+    el=q('.cart-note'); if(el)el.textContent=t('cart.note');
+    el=q('#cartFoot .btn-cart-go'); if(el)el.textContent=t('cart.checkout');
+    el=q('#cartFoot .btn-cart-more'); if(el)el.textContent=t('cart.more');
+    document.documentElement.lang=(FP.lang==='pt'?'pt-BR':'en');
+    if(typeof _cartRender==='function'){try{_cartRender();}catch(e){}}
+    atualizaSeletor();
+    atualizaFreteLabels();
+  }
+  FP.setLang=function(l){FP.lang=l;save();aplicar();};
+  FP.setRegion=function(r){if(!CFG[r])return;FP.region=r;FP.lang=CFG[r].lang;if(typeof resetFrete==='function')resetFrete();save();aplicar();};
+  window.FP=FP;
+
+  function montaSeletor(){
+    var header=document.querySelector('header'); if(!header||document.getElementById('fpLang'))return;
+    var cartBtn=document.getElementById('cartBtn');
+    var wrap=document.createElement('div'); wrap.className='fp-lang'; wrap.id='fpLang';
+    wrap.innerHTML='<button class="fp-lang-btn" id="fpLangBtn" aria-label="Idioma e região"><span class="fp-flag" id="fpLangFlag"></span><span class="fp-lang-txt" id="fpLangTxt">PT</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'
+      +'<div class="fp-lang-menu" id="fpLangMenu">'
+      +'<div class="fp-lang-h" id="fpH1">Idioma</div>'
+      +'<div class="fp-lang-opt" data-lang="pt"><span class="fp-flag">'+flagSVG('BR')+'</span> Português</div>'
+      +'<div class="fp-lang-opt" data-lang="en"><span class="fp-flag">'+flagSVG('GB')+'</span> English</div>'
+      +'<div class="fp-lang-opt" data-lang="es"><span class="fp-flag">'+flagSVG('ES')+'</span> Español</div>'
+      +'<div class="fp-lang-opt" data-lang="fr"><span class="fp-flag">'+flagSVG('FR')+'</span> Français</div>'
+      +'<div class="fp-lang-div"></div>'
+      +'<div class="fp-lang-h" id="fpH2">Região / Entrega</div>'
+      +'<div class="fp-lang-opt" data-reg="BR"><span class="fp-flag">'+flagSVG('BR')+'</span> <span data-rk="BR">Brasil</span></div>'
+      +'<div class="fp-lang-opt" data-reg="EU"><span class="fp-flag">'+flagSVG('EU')+'</span> <span data-rk="EU">Europa</span></div>'
+      +'<div class="fp-lang-opt" data-reg="US"><span class="fp-flag">'+flagSVG('US')+'</span> <span data-rk="US">EUA</span></div>'
+      +'</div>';
+    if(cartBtn)header.insertBefore(wrap,cartBtn); else header.appendChild(wrap);
+    document.getElementById('fpLangBtn').addEventListener('click',function(e){e.stopPropagation();document.getElementById('fpLangMenu').classList.toggle('open');});
+    document.addEventListener('click',function(){var m=document.getElementById('fpLangMenu');if(m)m.classList.remove('open');});
+    wrap.querySelectorAll('[data-lang]').forEach(function(o){o.addEventListener('click',function(){FP.setLang(o.getAttribute('data-lang'));});});
+    wrap.querySelectorAll('[data-reg]').forEach(function(o){o.addEventListener('click',function(){FP.setRegion(o.getAttribute('data-reg'));});});
+  }
+  function atualizaSeletor(){
+    var fl=document.getElementById('fpLangFlag'); if(fl)fl.innerHTML=flagSVG(FP.region);
+    var tx=document.getElementById('fpLangTxt'); if(tx)tx.textContent=FP.lang.toUpperCase();
+    var _h1={pt:'Idioma',en:'Language',es:'Idioma',fr:'Langue'}, _h2={pt:'Região / Entrega',en:'Region / Delivery',es:'Región / Envío',fr:'Région / Livraison'};
+    var h1=document.getElementById('fpH1'); if(h1)h1.textContent=_h1[FP.lang]||_h1.pt;
+    var h2=document.getElementById('fpH2'); if(h2)h2.textContent=_h2[FP.lang]||_h2.pt;
+    document.querySelectorAll('#fpLang [data-lang]').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-lang')===FP.lang);});
+    document.querySelectorAll('#fpLang [data-reg]').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-reg')===FP.region);});
+    document.querySelectorAll('#fpLang [data-rk]').forEach(function(s){var r=s.getAttribute('data-rk');if(CFG[r])s.textContent=CFG[r].reg[FP.lang]||CFG[r].reg.pt;});
+  }
+
+  // ── FRETE: cálculo REAL — SuperFrete (BR ≤100cm) · Melhor Envio/Jadlog (BR >100cm) · Sendcloud (EU) ──
+  FP.frete=null;
+  var FRETE_EU_PAISES=[['BE','Bélgica'],['FR','França'],['DE','Alemanha'],['NL','Países Baixos'],['LU','Luxemburgo'],['IT','Itália'],['ES','Espanha'],['PT','Portugal'],['AT','Áustria'],['IE','Irlanda']];
+  function fmt(v){var loc={pt:'pt-BR',en:'en-US',es:'es-ES',fr:'fr-FR'}[FP.lang]||'pt-BR';return Number(v||0).toLocaleString(loc,{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function _freteDim(i){
+    if(i&&i.cfg){ if(i.cfg.legoDim)return i.cfg.legoDim; if(i.cfg.quadroDim)return i.cfg.quadroDim; if(i.cfg.dim)return i.cfg.dim; }
+    if(i&&i.dim)return i.dim;
+    var txt=((i&&i.sub)||'')+' '+(((i&&i.linhas)||[]).join(' '));
+    var m=txt.match(/\d{1,3}(?:[.,]\d)?\s*[×x]\s*\d{1,3}(?:[.,]\d)?\s*cm/i);
+    return m?m[0]:'';
+  }
+  function _freteItens(){ return (window.CART||[]).map(function(i){return {dim:_freteDim(i),qty:1};}).filter(function(x){return x.dim;}); }
+  function atualizaFreteLabels(){
+    var t=FP.t,e;
+    e=document.getElementById('fpFreteT'); if(e)e.textContent=t('frete.title');
+    e=document.getElementById('fpCep'); if(e)e.placeholder=(FP.region==='BR')?t('frete.cep'):'Postal code / ZIP';
+    e=document.getElementById('fpCalcBtn'); if(e)e.textContent=t('frete.calc');
+    e=document.getElementById('fpFreteNote'); if(e)e.textContent='';
+    var pais=document.getElementById('fpFretePais'); if(pais)pais.style.display=(FP.region==='EU')?'':'none';
+  }
+  function resetFrete(){FP.frete=null;var o=document.getElementById('fpFreteOpts');if(o)o.innerHTML='';var c=document.getElementById('fpCep');if(c)c.value='';var tt=document.getElementById('fpFreteTot');if(tt)tt.remove();}
+  function renderOpcoes(carrier,currency,options){
+    var t=FP.t, opts=document.getElementById('fpFreteOpts'); if(!opts)return;
+    if(!options||!options.length){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.none')+'</div>'; return; }
+    var html=options.map(function(o){
+      var prazo=o.days?(o.days+' '+t('frete.days')):'';
+      var nome=String(o.label||'').replace(/"/g,'&quot;');
+      return '<div class="fp-frete-opt" data-preco="'+o.price+'" data-nome="'+nome+'"><div class="fp-frete-radio"></div><div class="fp-frete-info"><div class="fp-frete-nome">'+nome+'</div><div class="fp-frete-prazo">'+prazo+'</div></div><div class="fp-frete-preco">'+currency+' '+fmt(o.price)+'</div></div>';
+    }).join('');
+    opts.innerHTML=html;
+    opts.querySelectorAll('.fp-frete-opt').forEach(function(o){o.addEventListener('click',function(){selFrete(o,currency,carrier);});});
+  }
+  function calcFrete(){
+    var t=FP.t, cepEl=document.getElementById('fpCep'), opts=document.getElementById('fpFreteOpts'); if(!opts||!cepEl)return;
+    var v=(cepEl.value||'').replace(/[^0-9A-Za-z]/g,''); var minLen=(FP.region==='BR')?8:4;
+    if(v.length<minLen){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.invalid')+'</div>'; FP.frete=null; return; }
+    var itens=_freteItens();
+    if(!itens.length){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.emptyCart')+'</div>'; return; }
+    var paisEl=document.getElementById('fpFretePaisSel');
+    var country=(FP.region==='BR')?'BR':((paisEl&&paisEl.value)||FP.geoCountry||'BE');
+    opts.innerHTML='<div class="fp-frete-msg">'+t('frete.calculating')+'</div>';
+    var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
+    fetch(API+'/frete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({region:FP.region,country:country,postal_code:v,items:itens})})
+      .then(function(r){return r.json();})
+      .then(function(d){ if(d&&d.ok){ renderOpcoes(d.carrier,CFG[FP.region].symbol,d.options||[]); } else { opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+((d&&d.erro)||t('frete.fail'))+'</div>'; } })
+      .catch(function(){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.fail')+'</div>'; });
+  }
+  function selFrete(o,currency,carrier){
+    document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(x){x.classList.remove('on');});
+    o.classList.add('on');
+    FP.frete={price:parseFloat(o.getAttribute('data-preco')),label:o.getAttribute('data-nome'),carrier:carrier||'',currency:currency||CFG[FP.region].symbol,region:FP.region};
+    var sym=currency||CFG[FP.region].symbol, sub=(typeof _cartTotal==='function')?_cartTotal():0, tot=sub+FP.frete.price;
+    var old=document.getElementById('fpFreteTot'); if(old)old.remove();
+    var d=document.createElement('div'); d.className='fp-frete-tot'; d.id='fpFreteTot';
+    d.innerHTML='<span>'+FP.t('frete.totalShip')+'</span><span>'+sym+' '+fmt(tot)+'</span>';
+    document.getElementById('fpFreteOpts').appendChild(d);
+  }
+  function injetaFrete(){
+    var foot=document.getElementById('cartFoot'); if(!foot||document.getElementById('fpFrete'))return;
+    var box=document.createElement('div'); box.className='fp-frete'; box.id='fpFrete';
+    var paisOpts=FRETE_EU_PAISES.map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>';}).join('');
+    box.innerHTML='<div class="fp-frete-h"><span>🚚</span> <span id="fpFreteT"></span></div>'
+      +'<div id="fpFretePais" style="display:none;margin-bottom:8px"><select id="fpFretePaisSel" style="width:100%;background:#101010;border:1px solid #2c2c2c;color:#eee;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px">'+paisOpts+'</select></div>'
+      +'<div class="fp-frete-row"><input id="fpCep" inputmode="numeric" maxlength="9" autocomplete="postal-code"><button id="fpCalcBtn" type="button"></button></div>'
+      +'<div id="fpFreteOpts"></div>'
+      +'<div class="fp-frete-note" id="fpFreteNote"></div>';
+    var btnGo=foot.querySelector('.btn-cart-go');
+    if(btnGo)foot.insertBefore(box,btnGo); else foot.appendChild(box);
+    document.getElementById('fpCalcBtn').addEventListener('click',calcFrete);
+    document.getElementById('fpCep').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();calcFrete();}});
+    var ps=document.getElementById('fpFretePaisSel'); if(ps&&FP.geoCountry){ for(var k=0;k<ps.options.length;k++){ if(ps.options[k].value===FP.geoCountry){ps.selectedIndex=k;break;} } }
+    atualizaFreteLabels();
+  }
+  window.FP.resetFrete=resetFrete; window.FP.atualizaFreteLabels=atualizaFreteLabels; window.FP.injetaFrete=injetaFrete;
+
+  function posicionaSeletor(){
+    var cb=document.getElementById('cartBtn'), fp=document.getElementById('fpLang');
+    if(!cb||!fp)return;
+    var cs=getComputedStyle(cb);
+    if(cs.position==='absolute'){
+      var cbW=cb.getBoundingClientRect().width;
+      var cbRight=parseFloat(cs.right)||22;
+      fp.style.right=Math.round(cbRight+cbW+12)+'px';
+    }
+  }
+  function init(){
+    montaSeletor();
+    injetaFrete();
+    posicionaSeletor();
+    window.addEventListener('resize',posicionaSeletor);
+    setTimeout(posicionaSeletor,300);
+    var sl=null,sr=null; try{sl=localStorage.getItem('fp_lang');sr=localStorage.getItem('fp_region');}catch(e){}
+    if(sl&&sr&&CFG[sr]){ FP.lang=sl; FP.region=sr; aplicar(); return; }
+    aplicar(); // PT enquanto detecta
+    fetch('/cdn-cgi/trace',{cache:'no-store'}).then(function(r){return r.text();}).then(function(txt){
+      var cc=(txt.match(/loc=([A-Z]{2})/)||[])[1]; FP.geoCountry=cc||null;
+      var reg=regiaoDe(cc); FP.region=reg; FP.lang=CFG[reg].lang; save(); aplicar();
+    }).catch(function(){});
+  }
+  if(document.readyState!=='loading')init(); else document.addEventListener('DOMContentLoaded',init);
+})();
+
+/* ══════════════ CUPOM DE DESCONTO (carrinho) ══════════════
+   Inline para não depender de novo deploy do app_1.js.
+   Valida no Worker (/cupom), aplica o desconto no total (fonte única = _cartTotal)
+   e injeta o código no POST /pedido para o servidor recalcular e contar o uso. */
+(function(){
+  var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
+  var LS='fp_cupom_v1';
+  window._cupom=null;
+  var L={
+    pt:{title:'Cupom de desconto',ph:'Digite seu cupom',apply:'Aplicar',remove:'remover',applied:'aplicado',freeship:'+ frete grátis',invalid:'Cupom inválido',checking:'Verificando…',empty:'Informe um cupom'},
+    en:{title:'Discount coupon',ph:'Enter your coupon',apply:'Apply',remove:'remove',applied:'applied',freeship:'+ free shipping',invalid:'Invalid coupon',checking:'Checking…',empty:'Enter a coupon'}
+  };
+  function lg(k){var l=(window.FP&&FP.lang==='en')?'en':'pt';return (L[l]&&L[l][k])||L.pt[k];}
+  function sym(){return (window.CFG&&window.FP&&CFG[FP.region])?CFG[FP.region].symbol:'R$';}
+  function fmt(v){var l=(window.FP&&FP.lang==='en')?'en-US':'pt-BR';return Number(v||0).toLocaleString(l,{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+  var _subOrig=window._cartTotal;                 // total ORIGINAL (sem desconto)
+  function subtotalBruto(){ return (typeof _subOrig==='function')?(Number(_subOrig())||0):0; }
+  function descontoDe(sub){
+    if(!window._cupom)return 0;
+    var c=window._cupom;
+    var d=(c.tipo==='fixo')?Math.min(Number(c.valor)||0,sub):(sub*(Number(c.valor)||0)/100);
+    d=Math.round(d*100)/100; if(d>sub)d=sub; if(d<0)d=0; return d;
+  }
+  // a partir daqui _cartTotal é o total COM desconto (o site inteiro passa a usar este)
+  window._cartTotal=function(){ var s=subtotalBruto(); return Math.max(0,Math.round((s-descontoDe(s))*100)/100); };
+  window._cupomDesconto=function(){ return descontoDe(subtotalBruto()); };
+
+  // acabamento: valores inteiros ficam limpos (R$ 689); com desconto fracionado mostra 2 casas (R$ 620,10)
+  var _obrl=window._brlCart;
+  window._brlCart=function(v){
+    var n=Number(v||0);
+    if(Number.isInteger(n)) return (typeof _obrl==='function')?_obrl(n):('R$ '+n.toLocaleString('pt-BR'));
+    return 'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  };
+
+  function salvar(){ try{ if(window._cupom)localStorage.setItem(LS,JSON.stringify(window._cupom)); else localStorage.removeItem(LS);}catch(e){} }
+
+  function boxHTML(){
+    if(window._cupom){
+      var c=window._cupom, desc=descontoDe(subtotalBruto());
+      return '<div class="fp-cup-h"><span>🎟️</span> '+lg('title')+'</div>'
+        +'<div class="fp-cup-applied"><div class="fp-cup-tag">'+esc(c.codigo)+' '+lg('applied')
+          +(c.frete_gratis?' <em>'+lg('freeship')+'</em>':'')+'</div>'
+          +'<div class="fp-cup-val">− '+sym()+' '+fmt(desc)+'</div>'
+          +'<button type="button" class="fp-cup-rm" id="fpCupRm">'+lg('remove')+'</button></div>';
+    }
+    return '<div class="fp-cup-h"><span>🎟️</span> '+lg('title')+'</div>'
+      +'<div class="fp-cup-row"><input id="fpCupIn" autocomplete="off" placeholder="'+esc(lg('ph'))+'" style="text-transform:uppercase"><button type="button" id="fpCupBtn">'+lg('apply')+'</button></div>'
+      +'<div class="fp-cup-msg" id="fpCupMsg"></div>';
+  }
+  function montaBox(){
+    var foot=document.getElementById('cartFoot'); if(!foot)return null;
+    var box=document.getElementById('fpCup');
+    if(!box){ box=document.createElement('div'); box.className='fp-cup'; box.id='fpCup';
+      var fre=document.getElementById('fpFrete'), note=foot.querySelector('.cart-note');
+      var ref=fre||note; if(ref)foot.insertBefore(box,ref); else foot.appendChild(box);
+    }
+    return box;
+  }
+  function bind(){
+    var b=document.getElementById('fpCupBtn'); if(b)b.onclick=aplicar;
+    var inp=document.getElementById('fpCupIn'); if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();aplicar();}});
+    var rm=document.getElementById('fpCupRm'); if(rm)rm.onclick=remover;
+  }
+  function render(){
+    var box=montaBox(); if(!box)return;
+    if(!window.CART||!CART.length){ box.style.display='none'; return; }
+    box.style.display=''; box.innerHTML=boxHTML(); bind();
+  }
+  window._renderCupomBox=render;
+  function msg(txt,cor){ var m=document.getElementById('fpCupMsg'); if(m){m.textContent=txt||'';m.style.color=cor||'#8a8a8a';} }
+
+  function aplicar(){
+    var inp=document.getElementById('fpCupIn'); if(!inp)return;
+    var cod=(inp.value||'').trim(); if(!cod){msg(lg('empty'),'#d98a82');return;}
+    var btn=document.getElementById('fpCupBtn'); if(btn)btn.disabled=true; msg(lg('checking'));
+    fetch(API+'/cupom',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo:cod,subtotal:subtotalBruto()})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(btn)btn.disabled=false;
+        if(d&&d.ok){ window._cupom={codigo:d.codigo,tipo:d.tipo,valor:d.valor,frete_gratis:!!d.frete_gratis}; salvar(); atualizaTudo(); }
+        else { msg((d&&d.erro)||lg('invalid'),'#d98a82'); }
+      }).catch(function(){ if(btn)btn.disabled=false; msg(lg('invalid'),'#d98a82'); });
+  }
+  function remover(){ window._cupom=null; salvar(); atualizaTudo(); }
+
+  function atualizaTudo(){
+    render();
+    if(typeof window._cartRender==='function')window._cartRender();
+    var t2=document.getElementById('cartTotal2'); if(t2&&typeof _brlCart==='function')t2.textContent=_brlCart(_cartTotal());
+    var sel=document.querySelector('#fpFreteOpts .fp-frete-opt.on'); if(sel)sel.click(); // recomputa "Total com frete"
+  }
+
+  // re-renderiza a caixa sempre que o carrinho é redesenhado
+  var _cr=window._cartRender;
+  window._cartRender=function(){ if(typeof _cr==='function')_cr.apply(this,arguments); render(); };
+
+  // injeta o cupom no POST /pedido (o app_1.js não conhece o cupom)
+  var _of=window.fetch;
+  window.fetch=function(input,init){
+    try{
+      var u=(typeof input==='string')?input:(input&&input.url)||'';
+      if(init&&init.method&&String(init.method).toUpperCase()==='POST'&&init.body&&u.indexOf('/pedido')>=0){
+        var b=JSON.parse(init.body);
+        if(b&&Array.isArray(b.itens)){
+          if(window._cupom)b.cupom=window._cupom.codigo;
+          if(window.FP&&FP.frete&&FP.frete.price!=null){ b.frete={label:FP.frete.label,price:FP.frete.price,carrier:FP.frete.carrier||'',currency:FP.frete.currency||'R$'}; }
+          init=Object.assign({},init,{body:JSON.stringify(b)});
+        }
+      }
+    }catch(e){}
+    return _of.call(this,input,init);
+  };
+
+  function revalida(cod){
+    fetch(API+'/cupom',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo:cod,subtotal:subtotalBruto()})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d&&d.ok){ window._cupom={codigo:d.codigo,tipo:d.tipo,valor:d.valor,frete_gratis:!!d.frete_gratis}; }
+        else { window._cupom=null; salvar(); }
+        atualizaTudo();
+      }).catch(function(){});
+  }
+  function init(){
+    try{ var s=localStorage.getItem(LS); if(s){ var c=JSON.parse(s); if(c&&c.codigo){ window._cupom=c; revalida(c.codigo); } } }catch(e){}
+    render();
+  }
+  if(document.readyState!=='loading')setTimeout(init,250); else document.addEventListener('DOMContentLoaded',function(){setTimeout(init,250);});
+})();
+
+/* ══════════ FRETE na mensagem do WhatsApp (fechamento) ══════════
+   Injeta a transportadora escolhida + "Total com frete" na mensagem, sem tocar no app_1.js. */
+(function(){
+  var _open=window.open;
+  var CN={superfrete:'SuperFrete',melhorenvio:'Melhor Envio',sendcloud:'Sendcloud'};
+  function fmtM(v,sym){ return (sym||'R$')+' '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function bloco(){
+    var f=(window.FP&&FP.frete)?FP.frete:null; if(!f||f.price==null)return '';
+    var sym=f.currency||'R$'; var carr=(CN[f.carrier]||f.carrier||'').toString().trim();
+    var nome=(carr?carr+' · ':'')+(f.label||'');
+    var sub=(typeof _cartTotal==='function')?_cartTotal():0;
+    var b='\n*Frete:* '+nome+' — '+fmtM(f.price,sym);
+    if(sym==='R$') b+='\n*Total com frete:* '+fmtM(sub+Number(f.price),sym);
+    return b;
+  }
+  function injURL(url){
+    try{
+      if(typeof url!=='string'||!/wa\.me|api\.whatsapp/.test(url)||url.indexOf('text=')<0)return url;
+      var b=bloco(); if(!b)return url;
+      var i=url.indexOf('text=')+5, pre=url.slice(0,i), txt=decodeURIComponent(url.slice(i));
+      if(txt.indexOf('*Frete:*')>=0)return url;
+      if(txt.indexOf('\n\nDetalhes e imagens:')>=0) txt=txt.replace('\n\nDetalhes e imagens:', b+'\n\nDetalhes e imagens:');
+      else if(txt.indexOf('*MEUS DADOS*')>=0) txt=txt.replace('*MEUS DADOS*', b.replace(/^\n/,'')+'\n\n*MEUS DADOS*');
+      else txt=txt+'\n'+b.replace(/^\n/,'');
+      return pre+encodeURIComponent(txt);
+    }catch(e){return url;}
+  }
+  window.open=function(u,name,feat){
+    if(typeof u==='string' && /wa\.me|api\.whatsapp/.test(u)) u=injURL(u);
+    var w=_open.call(window,u,name,feat);
+    if((u===''||u==null) && w){
+      try{
+        return {
+          _real:w,
+          get closed(){ try{return w.closed;}catch(e){return false;} },
+          focus:function(){ try{w.focus();}catch(e){} },
+          close:function(){ try{w.close();}catch(e){} },
+          get location(){ return { set href(url){ try{ w.location.href=injURL(url); }catch(e){ try{w.location.href=url;}catch(_){} } }, get href(){ try{return w.location.href;}catch(e){return '';} } }; }
+        };
+      }catch(e){ return w; }
+    }
+    return w;
+  };
+})();
+
+/* Bloqueia clique direto nas etapas do topo (stepper).
+   O cliente é forçado a seguir o passo a passo: navega só pelos botões "Próximo →" e "← Voltar". */
+(function(){
+  document.addEventListener('click', function(e){
+    var t=e.target; var tab=(t&&t.closest)?t.closest('.stab'):null;
+    if(tab){ e.preventDefault(); e.stopPropagation(); }
+  }, true);
+  document.addEventListener('keydown', function(e){
+    // impede ativar a etapa por teclado (Enter/Espaço) caso esteja focada
+    if((e.key==='Enter'||e.key===' ')&&document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.stab')){ e.preventDefault(); e.stopPropagation(); }
+  }, true);
+  var st=document.createElement('style');
+  st.textContent='.stab{cursor:default!important;}';
+  (document.head||document.documentElement).appendChild(st);
+})();
