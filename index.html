@@ -1205,7 +1205,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 
 <!-- ══════ FASE 1: GEO + IDIOMAS (i18n) + SELETOR DE REGIÃO ══════ -->
 <style>
-.fp-lang{position:relative;display:inline-flex;margin-left:12px;}
+.fp-lang{position:absolute;top:14px;right:170px;display:inline-flex;z-index:60;}
 .fp-lang-btn{display:inline-flex;align-items:center;gap:6px;background:#161616;border:1px solid #2c2c2c;color:#ddd;font-family:inherit;font-size:12px;font-weight:600;padding:7px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .15s;}
 .fp-lang-btn:hover{border-color:#e07b00;}
 .fp-lang-btn .fp-flag{font-size:14px;line-height:1;}
@@ -1298,8 +1298,21 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     document.querySelectorAll('#fpLang [data-rk]').forEach(function(s){var r=s.getAttribute('data-rk');if(CFG[r])s.textContent=CFG[r].reg[FP.lang]||CFG[r].reg.pt;});
   }
 
+  function posicionaSeletor(){
+    var cb=document.getElementById('cartBtn'), fp=document.getElementById('fpLang');
+    if(!cb||!fp)return;
+    var cs=getComputedStyle(cb);
+    if(cs.position==='absolute'){
+      var cbW=cb.getBoundingClientRect().width;
+      var cbRight=parseFloat(cs.right)||22;
+      fp.style.right=Math.round(cbRight+cbW+12)+'px';
+    }
+  }
   function init(){
     montaSeletor();
+    posicionaSeletor();
+    window.addEventListener('resize',posicionaSeletor);
+    setTimeout(posicionaSeletor,300);
     var sl=null,sr=null; try{sl=localStorage.getItem('fp_lang');sr=localStorage.getItem('fp_region');}catch(e){}
     if(sl&&sr&&CFG[sr]){ FP.lang=sl; FP.region=sr; aplicar(); return; }
     aplicar(); // PT enquanto detecta
