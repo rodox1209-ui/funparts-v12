@@ -1582,3 +1582,35 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   if(document.readyState!=='loading')setTimeout(init,250); else document.addEventListener('DOMContentLoaded',function(){setTimeout(init,250);});
 })();
 </script>
+
+<script>
+/* ══════════ FRETE na mensagem do WhatsApp (fechamento) ══════════
+   Injeta a transportadora escolhida + "Total com frete" na mensagem, sem tocar no app_1.js. */
+(function(){
+  var _oz=window._abrirZap;
+  if(typeof _oz!=='function')return;
+  var CN={superfrete:'SuperFrete',melhorenvio:'Melhor Envio',sendcloud:'Sendcloud'};
+  function fmtM(v,sym){ return (sym||'R$')+' '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  window._abrirZap=function(texto){
+    try{
+      var f=(window.FP&&FP.frete)?FP.frete:null;
+      if(f&&f.price!=null&&typeof texto==='string'){
+        var sym=f.currency||'R$';
+        var carr=(CN[f.carrier]||f.carrier||'').toString().trim();
+        var nome=(carr?carr+' · ':'')+(f.label||'');
+        var sub=(typeof _cartTotal==='function')?_cartTotal():0;
+        var bloco='\n*Frete:* '+nome+' — '+fmtM(f.price,sym);
+        if(sym==='R$') bloco+='\n*Total com frete:* '+fmtM(sub+Number(f.price),sym);
+        if(texto.indexOf('\n\nDetalhes e imagens:')>=0){
+          texto=texto.replace('\n\nDetalhes e imagens:', bloco+'\n\nDetalhes e imagens:');
+        } else if(texto.indexOf('*MEUS DADOS*')>=0){
+          texto=texto.replace('*MEUS DADOS*', bloco.replace(/^\n/,'')+'\n\n*MEUS DADOS*');
+        } else {
+          texto=texto+'\n'+bloco.replace(/^\n/,'');
+        }
+      }
+    }catch(e){}
+    return _oz.call(this,texto);
+  };
+})();
+</script>
