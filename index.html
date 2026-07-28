@@ -1587,30 +1587,45 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 /* ══════════ FRETE na mensagem do WhatsApp (fechamento) ══════════
    Injeta a transportadora escolhida + "Total com frete" na mensagem, sem tocar no app_1.js. */
 (function(){
-  var _oz=window._abrirZap;
-  if(typeof _oz!=='function')return;
+  var _open=window.open;
   var CN={superfrete:'SuperFrete',melhorenvio:'Melhor Envio',sendcloud:'Sendcloud'};
   function fmtM(v,sym){ return (sym||'R$')+' '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-  window._abrirZap=function(texto){
+  function bloco(){
+    var f=(window.FP&&FP.frete)?FP.frete:null; if(!f||f.price==null)return '';
+    var sym=f.currency||'R$'; var carr=(CN[f.carrier]||f.carrier||'').toString().trim();
+    var nome=(carr?carr+' · ':'')+(f.label||'');
+    var sub=(typeof _cartTotal==='function')?_cartTotal():0;
+    var b='\n*Frete:* '+nome+' — '+fmtM(f.price,sym);
+    if(sym==='R$') b+='\n*Total com frete:* '+fmtM(sub+Number(f.price),sym);
+    return b;
+  }
+  function injURL(url){
     try{
-      var f=(window.FP&&FP.frete)?FP.frete:null;
-      if(f&&f.price!=null&&typeof texto==='string'){
-        var sym=f.currency||'R$';
-        var carr=(CN[f.carrier]||f.carrier||'').toString().trim();
-        var nome=(carr?carr+' · ':'')+(f.label||'');
-        var sub=(typeof _cartTotal==='function')?_cartTotal():0;
-        var bloco='\n*Frete:* '+nome+' — '+fmtM(f.price,sym);
-        if(sym==='R$') bloco+='\n*Total com frete:* '+fmtM(sub+Number(f.price),sym);
-        if(texto.indexOf('\n\nDetalhes e imagens:')>=0){
-          texto=texto.replace('\n\nDetalhes e imagens:', bloco+'\n\nDetalhes e imagens:');
-        } else if(texto.indexOf('*MEUS DADOS*')>=0){
-          texto=texto.replace('*MEUS DADOS*', bloco.replace(/^\n/,'')+'\n\n*MEUS DADOS*');
-        } else {
-          texto=texto+'\n'+bloco.replace(/^\n/,'');
-        }
-      }
-    }catch(e){}
-    return _oz.call(this,texto);
+      if(typeof url!=='string'||!/wa\.me|api\.whatsapp/.test(url)||url.indexOf('text=')<0)return url;
+      var b=bloco(); if(!b)return url;
+      var i=url.indexOf('text=')+5, pre=url.slice(0,i), txt=decodeURIComponent(url.slice(i));
+      if(txt.indexOf('*Frete:*')>=0)return url;
+      if(txt.indexOf('\n\nDetalhes e imagens:')>=0) txt=txt.replace('\n\nDetalhes e imagens:', b+'\n\nDetalhes e imagens:');
+      else if(txt.indexOf('*MEUS DADOS*')>=0) txt=txt.replace('*MEUS DADOS*', b.replace(/^\n/,'')+'\n\n*MEUS DADOS*');
+      else txt=txt+'\n'+b.replace(/^\n/,'');
+      return pre+encodeURIComponent(txt);
+    }catch(e){return url;}
+  }
+  window.open=function(u,name,feat){
+    if(typeof u==='string' && /wa\.me|api\.whatsapp/.test(u)) u=injURL(u);
+    var w=_open.call(window,u,name,feat);
+    if((u===''||u==null) && w){
+      try{
+        return {
+          _real:w,
+          get closed(){ try{return w.closed;}catch(e){return false;} },
+          focus:function(){ try{w.focus();}catch(e){} },
+          close:function(){ try{w.close();}catch(e){} },
+          get location(){ return { set href(url){ try{ w.location.href=injURL(url); }catch(e){ try{w.location.href=url;}catch(_){} } }, get href(){ try{return w.location.href;}catch(e){return '';} } }; }
+        };
+      }catch(e){ return w; }
+    }
+    return w;
   };
 })();
 </script>
