@@ -892,3 +892,16 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       +'</div>';
   };
 })();
+
+/* ══ Imagem de entrada (home/Tipo): ancorar no topo, perto do menu ══
+   Antes #heroImg centralizava vertical (align-items:center;height:100%), então em monitores
+   mais verticais a imagem descia demais. Agora fica colada ao topo, próxima do menu, em qualquer tela. */
+(function(){
+  function anchorHero(){
+    var h=document.getElementById('heroImg');
+    if(h){ h.style.alignItems='flex-start'; h.style.paddingTop='30px'; }
+  }
+  if(document.readyState!=='loading')anchorHero(); else document.addEventListener('DOMContentLoaded',anchorHero);
+  // reforça caso o painel seja re-renderizado ao voltar pra home
+  setTimeout(anchorHero,400);
+})();
