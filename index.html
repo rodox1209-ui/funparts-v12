@@ -1377,7 +1377,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       return '<div class="fp-frete-opt" data-preco="'+o.price+'" data-nome="'+nome+'"><div class="fp-frete-radio"></div><div class="fp-frete-info"><div class="fp-frete-nome">'+nome+'</div><div class="fp-frete-prazo">'+prazo+'</div></div><div class="fp-frete-preco">'+currency+' '+fmt(o.price)+'</div></div>';
     }).join('');
     opts.innerHTML=html;
-    opts.querySelectorAll('.fp-frete-opt').forEach(function(o){o.addEventListener('click',function(){selFrete(o,currency);});});
+    opts.querySelectorAll('.fp-frete-opt').forEach(function(o){o.addEventListener('click',function(){selFrete(o,currency,carrier);});});
   }
   function calcFrete(){
     var t=FP.t, cepEl=document.getElementById('fpCep'), opts=document.getElementById('fpFreteOpts'); if(!opts||!cepEl)return;
@@ -1394,10 +1394,10 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       .then(function(d){ if(d&&d.ok){ renderOpcoes(d.carrier,CFG[FP.region].symbol,d.options||[]); } else { opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+((d&&d.erro)||t('frete.fail'))+'</div>'; } })
       .catch(function(){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.fail')+'</div>'; });
   }
-  function selFrete(o,currency){
+  function selFrete(o,currency,carrier){
     document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(x){x.classList.remove('on');});
     o.classList.add('on');
-    FP.frete={price:parseFloat(o.getAttribute('data-preco')),label:o.getAttribute('data-nome')};
+    FP.frete={price:parseFloat(o.getAttribute('data-preco')),label:o.getAttribute('data-nome'),carrier:carrier||'',currency:currency||CFG[FP.region].symbol,region:FP.region};
     var sym=currency||CFG[FP.region].symbol, sub=(typeof _cartTotal==='function')?_cartTotal():0, tot=sub+FP.frete.price;
     var old=document.getElementById('fpFreteTot'); if(old)old.remove();
     var d=document.createElement('div'); d.className='fp-frete-tot'; d.id='fpFreteTot';
@@ -1555,9 +1555,13 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   window.fetch=function(input,init){
     try{
       var u=(typeof input==='string')?input:(input&&input.url)||'';
-      if(window._cupom&&init&&init.method&&String(init.method).toUpperCase()==='POST'&&init.body&&u.indexOf('/pedido')>=0){
+      if(init&&init.method&&String(init.method).toUpperCase()==='POST'&&init.body&&u.indexOf('/pedido')>=0){
         var b=JSON.parse(init.body);
-        if(b&&Array.isArray(b.itens)){ b.cupom=window._cupom.codigo; init=Object.assign({},init,{body:JSON.stringify(b)}); }
+        if(b&&Array.isArray(b.itens)){
+          if(window._cupom)b.cupom=window._cupom.codigo;
+          if(window.FP&&FP.frete&&FP.frete.price!=null){ b.frete={label:FP.frete.label,price:FP.frete.price,carrier:FP.frete.carrier||'',currency:FP.frete.currency||'R$'}; }
+          init=Object.assign({},init,{body:JSON.stringify(b)});
+        }
       }
     }catch(e){}
     return _of.call(this,input,init);
