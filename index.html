@@ -991,15 +991,16 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     var body=document.getElementById('cartBody');
     var foot=document.getElementById('cartFoot');
     if(!body)return;
+    var _T=function(k,fb){return (window.FP&&FP.t)?FP.t(k):fb;};
     if(!n){
-      body.innerHTML='<div class="cart-empty">Seu carrinho está vazio.<br>Monte um quadro e adicione aqui.</div>';
+      body.innerHTML='<div class="cart-empty">'+_T('cart.empty','Seu carrinho está vazio.')+'<br>'+_T('cart.emptyHint','Monte um quadro e adicione aqui.')+'</div>';
       if(foot)foot.style.display='none';
       return;
     }
     body.innerHTML=CART.map(function(i){
       var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'🧱':'🏎️')+'</div>';
       var editavel=(i.cfg && i.via!=='catalogo' && (i.tipo==='lego' || (i.tipo==='mini' && i.cfg.miniScale!==undefined)));
-      var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">editar produto</button>' : '';
+      var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">'+_T('cart.edit','editar produto')+'</button>' : '';
       return '<div class="cart-item">'
         +'<div class="cart-thumb">'+img+'</div>'
         +'<div class="cart-info">'
@@ -1007,7 +1008,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
           +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
           +'<div class="cart-foot-row">'
             +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
-            +'<div class="cart-acts">'+edBtn+'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">remover</button></div>'
+            +'<div class="cart-acts">'+edBtn+'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">'+_T('cart.remove','remover')+'</button></div>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -1199,5 +1200,114 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 
   // re-render inicial: aplica o botao "editar" em itens ja no carrinho
   if(typeof _cartRender==='function'){ try{ _cartRender(); }catch(e){} }
+})();
+</script>
+
+<!-- ══════ FASE 1: GEO + IDIOMAS (i18n) + SELETOR DE REGIÃO ══════ -->
+<style>
+.fp-lang{position:relative;display:inline-flex;margin-left:12px;}
+.fp-lang-btn{display:inline-flex;align-items:center;gap:6px;background:#161616;border:1px solid #2c2c2c;color:#ddd;font-family:inherit;font-size:12px;font-weight:600;padding:7px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .15s;}
+.fp-lang-btn:hover{border-color:#e07b00;}
+.fp-lang-btn .fp-flag{font-size:14px;line-height:1;}
+.fp-lang-menu{position:absolute;top:calc(100% + 8px);right:0;background:#141414;border:1px solid #2c2c2c;border-radius:12px;padding:7px;min-width:195px;box-shadow:0 10px 30px rgba(0,0,0,.55);display:none;z-index:130;}
+.fp-lang-menu.open{display:block;}
+.fp-lang-h{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:#e07b00;font-weight:700;padding:7px 10px 3px;}
+.fp-lang-opt{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:#cfcfcf;font-size:12.5px;cursor:pointer;transition:background .12s,color .12s;}
+.fp-lang-opt:hover{background:#1e1e1e;color:#fff;}
+.fp-lang-opt.on{color:#e07b00;font-weight:700;}
+.fp-lang-opt .fp-flag{font-size:15px;}
+.fp-lang-div{height:1px;background:#262626;margin:6px 4px;}
+@media(max-width:680px){.fp-lang-txt{display:none;}.fp-lang-btn{padding:7px 9px;margin-left:8px;}}
+</style>
+<script>
+(function(){
+  var CFG={
+    BR:{lang:'pt',currency:'BRL',symbol:'R$',frete:'superfrete',gateway:'pagarme',flag:'🇧🇷',reg:{pt:'Brasil',en:'Brazil'}},
+    EU:{lang:'en',currency:'EUR',symbol:'€',frete:'sendcloud',gateway:'stripe',flag:'🇪🇺',reg:{pt:'Europa',en:'Europe'}},
+    US:{lang:'en',currency:'USD',symbol:'$',frete:'sendcloud',gateway:'stripe',flag:'🇺🇸',reg:{pt:'EUA',en:'USA'}}
+  };
+  var EUcc=['PT','ES','FR','DE','IT','BE','NL','LU','IE','AT','FI','GR','CY','MT','EE','LV','LT','SK','SI','HR','PL','CZ','HU','RO','BG','DK','SE','GB','CH','NO','IS'];
+  function regiaoDe(cc){cc=(cc||'').toUpperCase();if(cc==='BR')return'BR';if(cc==='US')return'US';if(EUcc.indexOf(cc)>-1)return'EU';return'BR';}
+
+  var DICT={
+    pt:{
+      'nav.newCustom':'Iniciar nova personalização','nav.cart':'Carrinho',
+      'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Produto','step.detalhe':'Detalhamento','step.fundo':'Fundo','step.moldura':'Moldura + LED','step.relevo':'Alto-relevo','step.pedido':'Pedido',
+      'cart.title':'Seu carrinho','cart.total':'Total','cart.note':'Sem frete · Combinamos o envio pelo WhatsApp','cart.checkout':'Fechar pedido →','cart.more':'Continuar comprando',
+      'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho está vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.'
+    },
+    en:{
+      'nav.newCustom':'Start new customization','nav.cart':'Cart',
+      'step.tipo':'Type','step.modelo':'Model','step.produto':'Product','step.detalhe':'Details','step.fundo':'Background','step.moldura':'Frame + LED','step.relevo':'Relief','step.pedido':'Order',
+      'cart.title':'Your cart','cart.total':'Total','cart.note':'Shipping calculated at checkout','cart.checkout':'Checkout →','cart.more':'Continue shopping',
+      'cart.remove':'remove','cart.edit':'edit product','cart.empty':'Your cart is empty.','cart.emptyHint':'Build a frame and add it here.'
+    }
+  };
+
+  var FP={lang:'pt',region:'BR',cfg:CFG,geoCountry:null};
+  FP.t=function(k){var d=DICT[FP.lang]||DICT.pt;return (d[k]!=null)?d[k]:((DICT.pt[k]!=null)?DICT.pt[k]:k);};
+  function save(){try{localStorage.setItem('fp_lang',FP.lang);localStorage.setItem('fp_region',FP.region);}catch(e){}}
+
+  function aplicar(){
+    var t=FP.t, q=function(s){return document.querySelector(s);}, el;
+    el=q('.novaPersona-btn span'); if(el)el.textContent=t('nav.newCustom');
+    el=q('.cart-btn .lbl'); if(el)el.textContent=t('nav.cart');
+    var order=['step.tipo','step.modelo','step.produto','step.detalhe','step.fundo','step.moldura','step.relevo','step.pedido'];
+    document.querySelectorAll('.stab .slbl').forEach(function(e,i){ if(order[i])e.textContent=t(order[i]); });
+    el=q('#cartTitulo'); if(el)el.textContent=t('cart.title');
+    document.querySelectorAll('.cart-tot-l').forEach(function(e){e.textContent=t('cart.total');});
+    el=q('.cart-note'); if(el)el.textContent=t('cart.note');
+    el=q('#cartFoot .btn-cart-go'); if(el)el.textContent=t('cart.checkout');
+    el=q('#cartFoot .btn-cart-more'); if(el)el.textContent=t('cart.more');
+    document.documentElement.lang=(FP.lang==='pt'?'pt-BR':'en');
+    if(typeof _cartRender==='function'){try{_cartRender();}catch(e){}}
+    atualizaSeletor();
+  }
+  FP.setLang=function(l){FP.lang=l;save();aplicar();};
+  FP.setRegion=function(r){if(!CFG[r])return;FP.region=r;FP.lang=CFG[r].lang;save();aplicar();};
+  window.FP=FP;
+
+  function montaSeletor(){
+    var header=document.querySelector('header'); if(!header||document.getElementById('fpLang'))return;
+    var cartBtn=document.getElementById('cartBtn');
+    var wrap=document.createElement('div'); wrap.className='fp-lang'; wrap.id='fpLang';
+    wrap.innerHTML='<button class="fp-lang-btn" id="fpLangBtn" aria-label="Idioma e região"><span class="fp-flag" id="fpLangFlag">🇧🇷</span><span class="fp-lang-txt" id="fpLangTxt">PT</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'
+      +'<div class="fp-lang-menu" id="fpLangMenu">'
+      +'<div class="fp-lang-h" id="fpH1">Idioma</div>'
+      +'<div class="fp-lang-opt" data-lang="pt"><span class="fp-flag">🇧🇷</span> Português</div>'
+      +'<div class="fp-lang-opt" data-lang="en"><span class="fp-flag">🇬🇧</span> English</div>'
+      +'<div class="fp-lang-div"></div>'
+      +'<div class="fp-lang-h" id="fpH2">Região / Entrega</div>'
+      +'<div class="fp-lang-opt" data-reg="BR"><span class="fp-flag">🇧🇷</span> <span data-rk="BR">Brasil</span></div>'
+      +'<div class="fp-lang-opt" data-reg="EU"><span class="fp-flag">🇪🇺</span> <span data-rk="EU">Europa</span></div>'
+      +'<div class="fp-lang-opt" data-reg="US"><span class="fp-flag">🇺🇸</span> <span data-rk="US">EUA</span></div>'
+      +'</div>';
+    if(cartBtn)header.insertBefore(wrap,cartBtn); else header.appendChild(wrap);
+    document.getElementById('fpLangBtn').addEventListener('click',function(e){e.stopPropagation();document.getElementById('fpLangMenu').classList.toggle('open');});
+    document.addEventListener('click',function(){var m=document.getElementById('fpLangMenu');if(m)m.classList.remove('open');});
+    wrap.querySelectorAll('[data-lang]').forEach(function(o){o.addEventListener('click',function(){FP.setLang(o.getAttribute('data-lang'));});});
+    wrap.querySelectorAll('[data-reg]').forEach(function(o){o.addEventListener('click',function(){FP.setRegion(o.getAttribute('data-reg'));});});
+  }
+  function atualizaSeletor(){
+    var fl=document.getElementById('fpLangFlag'); if(fl)fl.textContent=(CFG[FP.region]||{}).flag||'🌐';
+    var tx=document.getElementById('fpLangTxt'); if(tx)tx.textContent=FP.lang.toUpperCase();
+    var h1=document.getElementById('fpH1'); if(h1)h1.textContent=(FP.lang==='pt'?'Idioma':'Language');
+    var h2=document.getElementById('fpH2'); if(h2)h2.textContent=(FP.lang==='pt'?'Região / Entrega':'Region / Delivery');
+    document.querySelectorAll('#fpLang [data-lang]').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-lang')===FP.lang);});
+    document.querySelectorAll('#fpLang [data-reg]').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-reg')===FP.region);});
+    document.querySelectorAll('#fpLang [data-rk]').forEach(function(s){var r=s.getAttribute('data-rk');if(CFG[r])s.textContent=CFG[r].reg[FP.lang]||CFG[r].reg.pt;});
+  }
+
+  function init(){
+    montaSeletor();
+    var sl=null,sr=null; try{sl=localStorage.getItem('fp_lang');sr=localStorage.getItem('fp_region');}catch(e){}
+    if(sl&&sr&&CFG[sr]){ FP.lang=sl; FP.region=sr; aplicar(); return; }
+    aplicar(); // PT enquanto detecta
+    fetch('/cdn-cgi/trace',{cache:'no-store'}).then(function(r){return r.text();}).then(function(txt){
+      var cc=(txt.match(/loc=([A-Z]{2})/)||[])[1]; FP.geoCountry=cc||null;
+      var reg=regiaoDe(cc); FP.region=reg; FP.lang=CFG[reg].lang; save(); aplicar();
+    }).catch(function(){});
+  }
+  if(document.readyState!=='loading')init(); else document.addEventListener('DOMContentLoaded',init);
 })();
 </script>
