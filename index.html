@@ -1281,14 +1281,14 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Produto','step.detalhe':'Detalhamento','step.fundo':'Fundo','step.moldura':'Moldura + LED','step.relevo':'Alto-relevo','step.pedido':'Pedido',
       'cart.title':'Seu carrinho','cart.total':'Total','cart.note':'Sem frete · Combinamos o envio pelo WhatsApp','cart.checkout':'Fechar pedido →','cart.more':'Continuar comprando',
       'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho está vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.',
-      'frete.title':'Frete / Entrega','frete.cep':'Digite seu CEP','frete.calc':'Calcular','frete.calculating':'Calculando…','frete.eco':'Econômico','frete.exp':'Expresso','frete.days':'dias úteis','frete.invalid':'Informe um CEP válido','frete.totalShip':'Total com frete','frete.mock':'Valores de exemplo · integração real na próxima fase'
+      'frete.title':'Frete / Entrega','frete.cep':'Digite seu CEP','frete.calc':'Calcular','frete.calculating':'Calculando…','frete.eco':'Econômico','frete.exp':'Expresso','frete.days':'dias úteis','frete.invalid':'Informe um CEP válido','frete.totalShip':'Total com frete','frete.mock':'','frete.none':'Nenhuma opção de frete para este endereço.','frete.fail':'Não foi possível calcular o frete agora. Tente novamente.','frete.emptyCart':'Adicione um item ao carrinho para calcular o frete.'
     },
     en:{
       'nav.newCustom':'Start new customization','nav.cart':'Cart',
       'step.tipo':'Type','step.modelo':'Model','step.produto':'Product','step.detalhe':'Details','step.fundo':'Background','step.moldura':'Frame + LED','step.relevo':'Relief','step.pedido':'Order',
       'cart.title':'Your cart','cart.total':'Total','cart.note':'Shipping calculated at checkout','cart.checkout':'Checkout →','cart.more':'Continue shopping',
       'cart.remove':'remove','cart.edit':'edit product','cart.empty':'Your cart is empty.','cart.emptyHint':'Build a frame and add it here.',
-      'frete.title':'Shipping / Delivery','frete.cep':'Enter your postal code','frete.calc':'Calculate','frete.calculating':'Calculating…','frete.eco':'Standard','frete.exp':'Express','frete.days':'business days','frete.invalid':'Enter a valid postal code','frete.totalShip':'Total with shipping','frete.mock':'Sample rates · live integration in the next phase'
+      'frete.title':'Shipping / Delivery','frete.cep':'Enter your postal code','frete.calc':'Calculate','frete.calculating':'Calculating…','frete.eco':'Standard','frete.exp':'Express','frete.days':'business days','frete.invalid':'Enter a valid postal code','frete.totalShip':'Total with shipping','frete.mock':'','frete.none':'No shipping options for this address.','frete.fail':'Could not calculate shipping right now. Please try again.','frete.emptyCart':'Add an item to the cart to calculate shipping.'
     }
   };
 
@@ -1347,37 +1347,58 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     document.querySelectorAll('#fpLang [data-rk]').forEach(function(s){var r=s.getAttribute('data-rk');if(CFG[r])s.textContent=CFG[r].reg[FP.lang]||CFG[r].reg.pt;});
   }
 
-  // ── FRETE: UI + cálculo MOCK (APIs reais SuperFrete/Sendcloud entram na Fase 2) ──
+  // ── FRETE: cálculo REAL — SuperFrete (BR ≤100cm) · Melhor Envio/Jadlog (BR >100cm) · Sendcloud (EU) ──
   FP.frete=null;
-  function fmt(v){return v.toLocaleString(FP.lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  var FRETE_EU_PAISES=[['BE','Bélgica'],['FR','França'],['DE','Alemanha'],['NL','Países Baixos'],['LU','Luxemburgo'],['IT','Itália'],['ES','Espanha'],['PT','Portugal'],['AT','Áustria'],['IE','Irlanda']];
+  function fmt(v){return Number(v||0).toLocaleString(FP.lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function _freteDim(i){
+    if(i&&i.cfg){ if(i.cfg.legoDim)return i.cfg.legoDim; if(i.cfg.quadroDim)return i.cfg.quadroDim; if(i.cfg.dim)return i.cfg.dim; }
+    if(i&&i.dim)return i.dim;
+    var txt=((i&&i.sub)||'')+' '+(((i&&i.linhas)||[]).join(' '));
+    var m=txt.match(/\d{1,3}(?:[.,]\d)?\s*[×x]\s*\d{1,3}(?:[.,]\d)?\s*cm/i);
+    return m?m[0]:'';
+  }
+  function _freteItens(){ return (window.CART||[]).map(function(i){return {dim:_freteDim(i),qty:1};}).filter(function(x){return x.dim;}); }
   function atualizaFreteLabels(){
     var t=FP.t,e;
     e=document.getElementById('fpFreteT'); if(e)e.textContent=t('frete.title');
-    e=document.getElementById('fpCep'); if(e)e.placeholder=t('frete.cep');
+    e=document.getElementById('fpCep'); if(e)e.placeholder=(FP.region==='BR')?t('frete.cep'):'Postal code / ZIP';
     e=document.getElementById('fpCalcBtn'); if(e)e.textContent=t('frete.calc');
-    e=document.getElementById('fpFreteNote'); if(e)e.textContent=t('frete.mock');
+    e=document.getElementById('fpFreteNote'); if(e)e.textContent='';
+    var pais=document.getElementById('fpFretePais'); if(pais)pais.style.display=(FP.region==='EU')?'':'none';
   }
-  function resetFrete(){FP.frete=null;var o=document.getElementById('fpFreteOpts');if(o)o.innerHTML='';var c=document.getElementById('fpCep');if(c)c.value='';}
-  function mostraOpcoes(){
-    var t=FP.t, sym=CFG[FP.region].symbol;
-    var tab={BR:[['eco','5–8',32.90],['exp','2–3',58.50]],EU:[['eco','4–7',14.90],['exp','1–2',29.90]],US:[['eco','5–8',19.90],['exp','2–3',39.90]]};
-    var arr=tab[FP.region]||tab.BR;
-    var html=arr.map(function(o){var nome=t(o[0]==='eco'?'frete.eco':'frete.exp');return '<div class="fp-frete-opt" data-preco="'+o[2]+'" data-nome="'+nome+'"><div class="fp-frete-radio"></div><div class="fp-frete-info"><div class="fp-frete-nome">'+nome+'</div><div class="fp-frete-prazo">'+o[1]+' '+t('frete.days')+'</div></div><div class="fp-frete-preco">'+sym+' '+fmt(o[2])+'</div></div>';}).join('');
-    var opts=document.getElementById('fpFreteOpts'); if(!opts)return; opts.innerHTML=html;
-    opts.querySelectorAll('.fp-frete-opt').forEach(function(o){o.addEventListener('click',function(){selFrete(o);});});
+  function resetFrete(){FP.frete=null;var o=document.getElementById('fpFreteOpts');if(o)o.innerHTML='';var c=document.getElementById('fpCep');if(c)c.value='';var tt=document.getElementById('fpFreteTot');if(tt)tt.remove();}
+  function renderOpcoes(carrier,currency,options){
+    var t=FP.t, opts=document.getElementById('fpFreteOpts'); if(!opts)return;
+    if(!options||!options.length){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.none')+'</div>'; return; }
+    var html=options.map(function(o){
+      var prazo=o.days?(o.days+' '+t('frete.days')):'';
+      var nome=String(o.label||'').replace(/"/g,'&quot;');
+      return '<div class="fp-frete-opt" data-preco="'+o.price+'" data-nome="'+nome+'"><div class="fp-frete-radio"></div><div class="fp-frete-info"><div class="fp-frete-nome">'+nome+'</div><div class="fp-frete-prazo">'+prazo+'</div></div><div class="fp-frete-preco">'+currency+' '+fmt(o.price)+'</div></div>';
+    }).join('');
+    opts.innerHTML=html;
+    opts.querySelectorAll('.fp-frete-opt').forEach(function(o){o.addEventListener('click',function(){selFrete(o,currency);});});
   }
   function calcFrete(){
     var t=FP.t, cepEl=document.getElementById('fpCep'), opts=document.getElementById('fpFreteOpts'); if(!opts||!cepEl)return;
-    var v=(cepEl.value||'').replace(/\D/g,''); var minLen=(FP.region==='BR')?8:4;
+    var v=(cepEl.value||'').replace(/[^0-9A-Za-z]/g,''); var minLen=(FP.region==='BR')?8:4;
     if(v.length<minLen){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.invalid')+'</div>'; FP.frete=null; return; }
+    var itens=_freteItens();
+    if(!itens.length){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.emptyCart')+'</div>'; return; }
+    var paisEl=document.getElementById('fpFretePaisSel');
+    var country=(FP.region==='BR')?'BR':((paisEl&&paisEl.value)||FP.geoCountry||'BE');
     opts.innerHTML='<div class="fp-frete-msg">'+t('frete.calculating')+'</div>';
-    setTimeout(mostraOpcoes,650);
+    var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
+    fetch(API+'/frete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({region:FP.region,country:country,postal_code:v,items:itens})})
+      .then(function(r){return r.json();})
+      .then(function(d){ if(d&&d.ok){ renderOpcoes(d.carrier,CFG[FP.region].symbol,d.options||[]); } else { opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+((d&&d.erro)||t('frete.fail'))+'</div>'; } })
+      .catch(function(){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.fail')+'</div>'; });
   }
-  function selFrete(o){
+  function selFrete(o,currency){
     document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(x){x.classList.remove('on');});
     o.classList.add('on');
     FP.frete={price:parseFloat(o.getAttribute('data-preco')),label:o.getAttribute('data-nome')};
-    var sym=CFG[FP.region].symbol, sub=(typeof _cartTotal==='function')?_cartTotal():0, tot=sub+FP.frete.price;
+    var sym=currency||CFG[FP.region].symbol, sub=(typeof _cartTotal==='function')?_cartTotal():0, tot=sub+FP.frete.price;
     var old=document.getElementById('fpFreteTot'); if(old)old.remove();
     var d=document.createElement('div'); d.className='fp-frete-tot'; d.id='fpFreteTot';
     d.innerHTML='<span>'+FP.t('frete.totalShip')+'</span><span>'+sym+' '+fmt(tot)+'</span>';
@@ -1386,7 +1407,9 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   function injetaFrete(){
     var foot=document.getElementById('cartFoot'); if(!foot||document.getElementById('fpFrete'))return;
     var box=document.createElement('div'); box.className='fp-frete'; box.id='fpFrete';
+    var paisOpts=FRETE_EU_PAISES.map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>';}).join('');
     box.innerHTML='<div class="fp-frete-h"><span>🚚</span> <span id="fpFreteT"></span></div>'
+      +'<div id="fpFretePais" style="display:none;margin-bottom:8px"><select id="fpFretePaisSel" style="width:100%;background:#101010;border:1px solid #2c2c2c;color:#eee;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px">'+paisOpts+'</select></div>'
       +'<div class="fp-frete-row"><input id="fpCep" inputmode="numeric" maxlength="9" autocomplete="postal-code"><button id="fpCalcBtn" type="button"></button></div>'
       +'<div id="fpFreteOpts"></div>'
       +'<div class="fp-frete-note" id="fpFreteNote"></div>';
@@ -1394,6 +1417,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(btnGo)foot.insertBefore(box,btnGo); else foot.appendChild(box);
     document.getElementById('fpCalcBtn').addEventListener('click',calcFrete);
     document.getElementById('fpCep').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();calcFrete();}});
+    var ps=document.getElementById('fpFretePaisSel'); if(ps&&FP.geoCountry){ for(var k=0;k<ps.options.length;k++){ if(ps.options[k].value===FP.geoCountry){ps.selectedIndex=k;break;} } }
     atualizaFreteLabels();
   }
   window.FP.resetFrete=resetFrete; window.FP.atualizaFreteLabels=atualizaFreteLabels; window.FP.injetaFrete=injetaFrete;
