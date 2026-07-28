@@ -876,7 +876,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     var _mobG=window.innerWidth<=720;
     var _wrap=_mobG
       ? 'width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;'
-      : 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;';
+      : 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;';
     // box da imagem NÃO cresce (flex:0) -> a foto encosta nas miniaturas e o bloco fica centralizado
     var _box=_mobG
       ? 'width:100%;display:flex;align-items:flex-start;justify-content:center;'
@@ -904,4 +904,21 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   if(document.readyState!=='loading')anchorHero(); else document.addEventListener('DOMContentLoaded',anchorHero);
   // reforça caso o painel seja re-renderizado ao voltar pra home
   setTimeout(anchorHero,400);
+})();
+
+/* ══ Ancoragem geral no topo: coluna esquerda (todas as etapas) + resumo/TOTAL do checkout ══
+   1) .pv-panel usava justify-content:center -> em monitores altos/verticais todo preview da
+      esquerda (produto, LEGO, Mini, preview em tempo real) descia demais. Agora cola no topo,
+      logo abaixo do menu superior, em qualquer resolução.
+   2) #cartForm (dados do cliente) tinha flex:1 e crescia, empurrando o bloco TOTAL/botão do
+      WhatsApp para o rodapé. Agora o form não estica (flex:0 1 auto): o resumo/TOTAL fica
+      colado logo após o último campo. Se a tela for baixa, o form rola normalmente. */
+(function(){
+  var css=''
+    + '.pv-panel{justify-content:flex-start!important;}'
+    + '#cartForm.cart-body{flex:0 1 auto!important;}';
+  var st=document.createElement('style');
+  st.setAttribute('data-fp','anchor-top');
+  st.textContent=css;
+  (document.head||document.documentElement).appendChild(st);
 })();
