@@ -1208,16 +1208,36 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 .fp-lang{position:absolute;top:14px;right:170px;display:inline-flex;z-index:60;}
 .fp-lang-btn{display:inline-flex;align-items:center;gap:6px;background:#161616;border:1px solid #2c2c2c;color:#ddd;font-family:inherit;font-size:12px;font-weight:600;padding:7px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .15s;}
 .fp-lang-btn:hover{border-color:#e07b00;}
-.fp-lang-btn .fp-flag{font-size:14px;line-height:1;}
+.fp-flag{display:inline-flex;align-items:center;line-height:0;}
 .fp-lang-menu{position:absolute;top:calc(100% + 8px);right:0;background:#141414;border:1px solid #2c2c2c;border-radius:12px;padding:7px;min-width:195px;box-shadow:0 10px 30px rgba(0,0,0,.55);display:none;z-index:130;}
 .fp-lang-menu.open{display:block;}
 .fp-lang-h{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:#e07b00;font-weight:700;padding:7px 10px 3px;}
 .fp-lang-opt{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:#cfcfcf;font-size:12.5px;cursor:pointer;transition:background .12s,color .12s;}
 .fp-lang-opt:hover{background:#1e1e1e;color:#fff;}
 .fp-lang-opt.on{color:#e07b00;font-weight:700;}
-.fp-lang-opt .fp-flag{font-size:15px;}
 .fp-lang-div{height:1px;background:#262626;margin:6px 4px;}
 @media(max-width:680px){.fp-lang-txt{display:none;}.fp-lang-btn{padding:7px 9px;margin-left:8px;}}
+/* Frete / Entrega no carrinho */
+.fp-frete{border-top:1px solid #262626;margin:10px 0;padding-top:12px;}
+.fp-frete-h{font-size:11px;font-weight:700;letter-spacing:.5px;color:#e07b00;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.fp-frete-row{display:flex;gap:8px;}
+.fp-frete-row input{flex:1;min-width:0;background:#101010;border:1px solid #2c2c2c;color:#eee;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;}
+.fp-frete-row input:focus{outline:none;border-color:#e07b00;}
+.fp-frete-row button{background:#e07b00;border:none;color:#fff;font-family:inherit;font-weight:700;font-size:12px;padding:0 16px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:filter .15s;}
+.fp-frete-row button:hover{filter:brightness(1.08);}
+.fp-frete-opt{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid #2c2c2c;border-radius:8px;margin-top:7px;cursor:pointer;transition:border-color .12s,background .12s;}
+.fp-frete-opt:hover{border-color:#3a3a3a;}
+.fp-frete-opt.on{border-color:#e07b00;background:#1a1206;}
+.fp-frete-radio{width:15px;height:15px;border-radius:50%;border:2px solid #555;flex-shrink:0;position:relative;}
+.fp-frete-opt.on .fp-frete-radio{border-color:#e07b00;}
+.fp-frete-opt.on .fp-frete-radio::after{content:'';position:absolute;left:2px;top:2px;right:2px;bottom:2px;border-radius:50%;background:#e07b00;}
+.fp-frete-info{flex:1;min-width:0;}
+.fp-frete-nome{font-size:12.5px;color:#eee;font-weight:600;}
+.fp-frete-prazo{font-size:10.5px;color:#8a8a8a;margin-top:1px;}
+.fp-frete-preco{font-size:13px;color:#fff;font-weight:700;white-space:nowrap;}
+.fp-frete-msg{font-size:11.5px;color:#8a8a8a;margin-top:8px;}
+.fp-frete-tot{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:#fff;font-weight:700;margin-top:9px;padding-top:9px;border-top:1px dashed #333;}
+.fp-frete-note{font-size:9.5px;color:#666;margin-top:7px;font-style:italic;}
 </style>
 <script>
 (function(){
@@ -1229,18 +1249,31 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   var EUcc=['PT','ES','FR','DE','IT','BE','NL','LU','IE','AT','FI','GR','CY','MT','EE','LV','LT','SK','SI','HR','PL','CZ','HU','RO','BG','DK','SE','GB','CH','NO','IS'];
   function regiaoDe(cc){cc=(cc||'').toUpperCase();if(cc==='BR')return'BR';if(cc==='US')return'US';if(EUcc.indexOf(cc)>-1)return'EU';return'BR';}
 
+  // Bandeiras em SVG (renderizam iguais em qualquer sistema, inclusive Windows)
+  function euStars(){var a=[[14,3.8],[17.1,4.63],[19.37,6.9],[20.2,10],[19.37,13.1],[17.1,15.37],[14,16.2],[10.9,15.37],[8.63,13.1],[7.8,10],[8.63,6.9],[10.9,4.63]];return a.map(function(p){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r=".85"/>';}).join('');}
+  function flagSVG(code){
+    var a='width="18" height="13" viewBox="0 0 28 20" style="border-radius:2px;display:block;flex-shrink:0"';
+    if(code==='BR')return '<svg '+a+'><rect width="28" height="20" fill="#009c3b"/><path d="M14 2.5 25.5 10 14 17.5 2.5 10Z" fill="#ffdf00"/><circle cx="14" cy="10" r="4" fill="#002776"/></svg>';
+    if(code==='GB')return '<svg '+a+'><rect width="28" height="20" fill="#012169"/><path d="M0 0L28 20M28 0L0 20" stroke="#fff" stroke-width="4"/><path d="M0 0L28 20M28 0L0 20" stroke="#c8102e" stroke-width="2"/><path d="M14 0V20M0 10H28" stroke="#fff" stroke-width="6"/><path d="M14 0V20M0 10H28" stroke="#c8102e" stroke-width="3.4"/></svg>';
+    if(code==='US')return '<svg '+a+'><rect width="28" height="20" fill="#fff"/><g fill="#b22234"><rect width="28" height="2"/><rect y="4" width="28" height="2"/><rect y="8" width="28" height="2"/><rect y="12" width="28" height="2"/><rect y="16" width="28" height="2"/></g><rect width="12" height="10" fill="#3c3b6e"/><g fill="#fff"><circle cx="2.4" cy="2.2" r=".75"/><circle cx="6" cy="2.2" r=".75"/><circle cx="9.6" cy="2.2" r=".75"/><circle cx="4.2" cy="5" r=".75"/><circle cx="7.8" cy="5" r=".75"/><circle cx="2.4" cy="7.8" r=".75"/><circle cx="6" cy="7.8" r=".75"/><circle cx="9.6" cy="7.8" r=".75"/></g></svg>';
+    if(code==='EU')return '<svg '+a+'><rect width="28" height="20" fill="#003399"/><g fill="#ffcc00">'+euStars()+'</g></svg>';
+    return '';
+  }
+
   var DICT={
     pt:{
       'nav.newCustom':'Iniciar nova personalização','nav.cart':'Carrinho',
       'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Produto','step.detalhe':'Detalhamento','step.fundo':'Fundo','step.moldura':'Moldura + LED','step.relevo':'Alto-relevo','step.pedido':'Pedido',
       'cart.title':'Seu carrinho','cart.total':'Total','cart.note':'Sem frete · Combinamos o envio pelo WhatsApp','cart.checkout':'Fechar pedido →','cart.more':'Continuar comprando',
-      'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho está vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.'
+      'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho está vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.',
+      'frete.title':'Frete / Entrega','frete.cep':'Digite seu CEP','frete.calc':'Calcular','frete.calculating':'Calculando…','frete.eco':'Econômico','frete.exp':'Expresso','frete.days':'dias úteis','frete.invalid':'Informe um CEP válido','frete.totalShip':'Total com frete','frete.mock':'Valores de exemplo · integração real na próxima fase'
     },
     en:{
       'nav.newCustom':'Start new customization','nav.cart':'Cart',
       'step.tipo':'Type','step.modelo':'Model','step.produto':'Product','step.detalhe':'Details','step.fundo':'Background','step.moldura':'Frame + LED','step.relevo':'Relief','step.pedido':'Order',
       'cart.title':'Your cart','cart.total':'Total','cart.note':'Shipping calculated at checkout','cart.checkout':'Checkout →','cart.more':'Continue shopping',
-      'cart.remove':'remove','cart.edit':'edit product','cart.empty':'Your cart is empty.','cart.emptyHint':'Build a frame and add it here.'
+      'cart.remove':'remove','cart.edit':'edit product','cart.empty':'Your cart is empty.','cart.emptyHint':'Build a frame and add it here.',
+      'frete.title':'Shipping / Delivery','frete.cep':'Enter your postal code','frete.calc':'Calculate','frete.calculating':'Calculating…','frete.eco':'Standard','frete.exp':'Express','frete.days':'business days','frete.invalid':'Enter a valid postal code','frete.totalShip':'Total with shipping','frete.mock':'Sample rates · live integration in the next phase'
     }
   };
 
@@ -1262,25 +1295,26 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     document.documentElement.lang=(FP.lang==='pt'?'pt-BR':'en');
     if(typeof _cartRender==='function'){try{_cartRender();}catch(e){}}
     atualizaSeletor();
+    atualizaFreteLabels();
   }
   FP.setLang=function(l){FP.lang=l;save();aplicar();};
-  FP.setRegion=function(r){if(!CFG[r])return;FP.region=r;FP.lang=CFG[r].lang;save();aplicar();};
+  FP.setRegion=function(r){if(!CFG[r])return;FP.region=r;FP.lang=CFG[r].lang;if(typeof resetFrete==='function')resetFrete();save();aplicar();};
   window.FP=FP;
 
   function montaSeletor(){
     var header=document.querySelector('header'); if(!header||document.getElementById('fpLang'))return;
     var cartBtn=document.getElementById('cartBtn');
     var wrap=document.createElement('div'); wrap.className='fp-lang'; wrap.id='fpLang';
-    wrap.innerHTML='<button class="fp-lang-btn" id="fpLangBtn" aria-label="Idioma e região"><span class="fp-flag" id="fpLangFlag">🇧🇷</span><span class="fp-lang-txt" id="fpLangTxt">PT</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'
+    wrap.innerHTML='<button class="fp-lang-btn" id="fpLangBtn" aria-label="Idioma e região"><span class="fp-flag" id="fpLangFlag"></span><span class="fp-lang-txt" id="fpLangTxt">PT</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'
       +'<div class="fp-lang-menu" id="fpLangMenu">'
       +'<div class="fp-lang-h" id="fpH1">Idioma</div>'
-      +'<div class="fp-lang-opt" data-lang="pt"><span class="fp-flag">🇧🇷</span> Português</div>'
-      +'<div class="fp-lang-opt" data-lang="en"><span class="fp-flag">🇬🇧</span> English</div>'
+      +'<div class="fp-lang-opt" data-lang="pt"><span class="fp-flag">'+flagSVG('BR')+'</span> Português</div>'
+      +'<div class="fp-lang-opt" data-lang="en"><span class="fp-flag">'+flagSVG('GB')+'</span> English</div>'
       +'<div class="fp-lang-div"></div>'
       +'<div class="fp-lang-h" id="fpH2">Região / Entrega</div>'
-      +'<div class="fp-lang-opt" data-reg="BR"><span class="fp-flag">🇧🇷</span> <span data-rk="BR">Brasil</span></div>'
-      +'<div class="fp-lang-opt" data-reg="EU"><span class="fp-flag">🇪🇺</span> <span data-rk="EU">Europa</span></div>'
-      +'<div class="fp-lang-opt" data-reg="US"><span class="fp-flag">🇺🇸</span> <span data-rk="US">EUA</span></div>'
+      +'<div class="fp-lang-opt" data-reg="BR"><span class="fp-flag">'+flagSVG('BR')+'</span> <span data-rk="BR">Brasil</span></div>'
+      +'<div class="fp-lang-opt" data-reg="EU"><span class="fp-flag">'+flagSVG('EU')+'</span> <span data-rk="EU">Europa</span></div>'
+      +'<div class="fp-lang-opt" data-reg="US"><span class="fp-flag">'+flagSVG('US')+'</span> <span data-rk="US">EUA</span></div>'
       +'</div>';
     if(cartBtn)header.insertBefore(wrap,cartBtn); else header.appendChild(wrap);
     document.getElementById('fpLangBtn').addEventListener('click',function(e){e.stopPropagation();document.getElementById('fpLangMenu').classList.toggle('open');});
@@ -1289,7 +1323,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     wrap.querySelectorAll('[data-reg]').forEach(function(o){o.addEventListener('click',function(){FP.setRegion(o.getAttribute('data-reg'));});});
   }
   function atualizaSeletor(){
-    var fl=document.getElementById('fpLangFlag'); if(fl)fl.textContent=(CFG[FP.region]||{}).flag||'🌐';
+    var fl=document.getElementById('fpLangFlag'); if(fl)fl.innerHTML=flagSVG(FP.region);
     var tx=document.getElementById('fpLangTxt'); if(tx)tx.textContent=FP.lang.toUpperCase();
     var h1=document.getElementById('fpH1'); if(h1)h1.textContent=(FP.lang==='pt'?'Idioma':'Language');
     var h2=document.getElementById('fpH2'); if(h2)h2.textContent=(FP.lang==='pt'?'Região / Entrega':'Region / Delivery');
@@ -1297,6 +1331,57 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     document.querySelectorAll('#fpLang [data-reg]').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-reg')===FP.region);});
     document.querySelectorAll('#fpLang [data-rk]').forEach(function(s){var r=s.getAttribute('data-rk');if(CFG[r])s.textContent=CFG[r].reg[FP.lang]||CFG[r].reg.pt;});
   }
+
+  // ── FRETE: UI + cálculo MOCK (APIs reais SuperFrete/Sendcloud entram na Fase 2) ──
+  FP.frete=null;
+  function fmt(v){return v.toLocaleString(FP.lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function atualizaFreteLabels(){
+    var t=FP.t,e;
+    e=document.getElementById('fpFreteT'); if(e)e.textContent=t('frete.title');
+    e=document.getElementById('fpCep'); if(e)e.placeholder=t('frete.cep');
+    e=document.getElementById('fpCalcBtn'); if(e)e.textContent=t('frete.calc');
+    e=document.getElementById('fpFreteNote'); if(e)e.textContent=t('frete.mock');
+  }
+  function resetFrete(){FP.frete=null;var o=document.getElementById('fpFreteOpts');if(o)o.innerHTML='';var c=document.getElementById('fpCep');if(c)c.value='';}
+  function mostraOpcoes(){
+    var t=FP.t, sym=CFG[FP.region].symbol;
+    var tab={BR:[['eco','5–8',32.90],['exp','2–3',58.50]],EU:[['eco','4–7',14.90],['exp','1–2',29.90]],US:[['eco','5–8',19.90],['exp','2–3',39.90]]};
+    var arr=tab[FP.region]||tab.BR;
+    var html=arr.map(function(o){var nome=t(o[0]==='eco'?'frete.eco':'frete.exp');return '<div class="fp-frete-opt" data-preco="'+o[2]+'" data-nome="'+nome+'"><div class="fp-frete-radio"></div><div class="fp-frete-info"><div class="fp-frete-nome">'+nome+'</div><div class="fp-frete-prazo">'+o[1]+' '+t('frete.days')+'</div></div><div class="fp-frete-preco">'+sym+' '+fmt(o[2])+'</div></div>';}).join('');
+    var opts=document.getElementById('fpFreteOpts'); if(!opts)return; opts.innerHTML=html;
+    opts.querySelectorAll('.fp-frete-opt').forEach(function(o){o.addEventListener('click',function(){selFrete(o);});});
+  }
+  function calcFrete(){
+    var t=FP.t, cepEl=document.getElementById('fpCep'), opts=document.getElementById('fpFreteOpts'); if(!opts||!cepEl)return;
+    var v=(cepEl.value||'').replace(/\D/g,''); var minLen=(FP.region==='BR')?8:4;
+    if(v.length<minLen){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.invalid')+'</div>'; FP.frete=null; return; }
+    opts.innerHTML='<div class="fp-frete-msg">'+t('frete.calculating')+'</div>';
+    setTimeout(mostraOpcoes,650);
+  }
+  function selFrete(o){
+    document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(x){x.classList.remove('on');});
+    o.classList.add('on');
+    FP.frete={price:parseFloat(o.getAttribute('data-preco')),label:o.getAttribute('data-nome')};
+    var sym=CFG[FP.region].symbol, sub=(typeof _cartTotal==='function')?_cartTotal():0, tot=sub+FP.frete.price;
+    var old=document.getElementById('fpFreteTot'); if(old)old.remove();
+    var d=document.createElement('div'); d.className='fp-frete-tot'; d.id='fpFreteTot';
+    d.innerHTML='<span>'+FP.t('frete.totalShip')+'</span><span>'+sym+' '+fmt(tot)+'</span>';
+    document.getElementById('fpFreteOpts').appendChild(d);
+  }
+  function injetaFrete(){
+    var foot=document.getElementById('cartFoot'); if(!foot||document.getElementById('fpFrete'))return;
+    var box=document.createElement('div'); box.className='fp-frete'; box.id='fpFrete';
+    box.innerHTML='<div class="fp-frete-h"><span>🚚</span> <span id="fpFreteT"></span></div>'
+      +'<div class="fp-frete-row"><input id="fpCep" inputmode="numeric" maxlength="9" autocomplete="postal-code"><button id="fpCalcBtn" type="button"></button></div>'
+      +'<div id="fpFreteOpts"></div>'
+      +'<div class="fp-frete-note" id="fpFreteNote"></div>';
+    var btnGo=foot.querySelector('.btn-cart-go');
+    if(btnGo)foot.insertBefore(box,btnGo); else foot.appendChild(box);
+    document.getElementById('fpCalcBtn').addEventListener('click',calcFrete);
+    document.getElementById('fpCep').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();calcFrete();}});
+    atualizaFreteLabels();
+  }
+  window.FP.resetFrete=resetFrete; window.FP.atualizaFreteLabels=atualizaFreteLabels; window.FP.injetaFrete=injetaFrete;
 
   function posicionaSeletor(){
     var cb=document.getElementById('cartBtn'), fp=document.getElementById('fpLang');
@@ -1310,6 +1395,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   }
   function init(){
     montaSeletor();
+    injetaFrete();
     posicionaSeletor();
     window.addEventListener('resize',posicionaSeletor);
     setTimeout(posicionaSeletor,300);
