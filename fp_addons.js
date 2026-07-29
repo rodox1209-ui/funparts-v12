@@ -957,7 +957,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   (document.head||document.documentElement).appendChild(st);
 
   function forcarSemRgb(){
-    if(!(window.S && S.led)) return;
+    if(typeof S==='undefined' || !S.led) return;
     if(typeof selLedFio==='function') selLedFio('sem');
     var rgb=document.getElementById('ledCardRgb');
     if(rgb && typeof setLED==='function') setLED(rgb,'rgb');
