@@ -1030,22 +1030,24 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
    aqui encolhemos o fundo para calc(100% - 1px) SÓ no 53×83, deixando-o 1px menor que a moldura.
    Envolve updateDetPreview (que reseta o fundo para 100% a cada render) e reaplica depois. */
 (function(){
-  var _orig=window.updateDetPreview;
-  if(typeof _orig!=='function') return;
-  function ajustaFundo5383(){
+  // Apenas no mobile, quadros 53×83: encolhe verticalmente 9px o FUNDO e os overlays do LED RGB
+  // (legoLedGlow/legoLedDark), para não vazarem por baixo da moldura. No desktop mantém 100%.
+  function ajusta5383(){
     try{
       var dim=(typeof S!=='undefined'&&S.legoDim)?S.legoDim:'';
       if(!/53\s*[×x]\s*83/.test(dim)) return;
-      var fu=document.getElementById('legoDetFundo');
-      if(!fu) return;
-      // Apenas no mobile: encolhe o fundo 6px verticalmente para não vazar por baixo da moldura.
-      // No desktop mantém 100% (comportamento original).
-      fu.style.height=(window.innerWidth<=720)?'calc(100% - 6px)':'100%';
+      var mob=(window.innerWidth<=720);
+      var h=mob?'calc(100% - 9px)':'100%';
+      ['legoDetFundo','legoLedGlow','legoLedDark'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(el) el.style.height=h;
+      });
     }catch(e){}
   }
-  window.updateDetPreview=function(){
-    var r=_orig.apply(this,arguments);
-    ajustaFundo5383();
-    return r;
-  };
+  // reaplica após qualquer render/alteração do preview ou do LED
+  ['updateDetPreview','togLED','setLED'].forEach(function(fn){
+    var _orig=window[fn];
+    if(typeof _orig!=='function') return;
+    window[fn]=function(){ var r=_orig.apply(this,arguments); ajusta5383(); return r; };
+  });
 })();
