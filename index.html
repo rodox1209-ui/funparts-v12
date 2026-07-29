@@ -698,32 +698,22 @@
     </div>
     <div id="ledTypes" style="display:none;margin-top:10px;">
       <div class="sec-sub" style="margin-bottom:8px;">Tipo de LED</div>
-      <!-- COM FIO / SEM FIO toggle -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-        <div id="ledFioCom" class="tcard sel" style="padding:8px 10px;cursor:pointer;" onclick="selLedFio('com')">
-          <div class="ttitle" style="font-size:11px;">🔌 Com Fio</div>
-          <div class="tdesc" style="font-size:10px;margin-top:2px;">R$ 389 – R$ 489</div>
-        </div>
-        <div id="ledFioSem" class="tcard" style="padding:8px 10px;cursor:pointer;" onclick="selLedFio('sem')">
+      <!-- SEM FIO (única opção disponível) -->
+      <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px;">
+        <div id="ledFioSem" class="tcard sel" style="padding:8px 10px;cursor:pointer;" onclick="selLedFio('sem')">
           <div class="ttitle" style="font-size:11px;">🔋 Sem Fio</div>
           <div class="tdesc" style="font-size:10px;margin-top:2px;">R$ 489 – R$ 589</div>
         </div>
       </div>
-      <!-- Tipo: Neutro / RGB -->
-      <div class="led-opts" style="grid-template-columns:1fr 1fr;">
-        <div class="led-card on" id="ledCardWarm" onclick="setLED(this,'warm')">
-          <div class="led-card-icon">🟡</div>
-          <div class="led-card-name">Neutro</div>
-          <div class="led-card-desc">Luz 3000K</div>
-        </div>
-        <div class="led-card" id="ledCardRgb" onclick="setLED(this,'rgb')">
+      <!-- Tipo: RGB (única opção disponível) -->
+      <div class="led-opts" style="grid-template-columns:1fr;">
+        <div class="led-card on" id="ledCardRgb" onclick="setLED(this,'rgb')">
           <div class="led-card-icon">🌈</div>
           <div class="led-card-name">RGB</div>
           <div class="led-card-desc">Multicolor</div>
         </div>
       </div>
     </div>
-  </div>
 
   <div class="nav-btns">
     <button class="btn-back" onclick="goStep(4)">← Voltar</button>
