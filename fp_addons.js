@@ -1023,3 +1023,26 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     }catch(e){ cb(''); }
   };
 })();
+
+/* ══ Preview LEGO 53×83cm: fundo 1px menor que a moldura ══
+   No mobile, para os quadros 53×83, o fundo (legoDetFundo, 100%) vazava ~1px por baixo da
+   moldura (legoDetFrame, 100% object-fit:fill). Mesmo padrão já usado no 49×49 (que encolhe 2px):
+   aqui encolhemos o fundo para calc(100% - 1px) SÓ no 53×83, deixando-o 1px menor que a moldura.
+   Envolve updateDetPreview (que reseta o fundo para 100% a cada render) e reaplica depois. */
+(function(){
+  var _orig=window.updateDetPreview;
+  if(typeof _orig!=='function') return;
+  function ajustaFundo5383(){
+    try{
+      var dim=(typeof S!=='undefined'&&S.legoDim)?S.legoDim:'';
+      if(!/53\s*[×x]\s*83/.test(dim)) return;
+      var fu=document.getElementById('legoDetFundo');
+      if(fu) fu.style.height='calc(100% - 1px)';
+    }catch(e){}
+  }
+  window.updateDetPreview=function(){
+    var r=_orig.apply(this,arguments);
+    ajustaFundo5383();
+    return r;
+  };
+})();
