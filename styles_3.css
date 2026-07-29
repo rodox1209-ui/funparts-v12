@@ -175,4 +175,9 @@
   .cart-foot{padding-bottom:26px;}
   .cart-toast{bottom:96px;flex-direction:column;align-items:stretch;text-align:center;}
   .cart-toast button{width:100%;}
+  /* 53×83cm mobile: fundo -9px e LED -9px na vertical */
+  .quadro.lego-53x83 .c-fundo{height:100%;}
+  .quadro.lego-53x83 .c-fundo img{height:calc(100% - 9px);object-fit:cover;}
+  .quadro.lego-53x83 .led-dark,
+  .quadro.lego-53x83 .led-glow{height:calc(100% - 9px);}
 }

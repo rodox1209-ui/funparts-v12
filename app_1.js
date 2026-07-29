@@ -1418,6 +1418,7 @@ function updateDetPreview(){
     if(_quadro&&S.legoDim){
       var ratio=_legoLegacyRatio(S.legoDim);
       if(ratio){_quadro.style.aspectRatio=ratio;_quadro.style.overflow='hidden';}
+      _quadro.classList.toggle('lego-53x83',/^53\s*[×x]\s*83/.test(S.legoDim));
     }
     // === LEGO preview: update legoPreviewWrap elements ===
     // Fundo gradient
