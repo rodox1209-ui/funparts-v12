@@ -1037,7 +1037,10 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       var dim=(typeof S!=='undefined'&&S.legoDim)?S.legoDim:'';
       if(!/53\s*[×x]\s*83/.test(dim)) return;
       var fu=document.getElementById('legoDetFundo');
-      if(fu) fu.style.height='calc(100% - 1px)';
+      if(!fu) return;
+      // Apenas no mobile: encolhe o fundo 6px verticalmente para não vazar por baixo da moldura.
+      // No desktop mantém 100% (comportamento original).
+      fu.style.height=(window.innerWidth<=720)?'calc(100% - 6px)':'100%';
     }catch(e){}
   }
   window.updateDetPreview=function(){
