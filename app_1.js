@@ -1440,7 +1440,7 @@ function updateDetPreview(){
     // 49×49cm: encolhe o fundo 2px na altura para não vazar por baixo da moldura quadrada.
     // Fora do 49×49 restaura 100% (altura base do HTML) — nunca '' (isso zerava o fundo).
     var _lfu=document.getElementById('legoDetFundo');
-    if(_lfu){ _lfu.style.height=_is4949?'calc(100% - 2px)':'100%'; }
+    if(_lfu){ var _is5383m=/^53\s*[×x]\s*83/.test(S.legoDim||'')&&window.innerWidth<=720; _lfu.style.height=_is4949?'calc(100% - 2px)':(_is5383m?'calc(100% - 13px)':'100%'); }
     // Car image - top-view sobre o fundo. Banco (por modelo) tem prioridade.
     var lcar=document.getElementById('legoDetCar');
     if(lcar){
