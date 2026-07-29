@@ -108,6 +108,15 @@ const S = {
   _total:0,
 };
 
+// ── INICIAR NOVA PERSONALIZAÇÃO ──
+// Zera 100% da personalização atual (o estado S é reconstruído do zero no load)
+// e volta para a etapa TIPO. O carrinho fica salvo no localStorage
+// (funparts_cart_v1) e é recarregado no init, então os itens são preservados.
+function iniciarNovaPersonalizacao(){
+  try{ location.reload(); }
+  catch(e){ location.href = location.pathname + location.search; }
+}
+
 // ── NAVEGAÇÃO ──
 function showAiPopup(title,body){var defT='Fanático, você está prestes a criar<br>um quadro exclusivo!';var defB='Aguarde, estamos gerando a imagem da sua miniatura em alta resolução.';var p=document.getElementById('aiLoadingPopup');if(!p)return;var t=document.getElementById('aiPopupTitle');var b=document.getElementById('aiPopupBody');if(t)t.innerHTML=title||defT;if(b)b.innerHTML=body||defB;p.style.display='flex';_aiProgStart(22);}
 function hideAiPopup(){var p=document.getElementById('aiLoadingPopup');_aiProgFinish();if(p)setTimeout(function(){p.style.display='none';},320);}
