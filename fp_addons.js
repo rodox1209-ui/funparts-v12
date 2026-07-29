@@ -992,3 +992,34 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     return it;
   };
 })();
+
+/* ══ _cartThumb: habilitar CORS para gerar a miniatura ══
+   As imagens do preview (carro/IA) são servidas pelo Worker (outra origem). Sem crossOrigin,
+   desenhá-las no canvas "tainta" o canvas e toDataURL lança SecurityError -> thumb vazio.
+   Com crossOrigin='anonymous' (o Worker envia CORS) a miniatura é gerada corretamente.
+   Fontes sem CORS simplesmente falham para '' (mesmo resultado de antes: sem regressão). */
+(function(){
+  if(typeof window._cartThumb!=='function') return;
+  window._cartThumb=function(src,cb){
+    if(!src){ cb(''); return; }
+    try{
+      var im=new Image();
+      im.crossOrigin='anonymous';
+      var pronto=false;
+      var fim=function(v){ if(pronto)return; pronto=true; cb(v); };
+      setTimeout(function(){ fim(''); },8000);
+      im.onload=function(){
+        try{
+          var L=160, c=document.createElement('canvas');
+          var r=Math.min(L/im.width,L/im.height,1);
+          c.width=Math.max(1,Math.round(im.width*r));
+          c.height=Math.max(1,Math.round(im.height*r));
+          c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+          fim(c.toDataURL('image/jpeg',0.72));
+        }catch(e){ fim(''); }
+      };
+      im.onerror=function(){ fim(''); };
+      im.src=src;
+    }catch(e){ cb(''); }
+  };
+})();
