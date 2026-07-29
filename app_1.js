@@ -1453,6 +1453,7 @@ function updateDetPreview(){
     if(ldq&&S.legoDim){
       var _lr=_legoLegacyRatio(S.legoDim);
       if(_lr){ldq.style.aspectRatio=_lr;}
+      ldq.classList.toggle('lego-53x83',/^53\s*[×x]\s*83/.test(S.legoDim));
     }
     // Scale reference image (lazy-load from wallModal)
     var lsi=document.getElementById('legoScaleImg');
