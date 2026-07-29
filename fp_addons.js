@@ -1051,3 +1051,108 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     window[fn]=function(){ var r=_orig.apply(this,arguments); ajusta5383(); return r; };
   });
 })();
+
+/* ══════════ PAGAMENTO ONLINE (Pagar.me) — botão Pagar + retorno c/ WhatsApp ══════════
+   Fluxo: cria o pedido (/pedido, total autoritativo + cupom/frete já injetados pelo wrapper),
+   depois gera o link do checkout Pagar.me (/pagamento) e redireciona. Ao voltar (?pago=1),
+   mostra confirmação e dispara o WhatsApp automático. */
+(function(){
+  var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
+
+  window.pagarPedido=function(){
+    if(!window.CART||!CART.length)return;
+    var aviso=document.getElementById('frmAviso');
+    var btn=document.getElementById('btnPagarOnline');
+    if(typeof _frmValidaTudo==='function' && !_frmValidaTudo(true)){
+      if(aviso)aviso.textContent='Confira os campos destacados antes de continuar.';
+      try{
+        var ruim=(FRM_CAMPOS||[]).map(function(c){return document.getElementById(c.id);})
+                  .filter(function(e){return e&&e.classList.contains('erro');})[0];
+        if(ruim){ ruim.focus(); ruim.scrollIntoView({behavior:'smooth',block:'center'}); }
+      }catch(e){}
+      return;
+    }
+    if(aviso)aviso.textContent='';
+    if(typeof _cliSalva==='function')_cliSalva();
+    var c=(typeof dadosCliente==='function')?dadosCliente():{};
+    if(btn){ btn.disabled=true; btn.dataset.txt=btn.textContent; btn.textContent='Gerando pagamento…'; }
+
+    var corpo={
+      rascunhoToken:(typeof _rascToken==='function'?_rascToken():'')||undefined,
+      cliente:c,
+      itens:CART.map(function(i){
+        return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
+                 preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
+                 preview:(typeof _pvDoItem==='function'?_pvDoItem(i):null),
+                 resumo:i.resumo||[] };
+      })
+    };
+    // 1) cria o pedido (cupom/frete são injetados pelo wrapper de fetch)
+    fetch(API+'/pedido',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok||!d.token)throw new Error(d&&d.erro||'falha ao criar pedido');
+        // 2) gera o link do checkout Pagar.me
+        return fetch(API+'/pagamento',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({token:d.token,origin:location.origin})}).then(function(r){return r.json();});
+      })
+      .then(function(p){
+        if(!p||!p.ok||!p.url)throw new Error(p&&p.erro||'falha no pagamento');
+        // 3) redireciona para a página segura do Pagar.me (mesma aba, dentro do clique)
+        window.location.href=p.url;
+      })
+      .catch(function(e){
+        if(btn){ btn.disabled=false; btn.textContent=btn.dataset.txt||'Pagar (Cartão ou Pix)'; }
+        if(aviso)aviso.textContent='Não foi possível iniciar o pagamento agora. Tente novamente ou use o WhatsApp.';
+      });
+  };
+
+  // injeta o botão "Pagar" como ação principal e mantém o WhatsApp como alternativa discreta
+  function montaBotaoPagar(){
+    var foot=document.getElementById('cartFoot2');
+    if(!foot || document.getElementById('btnPagarOnline')) return;
+    var wpp=document.getElementById('btnFecharPedido');
+    var b=document.createElement('button');
+    b.id='btnPagarOnline'; b.className='btn-cart-go';
+    b.textContent='Pagar (Cartão ou Pix)';
+    b.onclick=window.pagarPedido;
+    if(wpp && wpp.parentNode){
+      wpp.parentNode.insertBefore(b,wpp);
+      // WhatsApp vira alternativa secundária
+      wpp.classList.remove('btn-cart-go'); wpp.classList.add('btn-cart-more');
+      wpp.textContent='Prefiro combinar pelo WhatsApp';
+      wpp.style.marginTop='9px';
+    } else {
+      foot.appendChild(b);
+    }
+  }
+  if(document.readyState!=='loading')montaBotaoPagar(); else document.addEventListener('DOMContentLoaded',montaBotaoPagar);
+  setTimeout(montaBotaoPagar,600);
+
+  // ── Retorno do checkout: ?pago=1&pedido=FP-XXXX → confirma + WhatsApp automático ──
+  function telaPago(){
+    var q; try{ q=new URLSearchParams(location.search); }catch(e){ return; }
+    if(!q || q.get('pago')!=='1') return;
+    var cod=(q.get('pedido')||'').slice(0,20);
+    try{ if(window.CART){ CART.length=0; if(typeof _cartSave==='function')_cartSave(); if(typeof _cartRender==='function')_cartRender(); } }catch(e){}
+    try{ if(typeof _rascLimpa==='function')_rascLimpa(); }catch(e){}
+    var zap='https://wa.me/5511910646157?text='+encodeURIComponent('Olá! Meu pagamento foi aprovado ✅\n\nPedido: '+cod+'\nGostaria de confirmar a produção e o envio.');
+    var ov=document.createElement('div'); ov.id='fpPagoOv';
+    ov.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(6,6,6,.95);display:flex;align-items:center;justify-content:center;padding:24px;font-family:\'Barlow Condensed\',Arial,sans-serif;';
+    ov.innerHTML=''
+      +'<div style="max-width:430px;width:100%;text-align:center;color:#fff;background:#111;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:34px 26px;">'
+      +'<div style="font-size:56px;line-height:1;margin-bottom:10px;">✅</div>'
+      +'<div style="font-size:24px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Pagamento aprovado</div>'
+      +'<div style="font-size:13px;color:#bbb;margin:12px 0 4px;">Seu pedido <b style="color:#e07b00;">'+(cod||'')+'</b> foi confirmado.</div>'
+      +'<div style="font-size:12px;color:#888;margin-bottom:22px;">Vamos iniciar a produção. Confirme pelo WhatsApp para acompanhar.</div>'
+      +'<a href="'+zap+'" id="fpZapConf" style="display:block;width:100%;box-sizing:border-box;padding:14px;background:#25D366;color:#062e15;border-radius:10px;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">Confirmar no WhatsApp</a>'
+      +'<button id="fpVoltarLoja" style="width:100%;margin-top:10px;padding:11px;background:transparent;border:1px solid rgba(255,255,255,.16);border-radius:10px;color:#bbb;font-size:12px;letter-spacing:1px;cursor:pointer;">Voltar à loja</button>'
+      +'</div>';
+    document.body.appendChild(ov);
+    var volta=document.getElementById('fpVoltarLoja');
+    if(volta)volta.onclick=function(){ try{history.replaceState({},'',location.pathname);}catch(e){} ov.remove(); };
+    // dispara o WhatsApp automático (o botão fica como garantia se o navegador bloquear)
+    setTimeout(function(){ try{ window.open(zap,'_blank'); }catch(e){} },900);
+  }
+  if(document.readyState!=='loading')telaPago(); else document.addEventListener('DOMContentLoaded',telaPago);
+})();
