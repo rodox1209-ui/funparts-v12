@@ -941,3 +941,33 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   st.textContent=css;
   (document.head||document.documentElement).appendChild(st);
 })();
+
+/* ══ Iluminação LED: manter apenas "Sem Fio" + "RGB" ══
+   Decisão interna: remover as opções "Com Fio" e "Neutro". Fica só Sem Fio (tipo) + RGB (cor).
+   - Esconde os cards #ledFioCom e #ledCardWarm e faz os restantes ocuparem a largura toda.
+   - Ao LIGAR o LED, força sem fio + RGB (default), mantendo o preview RGB idêntico ao atual.
+   Nada do preview é alterado: reaproveita as próprias funções selLedFio('sem') e setLED(rgb). */
+(function(){
+  var css=''
+    + '#ledFioCom,#ledCardWarm{display:none!important;}'
+    + '#ledFioSem,#ledCardRgb{grid-column:1 / -1!important;}';
+  var st=document.createElement('style');
+  st.setAttribute('data-fp','led-somente-rgb');
+  st.textContent=css;
+  (document.head||document.documentElement).appendChild(st);
+
+  function forcarSemRgb(){
+    if(!(window.S && S.led)) return;
+    if(typeof selLedFio==='function') selLedFio('sem');
+    var rgb=document.getElementById('ledCardRgb');
+    if(rgb && typeof setLED==='function') setLED(rgb,'rgb');
+  }
+  // Envolve togLED: depois do comportamento original, força sem fio + RGB quando o LED está ligado.
+  var _origTogLED=window.togLED;
+  if(typeof _origTogLED==='function'){
+    window.togLED=function(){
+      _origTogLED.apply(this,arguments);
+      forcarSemRgb();
+    };
+  }
+})();
