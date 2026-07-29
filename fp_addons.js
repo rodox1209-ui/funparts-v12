@@ -971,3 +971,24 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     };
   }
 })();
+
+/* ══ Miniatura do carrinho: usar SEMPRE a imagem do CARRO do preview ══
+   Bug: o item personalizado montava a thumb a partir de #detPvCar com fallback para #iFundo.
+   No fluxo LEGO o #detPvCar fica vazio -> caía no #iFundo (a textura do fundo), gerando uma
+   miniatura errada (ex.: "caixa marrom"). Agora escolhe a 1ª imagem de carro disponível:
+   #detPvCar (mini/IA) -> #legoDetCar (LEGO) -> #iCarro (camada carro). Catálogo fica intacto. */
+(function(){
+  var _orig=window._cartMontaItem;
+  if(typeof _orig!=='function') return;
+  window._cartMontaItem=function(){
+    var it=_orig.apply(this,arguments);
+    try{
+      if(it && it.via!=='catalogo'){
+        var pick=function(id){ var e=document.getElementById(id); var s=e&&e.getAttribute('src'); return (s&&s.length>5)?s:''; };
+        var car=pick('detPvCar')||pick('legoDetCar')||pick('iCarro');
+        if(car) it.imgSrc=car;
+      }
+    }catch(e){}
+    return it;
+  };
+})();
