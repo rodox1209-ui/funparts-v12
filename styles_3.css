@@ -179,4 +179,7 @@
   #legoDetQuadro.lego-53x83 #legoDetFundo{height:calc(100% - 9px);}
   #legoDetQuadro.lego-53x83 #legoLedDark,
   #legoDetQuadro.lego-53x83 #legoLedGlow{height:calc(100% - 9px);}
+  /* Regular quadro mobile: LED -13px na vertical */
+  .quadro #ledDark,
+  .quadro #ledGlow{height:calc(100% - 13px);}
 }
