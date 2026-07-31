@@ -103,7 +103,7 @@ const S = {
   miniOpt:'own', disp:'exist', customs:[], customExtra:0,
   moldura:'m-laca', molduraLbl:'Laca Preto',
   fundo:'f-carbono', fundoLbl:'Fibra de Carbono (Vinil)', fundoLayout:'Revestimento do fundo com vinil texturizado de fibra de carbono', uvColor:'#FF2200',
-  led:false, ledFio:'com', ledTipo:'warm', ledPrice:199, relTL:'#fff', relBR:'#d5040f',
+  led:false, ledFio:'sem', ledTipo:'rgb', ledPrice:199, relTL:'#fff', relBR:'#d5040f',
   relOpts:[], relOptsExtra:0,
   _total:0,
 };
@@ -419,7 +419,7 @@ function restoreSumItem(type, key, label){
     var _fc=document.querySelector('#step-5 .ocard[onclick*="m-fibra"]');
     if(_fc) selMoldura(_fc,'m-fibra','Fibra de Carbono');
   } else if(type==='led'){
-    var _sF=_sumRemoved.ledFio||'com', _sT=_sumRemoved.ledTipo||'warm';
+    var _sF=_sumRemoved.ledFio||'sem', _sT=_sumRemoved.ledTipo||'rgb';
     _sumRemoved.led=false;
     if(!S.led) togLED(); // liga com reset padrão
     // Restaurar fio/tipo que o cliente havia escolhido
@@ -1623,7 +1623,7 @@ function selMoldura(card,cls,lbl){
 
 function togLED(){
   S.led=!S.led;
-  if(S.led){ S.ledFio='com'; S.ledTipo='warm'; var _fc=document.getElementById('ledFioCom'),_fs=document.getElementById('ledFioSem'); if(_fc)_fc.classList.add('sel'); if(_fs)_fs.classList.remove('sel'); var _cw=document.getElementById('ledCardWarm'),_cr=document.getElementById('ledCardRgb'); if(_cw){_cw.classList.add('on');} if(_cr){_cr.classList.remove('on');} }
+  if(S.led){ S.ledFio='sem'; S.ledTipo='rgb'; var _fs=document.getElementById('ledFioSem'); if(_fs)_fs.classList.add('sel'); var _cr=document.getElementById('ledCardRgb'); if(_cr){_cr.classList.add('on');} }
   document.getElementById('ledToggle').classList.toggle('sel',S.led);
   setEl('ledPill',S.led?'Com LED ✨':'Sem LED');
   // Mostrar/ocultar seletor de tipo LED
@@ -1635,7 +1635,7 @@ function togLED(){
     const dark=document.getElementById(darkId);
     if(glow){
       if(S.led){
-        const t=S.ledTipo||'warm';
+        const t=S.ledTipo||'rgb';
         glow.className='led-glow '+(t==='rgb'?'cold':t);
         if(dark) dark.className='led-dark active';
       } else {
@@ -2401,7 +2401,7 @@ function updateBadgeBR(text,color){
 // ── PREÇO ──
 function selLedFio(fio){
   S.ledFio=fio;
-  document.getElementById('ledFioCom').classList.toggle('sel',fio==='com');
+  var _fc=document.getElementById('ledFioCom'); if(_fc)_fc.classList.toggle('sel',fio==='com');
   document.getElementById('ledFioSem').classList.toggle('sel',fio==='sem');
   calcPrice();
 }
