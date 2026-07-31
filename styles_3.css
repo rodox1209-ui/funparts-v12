@@ -176,7 +176,7 @@
   .cart-toast{bottom:96px;flex-direction:column;align-items:stretch;text-align:center;}
   .cart-toast button{width:100%;}
   /* 53×83cm mobile: fundo -9px e LED -9px na vertical (legoPreviewWrap) */
-  #legoDetQuadro.lego-53x83 #legoDetFundo{height:calc(100% - 9px);}
+  #legoDetQuadro.lego-53x83 #legoDetFundo{height:calc(100% - 13px);}
   #legoDetQuadro.lego-53x83 #legoLedDark,
   #legoDetQuadro.lego-53x83 #legoLedGlow{height:calc(100% - 13px);}
   /* Regular quadro mobile: LED -13px na vertical */
