@@ -175,12 +175,10 @@
   .cart-foot{padding-bottom:26px;}
   .cart-toast{bottom:96px;flex-direction:column;align-items:stretch;text-align:center;}
   .cart-toast button{width:100%;}
-  /* 53x83cm mobile: reducao proporcional (96.8%) — funciona em QUALQUER resolucao de tela */
-  /* 13px / 407px = 3.2%, entao 100% - 3.2% = 96.8% escala com qualquer largura de viewport */
-  #legoDetQuadro.lego-53x83{overflow:hidden !important;}
-  #legoDetQuadro.lego-53x83 #legoDetFundo{height:96.8% !important;}
-  #legoDetQuadro.lego-53x83 #legoLedDark,
-  #legoDetQuadro.lego-53x83 #legoLedGlow{height:96.8% !important;}
+  /* 53x83cm mobile: fix definitivo — altura via aspect-ratio, nao flex-stretch */
+  /* O container pai tem max-height:calc(100vh-160px) que varia por device. */
+  /* height:auto libera o aspect-ratio:53/83 do JS para controlar a altura corretamente. */
+  #legoDetQuadro.lego-53x83{height:auto !important;overflow:hidden !important;}
   /* Regular quadro mobile: LED -13px na vertical */
   .quadro #ledDark,
   .quadro #ledGlow{height:auto;bottom:13px;}
