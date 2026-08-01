@@ -3557,7 +3557,7 @@ function fecharPedidoWpp(){
     var _tot=_cartTotal()+_frv;
     return 'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n*ITENS*\n'+itens+
            (_freteEscolhido?'\n*Frete ('+_freteEscolhido.label+'):* '+_fpFreteBrl(_frv):'')+
-           '\n\n*TOTAL:* '+_fpFreteBrl(_tot)+'\n\n*MEUS DADOS*\n'+
+           '\n\n*TOTAL:* '+_fpFreteBrl(_tot)+'\n\n*MEUS DADOS*\n'++
            'Nome: '+c.nome+'\nCPF: '+_mascCpf(c.cpf)+'\nWhatsApp: '+_mascTel(c.whatsapp)+
            '\nE-mail: '+c.email+'\nEndere\u00e7o: '+c.rua+', '+c.numero+
            (c.complemento?' - '+c.complemento:'')+'\n'+c.bairro+' - '+c.cidade+'/'+c.uf+
@@ -3799,7 +3799,7 @@ function _fpFreteRender(options,carrier,currency){
 function _fpFreteCalc(){
   var cep=_so(_frmVal('fCep'));
   if(cep.length!==8)return;
-  if(cep===_freteCepCalcado*&�_freteEscolhido)return;
+  if(cep===_freteCepCalcado&&_freteEscolhido)return;
   if(_freteCalcEmCurso)return;
   _freteCepCalcado=cep; _freteCalcEmCurso=true; _freteEscolhido=null;
   var opts=document.getElementById('fpFreteOpts');
