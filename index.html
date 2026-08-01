@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funparts â Ferrari SF24</title>
+<title>Funparts — Ferrari SF24</title>
 <link rel="stylesheet" href="styles_1.css">
 <link rel="stylesheet" href="styles_3.css">
 </head>
@@ -22,8 +22,8 @@
     <div style="font-size:.72rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="mobBarTitle">Tipo de Quadro</div>
   </div>h
   <div class="mob-nav">
-    <button class="mob-btn mob-btn-back" id="mobBtnBack" onclick="mobBack()" style="display:none">â</button>
-    <button class="mob-btn mob-btn-next" id="mobBtnNext" onclick="mobNext()">Modelo â</button>
+    <button class="mob-btn mob-btn-back" id="mobBtnBack" onclick="mobBack()" style="display:none">←</button>
+    <button class="mob-btn mob-btn-next" id="mobBtnNext" onclick="mobNext()">Modelo →</button>
   </div>
 </div>
 
@@ -38,11 +38,11 @@
   <div class="logo-img-wrap">
     <img src="images/img_001.png" alt="Funparts" class="logo-img">
   </div>
-  <button class="novaPersona-btn" onclick="iniciarNovaPersonalizacao()" title="ComeÃ§ar uma personalizaÃ§Ã£o do zero (mantÃ©m o carrinho)">
+  <button class="novaPersona-btn" onclick="iniciarNovaPersonalizacao()" title="Começar uma personalização do zero (mantém o carrinho)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-    <span>Iniciar nova personalizaÃ§Ã£o</span>
+    <span>Iniciar nova personalização</span>
   </button>
-  <div class="sub" id="headerSub">Visualizador Â· Ferrari SF24 F1 LEGO</div>
+  <div class="sub" id="headerSub">Visualizador · Ferrari SF24 F1 LEGO</div>
   <button class="cart-btn" id="cartBtn" onclick="abrirCarrinho()" aria-label="Abrir carrinho">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span class="lbl">Carrinho</span>
@@ -50,7 +50,7 @@
   </button>
 </header>
 
-<!-- âââ CARRINHO âââ -->
+<!-- ═══ CARRINHO ═══ -->
 <div class="cart-ov" id="cartOv" onclick="fecharCarrinho()"></div>
 <aside class="cart-panel" id="cartPanel" aria-label="Carrinho de compras">
   <div class="cart-head">
@@ -66,7 +66,7 @@
       <div class="cart-tot-l">Total</div>
       <div class="cart-tot-v" id="cartTotal">R$ 0</div>
     </div>
-    <div class="cart-note">Sem frete Â· Combinamos o envio pelo WhatsApp</div>
+    <div class="cart-note">Sem frete · Combinamos o envio pelo WhatsApp</div>
     <button class="btn-cart-go" onclick="carrinhoPasso(2)">Fechar pedido &rarr;</button>
     <button class="btn-cart-more" onclick="fecharCarrinho()">Continuar comprando</button>
   </div>
@@ -107,20 +107,20 @@
     </div>
 
     <div class="frm-g">
-      <label for="fRua">EndereÃ§o</label>
-      <input id="fRua" type="text" autocomplete="address-line1" placeholder="Rua, avenidaâ¦">
+      <label for="fRua">Endereço</label>
+      <input id="fRua" type="text" autocomplete="address-line1" placeholder="Rua, avenida…">
       <div class="frm-err" id="eRua"></div>
     </div>
 
     <div class="frm-row">
       <div class="frm-g" style="flex:0 0 34%;">
-        <label for="fNum">NÃºmero</label>
+        <label for="fNum">Número</label>
         <input id="fNum" type="text" inputmode="numeric" placeholder="123">
         <div class="frm-err" id="eNum"></div>
       </div>
       <div class="frm-g">
         <label for="fCompl">Complemento <span class="opt">(opcional)</span></label>
-        <input id="fCompl" type="text" autocomplete="address-line2" placeholder="Apto, blocoâ¦">
+        <input id="fCompl" type="text" autocomplete="address-line2" placeholder="Apto, bloco…">
       </div>
     </div>
 
@@ -143,7 +143,7 @@
       </div>
     </div>
 
-    <div class="frm-lgpd">Seus dados sÃ£o usados apenas para emitir a nota fiscal e realizar a entrega.</div>
+    <div class="frm-lgpd">Seus dados são usados apenas para emitir a nota fiscal e realizar a entrega.</div>
   </div>
 
   <div class="cart-foot" id="cartFoot2" style="display:none;">
@@ -152,7 +152,7 @@
       <div class="cart-tot-v" id="cartTotal2">R$ 0</div>
     </div>
     <div class="frm-aviso" id="frmAviso"></div>
-    <button class="btn-cart-go" id="btnFecharPedido" onclick="fecharPedidoWpp()">Finalizar e pagar →</button>
+    <button class="btn-cart-go" id="btnFecharPedido" onclick="fecharPedidoWpp()">Finalizar e pagar &rarr;</button>
     <button class="btn-cart-more" onclick="carrinhoPasso(1)">&larr; Voltar aos itens</button>
   </div>
 </aside>
@@ -188,7 +188,7 @@
         <div style="font-family:'Designer',Arial Black,sans-serif;font-size:clamp(16px,2.2vw,28px);letter-spacing:3px;color:#fff;text-shadow:2px 2px 8px rgba(0,0,0,0.85);">CHEGOU A HORA</div>
         <div style="font-family:'Designer',Arial Black,sans-serif;font-size:clamp(16px,2.2vw,28px);letter-spacing:3px;color:#fff;text-shadow:2px 2px 8px rgba(0,0,0,0.85);">DE PERSONALIZAR</div>
         <div style="font-family:'Designer',Arial Black,sans-serif;font-size:clamp(16px,2.2vw,28px);letter-spacing:3px;color:#fff;text-shadow:2px 2px 8px rgba(0,0,0,0.85);">SEU QUADRO</div>
-        <div style="font-family:'Designer',Arial Black,sans-serif;font-size:clamp(11px,1.4vw,18px);letter-spacing:2px;color:#ccc;text-shadow:1px 1px 6px rgba(0,0,0,0.8);margin-top:14px;">SIGA AS ORIENTAÃÃES</div>
+        <div style="font-family:'Designer',Arial Black,sans-serif;font-size:clamp(11px,1.4vw,18px);letter-spacing:2px;color:#ccc;text-shadow:1px 1px 6px rgba(0,0,0,0.8);margin-top:14px;">SIGA AS ORIENTAÇÕES</div>
         <div style="font-family:'Designer',Arial Black,sans-serif;font-size:clamp(11px,1.4vw,18px);letter-spacing:2px;color:#ccc;text-shadow:1px 1px 6px rgba(0,0,0,0.8);">DO MENU ABAIXO</div>
       </div>
     </div>
@@ -202,7 +202,7 @@
       <div id="detPvFundo" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;z-index:1;pointer-events:none;"></div>
     <img id="detPvFrame" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:fill;z-index:25;pointer-events:none;border-radius:0;" alt="">
     <img id="detPvCar" style="display:none;position:absolute;z-index:10;pointer-events:none;transition:opacity .5s;filter:drop-shadow(0 2px 10px rgba(0,0,0,.7));" alt="">
-    <div id="detPvCarLoader" style="display:none;position:absolute;z-index:15;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;"><div style="color:rgba(255,255,255,.45);font-size:11px;letter-spacing:.5px;animation:aiPulse 2s ease infinite;">Gerando top-viewâ¦</div></div>
+    <div id="detPvCarLoader" style="display:none;position:absolute;z-index:15;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;"><div style="color:rgba(255,255,255,.45);font-size:11px;letter-spacing:.5px;animation:aiPulse 2s ease infinite;">Gerando top-view…</div></div>
       <div class="c-fundo"><img id="iFundo" src="images/img_005.jpg" alt="Fundo"></div>
       <div class="rel-extra-wrap" id="relExtras"></div>
       <div class="led-dark" id="ledDark"></div>
@@ -210,14 +210,14 @@
 
       <div class="c-carro"><img id="iCarro" src="images/img_006.webp" alt="Ferrari SF24"></div>
       <div class="c-moldura"><img id="iMoldura" src="images/img_007.webp" alt="Moldura"></div>
-      <!-- Logo F1 â canto superior esquerdo, cor alterÃ¡vel -->
+      <!-- Logo F1 — canto superior esquerdo, cor alterável -->
       <div class="b-tl">
         <img id="logoF1" src="images/img_008.svg"
              style="width:17%;filter:brightness(0) invert(1) drop-shadow(1px 2px 2px rgba(0,0,0,0.45));transition:filter .3s;"
              alt="F1">
         <div id="logoTLLoad" class="logo-load" style="display:none;"></div>
       </div>
-      <!-- Logo Ferrari â canto inferior direito, fixo -->
+      <!-- Logo Ferrari — canto inferior direito, fixo -->
       <div class="b-br">
         <img id="logoBR" src="images/img_009.png"
              style="width:12%;filter:drop-shadow(1px 2px 2px rgba(0,0,0,0.45));" alt="Ferrari">
@@ -225,7 +225,7 @@
       </div>
     </div>
     <div class="pi">
-      <div><div class="pn" id="pvMod">Ferrari SF24 F1</div><div class="pd" id="pvSpecDesc">53 Ã 83cm Â· LEGO Technic Â· 1:8</div><div class="pd" id="pvCarColor" style="display:none;"></div><button id="btnFlipCar" onclick="toggleCarFlip()" title="Se o carro vier de cabeÃ§a para baixo, clique para corrigir" style="display:none;margin-top:9px;background:transparent;border:1px solid rgba(255,255,255,0.18);color:#999;padding:5px 10px;border-radius:5px;font-size:9px;letter-spacing:.8px;cursor:pointer;text-transform:uppercase;transition:all .2s;" onmouseenter="this.style.borderColor='#e07b00';this.style.color='#e07b00'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.18)';this.style.color='#999'">â² Girar carro 180Â°</button></div>
+      <div><div class="pn" id="pvMod">Ferrari SF24 F1</div><div class="pd" id="pvSpecDesc">53 × 83cm · LEGO Technic · 1:8</div><div class="pd" id="pvCarColor" style="display:none;"></div><button id="btnFlipCar" onclick="toggleCarFlip()" title="Se o carro vier de cabeça para baixo, clique para corrigir" style="display:none;margin-top:9px;background:transparent;border:1px solid rgba(255,255,255,0.18);color:#999;padding:5px 10px;border-radius:5px;font-size:9px;letter-spacing:.8px;cursor:pointer;text-transform:uppercase;transition:all .2s;" onmouseenter="this.style.borderColor='#e07b00';this.style.color='#e07b00'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.18)';this.style.color='#999'">⟲ Girar carro 180°</button></div>
       <div class="fa" id="fAtual">Bicolor Brilho
   </div>
     </div><!-- /pi -->
@@ -255,9 +255,9 @@
       </div>
     </div>
     <div style="flex:0.9;min-width:0;display:flex;flex-direction:column;padding-left:12px;">
-      <button class="btn-wall-example" style="margin:0 0 8px;width:100%;font-size:8.5px;letter-spacing:0.6px;padding:8px 6px;" onclick="document.getElementById('wallModal').classList.add('open')">VEJA O EXEMPLO DA PROPORÃÃO (DIMENSÃO) DO QUADRO</button>
+      <button class="btn-wall-example" style="margin:0 0 8px;width:100%;font-size:8.5px;letter-spacing:0.6px;padding:8px 6px;" onclick="document.getElementById('wallModal').classList.add('open')">VEJA O EXEMPLO DA PROPORÇÃO (DIMENSÃO) DO QUADRO</button>
       <img id="legoScaleImg" src="" style="width:100%;border-radius:8px;display:block;object-fit:cover;max-height:260px;" alt="">
-      <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:8px;line-height:1.6;">A partir do exemplo acima, vocÃª conseguirÃ¡ ter a noÃ§Ã£o geral da dimensÃ£o do quadro comparado a dimensÃ£o de uma pessoa com 1,75m de altura</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:8px;line-height:1.6;">A partir do exemplo acima, você conseguirá ter a noção geral da dimensão do quadro comparado a dimensão de uma pessoa com 1,75m de altura</div>
     </div>
   </div>
   <div class="pi" style="padding:0 14px 10px;margin-top:-4px;">
@@ -270,9 +270,9 @@
   </div>
 </div>
 <div id="miniPreviewWrap" style="display:none;flex:0 0 auto;min-width:0;flex-direction:column;padding:16px 12px 16px 0;">
-  <button class="btn-wall-example" style="margin:0 0 8px;width:100%;font-size:8.5px;letter-spacing:0.6px;padding:8px 6px;" onclick="document.getElementById('wallModal').classList.add('open')">VEJA O EXEMPLO DA PROPORÃÃO (DIMENSÃO) DO QUADRO</button>
+  <button class="btn-wall-example" style="margin:0 0 8px;width:100%;font-size:8.5px;letter-spacing:0.6px;padding:8px 6px;" onclick="document.getElementById('wallModal').classList.add('open')">VEJA O EXEMPLO DA PROPORÇÃO (DIMENSÃO) DO QUADRO</button>
   <img id="miniScaleImg" src="" style="width:100%;border-radius:8px;display:block;object-fit:contain;" alt="">
-  <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:8px;line-height:1.6;">A partir do exemplo acima, vocÃª conseguirÃ¡ ter a noÃ§Ã£o geral da dimensÃ£o do quadro comparado a dimensÃ£o de uma pessoa com 1,75m de altura</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:8px;line-height:1.6;">A partir do exemplo acima, você conseguirá ter a noção geral da dimensão do quadro comparado a dimensão de uma pessoa com 1,75m de altura</div>
 </div>
 </div><!-- /pv-panel -->
 
@@ -281,14 +281,14 @@
 <div id="aiLoadingPopup" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,4,4,0.93);align-items:center;justify-content:center;flex-direction:column;">
   <div style="text-align:center;padding:40px 24px;max-width:380px;">
     <div class="ai-spin" style="width:64px;height:64px;border:3px solid rgba(224,123,0,0.15);border-top:3px solid #e07b00;border-radius:50%;margin:0 auto 28px;"></div>
-    <div id="aiPopupTitle" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:#e07b00;text-transform:uppercase;margin-bottom:16px;line-height:1.3;">FanÃ¡tico, vocÃª estÃ¡ prestes a criar<br>um quadro exclusivo!</div>
-    <div id="aiPopupBody" style="font-size:8px;color:#aaa;line-height:1.7;letter-spacing:0.3px;">Aguarde, estamos gerando a imagem da sua miniatura em alta resoluÃ§Ã£o.</div>
+    <div id="aiPopupTitle" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:#e07b00;text-transform:uppercase;margin-bottom:16px;line-height:1.3;">Fanático, você está prestes a criar<br>um quadro exclusivo!</div>
+    <div id="aiPopupBody" style="font-size:8px;color:#aaa;line-height:1.7;letter-spacing:0.3px;">Aguarde, estamos gerando a imagem da sua miniatura em alta resolução.</div>
     <div style="margin:24px auto 0;max-width:300px;">
       <div style="height:4px;background:rgba(255,255,255,0.10);border-radius:99px;overflow:hidden;">
         <div id="aiProgBar" style="height:100%;width:0%;background:linear-gradient(90deg,#e07b00,#ffab3d);border-radius:99px;transition:width .35s ease;"></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-        <div id="aiProgStage" style="font-size:8px;color:#888;letter-spacing:.6px;">Preparandoâ¦</div>
+        <div id="aiProgStage" style="font-size:8px;color:#888;letter-spacing:.6px;">Preparando…</div>
         <div id="aiProgPct" style="font-size:9px;color:#e07b00;font-weight:700;letter-spacing:.5px;">0%</div>
       </div>
     </div>
@@ -296,62 +296,62 @@
 </div>
 <!-- STEP 1: TIPO -->
 <div class="cfg-sec active" id="step-0">
-  <div><div class="sec-title">Tipo de Quadro</div><div class="sec-sub">Qual Ã© o seu colecionÃ¡vel? Tudo comeÃ§a aqui.</div></div>
+  <div><div class="sec-title">Tipo de Quadro</div><div class="sec-sub">Qual é o seu colecionável? Tudo começa aqui.</div></div>
   <div class="toggle2">
     <div class="tcard sel" id="tLego" onclick="selectTipo('lego')">
-      <div class="ticon">ð§±</div>
+      <div class="ticon">🧱</div>
       <div class="ttitle">QUADROS PARA LEGO</div>
       <div class="tdesc">Quadros para sets LEGO Technic, Creator, Icons e F1</div>
     </div>
     <div class="tcard" id="tMini" onclick="selectTipo('mini')">
-      <div class="ticon">ðï¸</div>
+      <div class="ticon">🏎️</div>
       <div class="ttitle">Quadros para Miniaturas</div>
       <div class="tdesc">Die-cast em escalas 1:12, 1:18, 1:24 e 1:43</div>
     </div>
   </div>
   <div class="nav-btns">
-    <button class="btn-next" onclick="goStep(1)">PrÃ³ximo: Escolher Modelo â</button>
+    <button class="btn-next" onclick="goStep(1)">Próximo: Escolher Modelo →</button>
   </div>
 </div>
 
 <!-- STEP 2: MODELO -->
 <div class="cfg-sec" id="step-1">
-  <div><div class="sec-title" id="step1Title">Modelo LEGO</div><div class="sec-sub" id="step1Sub">Selecione a marca e depois o modelo especÃ­fico</div></div>
+  <div><div class="sec-title" id="step1Title">Modelo LEGO</div><div class="sec-sub" id="step1Sub">Selecione a marca e depois o modelo específico</div></div>
 
   <!-- COM OU SEM MINIATURA -->
   <div id="miniChoiceSection" style="display:none;">
     <div class="sec-title" style="margin-bottom:6px;">Com ou Sem Miniatura?</div>
     <div class="toggle2" style="gap:14px;">
       <div class="tcard" onclick="selMiniChoice('apenas')" style="cursor:pointer;">
-        <div class="ticon">ð¼ï¸</div>
+        <div class="ticon">🖼️</div>
         <div class="ttitle">SOMENTE QUADRO</div>
-        <div class="tdesc">Nessa opÃ§Ã£o vocÃª terÃ¡ a oportunidade de personalizar um quadro para a sua miniatura especial</div>
+        <div class="tdesc">Nessa opção você terá a oportunidade de personalizar um quadro para a sua miniatura especial</div>
       </div>
       <div class="tcard" onclick="selMiniChoice('incluso')" style="cursor:pointer;">
-        <div class="ticon">ð¦</div>
+        <div class="ticon">📦</div>
         <div class="ttitle">QUADRO INCLUSO MINIATURA</div>
-        <div class="tdesc">Nessa opÃ§Ã£o vocÃª encontrarÃ¡ quadros que jÃ¡ sÃ£o vendidos completos. Contendo o quadro e a miniatura</div>
+        <div class="tdesc">Nessa opção você encontrará quadros que já são vendidos completos. Contendo o quadro e a miniatura</div>
       </div>
     </div>
     <div class="nav-btns" style="margin-top:18px;">
-      <button class="btn-back" onclick="goStep(0)">â Voltar</button>
+      <button class="btn-back" onclick="goStep(0)">← Voltar</button>
     </div>
   </div>
 
 
   <!-- INCLUSO: model gallery section -->
   <div id="miniInclusoModelSection" style="display:none;">
-    <div class="sec-sub" style="margin-bottom:8px;" id="inclusoModelTitle">Modelos disponÃ­veis</div>
+    <div class="sec-sub" style="margin-bottom:8px;" id="inclusoModelTitle">Modelos disponíveis</div>
     <div id="inclusoModelGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;"></div>
     <div class="nav-btns" style="margin-top:18px;">
-      <button class="btn-back" onclick="backToInclusoBrands()">â Voltar</button>
+      <button class="btn-back" onclick="backToInclusoBrands()">← Voltar</button>
     </div>
   </div>
 
   <!-- INCLUSO: product detail page -->
   <div id="miniInclusoProductSection" style="display:none;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <button onclick="backToInclusoModels()" style="background:none;border:1px solid #444;color:#aaa;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;">â Voltar</button>
+      <button onclick="backToInclusoModels()" style="background:none;border:1px solid #444;color:#aaa;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;">← Voltar</button>
       <div id="productBreadcrumb" style="color:#666;font-size:12px;"></div>
     </div>
     <div id="productName" style="font-size:18px;font-weight:700;color:#fff;margin-bottom:4px;letter-spacing:0.5px;"></div>
@@ -367,12 +367,12 @@
       </div>
     </div>
 
-    <!-- DescriÃ§Ã£o -->
+    <!-- Descrição -->
     <div id="productDesc" style="color:#aaa;font-size:12.5px;line-height:1.7;margin-bottom:18px;"></div>
 
     <!-- CTA -->
     <button onclick="confirmarInclusoModel()" style="width:100%;padding:14px;background:#e07b00;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='#c96a00'" onmouseleave="this.style.background='#e07b00'">
-      â CONCLUIR ESCOLHA
+      ✓ CONCLUIR ESCOLHA
     </button>
   </div>
 
@@ -383,33 +383,33 @@
     <div class="sec-sub" style="margin-bottom:8px;">Escolha a marca</div>
     <div class="brands" id="inclusoBrands"></div>
     <div id="inclusoModelsWrap" style="margin-top:16px;display:none;">
-      <div class="sec-sub" style="margin-bottom:8px;">Modelos disponÃ­veis <span id="inclusoModelsCount" style="color:var(--t3);font-weight:400;"></span></div>
+      <div class="sec-sub" style="margin-bottom:8px;">Modelos disponíveis <span id="inclusoModelsCount" style="color:var(--t3);font-weight:400;"></span></div>
       <div class="models-list" id="inclusoModels"></div>
     </div>
-    <div class="nav-btns" style="margin-top:14px;"><button class="btn-back" onclick="backToMiniChoice()">â Voltar</button></div>
+    <div class="nav-btns" style="margin-top:14px;"><button class="btn-back" onclick="backToMiniChoice()">← Voltar</button></div>
   </div>
 
-  <!-- SOMENTE QUADRO â AI section -->
+  <!-- SOMENTE QUADRO — AI section -->
   <!-- LEGO section -->
   <div id="legoSection">
     <div class="sec-sub" style="margin-bottom:8px;">Marca / Categoria</div>
     <div class="brands" id="legoBrands">
-      <div class="bcard sel" onclick="selLegoBrand(this,'Formula 1','ð')"><div class="bico"><img src="images/img_010.png" alt="Formula 1"></div><div class="bnm">Formula 1</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Ferrari','ð´')"><div class="bico"><img src="images/img_011.png" alt="Ferrari"></div><div class="bnm">Ferrari</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'McLaren','ð¦')"><div class="bico"><img src="images/img_012.png" alt="McLaren"></div><div class="bnm">McLaren</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Porsche','ð')"><div class="bico"><img src="images/img_013.png" alt="Porsche"></div><div class="bnm">Porsche</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Lamborghini','ð')"><div class="bico"><img src="images/img_014.png" alt="Lamborghini"></div><div class="bnm">Lamborghini</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Mercedes','â­')"><div class="bico"><img src="images/img_015.png" alt="Mercedes"></div><div class="bnm">Mercedes</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Bugatti','ð·')"><div class="bico"><img src="images/img_016.png" alt="Bugatti"></div><div class="bnm">Bugatti</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'BMW','ðµ')"><div class="bico"><img src="images/img_017.png" alt="BMW"></div><div class="bnm">BMW</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Ford','ð¦')"><div class="bico"><img src="images/img_018.png" alt="Ford"></div><div class="bnm">Ford</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Dodge','ðª')"><div class="bico"><img src="images/img_019.png" alt="Dodge"></div><div class="bnm">Dodge</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Nissan','ð')"><div class="bico"><img src="images/img_020.png" alt="Nissan"></div><div class="bnm">Nissan</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Land Rover','ð¿')"><div class="bico"><img src="images/img_021.png" alt="Land Rover"></div><div class="bnm">Land Rover</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Motos','ðï¸')"><div class="bico"><img src="images/img_022.png" alt="Motos"></div><div class="bnm">Motos</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Super HerÃ³is','ð¦')"><div class="bico"><img src="images/img_023.png" alt="Super HerÃ³is"></div><div class="bnm">Super HerÃ³is</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Filmes','ð¬')"><div class="bico"><img src="images/img_024.png" alt="Filmes"></div><div class="bnm">Filmes</div></div>
-      <div class="bcard" onclick="selLegoBrand(this,'Outros','â')"><div class="bico"><img src="images/img_025.png" alt="Outros"></div><div class="bnm">Outros</div></div>
+      <div class="bcard sel" onclick="selLegoBrand(this,'Formula 1','🏁')"><div class="bico"><img src="images/img_010.png" alt="Formula 1"></div><div class="bnm">Formula 1</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Ferrari','🐴')"><div class="bico"><img src="images/img_011.png" alt="Ferrari"></div><div class="bnm">Ferrari</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'McLaren','🦅')"><div class="bico"><img src="images/img_012.png" alt="McLaren"></div><div class="bnm">McLaren</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Porsche','🏇')"><div class="bico"><img src="images/img_013.png" alt="Porsche"></div><div class="bnm">Porsche</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Lamborghini','🐂')"><div class="bico"><img src="images/img_014.png" alt="Lamborghini"></div><div class="bnm">Lamborghini</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Mercedes','⭐')"><div class="bico"><img src="images/img_015.png" alt="Mercedes"></div><div class="bnm">Mercedes</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Bugatti','🔷')"><div class="bico"><img src="images/img_016.png" alt="Bugatti"></div><div class="bnm">Bugatti</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'BMW','🔵')"><div class="bico"><img src="images/img_017.png" alt="BMW"></div><div class="bnm">BMW</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Ford','🦅')"><div class="bico"><img src="images/img_018.png" alt="Ford"></div><div class="bnm">Ford</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Dodge','💪')"><div class="bico"><img src="images/img_019.png" alt="Dodge"></div><div class="bnm">Dodge</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Nissan','🌀')"><div class="bico"><img src="images/img_020.png" alt="Nissan"></div><div class="bnm">Nissan</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Land Rover','🌿')"><div class="bico"><img src="images/img_021.png" alt="Land Rover"></div><div class="bnm">Land Rover</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Motos','🏍️')"><div class="bico"><img src="images/img_022.png" alt="Motos"></div><div class="bnm">Motos</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Super Heróis','🦇')"><div class="bico"><img src="images/img_023.png" alt="Super Heróis"></div><div class="bnm">Super Heróis</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Filmes','🎬')"><div class="bico"><img src="images/img_024.png" alt="Filmes"></div><div class="bnm">Filmes</div></div>
+      <div class="bcard" onclick="selLegoBrand(this,'Outros','➕')"><div class="bico"><img src="images/img_025.png" alt="Outros"></div><div class="bnm">Outros</div></div>
     </div>
     <div style="margin-top:12px;">
       <div class="sec-sub" style="margin-bottom:8px;">Modelo</div>
@@ -419,40 +419,40 @@
 
   <div id="miniApenasSection" style="display:none;">
     <div style="margin-bottom:20px;">
-      <div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">â¦ VisualizaÃ§Ã£o gerada por InteligÃªncia Artificial</div>
+      <div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">✦ Visualização gerada por Inteligência Artificial</div>
       <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:22px;">
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Marca do carro</div><select id="apenaCarBrandSelect" class="inp" onchange="brandSelectChanged('apenaCar')" style="width:100%;box-sizing:border-box;cursor:pointer;"></select><input id="apenaCarBrandOther" class="inp" placeholder="Digite a marca do carro..." oninput="brandOtherChanged('apenaCar')" style="width:100%;box-sizing:border-box;margin-top:8px;display:none;"><input id="apenaCarBrand" type="hidden" value=""></div>
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Modelo do carro</div><input id="apenaCarModel" class="inp" placeholder="Ex: 488 GTB, Senna, 911 Turbo S..." style="width:100%;box-sizing:border-box;"></div>
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;">Ano</div><input id="apenaCarYear" class="inp" type="number" placeholder="Ex: 2023" min="1950" max="2030" style="width:100%;box-sizing:border-box;"></div>
         <div><div style="color:#aaa;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Cor</div><div id="apenaColorPalette" style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-bottom:10px;"></div><div style="display:flex;align-items:center;gap:8px;margin-top:4px;"><div style="color:#666;font-size:9px;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;">Selecionada:</div><input id="apenaCarColor" class="inp" placeholder="Selecione acima ou digite..." style="flex:1;box-sizing:border-box;font-size:12px;padding:8px 10px;"></div></div>
       </div>
-      <button id="apenaGenerateBtn" onclick="gerarVisualizacaoApenas()" style="width:100%;padding:15px;background:#e07b00;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='#c96a00'" onmouseleave="this.style.background='#e07b00'">â¦ GERAR VISUALIZAÃÃO COM IA</button>
-      <div id="apenaLoadingState" style="display:none;text-align:center;padding:32px 16px;"><div style="width:48px;height:48px;border:3px solid #333;border-top-color:#e07b00;border-radius:50%;animation:aiSpin 0.9s linear infinite;margin:0 auto 16px;"></div><div style="color:#ddd;font-size:13px;font-weight:600;margin-bottom:6px;">Gerando sua visualizaÃ§Ã£o...</div><div style="color:#666;font-size:11px;animation:aiPulse 2s ease infinite;">A IA estÃ¡ criando uma imagem exclusiva do seu carro</div></div>
-      <div id="apenaGeneratedResult" style="display:none;margin-top:14px;"><div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">â¦ Sua miniatura â visualizaÃ§Ã£o gerada</div><div style="width:100%;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#111;margin-bottom:10px;"><img id="apenaGeneratedImg" style="width:100%;height:100%;object-fit:cover;" src="" alt=""></div><button onclick="gerarVisualizacaoApenas()" style="width:100%;padding:10px;background:transparent;color:#e07b00;border:1px solid rgba(224,123,0,0.4);border-radius:8px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;">â» GERAR NOVA VARIAÃÃO</button></div>
+      <button id="apenaGenerateBtn" onclick="gerarVisualizacaoApenas()" style="width:100%;padding:15px;background:#e07b00;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:background .2s;" onmouseenter="this.style.background='#c96a00'" onmouseleave="this.style.background='#e07b00'">✦ GERAR VISUALIZAÇÃO COM IA</button>
+      <div id="apenaLoadingState" style="display:none;text-align:center;padding:32px 16px;"><div style="width:48px;height:48px;border:3px solid #333;border-top-color:#e07b00;border-radius:50%;animation:aiSpin 0.9s linear infinite;margin:0 auto 16px;"></div><div style="color:#ddd;font-size:13px;font-weight:600;margin-bottom:6px;">Gerando sua visualização...</div><div style="color:#666;font-size:11px;animation:aiPulse 2s ease infinite;">A IA está criando uma imagem exclusiva do seu carro</div></div>
+      <div id="apenaGeneratedResult" style="display:none;margin-top:14px;"><div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">✦ Sua miniatura — visualização gerada</div><div style="width:100%;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#111;margin-bottom:10px;"><img id="apenaGeneratedImg" style="width:100%;height:100%;object-fit:cover;" src="" alt=""></div><button onclick="gerarVisualizacaoApenas()" style="width:100%;padding:10px;background:transparent;color:#e07b00;border:1px solid rgba(224,123,0,0.4);border-radius:8px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;">↻ GERAR NOVA VARIAÇÃO</button></div>
       <div id="apenaErrorState" style="display:none;margin-top:14px;background:rgba(200,50,50,0.12);border:1px solid rgba(200,50,50,0.3);border-radius:8px;padding:12px 14px;color:#f08080;font-size:12px;"></div>
     </div>
-    <div style="margin-top:14px;padding:14px 16px;background:rgba(224,123,0,0.06);border:1px solid rgba(224,123,0,0.2);border-radius:8px;font-size:12px;color:#bbb;line-height:1.7;letter-spacing:0.3px;">Geramos a imagem da sua miniatura com inteligÃªncia Artificial, para que confirme o modelo e consiga personalizar seu quadro o mais prÃ³ximo da realidade possÃ­vel.<br><br>Clique no botÃ£o <strong style="color:#e07b00;">PERSONALIZAR QUADRO</strong>, abaixo e dÃª continuidade na experiÃªncia</div>
-    <div class="nav-btns" style="margin-top:12px;"><button class="btn-back" onclick="backToMiniChoice()">â Voltar</button><button class="btn-next" id="miniModelNextBtn" onclick="S.tipo==='mini'?goStep(3):goStep(2)">PERSONALIZAR QUADRO â</button></div>
+    <div style="margin-top:14px;padding:14px 16px;background:rgba(224,123,0,0.06);border:1px solid rgba(224,123,0,0.2);border-radius:8px;font-size:12px;color:#bbb;line-height:1.7;letter-spacing:0.3px;">Geramos a imagem da sua miniatura com inteligência Artificial, para que confirme o modelo e consiga personalizar seu quadro o mais próximo da realidade possível.<br><br>Clique no botão <strong style="color:#e07b00;">PERSONALIZAR QUADRO</strong>, abaixo e dê continuidade na experiência</div>
+    <div class="nav-btns" style="margin-top:12px;"><button class="btn-back" onclick="backToMiniChoice()">← Voltar</button><button class="btn-next" id="miniModelNextBtn" onclick="S.tipo==='mini'?goStep(3):goStep(2)">PERSONALIZAR QUADRO →</button></div>
   </div>
 
   <!-- MINI section -->
   <div id="miniSection" style="display:none;">
-    <div class="sec-sub" style="margin-bottom:8px;">Marca do veÃ­culo</div>
+    <div class="sec-sub" style="margin-bottom:8px;">Marca do veículo</div>
         <div class="brands" id="miniBrands">
-      <div class="bcard sel" onclick="selMiniBrand(this,'Ferrari','ð´')"><div class="bico"><img src="images/img_011.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Ferrari</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Lamborghini','ð')"><div class="bico"><img src="images/img_014.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Lamborghini</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'McLaren','ð¦')"><div class="bico"><img src="images/img_012.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">McLaren</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Porsche','ð')"><div class="bico"><img src="images/img_013.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Porsche</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Mercedes','â­')"><div class="bico"><img src="images/img_015.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Mercedes</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'BMW','ðµ')"><div class="bico"><img src="images/img_017.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">BMW</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Bugatti','ð·')"><div class="bico"><img src="images/img_016.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Bugatti</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Aston Martin','ð')"><div class="bico"><img src="images/img_026.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Aston Martin</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Ford','ð©')"><div class="bico"><img src="images/img_027.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Ford</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Chevrolet','â¡')"><div class="bico"><img src="images/img_028.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Chevrolet</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Dodge','ðª')"><div class="bico"><img src="images/img_029.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Dodge</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Nissan','ð')"><div class="bico"><img src="images/img_030.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Nissan</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Formula 1','ð')"><div class="bico"><img src="images/img_010.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Formula 1</div></div>
-      <div class="bcard" onclick="selMiniBrand(this,'Outra','â')"><div class="bico"><img src="images/img_031.svg" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Outra</div></div>
+      <div class="bcard sel" onclick="selMiniBrand(this,'Ferrari','🐴')"><div class="bico"><img src="images/img_011.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Ferrari</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Lamborghini','🐂')"><div class="bico"><img src="images/img_014.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Lamborghini</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'McLaren','🦅')"><div class="bico"><img src="images/img_012.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">McLaren</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Porsche','🏇')"><div class="bico"><img src="images/img_013.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Porsche</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Mercedes','⭐')"><div class="bico"><img src="images/img_015.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Mercedes</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'BMW','🔵')"><div class="bico"><img src="images/img_017.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">BMW</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Bugatti','🔷')"><div class="bico"><img src="images/img_016.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Bugatti</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Aston Martin','🍀')"><div class="bico"><img src="images/img_026.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Aston Martin</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Ford','🔩')"><div class="bico"><img src="images/img_027.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Ford</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Chevrolet','⚡')"><div class="bico"><img src="images/img_028.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Chevrolet</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Dodge','💪')"><div class="bico"><img src="images/img_029.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Dodge</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Nissan','🌀')"><div class="bico"><img src="images/img_030.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Nissan</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Formula 1','🏁')"><div class="bico"><img src="images/img_010.png" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Formula 1</div></div>
+      <div class="bcard" onclick="selMiniBrand(this,'Outra','➕')"><div class="bico"><img src="images/img_031.svg" style="width:100%;height:100%;object-fit:contain;"></div><div class="bnm">Outra</div></div>
     </div>
     <div style="margin-top:12px;">
       <div class="sec-sub" style="margin-bottom:8px;">Modelo exato</div>
@@ -464,14 +464,14 @@
     </div>
   </div>
   <div class="nav-btns" id="step1NavBtns">
-    <button class="btn-back" onclick="goStep(0)">â Voltar</button>
-    <button class="btn-next" onclick="goStep(2)">PrÃ³ximo: Miniatura â</button>
+    <button class="btn-back" onclick="goStep(0)">← Voltar</button>
+    <button class="btn-next" onclick="goStep(2)">Próximo: Miniatura →</button>
   </div>
 </div>
 
 <!-- STEP 3: MINIATURA -->
 <div class="cfg-sec" id="step-2">
-  <div><div class="sec-title" id="step2Title">Miniatura</div><div class="sec-sub" id="step2Sub">Confirme que jÃ¡ possui a miniatura para montagem no quadro.</div></div>
+  <div><div class="sec-title" id="step2Title">Miniatura</div><div class="sec-sub" id="step2Sub">Confirme que já possui a miniatura para montagem no quadro.</div></div>
 
   <!-- INCLUSO: product detail inside step-2 -->
   <div id="inclusoProdutoSection" style="display:none;">
@@ -482,7 +482,7 @@
       <div id="ip2MainImgWrap" style="width:100%;border-radius:12px;overflow:hidden;background:#1e1e1e;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:8px;">
         <div id="ip2MainImg" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
           <div style="text-align:center;color:#444;">
-            <div style="font-size:32px;margin-bottom:6px;">ð¼ï¸</div>
+            <div style="font-size:32px;margin-bottom:6px;">🖼️</div>
             <div style="font-size:11px;letter-spacing:1px;">FOTOS EM BREVE</div>
           </div>
         </div>
@@ -491,17 +491,17 @@
       <div id="ip2Thumbs" style="display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding-bottom:2px;min-height:58px;"></div>
     </div>
 
-    <!-- DescriÃ§Ã£o -->
+    <!-- Descrição -->
     <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;">
-      <div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">DescriÃ§Ã£o do produto</div>
+      <div style="color:#e07b00;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Descrição do produto</div>
       <div id="ip2Desc" style="color:#bbb;font-size:12.5px;line-height:1.85;min-height:48px;">
-        <span style="color:#444;font-style:italic;">DescriÃ§Ã£o em breve...</span>
+        <span style="color:#444;font-style:italic;">Descrição em breve...</span>
       </div>
     </div>
 
     <div class="nav-btns" id="inclusoProdNav" style="margin-top:14px;">
-      <button class="btn-back" onclick="voltarInclusoCatalogo()">â Voltar</button>
-      <button class="btn-next" onclick="goStep(7)">Ver resumo â</button>
+      <button class="btn-back" onclick="voltarInclusoCatalogo()">← Voltar</button>
+      <button class="btn-next" onclick="goStep(7)">Ver resumo →</button>
     </div>
 
   </div>
@@ -510,18 +510,18 @@
   <div class="toggle2" style="grid-template-columns:1fr;">
     <div style="display:grid;grid-template-columns:1fr;gap:8px;">
       <div class="tcard sel" id="mOwnCard" onclick="selMiniOpt('own')">
-        <div class="ticon">ð¦</div>
-        <div class="ttitle">EU JÃ TENHO A MINIATURA</div>
-        <div class="tdesc">Confirmo que jÃ¡ tenho a miniatura e gostaria de comprar apenas o quadro.</div>
+        <div class="ticon">📦</div>
+        <div class="ttitle">EU JÁ TENHO A MINIATURA</div>
+        <div class="tdesc">Confirmo que já tenho a miniatura e gostaria de comprar apenas o quadro.</div>
       </div>
     </div>
   </div>
 
   <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:16px 18px;font-size:11.5px;color:#aaa;line-height:1.7;letter-spacing:0.2px;">
-    <p style="margin:0 0 10px 0;color:#e07b00;font-weight:700;letter-spacing:1px;font-size:12px;">â  ATENÃÃO: MINIATURA NÃO INCLUSA</p>
-    <p style="margin:0 0 10px 0;">Esta opÃ§Ã£o de personalizaÃ§Ã£o refere-se exclusivamente Ã  produÃ§Ã£o do quadro. A miniatura diecast exibida nas imagens (via inteligÃªncia artificial) nÃ£o acompanha o produto e nÃ£o estÃ¡ inclusa na compra.</p>
-    <p style="margin:0 0 10px 0;">Este serviÃ§o Ã© destinado a clientes que jÃ¡ possuem a prÃ³pria miniatura e desejam transformÃ¡-la em uma peÃ§a decorativa exclusiva, fixando-a na parede de maneira inovadora e elegante.</p>
-    <p style="margin:0 0 0 0;">O quadro serÃ¡ enviado pronto para que vocÃª faÃ§a a instalaÃ§Ã£o da miniatura utilizando parafusos, de forma simples e prÃ¡tica. O kit inclui: quadro personalizado, buchas, parafusos e gabarito de instalaÃ§Ã£o, facilitando tanto a fixaÃ§Ã£o da miniatura no quadro quanto a instalaÃ§Ã£o do quadro na parede.</p>
+    <p style="margin:0 0 10px 0;color:#e07b00;font-weight:700;letter-spacing:1px;font-size:12px;">⚠ ATENÇÃO: MINIATURA NÃO INCLUSA</p>
+    <p style="margin:0 0 10px 0;">Esta opção de personalização refere-se exclusivamente à produção do quadro. A miniatura diecast exibida nas imagens (via inteligência artificial) não acompanha o produto e não está inclusa na compra.</p>
+    <p style="margin:0 0 10px 0;">Este serviço é destinado a clientes que já possuem a própria miniatura e desejam transformá-la em uma peça decorativa exclusiva, fixando-a na parede de maneira inovadora e elegante.</p>
+    <p style="margin:0 0 0 0;">O quadro será enviado pronto para que você faça a instalação da miniatura utilizando parafusos, de forma simples e prática. O kit inclui: quadro personalizado, buchas, parafusos e gabarito de instalação, facilitando tanto a fixação da miniatura no quadro quanto a instalação do quadro na parede.</p>
   </div>
   <!-- SE TEM A MINIATURA -->
   <div id="ownSection">
@@ -531,31 +531,31 @@
   <!-- SE VAI COMPRAR -->
   <div id="buySection" style="display:none;">
     <div class="info-box">
-      <strong>VerificaÃ§Ã£o de disponibilidade</strong><br>
-      Miniaturas disponÃ­veis no mercado sÃ£o fornecidas em die-cast (ferro fundido) nas escalas 1:18 ou 1:24.<br>
-      Modelos raros ou exclusivos sÃ£o produzidos via <strong>impressÃ£o 3D + pintura automotiva</strong>.
+      <strong>Verificação de disponibilidade</strong><br>
+      Miniaturas disponíveis no mercado são fornecidas em die-cast (ferro fundido) nas escalas 1:18 ou 1:24.<br>
+      Modelos raros ou exclusivos são produzidos via <strong>impressão 3D + pintura automotiva</strong>.
     </div>
     <div>
       <div class="sec-sub" style="margin-bottom:8px;">Disponibilidade da miniatura</div>
       <div class="relevo-rows">
-        <div class="rrow sel" onclick="selDisp(this,'exist','Die-cast â disponÃ­vel no mercado')">
-          <div class="rrow-left"><div class="rrow-name">Existe no mercado</div><div class="rrow-desc">Die-cast 1:18 ou 1:24 â fundiÃ§Ã£o em ferro</div></div>
-          <div class="rbadge sel">PadrÃ£o</div>
+        <div class="rrow sel" onclick="selDisp(this,'exist','Die-cast — disponível no mercado')">
+          <div class="rrow-left"><div class="rrow-name">Existe no mercado</div><div class="rrow-desc">Die-cast 1:18 ou 1:24 — fundição em ferro</div></div>
+          <div class="rbadge sel">Padrão</div>
         </div>
         <div class="rrow" onclick="selDisp(this,'notsure','A verificar pela equipe Funparts')">
-          <div class="rrow-left"><div class="rrow-name">NÃ£o tenho certeza</div><div class="rrow-desc">Nossa equipe verifica e retorna via WhatsApp</div></div>
+          <div class="rrow-left"><div class="rrow-name">Não tenho certeza</div><div class="rrow-desc">Nossa equipe verifica e retorna via WhatsApp</div></div>
           <div class="rbadge">Consulta</div>
         </div>
-        <div class="rrow" onclick="selDisp(this,'3d','ImpressÃ£o 3D + Pintura Automotiva')">
-          <div class="rrow-left"><div class="rrow-name">NÃ£o existe â modelo exclusivo</div><div class="rrow-desc">ImpressÃ£o 3D com acabamento pintura automotiva</div></div>
+        <div class="rrow" onclick="selDisp(this,'3d','Impressão 3D + Pintura Automotiva')">
+          <div class="rrow-left"><div class="rrow-name">Não existe — modelo exclusivo</div><div class="rrow-desc">Impressão 3D com acabamento pintura automotiva</div></div>
           <div class="rbadge">Premium</div>
         </div>
       </div>
     </div>
     <div>
-      <div class="sec-sub" style="margin-bottom:8px;">PersonalizaÃ§Ã£o da miniatura</div>
+      <div class="sec-sub" style="margin-bottom:8px;">Personalização da miniatura</div>
       <div class="check-opts">
-        <div class="ckrow" onclick="togCustom(this,'NÃºmero de corrida')"><div class="ckbox"></div><div class="cklbl">NÃºmero de corrida na carroceria</div><div class="ckextra">+ R$ 35</div></div>
+        <div class="ckrow" onclick="togCustom(this,'Número de corrida')"><div class="ckbox"></div><div class="cklbl">Número de corrida na carroceria</div><div class="ckextra">+ R$ 35</div></div>
         <div class="ckrow" onclick="togCustom(this,'Cor personalizada (aerografia)')"><div class="ckbox"></div><div class="cklbl">Cor personalizada (aerografia)</div><div class="ckextra">+ R$ 120</div></div>
         <div class="ckrow" onclick="togCustom(this,'Placa personalizada')"><div class="ckbox"></div><div class="cklbl">Placa personalizada</div><div class="ckextra">+ R$ 25</div></div>
         <div class="ckrow" onclick="togCustom(this,'Decals de patrocinadores')"><div class="ckbox"></div><div class="cklbl">Decals de patrocinadores</div><div class="ckextra">+ R$ 45</div></div>
@@ -566,39 +566,39 @@
 </div>
 
 <div class="nav-btns" id="step2NavBtns">
-    <button class="btn-back" onclick="goStep(1)">â Voltar</button>
-    <button class="btn-next" onclick="goStep(3)">PrÃ³ximo: Detalhamento â</button>
+    <button class="btn-back" onclick="goStep(1)">← Voltar</button>
+    <button class="btn-next" onclick="goStep(3)">Próximo: Detalhamento →</button>
   </div>
 </div>
 
 <!-- STEP 4: DETALHAMENTO -->
 <div class="cfg-sec" id="step-3">
-  <div><div class="sec-title">Detalhamento</div><div class="sec-sub">EspecificaÃ§Ãµes da miniatura e do quadro</div></div>
+  <div><div class="sec-title">Detalhamento</div><div class="sec-sub">Especificações da miniatura e do quadro</div></div>
 
-  <!-- LEGO: set resumo (sÃ³ aparece quando tipo=lego) -->
+  <!-- LEGO: set resumo (só aparece quando tipo=lego) -->
   <div id="legoDetSection" style="display:none;margin-bottom:28px;">
     <div class="sec-sub" style="margin-bottom:10px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;">Set Selecionado</div>
     <div style="padding:14px 16px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.04);">
       <div id="legoDetModel" style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;"></div>
       <div id="legoDetBrand" style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:10px;"></div>
-      <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,200,100,0.7);margin-bottom:4px;">DimensÃ£o do quadro</div>
+      <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,200,100,0.7);margin-bottom:4px;">Dimensão do quadro</div>
       <div id="legoDetDim" style="font-size:16px;font-weight:700;color:#e8c96d;"></div>
     </div>
   </div>
-  <!-- MINI: seletores de escala e quadro (sÃ³ aparecem quando tipo=mini) -->
+  <!-- MINI: seletores de escala e quadro (só aparecem quando tipo=mini) -->
   <div id="miniDetSection">
   <div style="margin-bottom:28px;">
-    <div class="sec-sub" style="margin-bottom:12px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;">DimensÃ£o da miniatura</div>
+    <div class="sec-sub" style="margin-bottom:12px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;">Dimensão da miniatura</div>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;" id="scaleCards">
       <div class="ocard sel" data-scale="1:43" onclick="selMiniScale(this,'1:43')">
-        <div class="ochk">â</div>
+        <div class="ochk">✓</div>
         <div class="oname" style="font-size:18px;font-weight:700;margin:8px 0 4px;">1:43</div>
         <div class="odesc">Miniatura compacta</div>
       </div>
       <div class="ocard" data-scale="1:24" onclick="selMiniScale(this,'1:24')">
         <div class="ochk"></div>
         <div class="oname" style="font-size:18px;font-weight:700;margin:8px 0 4px;">1:24</div>
-        <div class="odesc">Tamanho mÃ©dio</div>
+        <div class="odesc">Tamanho médio</div>
       </div>
       <div class="ocard" data-scale="1:18" onclick="selMiniScale(this,'1:18')">
         <div class="ochk"></div>
@@ -614,7 +614,7 @@
   </div>
 
   <div style="margin-bottom:28px;">
-    <div class="sec-sub" style="margin-bottom:12px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;">DimensÃ£o do quadro</div>
+    <div class="sec-sub" style="margin-bottom:12px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;">Dimensão do quadro</div>
     <div style="display:flex;flex-direction:column;gap:10px;" id="frameCards">
       <!-- Preenchido dinamicamente via JS -->
     </div>
@@ -622,8 +622,8 @@
 
   </div><!-- /miniDetSection -->
   <div class="nav-btns">
-    <button class="btn-back" onclick="S.tipo==='mini'?goStep(1):goStep(2)">â Voltar</button>
-    <button class="btn-next" onclick="goStep(4)">PrÃ³ximo: Fundo â</button>
+    <button class="btn-back" onclick="S.tipo==='mini'?goStep(1):goStep(2)">← Voltar</button>
+    <button class="btn-next" onclick="goStep(4)">Próximo: Fundo →</button>
   </div>
 </div>
 
@@ -633,17 +633,17 @@
   <div class="fundo-wrapper">
     <div class="fundo-cards">
       <div class="ocard sel" onclick="selFundo(this,'f-carbono','Fibra de Carbono (Vinil)')">
-        <div class="ochk">â</div>
+        <div class="ochk">✓</div>
         <div class="oswatch sw-carbono"></div>
         <div class="oname">Fibra de Carbono</div>
         <div class="odesc">Revestimento em vinil texturizado. Visual esportivo profundo.</div>
         <div class="rbadge">R$ 689,00</div>
       </div>
-      <div class="ocard" onclick="selFundo(this,'f-uv','AcrÃ­lico Brilho com ImpressÃ£o UV')">
+      <div class="ocard" onclick="selFundo(this,'f-uv','Acrílico Brilho com Impressão UV')">
         <div class="ochk"></div>
         <div class="oswatch sw-uv"></div>
-        <div class="oname">AcrÃ­lico Brilho â UV</div>
-        <div class="odesc">ImpressÃ£o UV em acrÃ­lico de alto brilho. Cores profundas, acabamento espelhado.</div>
+        <div class="oname">Acrílico Brilho — UV</div>
+        <div class="odesc">Impressão UV em acrílico de alto brilho. Cores profundas, acabamento espelhado.</div>
         <div class="rbadge">R$ 689,00</div>
       </div>
       <div class="ocard" id="fundoFoscoCard" onclick="selFundo(this,'f-fosco','Fosco')">
@@ -661,8 +661,8 @@
     </div>
   </div>
   <div class="nav-btns">
-    <button class="btn-back" onclick="goStep(3)">â Voltar</button>
-    <button class="btn-next" onclick="goStep(5)">PrÃ³ximo: Moldura + LED â</button>
+    <button class="btn-back" onclick="goStep(3)">← Voltar</button>
+    <button class="btn-next" onclick="goStep(5)">Próximo: Moldura + LED →</button>
   </div>
 </div>
 
@@ -678,7 +678,7 @@
       <div class="rbadge">+ R$ 75,00</div>
     </div>
     <div class="ocard sel" onclick="selMoldura(this,'m-laca','Laca Preto')">
-      <div class="ochk">â</div>
+      <div class="ochk">✓</div>
       <div class="oswatch sw-laca"></div>
       <div class="oname">Laca Preto</div>
       <div class="odesc">Revestimento em laca preta. Acabamento liso, sofisticado e atemporal.</div>
@@ -688,27 +688,27 @@
 
   <!-- LED -->
   <div>
-    <div class="sec-sub" style="margin-bottom:8px;">IluminaÃ§Ã£o LED</div>
+    <div class="sec-sub" style="margin-bottom:8px;">Iluminação LED</div>
     <div class="led-toggle" id="ledToggle" onclick="togLED()">
       <div class="led-left">
-        <div class="led-name">ð¡ IluminaÃ§Ã£o LED interna <span style="color:var(--orange);font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;">Selecione o tipo abaixo</span></div>
-        <div class="led-desc">RetroiluminaÃ§Ã£o no interior do quadro â efeito espetacular no ambiente</div>
+        <div class="led-name">💡 Iluminação LED interna <span style="color:var(--orange);font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1px;">Selecione o tipo abaixo</span></div>
+        <div class="led-desc">Retroiluminação no interior do quadro — efeito espetacular no ambiente</div>
       </div>
       <div class="led-pill" id="ledPill">Sem LED</div>
     </div>
     <div id="ledTypes" style="display:none;margin-top:10px;">
       <div class="sec-sub" style="margin-bottom:8px;">Tipo de LED</div>
-      <!-- SEM FIO (Ãºnica opÃ§Ã£o disponÃ­vel) -->
+      <!-- SEM FIO (única opção disponível) -->
       <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px;">
         <div id="ledFioSem" class="tcard sel" style="padding:8px 10px;cursor:pointer;" onclick="selLedFio('sem')">
-          <div class="ttitle" style="font-size:11px;">ð Sem Fio</div>
+          <div class="ttitle" style="font-size:11px;">🔋 Sem Fio</div>
           <div class="tdesc" style="font-size:10px;margin-top:2px;">R$ 199</div>
         </div>
       </div>
-      <!-- Tipo: RGB (Ãºnica opÃ§Ã£o disponÃ­vel) -->
+      <!-- Tipo: RGB (única opção disponível) -->
       <div class="led-opts" style="grid-template-columns:1fr;">
         <div class="led-card on" id="ledCardRgb" onclick="setLED(this,'rgb')">
-          <div class="led-card-icon">ð</div>
+          <div class="led-card-icon">🌈</div>
           <div class="led-card-name">RGB</div>
           <div class="led-card-desc">Multicolor</div>
         </div>
@@ -718,8 +718,8 @@
 </div>
 
     <div class="nav-btns">
-    <button class="btn-back" onclick="goStep(4)">â Voltar</button>
-    <button class="btn-next" onclick="goStep(6)">PrÃ³ximo: Alto-relevo â</button>
+    <button class="btn-back" onclick="goStep(4)">← Voltar</button>
+    <button class="btn-next" onclick="goStep(6)">Próximo: Alto-relevo →</button>
   </div>
 </div>
 
@@ -729,15 +729,15 @@
 
   <!-- FIXOS -->
   <div>
-    <div class="sec-sub" style="margin-bottom:8px;">Relevos fixos <span style="color:var(--t3);font-size:10px;">(sempre incluÃ­dos)</span></div>
+    <div class="sec-sub" style="margin-bottom:8px;">Relevos fixos <span style="color:var(--t3);font-size:10px;">(sempre incluídos)</span></div>
     <div style="display:flex;flex-direction:column;gap:6px;">
       <div style="padding:10px 14px;border:1px solid var(--border);border-radius:5px;background:var(--s2);display:flex;justify-content:space-between;align-items:center;">
         <div class="rrow-left">
-          <div class="rrow-name" id="fixedTL">ð·ï¸ Logotipo Marca</div>
+          <div class="rrow-name" id="fixedTL">🏷️ Logotipo Marca</div>
           <div class="rrow-desc" id="fixedTLDesc">Gerado com IA conforme marca selecionada</div>
           <div class="relo-load" id="fixedTLLoad" style="display:none;">
             <div class="relo-load-track"><div class="relo-load-bar"></div></div>
-            <div class="relo-load-txt">Gerando o logo da marca com IAâ¦</div>
+            <div class="relo-load-txt">Gerando o logo da marca com IA…</div>
           </div>
         </div>
         <div id="tlColorWrap">
@@ -758,11 +758,11 @@
 
       <div id="miniFixedBR" style="display:none;padding:10px 14px;border:1px solid var(--border);border-radius:5px;background:var(--s2);">
         <div class="rrow-left">
-          <div class="rrow-name" id="fixedBR">ðï¸ Logo do Modelo â Canto inferior direito</div>
+          <div class="rrow-name" id="fixedBR">🏎️ Logo do Modelo — Canto inferior direito</div>
           <div class="rrow-desc">Gerado com IA conforme modelo selecionado</div>
           <div class="relo-load" id="fixedBRLoad" style="display:none;">
             <div class="relo-load-track"><div class="relo-load-bar"></div></div>
-            <div class="relo-load-txt">Gerando o logo do modelo com IAâ¦</div>
+            <div class="relo-load-txt">Gerando o logo do modelo com IA…</div>
           </div>
         </div>
       </div>
@@ -773,24 +773,24 @@
   <div>
     <div class="sec-sub" style="margin-bottom:8px;">Relevos opcionais</div>
     <div class="relevo-rows">
-      <div class="rrow" onclick="togRelevoOpt(this,'bandeira','Bandeira do PaÃ­s',89)">
-        <div class="rrow-left"><div class="rrow-name">ð´ Bandeira do PaÃ­s</div><div class="rrow-desc">Canto superior direito â bandeira do piloto ou escuderia em relevo</div></div>
+      <div class="rrow" onclick="togRelevoOpt(this,'bandeira','Bandeira do País',89)">
+        <div class="rrow-left"><div class="rrow-name">🏴 Bandeira do País</div><div class="rrow-desc">Canto superior direito — bandeira do piloto ou escuderia em relevo</div></div>
         <div class="rbadge">+ R$ 89</div>
       </div>
       <div id="bandeiraInput" style="display:none;margin-top:6px;">
-        <input id="inpPais" class="inp" placeholder="Digite o paÃ­s (ex: Brasil, ItÃ¡lia, Reino Unido...)" maxlength="30" oninput="debAddBandeira()">
+        <input id="inpPais" class="inp" placeholder="Digite o país (ex: Brasil, Itália, Reino Unido...)" maxlength="30" oninput="debAddBandeira()">
         <div id="bandeiraMsgBox" style="display:none;margin-top:6px;padding:8px 10px;background:rgba(58,156,200,.08);border:1px solid rgba(58,156,200,.2);border-radius:5px;font-size:11px;color:var(--t2);"></div>
       </div>
       <div class="rrow" data-rel="piloto" onclick="togRelevoOpt(this,'piloto','Nome do Piloto',89)">
-        <div class="rrow-left"><div class="rrow-name">ð¤ Nome do Piloto</div><div class="rrow-desc">Canto inferior esquerdo â atÃ© 20 caracteres gravados em relevo</div></div>
+        <div class="rrow-left"><div class="rrow-name">👤 Nome do Piloto</div><div class="rrow-desc">Canto inferior esquerdo — até 20 caracteres gravados em relevo</div></div>
         <div class="rbadge">+ R$ 89</div>
       </div>
-      <div class="rrow" data-rel="placa" style="display:none" onclick="togRelevoOpt(this,'placa','Placa com informaÃ§Ãµes do Carro',89)">
-        <div class="rrow-left"><div class="rrow-name">ð Placa com informaÃ§Ãµes do Carro</div><div class="rrow-desc">Placa tÃ©cnica em alto relevo com dados do veÃ­culo</div></div>
+      <div class="rrow" data-rel="placa" style="display:none" onclick="togRelevoOpt(this,'placa','Placa com informações do Carro',89)">
+        <div class="rrow-left"><div class="rrow-name">📋 Placa com informações do Carro</div><div class="rrow-desc">Placa técnica em alto relevo com dados do veículo</div></div>
         <div class="rbadge">+ R$ 89</div>
       </div>
-      <div class="rrow" data-rel="tracado" style="display:none" onclick="togRelevoOpt(this,'tracado','TraÃ§ado do circuito',89)">
-        <div class="rrow-left"><div class="rrow-name">ðºï¸ TraÃ§ado do circuito</div><div class="rrow-desc">Mapa em alto relevo do circuito oficial do modelo</div></div>
+      <div class="rrow" data-rel="tracado" style="display:none" onclick="togRelevoOpt(this,'tracado','Traçado do circuito',89)">
+        <div class="rrow-left"><div class="rrow-name">🗺️ Traçado do circuito</div><div class="rrow-desc">Mapa em alto relevo do circuito oficial do modelo</div></div>
         <div class="rbadge">+ R$ 89</div>
       </div>
 
@@ -799,7 +799,7 @@
     </div>
     <!-- Input custom relevo -->
     <div id="pilotoInput" style="display:none;margin-top:8px;">
-      <input id="inpPiloto" class="inp" placeholder="Nome do piloto (mÃ¡x. 20 caracteres)" maxlength="20" oninput="debAddPiloto()">
+      <input id="inpPiloto" class="inp" placeholder="Nome do piloto (máx. 20 caracteres)" maxlength="20" oninput="debAddPiloto()">
       <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap;" id="colorPiloto">
         <span style="font-size:11px;color:#aaa;letter-spacing:1px;white-space:nowrap;">COR DO NOME:</span>
         <div id="colorPiloto_lego" style="display:flex;gap:5px;">
@@ -816,14 +816,14 @@
 
 
   <div class="nav-btns">
-    <button class="btn-back" onclick="goStep(5)">â Voltar</button>
-    <button class="btn-next" onclick="goStep(7)">Ver Resumo â</button>
+    <button class="btn-back" onclick="goStep(5)">← Voltar</button>
+    <button class="btn-next" onclick="goStep(7)">Ver Resumo →</button>
   </div>
 </div>
 
 <!-- STEP 8: RESUMO -->
 <div class="cfg-sec" id="step-7">
-  <div><div class="sec-title">Seu Quadro</div><div class="sec-sub">Revise a configuraÃ§Ã£o e finalize o pedido</div></div>
+  <div><div class="sec-title">Seu Quadro</div><div class="sec-sub">Revise a configuração e finalize o pedido</div></div>
 
   <!-- RESUMO INCLUSO -->
   <div id="inclusoSummaryBlock" style="display:none;">
@@ -840,73 +840,73 @@
       </div>
     </div>
 
-    <!-- Bloco de preÃ§o -->
+    <!-- Bloco de preço -->
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px 18px;margin-bottom:18px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div style="color:#aaa;font-size:13px;">Quadro completo com miniatura</div>
-        <div style="color:#e07b00;font-size:20px;font-weight:700;" id="iSumPrice">â</div>
+        <div style="color:#e07b00;font-size:20px;font-weight:700;" id="iSumPrice">—</div>
       </div>
       <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#666;line-height:1.6;">
-        â Produto pronto para entrega &nbsp;Â·&nbsp; â Quadro + Miniatura inclusos &nbsp;Â·&nbsp; â Embalagem premium
+        ✔ Produto pronto para entrega &nbsp;·&nbsp; ✔ Quadro + Miniatura inclusos &nbsp;·&nbsp; ✔ Embalagem premium
       </div>
     </div>
 
     <div class="tags" style="margin-bottom:16px;">
-      <div class="tag">ð Artesanal</div>
-      <div class="tag">ð¦ Quadro + Miniatura</div>
-      <div class="tag">â± 7â12 dias Ãºteis</div>
-      <div class="tag">â Todo o Brasil</div>
+      <div class="tag">🏆 Artesanal</div>
+      <div class="tag">📦 Quadro + Miniatura</div>
+      <div class="tag">⏱ 7–12 dias úteis</div>
+      <div class="tag">✈ Todo o Brasil</div>
     </div>
 
-    <button class="btn-add-cart" id="btnAddCartInc" onclick="adicionarAoCarrinho()">Adicionar ao carrinho â</button>
+    <button class="btn-add-cart" id="btnAddCartInc" onclick="adicionarAoCarrinho()">Adicionar ao carrinho →</button>
     <button class="btn-continuar" id="btnContinuarInc" onclick="continuarComprando()" style="display:none;">Continuar comprando</button>
     <button class="btn-wpp" onclick="abrirWpp()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Tirar dÃºvidas no WhatsApp
+      Tirar dúvidas no WhatsApp
     </button>
-    <button class="btn-back" onclick="backToInclusoProduct()" style="margin-top:10px;width:100%;">â Voltar ao produto</button>
+    <button class="btn-back" onclick="backToInclusoProduct()" style="margin-top:10px;width:100%;">← Voltar ao produto</button>
   </div>
 
   <div class="sum-block">
-    <div class="sum-row"><div class="sum-key">Categoria</div><div class="sum-val" id="sumCat">â</div></div>
-    <div class="sum-row"><div class="sum-key">Modelo</div><div class="sum-val" id="sumMod">â</div></div>
-    <div class="sum-row"><div class="sum-key">DimensÃ£o</div><div class="sum-val" id="sumDim">â</div></div>
-    <div class="sum-row"><div class="sum-key">Moldura</div><div class="sum-val" id="sumMold">â</div></div>
-    <div class="sum-row"><div class="sum-key">Fundo</div><div class="sum-val" id="sumFund">â</div></div>
+    <div class="sum-row"><div class="sum-key">Categoria</div><div class="sum-val" id="sumCat">—</div></div>
+    <div class="sum-row"><div class="sum-key">Modelo</div><div class="sum-val" id="sumMod">—</div></div>
+    <div class="sum-row"><div class="sum-key">Dimensão</div><div class="sum-val" id="sumDim">—</div></div>
+    <div class="sum-row"><div class="sum-key">Moldura</div><div class="sum-val" id="sumMold">—</div></div>
+    <div class="sum-row"><div class="sum-key">Fundo</div><div class="sum-val" id="sumFund">—</div></div>
     <div class="sum-row"><div class="sum-key">LED</div><div class="sum-val" id="sumLed">Sem LED</div></div>
-    <div class="sum-row"><div class="sum-key">Miniatura</div><div class="sum-val" id="sumMini">â</div></div>
+    <div class="sum-row"><div class="sum-key">Miniatura</div><div class="sum-val" id="sumMini">—</div></div>
     <div class="sum-row"><div class="sum-key">Alto-relevo extra</div><div class="sum-val" id="sumRel">Nenhum</div></div>
-    <div class="sum-row"><div class="sum-key" style="color:#888;font-size:10px;letter-spacing:1px;">SKU</div><div class="sum-val" id="pvSku" style="font-size:10px;font-family:monospace;color:#888;">â</div></div>
+    <div class="sum-row"><div class="sum-key" style="color:#888;font-size:10px;letter-spacing:1px;">SKU</div><div class="sum-val" id="pvSku" style="font-size:10px;font-family:monospace;color:#888;">—</div></div>
     <div class="sum-total">
       <div class="tot-lbl">Total estimado</div>
-      <div class="tot-val" id="sumTotal">â</div>
+      <div class="tot-val" id="sumTotal">—</div>
     </div>
   </div>
   <div class="tags">
-    <div class="tag">ð Artesanal</div>
-    <div class="tag">ð¦ Embalagem Premium</div>
-    <div class="tag">â± 7â12 dias Ãºteis</div>
-    <div class="tag">â Todo o Brasil</div>
+    <div class="tag">🏆 Artesanal</div>
+    <div class="tag">📦 Embalagem Premium</div>
+    <div class="tag">⏱ 7–12 dias úteis</div>
+    <div class="tag">✈ Todo o Brasil</div>
   </div>
-  <button class="btn-add-cart" id="btnAddCart" onclick="adicionarAoCarrinho()">Adicionar ao carrinho â</button>
+  <button class="btn-add-cart" id="btnAddCart" onclick="adicionarAoCarrinho()">Adicionar ao carrinho →</button>
   <button class="btn-continuar" id="btnContinuar" onclick="continuarComprando()" style="display:none;">Continuar comprando</button>
   <button class="btn-wpp" onclick="abrirWpp()">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    Tirar dÃºvidas no WhatsApp
+    Tirar dúvidas no WhatsApp
   </button>
-  <button class="btn-back" onclick="editarConfiguracao()">â Editar configuraÃ§Ã£o</button>
+  <button class="btn-back" onclick="editarConfiguracao()">← Editar configuração</button>
 </div>
 
-<div id="sidebarMiniInfo" style="display:none;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div id="miniInfoPaths"><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:12px;">Se escolher essa opÃ§Ã£o vocÃª terÃ¡ dois caminhos:</div><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">1)</span>Escolher quadros para sua miniatura(s);</div><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">2)</span>Escolher quadros prontos que jÃ¡ contenham miniaturas inclusas.</div></div></div><div id="miniInfoAI" style="display:none;"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:#fa0;letter-spacing:1.2px;font-weight:700;text-transform:uppercase;margin-bottom:9px;">Sobre esta visualizaÃ§Ã£o</div><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:9px;">A imagem do veÃ­culo foi gerada por InteligÃªncia Artificial para facilitar a visualizaÃ§Ã£o de como a sua miniatura ficarÃ¡ aplicada no quadro.</div><div style="font-size:11px;color:#999;line-height:1.6;margin-bottom:9px;">Por esse motivo, alguns detalhes, como rodas, farÃ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃ§as em relaÃ§Ã£o Ã  miniatura que vocÃª possui.</div><div style="font-size:11px;color:#ccc;line-height:1.6;">Nesta etapa, o objetivo principal Ã© demonstrar a <strong style="color:#fa0;">proporÃ§Ã£o do veÃ­culo em relaÃ§Ã£o ao quadro</strong>. Assim, na prÃ³xima etapa, vocÃª poderÃ¡ comparar os diferentes tamanhos disponÃ­veis e escolher com mais seguranÃ§a o modelo que melhor valoriza e acomoda a sua miniatura.</div></div></div></div>
+<div id="sidebarMiniInfo" style="display:none;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div id="miniInfoPaths"><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:12px;">Se escolher essa opção você terá dois caminhos:</div><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">1)</span>Escolher quadros para sua miniatura(s);</div><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">2)</span>Escolher quadros prontos que já contenham miniaturas inclusas.</div></div></div><div id="miniInfoAI" style="display:none;"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:#fa0;letter-spacing:1.2px;font-weight:700;text-transform:uppercase;margin-bottom:9px;">Sobre esta visualização</div><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:9px;">A imagem do veículo foi gerada por Inteligência Artificial para facilitar a visualização de como a sua miniatura ficará aplicada no quadro.</div><div style="font-size:11px;color:#999;line-height:1.6;margin-bottom:9px;">Por esse motivo, alguns detalhes, como rodas, faróis, tonalidades e acabamentos, podem apresentar pequenas diferenças em relação à miniatura que você possui.</div><div style="font-size:11px;color:#ccc;line-height:1.6;">Nesta etapa, o objetivo principal é demonstrar a <strong style="color:#fa0;">proporção do veículo em relação ao quadro</strong>. Assim, na próxima etapa, você poderá comparar os diferentes tamanhos disponíveis e escolher com mais segurança o modelo que melhor valoriza e acomoda a sua miniatura.</div></div></div></div>
 
-<div id="sidebarLegoInfo" style="display:block;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:11px;color:#ccc;line-height:1.6;">Se escolher essa opÃ§Ã£o vocÃª terÃ¡ <strong style="color:#fa0;">dezenas de opÃ§Ãµes de quadros</strong> para fixar sua miniatura de Lego.</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,200,0,0.18);font-size:10px;color:#999;line-height:1.6;"><span style="color:#fa0;font-weight:700;">ObservaÃ§Ã£o:</span> Nessa opÃ§Ã£o nÃ£o estÃ¡ incluso a miniatura. Produzimos e vendemos apenas os quadros <strong style="color:#ddd;">PREMIUM</strong> para Lego.</div></div></div>
+<div id="sidebarLegoInfo" style="display:block;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:11px;color:#ccc;line-height:1.6;">Se escolher essa opção você terá <strong style="color:#fa0;">dezenas de opções de quadros</strong> para fixar sua miniatura de Lego.</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,200,0,0.18);font-size:10px;color:#999;line-height:1.6;"><span style="color:#fa0;font-weight:700;">Observação:</span> Nessa opção não está incluso a miniatura. Produzimos e vendemos apenas os quadros <strong style="color:#ddd;">PREMIUM</strong> para Lego.</div></div></div>
 
 
 <!-- DESKTOP PRICE BAR -->
 <div id="deskPriceBar">
   <div>
     <div class="desk-price-lbl">Total estimado</div>
-    <div class="desk-price-note">Sem frete â¢ PreÃ§o pode variar</div>
+    <div class="desk-price-note">Sem frete • Preço pode variar</div>
   </div>
   <div class="desk-price-val" id="deskBarPrice">R$ 689</div>
 </div>
@@ -960,7 +960,7 @@
 </style>
 
 
-<!-- ââââââ FASE 1: GEO + IDIOMAS (i18n) + SELETOR DE REGIÃO ââââââ -->
+<!-- ══════ FASE 1: GEO + IDIOMAS (i18n) + SELETOR DE REGIÃO ══════ -->
 <style>
 .fp-lang{position:absolute;top:14px;right:170px;display:inline-flex;z-index:60;}
 .fp-lang-btn{display:inline-flex;align-items:center;gap:6px;background:#161616;border:1px solid #2c2c2c;color:#ddd;font-family:inherit;font-size:12px;font-weight:600;padding:7px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:border-color .15s;}
