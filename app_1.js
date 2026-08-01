@@ -3553,8 +3553,11 @@ function fecharPedidoWpp(){
       return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
            +'\n   '+i.linhas.join(' \u00b7 ')+'\n   '+_brlCart(i.preco);
     }).join('\n');
+    var _frv=_freteEscolhido?Number(_freteEscolhido.price||0):0;
+    var _tot=_cartTotal()+_frv;
     return 'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n*ITENS*\n'+itens+
-           '\n\n*TOTAL:* '+_brlCart(_cartTotal())+'\n\n*MEUS DADOS*\n'+
+           (_freteEscolhido?'\n*Frete ('+_freteEscolhido.label+'):* '+_fpFreteBrl(_frv):'')+
+           '\n\n*TOTAL:* '+_fpFreteBrl(_tot)+'\n\n*MEUS DADOS*\n'+
            'Nome: '+c.nome+'\nCPF: '+_mascCpf(c.cpf)+'\nWhatsApp: '+_mascTel(c.whatsapp)+
            '\nE-mail: '+c.email+'\nEndere\u00e7o: '+c.rua+', '+c.numero+
            (c.complemento?' - '+c.complemento:'')+'\n'+c.bairro+' - '+c.cidade+'/'+c.uf+
@@ -3564,6 +3567,7 @@ function fecharPedidoWpp(){
   var corpo={
     rascunhoToken:(typeof _rascToken==='function'?_rascToken():'')||undefined,
     cliente:c,
+    frete:_freteEscolhido||undefined,
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
                preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
@@ -3733,6 +3737,102 @@ function _frmValidaTudo(mostrar){
   return ok;
 }
 
+// ── cotação de frete (SuperFrete via Worker /frete) ──
+var _freteEscolhido=null;
+var _freteCarrierAtual='superfrete';
+var _freteCurrencyAtual='R$';
+var _freteCalcEmCurso=false;
+var _freteCepCalcado='';
+function _fpFreteBrl(v){
+  return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function _fpFreteAtualizaTot(){
+  var base=_cartTotal();
+  var fv=(_freteEscolhido&&_freteCurrencyAtual==='R$')?Number(_freteEscolhido.price||0):0;
+  var t2=document.getElementById('cartTotal2');
+  if(t2)t2.textContent=_fpFreteBrl(base+fv);
+}
+function _fpFreteSel(label,price){
+  _freteEscolhido={label:label,price:price,carrier:_freteCarrierAtual,currency:_freteCurrencyAtual};
+  var opts=document.getElementById('fpFreteOpts');
+  if(opts){
+    Array.from(opts.querySelectorAll('.fp-frete-opt')).forEach(function(el){
+      var nome=el.querySelector('.fp-frete-nome');
+      el.classList.toggle('on',!!(nome&&nome.textContent===label));
+    });
+  }
+  _fpFreteAtualizaTot();
+}
+function _fpFreteRender(options,carrier,currency){
+  _freteCarrierAtual=carrier||'superfrete';
+  _freteCurrencyAtual=currency||'R$';
+  var opts=document.getElementById('fpFreteOpts');
+  var msg=document.getElementById('fpFreteMsg');
+  var bloco=document.getElementById('fpFreteBloco');
+  if(!opts||!bloco)return;
+  if(!options||!options.length){
+    if(msg)msg.textContent='Nenhuma opção disponível para este CEP.';
+    bloco.style.display='';
+    return;
+  }
+  if(!_freteEscolhido){
+    var mb=options.reduce(function(a,b){return b.price<a.price?b:a;},options[0]);
+    _freteEscolhido={label:mb.label,price:mb.price,carrier:_freteCarrierAtual,currency:_freteCurrencyAtual};
+  }
+  opts.innerHTML=options.map(function(op){
+    var sel=_freteEscolhido&&_freteEscolhido.label===op.label;
+    var prazo=op.days?(op.days===1?'1 dia útil':op.days+' dias úteis'):'';
+    var precoFmt=(_freteCurrencyAtual==='€')?'€ '+Number(op.price).toFixed(2).replace('.',','):'R$ '+Number(op.price).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    return '<div class="fp-frete-opt'+(sel?' on':'')
+      +'" onclick="_fpFreteSel(\''+op.label.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
+      +'\','+op.price+')">'
+      +'<div class="fp-frete-radio"></div>'
+      +'<div class="fp-frete-info"><div class="fp-frete-nome">'+op.label+'</div>'
+      +(prazo?'<div class="fp-frete-prazo">'+prazo+'</div>':'')+'</div>'
+      +'<div class="fp-frete-preco">'+precoFmt+'</div>'
+      +'</div>';
+  }).join('');
+  if(msg)msg.textContent='';
+  bloco.style.display='';
+  _fpFreteAtualizaTot();
+}
+function _fpFreteCalc(){
+  var cep=_so(_frmVal('fCep'));
+  if(cep.length!==8)return;
+  if(cep===_freteCepCalcado*&�_freteEscolhido)return;
+  if(_freteCalcEmCurso)return;
+  _freteCepCalcado=cep; _freteCalcEmCurso=true; _freteEscolhido=null;
+  var opts=document.getElementById('fpFreteOpts');
+  var msg=document.getElementById('fpFreteMsg');
+  var bloco=document.getElementById('fpFreteBloco');
+  if(opts)opts.innerHTML='';
+  if(msg)msg.textContent='Calculando frete…';
+  if(bloco)bloco.style.display='';
+  var items=CART.map(function(i){
+    var dim=(i.cfg&&i.cfg.dim)||(i.linhas&&i.linhas.length?i.linhas[0]:'');
+    return {dim:dim,qty:1};
+  });
+  fetch(API_FUNPARTS+'/frete',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({postal_code:cep,items:items})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    _freteCalcEmCurso=false;
+    if(!d||!d.ok||!Array.isArray(d.options)||!d.options.length){
+      if(msg)msg.textContent='Não foi possível calcular o frete para este CEP.';
+      if(bloco)bloco.style.display='';
+      return;
+    }
+    _fpFreteRender(d.options,d.carrier,d.currency);
+  })
+  .catch(function(){
+    _freteCalcEmCurso=false;
+    if(msg)msg.textContent='Erro ao calcular frete. Tente novamente.';
+    if(bloco)bloco.style.display='';
+  });
+}
+
 // ── busca de endereco pelo CEP (ViaCEP) ──
 var _cepUltimo='';
 function _buscaCep(){
@@ -3791,7 +3891,7 @@ function _frmLiga(){
     });
   });
   var cep=document.getElementById('fCep');
-  if(cep)cep.addEventListener('input',function(){ if(_so(cep.value).length===8)_buscaCep(); });
+  if(cep)cep.addEventListener('input',function(){ if(_so(cep.value).length===8){ _buscaCep(); _fpFreteCalc(); } });
 }
 
 // ── guarda os dados para o cliente nao redigitar ──
@@ -3837,7 +3937,7 @@ function carrinhoPasso(n){
     if(volta)volta.style.display='';
     var t2=document.getElementById('cartTotal2');
     if(t2)t2.textContent=_brlCart(_cartTotal());
-    _frmLiga(); _cliCarrega(); _frmValidaTudo(false);
+    _frmLiga(); _cliCarrega(); _frmValidaTudo(false); _fpFreteCalc();
     var fm=document.getElementById('cartForm'); if(fm)fm.scrollTop=0;
   } else {
     if(body)body.style.display='';
