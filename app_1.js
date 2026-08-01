@@ -3584,23 +3584,62 @@ function fecharPedidoWpp(){
   .then(function(d){
     clearTimeout(to);
     if(!d||!d.ok||!d.codigo)throw new Error('resposta invalida');
-    // pedido gravado: mensagem curta + link com a imagem e a ficha completa
-    _abrirZap(
-      'Ol\u00e1! Fechei meu pedido na Funparts.\n\n'+
-      '*Pedido:* '+d.codigo+'\n'+
-      '*Cliente:* '+c.nome+'\n'+
-      '*Itens:* '+CART.length+'\n'+
-      '*Total:* '+_brlCart(d.total||_cartTotal())+'\n\n'+
-      'Detalhes e imagens:\n'+d.url
-    );
-    if(typeof _rascLimpa==='function')_rascLimpa();
-    CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
+    // pedido gravado: agora busca o link de pagamento Pagar.me
+    return fetch(API_FUNPARTS+'/pagamento',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:d.token, origin:window.location.origin})
+    })
+    .then(function(r2){ return r2.json(); })
+    .then(function(pg){
+      if(typeof _rascLimpa==='function')_rascLimpa();
+      CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
+      if(pg && pg.ok && pg.url){
+        // redireciona a aba já aberta para o checkout Pagar.me
+        if(aba && !aba.closed){ aba.location.href=pg.url; }
+        else { window.open(pg.url,'_blank'); }
+        if(btn){ btn.disabled=false; btn.textContent='Finalizar e pagar →'; }
+      } else {
+        // Pagar.me falhou: fallback WhatsApp para não perder a venda
+        _abrirZap(
+          'Olá! Fechei meu pedido na Funparts.\n\n'+
+          '*Pedido:* '+d.codigo+'\n'+
+          '*Cliente:* '+c.nome+'\n'+
+          '*Itens:* '+CART.length+'\n'+
+          '*Total:* '+_brlCart(d.total||_cartTotal())+'\n\n'+
+          'Detalhes e imagens:\n'+d.url
+        );
+      }
+    });
   })
   .catch(function(){
     clearTimeout(to);
     // servidor fora do ar nao pode impedir a venda: manda o resumo completo no texto
     _abrirZap(_resumoLongo());
   });
+}// ── handler de retorno de pagamento (?pago=1) ──
+(function(){
+  var sp=new URLSearchParams(window.location.search);
+  if(sp.get('pago')==='1'){
+    var cod=sp.get('pedido')||'';
+    history.replaceState(null,'',window.location.pathname);
+    _fpgtoMsgSucesso(cod);
+  }
+})();
+function _fpgtoMsgSucesso(cod){
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  var box=document.createElement('div');
+  box.style.cssText='background:#1a1a1a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:40px 32px;max-width:420px;width:90%;text-align:center;color:#fff;font-family:inherit;';
+  box.innerHTML=
+    '<div style="font-size:48px;margin-bottom:16px">✅</div>'+
+    '<div style="font-size:22px;font-weight:700;margin-bottom:8px">Pagamento confirmado!</div>'+
+    (cod?'<div style="font-size:14px;color:#e07b00;margin-bottom:16px">Pedido '+cod+'</div>':'')+
+    '<div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px">Você receberá as atualizações pelo WhatsApp. Obrigado por comprar na Funparts!</div>'+
+    '<button onclick="this.closest(\'[data-pgto-ov]\').remove()" style="background:#e07b00;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;cursor:pointer;">Fechar</button>';
+  ov.setAttribute('data-pgto-ov','1');
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+  ov.addEventListener('click',function(e){ if(e.target===ov)ov.remove(); });
 }
 
 document.addEventListener('keydown',function(e){ if(e.key==='Escape')fecharCarrinho(); });
