@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funparts · Admin Molduras</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #181818;
+    --border: #2a2a2a;
+    --accent: #e07b00;
+    --accent2: #ff9f2d;
+    --text: #f0f0f0;
+    --muted: #888;
+    --success: #22c55e;
+    --error: #ef4444;
+    --warn: #facc15;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+  .shell { max-width: 780px; margin: 0 auto; padding: 48px 24px; }
+  .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+  .logo-mark { width: 36px; height: 36px; background: var(--accent); border-radius: 8px;
+    display: grid; place-items: center; font-weight: 900; font-size: 14px; color: #000; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; }
+  .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+  h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.6px; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+  .card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 20px; }
+  label { display: block; font-size: 12px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; }
+  input[type=text], input[type=password] {
+    width: 100%; background: #111; border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); padding: 12px 16px; font-size: 14px; outline: none; transition: border-color .2s;
+  }
+  input[type=text]:focus, input[type=password]:focus { border-color: var(--accent); }
+  .field { margin-bottom: 20px; }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .drop-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius: 12px; padding: 28px 16px;
+    text-align: center; cursor: pointer; transition: all .2s; position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(224,123,0,.06); }
+  .drop-zone.has-file { border-color: var(--success); background: rgba(34,197,94,.06); }
+  .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop-icon { font-size: 28px; margin-bottom: 8px; }
+  .drop-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .drop-hint { font-size: 11px; color: var(--muted); }
+  .drop-filename { font-size: 11px; color: var(--success); margin-top: 6px; font-weight: 600; }
+  .preview-img { max-width: 100%; max-height: 80px; border-radius: 8px; margin-top: 8px; object-fit: cover; }
+  .btn {
+    width: 100%; padding: 16px; border: none; border-radius: 12px; cursor: pointer;
+    font-size: 16px; font-weight: 700; letter-spacing: -0.3px; transition: all .2s;
+    background: var(--accent); color: #000;
+  }
+  .btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .btn.secondary { background: var(--border); color: var(--text); }
+  .log-area {
+    background: #0a0a0a; border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; font-family: 'Fira Code', monospace; font-size: 12px;
+    line-height: 1.7; max-height: 340px; overflow-y: auto; display: none;
+  }
+  .log-area.visible { display: block; }
+  .log-line { display: flex; gap: 10px; }
+  .log-line .ts { color: var(--muted); flex-shrink: 0; }
+  .log-line.ok .msg { color: var(--success); }
+  .log-line.err .msg { color: var(--error); }
+  .log-line.warn .msg { color: var(--warn); }
+  .log-line.info .msg { color: #60a5fa; }
+  .log-line.plain .msg { color: var(--text); }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .tag {
+    background: rgba(224,123,0,.12); color: var(--accent); border: 1px solid rgba(224,123,0,.25);
+    border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tag .rm { cursor: pointer; opacity: .6; }
+  .tag .rm:hover { opacity: 1; color: var(--error); }
+  .success-banner {
+    background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3);
+    border-radius: 12px; padding: 20px; display: none;
+  }
+  .success-banner.show { display: block; }
+  .success-banner h4 { color: var(--success); font-size: 16px; margin-bottom: 8px; }
+  .success-banner p { font-size: 13px; color: var(--muted); }
+  .success-banner a { color: var(--accent); }
+  .model-select { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .model-chip {
+    background: #111; border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; cursor: pointer; text-align: center;
+    transition: all .15s; color: var(--muted);
+  }
+  .model-chip:hover { border-color: var(--accent); color: var(--text); }
+  .model-chip.sel { border-color: var(--accent); background: rgba(224,123,0,.1); color: var(--accent); font-weight: 600; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 4px; margin: 16px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; width: 0; transition: width .4s; }
+  .sep { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="logo">
+    <div class="logo-mark">F</div>
+    <div>
+      <div class="logo-text">Funparts</div>
+      <div class="logo-sub">Gerenciador de Molduras</div>
+    </div>
+  </div>
+
+  <h2>Adicionar / Trocar Moldura</h2>
+  <p class="subtitle">Selecione o modelo, faça upload das imagens e publique. Cloudflare Pages atualiza automaticamente em ~2min.</p>
+
+  <!-- AUTH -->
+  <div class="card">
+    <h3>🔑 Autenticação GitHub</h3>
+    <div class="field">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="ghPat" placeholder="ghp_..." value="">
+      <div class="hint">Permissões necessárias: contents:write no repo rodox1209-ui/funparts-v12</div>
+    </div>
+  </div>
+
+  <!-- MODEL -->
+  <div class="card">
+    <h3>🚗 Modelo do Produto</h3>
+    <div class="field">
+      <label>Nome exato do modelo (conforme LEGO_CATALOG)</label>
+      <input type="text" id="modelName" placeholder="Ex: Ferrari SF24 F1" list="modelSuggest">
+      <datalist id="modelSuggest"></datalist>
+      <div class="hint">Deve ser idêntico ao nome no catálogo LEGO. Case-sensitive.</div>
+    </div>
+    <div id="knownModels" class="tag-list" style="display:none">
+      <!-- populated by JS with existing MODEL_MOLDURA_IMAGES entries -->
+    </div>
+  </div>
+
+  <!-- IMAGES -->
+  <div class="card">
+    <h3>🖼️ Imagens das Molduras</h3>
+    <div class="drop-row">
+      <div>
+        <label>Moldura Fibra de Carbono</label>
+        <div class="drop-zone" id="dropFibra">
+          <input type="file" id="fileFibra" accept="image/*">
+          <div class="drop-icon">🖤</div>
+          <div class="drop-label">Fibra (m-fibra)</div>
+          <div class="drop-hint">Arraste ou clique · WEBP/PNG/JPG</div>
+          <div class="drop-filename" id="nameFibra"></div>
+          <img class="preview-img" id="prevFibra" style="display:none">
+        </div>
+      </div>
+      <div>
+        <label>Moldura Laca / Branca</label>
+        <div class="drop-zone" id="dropLaca">
+          <input type="file" id="fileLaca" accept="image/*">
+          <div class="drop-icon">🤍</div>
+          <div class="drop-label">Laca (m-laca)</div>
+          <div class="drop-hint">Arraste ou clique · WEBP/PNG/JPG</div>
+          <div class="drop-filename" id="nameLaca"></div>
+          <img class="preview-img" id="prevLaca" style="display:none">
+        </div>
+      </div>
+    </div>
+    <div class="hint">As imagens serão salvas no GitHub em <code>images/moldura_{slug}_fibra.webp</code> e <code>images/moldura_{slug}_laca.webp</code></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <button class="btn" id="btnPublish" onclick="publish()">🚀 Publicar Molduras</button>
+
+  <br><br>
+
+  <!-- LOG -->
+  <div class="log-area" id="logArea"></div>
+
+  <!-- SUCCESS -->
+  <div class="success-banner" id="successBanner">
+    <h4>✅ Molduras publicadas com sucesso!</h4>
+    <p>Cloudflare Pages está fazendo o deploy. Em ~2 minutos estará ao vivo em <a href="https://funparts-v12.pages.dev" target="_blank">funparts-v12.pages.dev</a></p>
+    <p style="margin-top:8px">Acompanhe o deploy em <a href="https://dash.cloudflare.com/bd6ae1ac714cdba7ee9183ca4885323b/pages/view/funparts-v12" target="_blank">Cloudflare Pages →</a></p>
+  </div>
+
+</div>
+
+<script>
+// ──────────────────── config ────────────────────
+const REPO  = 'rodox1209-ui/funparts-v12';
+const BRANCH = 'main';
+const GH_API = 'https://api.github.com';
+
+// ──────────────────── ui helpers ────────────────────
+let logEl, logArea;
+window.addEventListener('DOMContentLoaded', () => {
+  logEl = document.getElementById('logArea');
+  loadExistingModels();
+  setupDrop('dropFibra', 'fileFibra', 'nameFibra', 'prevFibra');
+  setupDrop('dropLaca',  'fileLaca',  'nameLaca',  'prevLaca');
+});
+
+function log(msg, type='plain') {
+  const area = document.getElementById('logArea');
+  area.classList.add('visible');
+  const line = document.createElement('div');
+  line.className = 'log-line ' + type;
+  const ts = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.innerHTML = `<span class="ts">[${ts}]</span><span class="msg">${msg}</span>`;
+  area.appendChild(line);
+  area.scrollTop = area.scrollHeight;
+}
+
+function setProgress(pct) {
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ──────────────────── drag-drop ────────────────────
+function setupDrop(zoneId, inputId, nameId, prevId) {
+  const zone  = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+  const name  = document.getElementById(nameId);
+  const prev  = document.getElementById(prevId);
+
+  input.addEventListener('change', () => handleFile(input.files[0], zone, name, prev));
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) { handleFile(f, zone, name, prev); input.files = e.dataTransfer.files; }
+  });
+}
+
+function handleFile(file, zone, nameEl, prevEl) {
+  if (!file) return;
+  nameEl.textContent = file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
+  zone.classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = e => { prevEl.src = e.target.result; prevEl.style.display = 'block'; };
+  reader.readAsDataURL(file);
+}
+
+// ──────────────────── slug ────────────────────
+function slugify(name) {
+  return name.toLowerCase()
+    .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
+    .replace(/[òóôõö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c')
+    .replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+}
+
+// ──────────────────── GitHub helpers ────────────────────
+function pat() { return document.getElementById('ghPat').value.trim(); }
+
+async function ghGet(path) {
+  const r = await fetch(`${GH_API}/repos/${REPO}/contents/${path}`, {
+    headers: { Authorization: 'token ' + pat(), Accept: 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) throw new Error('GitHub GET ' + path + ' → ' + r.status);
+  return r.json();
+}
+
+async function ghPut(path, content64, sha, message) {
+  const body = { message, content: content64, branch: BRANCH };
+  if (sha) body.sha = sha;
+  const r = await fetch(`${GH_API}/repos/${REPO}/contents/${path}`, {
+    method: 'PUT',
+    headers: { Authorization: 'token ' + pat(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const err = await r.json();
+    throw new Error('GitHub PUT ' + path + ' → ' + r.status + ': ' + (err.message || ''));
+  }
+  return r.json();
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload  = () => res(fr.result.split(',')[1]);
+    fr.onerror = rej;
+    fr.readAsDataURL(file);
+  });
+}
+
+function b64ToText(b64) {
+  const clean = b64.replace(/\s/g,'');
+  return decodeURIComponent(escape(atob(clean)));
+}
+
+function textToB64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+// ──────────────────── load existing models ────────────────────
+async function loadExistingModels() {
+  try {
+    const data = await ghGet('app_1.js');
+    const js = b64ToText(data.content);
+    const match = js.match(/var MODEL_MOLDURA_IMAGES\s*=\s*\{([\s\S]*?)\};/);
+    if (!match) return;
+    const entries = [...match[1].matchAll(/'([^']+)'\s*:\s*\{/g)];
+    const names = entries.map(e => e[1]);
+    const ds = document.getElementById('modelSuggest');
+    const container = document.getElementById('knownModels');
+    names.forEach(n => {
+      const opt = document.createElement('option'); opt.value = n; ds.appendChild(opt);
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.innerHTML = `<span>${n}</span><span class="rm" onclick="selectModel('${n.replace(/'/g,"\\'")}')">✎ editar</span>`;
+      container.appendChild(tag);
+    });
+    if (names.length > 0) {
+      container.style.display = 'flex';
+      const label = document.createElement('div');
+      label.style.cssText = 'font-size:11px;color:var(--muted);width:100%;margin-bottom:4px;';
+      label.textContent = 'Modelos já configurados (clique para selecionar):';
+      container.prepend(label);
+    }
+    window._appSha = data.sha;
+    window._appJs  = js;
+  } catch(e) {
+    console.warn('loadExistingModels:', e);
+  }
+}
+
+function selectModel(name) {
+  document.getElementById('modelName').value = name;
+}
+
+// ──────────────────── main publish ────────────────────
+async function publish() {
+  const btn = document.getElementById('btnPublish');
+  const modelName = document.getElementById('modelName').value.trim();
+  const fileFibra = document.getElementById('fileFibra').files[0];
+  const fileLaca  = document.getElementById('fileLaca').files[0];
+
+  // Validation
+  if (!pat()) { alert('Informe o GitHub PAT.'); return; }
+  if (!modelName) { alert('Informe o nome do modelo.'); return; }
+  if (!fileFibra) { alert('Selecione a imagem Fibra.'); return; }
+  if (!fileLaca)  { alert('Selecione a imagem Laca.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Publicando...';
+  document.getElementById('successBanner').classList.remove('show');
+  document.getElementById('logArea').innerHTML = '';
+  document.getElementById('logArea').classList.add('visible');
+  setProgress(5);
+
+  try {
+    const slug = slugify(modelName);
+    const pathFibra = `images/moldura_${slug}_fibra.webp`;
+    const pathLaca  = `images/moldura_${slug}_laca.webp`;
+
+    log(`Modelo: "${modelName}" → slug: "${slug}"`, 'info');
+    log(`Imagens: ${pathFibra}, ${pathLaca}`, 'info');
+
+    // Step 1: encode images
+    log('1/4 · Codificando imagens...', 'plain');
+    const [b64Fibra, b64Laca] = await Promise.all([fileToBase64(fileFibra), fileToBase64(fileLaca)]);
+    log(`  Fibra: ${(b64Fibra.length/1024).toFixed(1)} KB (base64)`, 'plain');
+    log(`  Laca:  ${(b64Laca.length/1024).toFixed(1)} KB (base64)`, 'plain');
+    setProgress(20);
+
+    // Step 2: upload fibra to GitHub
+    log('2/4 · Fazendo upload da imagem Fibra para GitHub...', 'plain');
+    let existingFibra = null, existingLaca = null;
+    try { existingFibra = await ghGet(pathFibra); } catch(e) {}
+    try { existingLaca  = await ghGet(pathLaca);  } catch(e) {}
+
+    await ghPut(pathFibra, b64Fibra, existingFibra?.sha || null,
+      `chore: add moldura ${slug} fibra`);
+    log(`  ✅ ${pathFibra} enviado`, 'ok');
+    setProgress(40);
+
+    // Step 3: upload laca to GitHub
+    log('3/4 · Fazendo upload da imagem Laca para GitHub...', 'plain');
+    await ghPut(pathLaca, b64Laca, existingLaca?.sha || null,
+      `chore: add moldura ${slug} laca`);
+    log(`  ✅ ${pathLaca} enviado`, 'ok');
+    setProgress(60);
+
+    // Step 4: update MODEL_MOLDURA_IMAGES in app_1.js
+    log('4/4 · Atualizando MODEL_MOLDURA_IMAGES no app_1.js...', 'plain');
+
+    // Re-fetch app_1.js to get latest SHA (uploads may have triggered a commit)
+    const appData = await ghGet('app_1.js');
+    const appJs   = b64ToText(appData.content);
+    const appSha  = appData.sha;
+
+    const newEntry = `  '${modelName}': {\n    fibra: '${pathFibra}',\n    laca:  '${pathLaca}',\n  },`;
+
+    let updatedJs;
+    const existingPattern = new RegExp(`'${modelName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}'\\s*:\\s*\\{[^}]*\\},??`, 's');
+    if (existingPattern.test(appJs)) {
+      updatedJs = appJs.replace(existingPattern, newEntry);
+      log(`  Substituindo entrada existente para "${modelName}"`, 'warn');
+    } else {
+      updatedJs = appJs.replace(
+        /^(var MODEL_MOLDURA_IMAGES\s*=\s*\{)([\s\S]*?)(\};)/m,
+        (_, open, body, close) => open + body + newEntry + '\n' + close
+      );
+      log(`  Adicionando nova entrada para "${modelName}"`, 'plain');
+    }
+
+    if (updatedJs === appJs) throw new Error('Falha ao atualizar MODEL_MOLDURA_IMAGES - padrão não encontrado.');
+
+    const updatedB64 = textToB64(updatedJs);
+    await ghPut('app_1.js', updatedB64, appSha, `feat: adiciona moldura ${slug} ao MODEL_MOLDURA_IMAGES`);
+    log(`  ✅ app_1.js atualizado e commitado`, 'ok');
+    setProgress(95);
+    log('🎈 Deploy iniciado! Cloudflare Pages vai publicar em ~2 minutos.', 'ok');
+    setProgress(100);
+    document.getElementById('successBanner').classList.add('show');
+    setTimeout(loadExistingModels, 2000);
+  } catch(err) {
+    log('❌ Erro: ' + err.message, 'err');
+    log('Verifique o PAT e tente novamente.', 'warn');
+    setProgress(0);
+  }
+  btn.disabled = false;
+  btn.textContent = '🚀 Publicar Molduras';
+}
+</script>
+</body>
+</html>
