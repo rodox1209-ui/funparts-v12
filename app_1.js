@@ -4190,3 +4190,101 @@ function _rascEnvia(){
   .catch(function(){})
   .then(function(){ _rascEnviando=false; });
 }
+
+// ═══ FUNPARTS PATCH v1: nova etapa de frete + RETIRAR NA FÁBRICA ═══
+;(function(){
+  var _step=1;
+  var RETIRADA='RETIRAR NA FÁBRICA';
+
+  window._selRetirada=function(){
+    window._freteEscolhido={label:RETIRADA,price:0,carrier:null,currency:'BRL'};
+    if(typeof _fpFreteAtualizaTot==='function')_fpFreteAtualizaTot();
+    document.querySelectorAll('#fpFreteOpts').forEach(function(c){
+      c.querySelectorAll('.fp-frete-opt').forEach(function(el){
+        var n=el.querySelector('.fp-frete-nome');
+        el.classList.toggle('on',!!(n&&n.textContent===RETIRADA));
+      });
+    });
+  };
+
+  var RETIRADA_HTML='<div class="fp-frete-opt" onclick="_selRetirada()">'
+    +'<div class="fp-frete-radio"></div>'
+    +'<div class="fp-frete-info"><div class="fp-frete-nome">'+RETIRADA+'</div>'
+    +'<div class="fp-frete-prazo">Combinar retirada</div>'
+    +'</div><div class="fp-frete-preco">Grátis</div>'
+    +'</div>';
+
+  function _ensureRetirada(){
+    document.querySelectorAll('#fpFreteOpts').forEach(function(el){
+      if(el.innerHTML.indexOf(RETIRADA)===-1)el.innerHTML+=RETIRADA_HTML;
+    });
+  }
+
+  function _updateRetiradaState(){
+    var sel=!!(window._freteEscolhido&&window._freteEscolhido.label===RETIRADA);
+    document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(el){
+      var n=el.querySelector('.fp-frete-nome');
+      if(n&&n.textContent===RETIRADA)el.classList.toggle('on',sel);
+    });
+  }
+
+  var _origRender=window._fpFreteRender;
+  window._fpFreteRender=function(options,carrier,currency){
+    var savedFrete=(window._freteEscolhido&&window._freteEscolhido.label===RETIRADA)?window._freteEscolhido:null;
+    _origRender(options,carrier,currency);
+    if(savedFrete)window._freteEscolhido=savedFrete;
+    _ensureRetirada();
+    _updateRetiradaState();
+    var all=document.querySelectorAll('#fpFreteOpts');
+    if(all.length>1)all[1].innerHTML=all[0].innerHTML;
+  };
+
+  var _origAbrirCarrinho=window.abrirCarrinho;
+  if(_origAbrirCarrinho){
+    window.abrirCarrinho=function(){
+      _step=1;
+      _origAbrirCarrinho.apply(this,arguments);
+    };
+  }
+
+  var _orig=window.carrinhoPasso;
+  window.carrinhoPasso=function(n){
+    if((n===2&&_step===1)||n===1.5||(n===1&&_step===2)){
+      if(!CART.length)return;
+      _step=1.5;
+      var body=document.getElementById('cartBody'),
+          form=document.getElementById('cartForm'),
+          f1=document.getElementById('cartFoot'),
+          f2=document.getElementById('cartFoot2'),
+          tit=document.getElementById('cartTitulo'),
+          volta=document.getElementById('cartVoltar');
+      if(body)body.style.display='none';
+      if(form)form.style.display='none';
+      if(f1)f1.style.display='';
+      if(f2)f2.style.display='none';
+      if(tit)tit.textContent='Escolha o frete';
+      if(volta)volta.style.display='';
+      var bG=f1?f1.querySelector('.btn-cart-go'):null;
+      if(bG)bG.textContent='Continuar →';
+      var bM=f1?f1.querySelector('.btn-cart-more'):null;
+      if(bM)bM.style.display='none';
+      _fpFreteCalc();
+      _ensureRetirada();
+    }else{
+      if(n!==2){
+        var f1r=document.getElementById('cartFoot');
+        var bGr=f1r?f1r.querySelector('.btn-cart-go'):null;
+        if(bGr)bGr.textContent='Fechar pedido →';
+        var bMr=f1r?f1r.querySelector('.btn-cart-more'):null;
+        if(bMr)bMr.style.display='';
+      }
+      _orig(n);
+      _step=n===2?2:1;
+      if(n===2){
+        var allOpts=document.querySelectorAll('#fpFreteOpts');
+        if(allOpts.length>1)allOpts[1].innerHTML=allOpts[0].innerHTML;
+        _ensureRetirada();
+      }
+    }
+  };
+})();
