@@ -1774,12 +1774,8 @@ var MODEL_MOLDURA_IMAGES={
     laca:'images/img_057.webp',
   },
   'Concorde Airbus':{
-    fibra:'images/moldura_concorde_fibra.webp',
-    laca:'images/moldura_concorde_laca.webp',
-  },
-  'CONCORDE AIRBUS': {
-    fibra: 'images/moldura_concorde_airbus_fibra.webp',
-    laca:  'images/moldura_concorde_airbus_laca.webp',
+    fibra:'images/moldura_concorde_airbus_fibra.webp',
+    laca:'images/moldura_concorde_airbus_laca.webp',
   },
 };
 var UV_PALETTE=[
