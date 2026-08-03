@@ -1777,6 +1777,10 @@ var MODEL_MOLDURA_IMAGES={
     fibra:'images/moldura_concorde_airbus_fibra.webp',
     laca:'images/moldura_concorde_airbus_laca.webp',
   },
+  'CONCORDE AIRBUS': {
+    fibra: 'images/moldura_concorde_airbus_fibra.webp',
+    laca:  'images/moldura_concorde_airbus_laca.webp',
+  },
 };
 var UV_PALETTE=[
   {color:'#FF2200',name:'Vermelho Ferrari'},
