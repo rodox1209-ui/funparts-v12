@@ -26,4 +26,19 @@ document.addEventListener('mouseup',function(){_cpDG=false;_cpDH=false;});
 document.addEventListener('touchmove',function(e){if(_cpDG||_cpDH){if(_cpDG)cpGP(e.touches[0]);if(_cpDH)cpHP(e.touches[0]);e.preventDefault();}},{passive:false});
 document.addEventListener('touchend',function(){_cpDG=false;_cpDH=false;});}
 cpBind();
+})();���
+// override escala Concorde Airbus
+(function(){
+  const _origSelLegoBrand = typeof selLegoBrand === 'function' ? selLegoBrand : null;
+  const _origSelLegoModel = typeof selLegoModel === 'function' ? selLegoModel : null;
+  function updateConcoScale(){
+    const el = document.getElementById('legoScaleImg');
+    const nm = document.getElementById('legoDetName');
+    if(el && nm && (nm.textContent||'').toLowerCase().includes('concorde')){
+      el.src = 'https://lh3.googleusercontent.com/d/1akiSa9VOS7MtrDOgrCBXt5pVv5uk46Nt';
+    }
+  }
+  document.addEventListener('click', function(e){
+    setTimeout(updateConcoScale, 400);
+  });
 })();
