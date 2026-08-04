@@ -1,4 +1,3 @@
-
 (function(){
 var _cpCB=null,_cpH=0,_cpS=1,_cpV=1,_cpDG=false,_cpDH=false;
 function h2r(h){h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return{r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16)};}
@@ -27,18 +26,16 @@ document.addEventListener('touchmove',function(e){if(_cpDG||_cpDH){if(_cpDG)cpGP
 document.addEventListener('touchend',function(){_cpDG=false;_cpDH=false;});}
 cpBind();
 })();���
+
 // override escala Concorde Airbus
 (function(){
-  const _origSelLegoBrand = typeof selLegoBrand === 'function' ? selLegoBrand : null;
-  const _origSelLegoModel = typeof selLegoModel === 'function' ? selLegoModel : null;
   function updateConcoScale(){
     const el = document.getElementById('legoScaleImg');
-    const nm = document.getElementById('legoDetName');
+    const nm = document.getElementById('pvMod');
     if(el && nm && (nm.textContent||'').toLowerCase().includes('concorde')){
       el.src = 'https://lh3.googleusercontent.com/d/1akiSa9VOS7MtrDOgrCBXt5pVv5uk46Nt';
     }
   }
-  document.addEventListener('click', function(e){
-    setTimeout(updateConcoScale, 400);
-  });
+  document.addEventListener('click', function(){ setTimeout(updateConcoScale, 400); });
+  setTimeout(updateConcoScale, 800);
 })();
