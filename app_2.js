@@ -82,3 +82,18 @@ od§)}üdo£um¥nt®geôEm¥me®tCùId¨'m¥goPvM¯d'©;s¥tuòn!¥&&¨e/ôeyôC
   setTimeout(init,800);
   document.addEventListener('click',function(){setTimeout(init,300);},true);
 })();                                                                                                                                                     
+
+                                                                                                                                                     
+// override escala Concorde Airbus - setInterval
+(function(){
+  var CS='https://lh3.googleusercontent.com/d/1akiSa9VOS7MtrDOgrCBXt5pVv5uk46Nt';
+  function fix(){
+    var pv=document.getElementById('pvMod')||document.getElementById('legoPvMod');
+    if(!pv||(pv.textContent||'').toLowerCase().indexOf('concorde')<0)return;
+    ['legoScaleImg','miniScaleImg'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&el.src&&el.src.indexOf('img_088')>=0)el.src=CS;
+    });
+  }
+  setInterval(fix,200);
+})();                                                                                                                                                     
