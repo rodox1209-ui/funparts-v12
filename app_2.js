@@ -39,6 +39,9 @@ cpBind();
       var el=document.getElementById(id);
       if(el&&el.src&&el.src.indexOf('img_088')>=0)el.src=CS;
     });
+    // corrigir imagem expandida do wallModal
+    var wm=document.querySelector('#wallModalBox img');
+    if(wm&&wm.src&&wm.src.indexOf('img_088')>=0)wm.src=CS;
   }
   setInterval(fix,200);
 })();
