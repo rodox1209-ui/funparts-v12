@@ -6,3 +6,5 @@
 .relo-load-txt{font-size:8px;color:#e07b00;letter-spacing:.5px;margin-top:5px}
 /* spinner no proprio preview, na posicao do logo que esta sendo gerado */
 .logo-load{width:20px;height:20px;border:2px solid rgba(224,123,0,.22);border-top-color:#e07b00;border-radius:50%;animation:aiSpin .8s linear infinite;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+/* fix: moldura Concorde Airbus preenche container 63x126 */
+#legoDetFrame{height:100%}
