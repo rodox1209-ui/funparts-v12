@@ -45,3 +45,23 @@ cpBind();
   }
   setInterval(fix,200);
 })();
+
+
+// Multi-currency: corrigir símbolo de moeda em todas as atualizações de preço
+(function(){
+  var lastSym='R$';
+  setInterval(function(){
+    var reg=(window.FP&&window.FP.region)||'BR';
+    var sym=(window.CFG&&window.CFG[reg]&&window.CFG[reg].symbol)||'R$';
+    if(sym===lastSym&&sym==='R$') return; // BR: nada a fazer
+    lastSym=sym;
+    ['pvPrice','mobBarPrice','deskBarPrice'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(!el||!el.textContent) return;
+      // Troca símbolo se ainda estiver como R$
+      if(el.textContent.indexOf('R$')>=0 && sym!=='R$'){
+        el.textContent=el.textContent.replace(/R\$/g,sym);
+      }
+    });
+  },300);
+})();
