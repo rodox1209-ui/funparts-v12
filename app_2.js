@@ -52,8 +52,8 @@ cpBind();
   var lastSym='R$';
   setInterval(function(){
     var reg=(window.FP&&window.FP.region)||'BR';
-    var sym=(window.CFG&&window.CFG[reg]&&window.CFG[reg].symbol)||'R$';
-    if(sym===lastSym&&sym==='R$') return; // BR: nada a fazer
+    var sym=reg==='US'?'$':reg==='EU'?'€':'R$';
+    if(sym===lastSym) return; // BR: nada a fazer
     lastSym=sym;
     ['pvPrice','mobBarPrice','deskBarPrice'].forEach(function(id){
       var el=document.getElementById(id);
