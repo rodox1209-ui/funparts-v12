@@ -5,101 +5,101 @@ function setStyle(id,p,v){var e=document.getElementById(id);if(e)e.style[p]=v;}
 
 // V2 JS
 
-// ── CATÁLOGO LEGO ──
+// ââ CATÃLOGO LEGO ââ
 const LEGO_CATALOG = {
   'Formula 1': [
-    {name:'Ferrari SF24 F1',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Red Bull F1',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'McLaren F1 MCL35',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'McLaren F1 MCL39',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Aston Martin F1',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Alfa Romeo F1',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Stake Sauber F1',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Renault F1',dim:'49×49cm',scale:'1:13',f1:true},
-    {name:'Toleman F1',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'McLaren MP4/4 Senna',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Mini F1 Speed Champions',dim:'49×49cm',scale:'1:13',f1:true},
+    {name:'Ferrari SF24 F1',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Red Bull F1',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'McLaren F1 MCL35',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'McLaren F1 MCL39',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Aston Martin F1',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Alfa Romeo F1',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Stake Sauber F1',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Renault F1',dim:'49Ã49cm',scale:'1:13',f1:true},
+    {name:'Toleman F1',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'McLaren MP4/4 Senna',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Mini F1 Speed Champions',dim:'49Ã49cm',scale:'1:13',f1:true},
   ],
   'Ferrari': [
-    {name:'Ferrari Daytona SP3',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Ferrari 488 GTE',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Ferrari SF24 F1',dim:'53×83cm',scale:'1:8',f1:true},
+    {name:'Ferrari Daytona SP3',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Ferrari 488 GTE',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Ferrari SF24 F1',dim:'53Ã83cm',scale:'1:8',f1:true},
   ],
   'McLaren': [
-    {name:'McLaren P1',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'McLaren GTR',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'McLaren MP4/4 Senna',dim:'49×49cm',scale:'1:13',f1:true},
-    {name:'McLaren F1 MCL35',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'McLaren F1 MCL39',dim:'53×83cm',scale:'1:8',f1:true},
+    {name:'McLaren P1',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'McLaren GTR',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'McLaren MP4/4 Senna',dim:'49Ã49cm',scale:'1:13',f1:true},
+    {name:'McLaren F1 MCL35',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'McLaren F1 MCL39',dim:'53Ã83cm',scale:'1:8',f1:true},
   ],
   'Porsche': [
-    {name:'Porsche 911 RSR',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Porsche GT3rs',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Porsche 911 Targa 1970',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Porsche 911 RSR',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Porsche GT3rs',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Porsche 911 Targa 1970',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Lamborghini': [
-    {name:'Lamborghini Sian',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Lamborghini Sian',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Mercedes': [
-    {name:'Mercedes W14',dim:'53×83cm',scale:'1:8',f1:true},
-    {name:'Mercedes AMG One',dim:'49×49cm',scale:'1:13',f1:false},
+    {name:'Mercedes W14',dim:'53Ã83cm',scale:'1:8',f1:true},
+    {name:'Mercedes AMG One',dim:'49Ã49cm',scale:'1:13',f1:false},
   ],
   'Bugatti': [
-    {name:'Bugatti Chiron',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Bugatti Chiron',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'BMW': [
-    {name:'BMW 1000RR',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'BMW GS 1250',dim:'83×53cm',scale:'1:8',f1:false},
+    {name:'BMW 1000RR',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'BMW GS 1250',dim:'83Ã53cm',scale:'1:8',f1:false},
   ],
   'Ford': [
-    {name:'Ford GT',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Ford Raptor',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Ford Mustang GT 1960',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Ford GT',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Ford Raptor',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Ford Mustang GT 1960',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Dodge': [
-    {name:'Dodge Charger R/T',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Dodge Charger R/T',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Nissan': [
-    {name:'Nissan GTR Skyline',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Nissan GTR Skyline',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Land Rover': [
-    {name:'Land Rover Defender',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'Land Rover Defender',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Motos': [
-    {name:'Ducati',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Yamaha MT-10',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'BMW 1000RR',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'BMW GS 1250',dim:'49×49cm',scale:'1:13',f1:false},
+    {name:'Ducati',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Yamaha MT-10',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'BMW 1000RR',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'BMW GS 1250',dim:'49Ã49cm',scale:'1:13',f1:false},
   ],
-  'Super Heróis': [
-    {name:'Batmóvel',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Tumbler Batman',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'Ecto-01 Ghostbusters',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'X-Wing Star Wars',dim:'53×83cm',scale:'1:8',f1:false},
+  'Super HerÃ³is': [
+    {name:'BatmÃ³vel',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Tumbler Batman',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'Ecto-01 Ghostbusters',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'X-Wing Star Wars',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Filmes': [
-    {name:'DeLorean — De Volta para o Futuro',dim:'49×49cm',scale:'1:13',f1:false},
-    {name:'Ecto-01 Ghostbusters',dim:'53×83cm',scale:'1:8',f1:false},
-    {name:'X-Wing Star Wars',dim:'53×83cm',scale:'1:8',f1:false},
+    {name:'DeLorean â De Volta para o Futuro',dim:'49Ã49cm',scale:'1:13',f1:false},
+    {name:'Ecto-01 Ghostbusters',dim:'53Ã83cm',scale:'1:8',f1:false},
+    {name:'X-Wing Star Wars',dim:'53Ã83cm',scale:'1:8',f1:false},
   ],
   'Outros': [
-    {name:'Traçado de Interlagos',dim:'53×83cm',scale:'—',f1:false},
-    {name:'Concorde Airbus',dim:'63×128cm',scale:'—',f1:false},
+    {name:'TraÃ§ado de Interlagos',dim:'53Ã83cm',scale:'â',f1:false},
+    {name:'Concorde Airbus',dim:'63Ã128cm',scale:'â',f1:false},
   ],
 };
 
 const MINI_SIZES = [
-  {id:'1043',label:'25 × 35 cm',scale:'1:43',base:459},
-  {id:'2449',label:'49 × 49 cm',scale:'1:24',base:1290},
-  {id:'1849',label:'49 × 49 cm',scale:'1:18',base:1490},
-  {id:'1866',label:'40 × 66,5 cm',scale:'1:18',base:1990},
-  {id:'1266',label:'40 × 66,5 cm',scale:'1:12',base:2490},
+  {id:'1043',label:'25 Ã 35 cm',scale:'1:43',base:459},
+  {id:'2449',label:'49 Ã 49 cm',scale:'1:24',base:1290},
+  {id:'1849',label:'49 Ã 49 cm',scale:'1:18',base:1490},
+  {id:'1866',label:'40 Ã 66,5 cm',scale:'1:18',base:1990},
+  {id:'1266',label:'40 Ã 66,5 cm',scale:'1:12',base:2490},
 ];
 
-// ── STATE ──
+// ââ STATE ââ
 const S = {
-  tipo:'lego', legoBrand:'Formula 1', legoModel:null, legoF1:true, legoDim:'53×83cm',
-  miniBrand:'Ferrari', miniModel:'', miniSize:'4066', miniDim:'40 × 66,5 cm',
+  tipo:'lego', legoBrand:'Formula 1', legoModel:null, legoF1:true, legoDim:'53Ã83cm',
+  miniBrand:'Ferrari', miniModel:'', miniSize:'4066', miniDim:'40 Ã 66,5 cm',
   miniOpt:'own', disp:'exist', customs:[], customExtra:0,
   moldura:'m-laca', molduraLbl:'Laca Preto',
   fundo:'f-carbono', fundoLbl:'Fibra de Carbono (Vinil)', fundoLayout:'Revestimento do fundo com vinil texturizado de fibra de carbono', uvColor:'#FF2200',
@@ -108,24 +108,24 @@ const S = {
   _total:0,
 };
 
-// ── INICIAR NOVA PERSONALIZAÇÃO ──
-// Zera 100% da personalização atual (o estado S é reconstruído do zero no load)
+// ââ INICIAR NOVA PERSONALIZAÃÃO ââ
+// Zera 100% da personalizaÃ§Ã£o atual (o estado S Ã© reconstruÃ­do do zero no load)
 // e volta para a etapa TIPO. O carrinho fica salvo no localStorage
-// (funparts_cart_v1) e é recarregado no init, então os itens são preservados.
+// (funparts_cart_v1) e Ã© recarregado no init, entÃ£o os itens sÃ£o preservados.
 function iniciarNovaPersonalizacao(){
   try{ location.reload(); }
   catch(e){ location.href = location.pathname + location.search; }
 }
 
-// ── NAVEGAÇÃO ──
-function showAiPopup(title,body){var defT='Fanático, você está prestes a criar<br>um quadro exclusivo!';var defB='Aguarde, estamos gerando a imagem da sua miniatura em alta resolução.';var p=document.getElementById('aiLoadingPopup');if(!p)return;var t=document.getElementById('aiPopupTitle');var b=document.getElementById('aiPopupBody');if(t)t.innerHTML=title||defT;if(b)b.innerHTML=body||defB;p.style.display='flex';_aiProgStart(22);}
+// ââ NAVEGAÃÃO ââ
+function showAiPopup(title,body){var defT='FanÃ¡tico, vocÃª estÃ¡ prestes a criar<br>um quadro exclusivo!';var defB='Aguarde, estamos gerando a imagem da sua miniatura em alta resoluÃ§Ã£o.';var p=document.getElementById('aiLoadingPopup');if(!p)return;var t=document.getElementById('aiPopupTitle');var b=document.getElementById('aiPopupBody');if(t)t.innerHTML=title||defT;if(b)b.innerHTML=body||defB;p.style.display='flex';_aiProgStart(22);}
 function hideAiPopup(){var p=document.getElementById('aiLoadingPopup');_aiProgFinish();if(p)setTimeout(function(){p.style.display='none';},320);}
 
-// ── Barra de progresso da geração por IA ──
+// ââ Barra de progresso da geraÃ§Ã£o por IA ââ
 // Estimativa: a API nao envia progresso real, entao usamos uma curva calibrada pelo tempo medio
 // medido (~19s em quality medium). A barra desacelera e trava em 95% ate a imagem chegar de fato.
 var _aiProgTimer=null;
-var _AI_STAGES=[[0,'Preparando o pedido…'],[14,'Analisando marca e modelo…'],[34,'Modelando a carroceria…'],[56,'Aplicando pintura e reflexos…'],[76,'Ajustando iluminação…'],[90,'Finalizando os detalhes…']];
+var _AI_STAGES=[[0,'Preparando o pedidoâ¦'],[14,'Analisando marca e modeloâ¦'],[34,'Modelando a carroceriaâ¦'],[56,'Aplicando pintura e reflexosâ¦'],[76,'Ajustando iluminaÃ§Ã£oâ¦'],[90,'Finalizando os detalhesâ¦']];
 function _aiStageTxt(p){var t=_AI_STAGES[0][1];for(var i=0;i<_AI_STAGES.length;i++){if(p>=_AI_STAGES[i][0])t=_AI_STAGES[i][1];}return t;}
 function _aiProgStart(estSec){
   var bar=document.getElementById('aiProgBar');
@@ -152,7 +152,7 @@ function _aiProgFinish(){
   if(st)st.textContent='Pronto!';
 }
 function goStep(n){
-  // Restaurar resumo padrão se saindo do contexto incluso
+  // Restaurar resumo padrÃ£o se saindo do contexto incluso
   if(n!==6){
     var iSb=document.getElementById('inclusoSummaryBlock');
     if(iSb)iSb.style.display='none';
@@ -171,7 +171,7 @@ function goStep(n){
     setStyle('inclusoProdutoSection','display','none');
     setEl('tabStep2Lbl','Miniatura');
     setEl('step2Title','Miniatura');
-    setEl('step2Sub','Confirme que já possui a miniatura para montagem no quadro.');
+    setEl('step2Sub','Confirme que jÃ¡ possui a miniatura para montagem no quadro.');
   }
   // catalogo (produto pronto): o aviso dos "dois caminhos" nao aparece daqui pra frente
   var _smiG=document.getElementById('sidebarMiniInfo');
@@ -230,7 +230,7 @@ function goStep(n){
     if(i<n)t.classList.add('done');
     const sn=t.querySelector('.snum');
     if(!sn)return;if(t.style.display==='none'){sn.textContent='';return;}
-    sn.textContent=i<n?'✓':_sn;_sn++;
+    sn.textContent=i<n?'â':_sn;_sn++;
   });
   document.querySelectorAll('.cfg-sec').forEach((s,i)=>s.classList.toggle('active',i===n));
   // Toggle hero image vs live preview
@@ -360,7 +360,7 @@ function goStep(n){
   }
   // use visibility (not display) so layout is preserved
   var _detVis=['iCarro','relExtras','logoF1','logoBR','iMoldura'];
-  // ledDark/ledGlow mantidos visíveis no mini step 5 para preview LED funcionar
+  // ledDark/ledGlow mantidos visÃ­veis no mini step 5 para preview LED funcionar
   _detVis.forEach(function(id){
     var el=document.getElementById(id);
     if(el) el.style.visibility=_pvAtivo?'hidden':'';
@@ -392,10 +392,10 @@ function goStep(n){
   calcPrice();
 }
 
-// ── SOFT-DELETE STATE (reset ao entrar no step 7) ──
+// ââ SOFT-DELETE STATE (reset ao entrar no step 7) ââ
 var _sumRemoved={moldura:false,led:false,rel:[]};
 
-// ── REMOVE OPCIONAL DO RESUMO ──
+// ââ REMOVE OPCIONAL DO RESUMO ââ
 function removeSumItem(type, key, label){
   if(type==='moldura'){
     _sumRemoved.moldura=true;
@@ -421,7 +421,7 @@ function restoreSumItem(type, key, label){
   } else if(type==='led'){
     var _sF=_sumRemoved.ledFio||'sem', _sT=_sumRemoved.ledTipo||'rgb';
     _sumRemoved.led=false;
-    if(!S.led) togLED(); // liga com reset padrão
+    if(!S.led) togLED(); // liga com reset padrÃ£o
     // Restaurar fio/tipo que o cliente havia escolhido
     S.ledFio=_sF; S.ledTipo=_sT;
     var _fc2=document.getElementById('ledFioCom'),_fs2=document.getElementById('ledFioSem');
@@ -443,7 +443,7 @@ function restoreSumItem(type, key, label){
   buildSummary();
 }
 
-// ── STEP 1: TIPO ──
+// ââ STEP 1: TIPO ââ
 function selectTipo(t){
   S.tipo=t;
   // sair do modo catalogo logo no inicio (garante reset mesmo se algo abaixo falhar)
@@ -486,7 +486,7 @@ function selectTipo(t){
   var _ia0=document.getElementById('miniInfoAI');    if(_ia0)_ia0.style.display='none';
 }
 
-// ── LEGO BRAND ──
+// ââ LEGO BRAND ââ
 function selLegoBrand(card,brand){
   document.querySelectorAll('#legoBrands .bcard').forEach(c=>c.classList.remove('sel'));
   card.classList.add('sel');
@@ -502,7 +502,7 @@ function renderLegoModels(brand){
   models.forEach(m=>{
     const d=document.createElement('div');
     d.className='mrow';
-    d.innerHTML=`<span>${m.name}</span><span class="mrow-tag">${m.dim} · ${m.scale}</span>`;
+    d.innerHTML=`<span>${m.name}</span><span class="mrow-tag">${m.dim} Â· ${m.scale}</span>`;
     d.onclick=()=>selLegoModel(d,m);
     el.appendChild(d);
   });
@@ -510,7 +510,7 @@ function renderLegoModels(brand){
 }
 
 
-// ── MODEL CAR IMAGES ──
+// ââ MODEL CAR IMAGES ââ
 var MODEL_CAR_IMAGES={
   'Mercedes W14':'images/img_032.webp',
   'McLaren MP4/4 Senna':'images/img_033.webp',
@@ -522,7 +522,7 @@ var MODEL_MINI_IMAGES={
 };
 var DEFAULT_MINI_SRC='images/img_004.webp';
 
-// ── LOGO BR POR MODELO ──
+// ââ LOGO BR POR MODELO ââ
 var MODEL_LOGO_BR={
   'Mercedes W14':'images/img_036.webp',
 };
@@ -568,7 +568,7 @@ function selLegoModel(row,model){
   }
   var iMiniHero=document.getElementById('iMiniHero');
   if(iMiniHero)iMiniHero.src=MODEL_MINI_IMAGES[model.name]||DEFAULT_MINI_SRC;
-  // imagens do modelo vindas do banco (foto do produto / top-view) têm prioridade
+  // imagens do modelo vindas do banco (foto do produto / top-view) tÃªm prioridade
   if(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[model.name]){
     var _dbM=LEGO_FUNDOS_DB[model.name];
     if(_dbM.produto && _dbM.produto.length && iMiniHero) iMiniHero.src=_fotoUrl(_dbM.produto[0].img);
@@ -596,7 +596,7 @@ function selLegoModel(row,model){
       if(_bbrDiv)_bbrDiv.style.display='none';
     }
   }
-  // Refresh fundo e moldura per-model (sem referência a F/M — definidos depois no INIT)
+  // Refresh fundo e moldura per-model (sem referÃªncia a F/M â definidos depois no INIT)
   const _iFund=document.getElementById('iFundo');
   if(_iFund){
     const _mf2=MODEL_FUNDO_IMAGES[model.name];
@@ -610,7 +610,7 @@ function selLegoModel(row,model){
     if(_mm2&&_mm2[_mk2]) _iMold.src=_mm2[_mk2];
   }
   var hSub=document.getElementById('headerSub');
-  if(hSub)hSub.textContent='Visualizador · '+model.name+' LEGO';
+  if(hSub)hSub.textContent='Visualizador Â· '+model.name+' LEGO';
   document.querySelectorAll('#legoModels .mrow').forEach(r=>r.classList.remove('sel'));
   row.classList.add('sel');
   S.legoModel=model.name;
@@ -636,7 +636,7 @@ function selLegoModel(row,model){
     if(_op) _op.remove();
     var _ot=document.querySelector('.rel-tracado');
     if(_ot) _ot.remove();
-    // Desmarcar rows se modelo não tem a imagem
+    // Desmarcar rows se modelo nÃ£o tem a imagem
     if(_rPlaca&&!_hasPlaca) _rPlaca.classList.remove('sel');
     if(_rTracado&&!_hasTracado) _rTracado.classList.remove('sel');
   })();
@@ -649,7 +649,7 @@ function selLegoModel(row,model){
   calcPrice();
 }
 
-// ── MINI BRAND ──
+// ââ MINI BRAND ââ
 
 
 function selMiniBrandIncluso(card,brand){
@@ -659,7 +659,7 @@ function selMiniBrandIncluso(card,brand){
   // Mostrar galeria de modelos incluso
   setStyle('miniSection','display','none');
   setStyle('miniInclusoModelSection','display','block');
-  setEl('inclusoModelTitle', brand + ' — Modelos disponíveis');
+  setEl('inclusoModelTitle', brand + ' â Modelos disponÃ­veis');
   var models=INCLUSO_MODELS[brand]||[];
   var grid=document.getElementById('inclusoModelGrid');
   if(!grid)return;
@@ -697,19 +697,19 @@ function selInclusoModel(model){
   var _ip=document.getElementById('miniInfoPaths'); if(_ip)_ip.style.display='none';
   var _ia=document.getElementById('miniInfoAI');    if(_ia)_ia.style.display='block';
 
-  // Renomear tab e título do step-2
+  // Renomear tab e tÃ­tulo do step-2
   setEl('tabStep2Lbl','Produto');
   setEl('step2Title', model.name || 'Produto');
   setEl('step2Sub', S.incBrand || '');
 
-  // Esconder conteúdo regular, mostrar incluso
+  // Esconder conteÃºdo regular, mostrar incluso
   setStyle('step2RegularContent','display','none');
   setStyle('inclusoProdutoSection','display','block');
 
   var imgs = model.imgs||[];
   var firstImg = imgs[0]||'';
 
-  // ── Injetar imagem AI no painel hero (substitui Ferrari SF24 default) ──
+  // ââ Injetar imagem AI no painel hero (substitui Ferrari SF24 default) ââ
   var mhi = document.getElementById('miniHeroImg');
   if(mhi && firstImg){
     mhi.style.padding='0';
@@ -717,12 +717,12 @@ function selInclusoModel(model){
     mhi.innerHTML='<img src="'+firstImg+'" style="width:100%;height:100%;object-fit:contain;border-radius:0;display:block;">';
   }
 
-  // Preencher galeria (ip2MainImgWrap oculto quando há imagem no hero)
+  // Preencher galeria (ip2MainImgWrap oculto quando hÃ¡ imagem no hero)
   var mainWrapOuter = document.getElementById('ip2MainImgWrap');
   var mainWrap = document.getElementById('ip2MainImg');
   var thumbsWrap = document.getElementById('ip2Thumbs');
   if(firstImg && mainWrapOuter){
-    // Imagem já no hero — esconde galeria duplicada
+    // Imagem jÃ¡ no hero â esconde galeria duplicada
     mainWrapOuter.style.display='none';
     if(thumbsWrap) thumbsWrap.style.display='none';
   } else if(mainWrap){
@@ -752,7 +752,7 @@ function selInclusoModel(model){
     }
   }
 
-  // Descrição
+  // DescriÃ§Ã£o
   setEl('ip2Desc', model.desc || '');
 
   // Navegar para step-2
@@ -768,11 +768,11 @@ function confirmarInclusoModel(){
   var m=S.inclusoModel||{};
   var brand=S.incBrand||S.miniBrand||'';
 
-  // Preencher cabeçalho incluso
+  // Preencher cabeÃ§alho incluso
   setEl('iSumBrand', brand);
   setEl('iSumName', m.name||'');
   setEl('iSumDesc', m.desc||'');
-  setEl('iSumPrice', m.price ? 'R$ '+m.price.toFixed(2).replace('.',',') : 'Consulte o preço');
+  setEl('iSumPrice', m.price ? 'R$ '+m.price.toFixed(2).replace('.',',') : 'Consulte o preÃ§o');
 
   // Imagem
   var imgWrap=document.getElementById('iSumImg');
@@ -785,20 +785,20 @@ function confirmarInclusoModel(){
 
   // Preencher sum-block com dados do produto incluso
   setEl('sumCat','Quadro para Miniaturas');
-  setEl('sumMod', brand + (m.name ? ' — ' + m.name : ''));
-  setEl('sumDim', m.dim||'—');
-  setEl('sumMold','—');
-  setEl('sumFund','—');
-  setEl('sumLed','—');
+  setEl('sumMod', brand + (m.name ? ' â ' + m.name : ''));
+  setEl('sumDim', m.dim||'â');
+  setEl('sumMold','â');
+  setEl('sumFund','â');
+  setEl('sumLed','â');
   setEl('sumMini','Inclusa no produto');
-  setEl('sumRel','—');
-  setEl('pvSku','—');
-  setEl('sumTotal', m.price ? 'R$ '+m.price.toFixed(2).replace('.',',') : 'Consulte o preço');
+  setEl('sumRel','â');
+  setEl('pvSku','â');
+  setEl('sumTotal', m.price ? 'R$ '+m.price.toFixed(2).replace('.',',') : 'Consulte o preÃ§o');
 
   // Navegar para step-7
   goStep(7);
 
-  // Mostrar cabeçalho incluso + manter sum-block
+  // Mostrar cabeÃ§alho incluso + manter sum-block
   setStyle('inclusoSummaryBlock','display','block');
   document.querySelector('#step-7 .sum-block').style.display='';
   document.querySelector('#step-7 .tags').style.display='none';
@@ -820,13 +820,13 @@ function finalizarIncluso(){
 }
 
 
-// Chave via URL hash (#key=sk-...) ou localStorage — nunca hardcoded
+// Chave via URL hash (#key=sk-...) ou localStorage â nunca hardcoded
 (function(){
   var hash=window.location.hash;
   var m=hash.match(/[#&]key=([^&]+)/);
   if(m&&m[1]){
     try{localStorage.setItem('funparts_oai_key',decodeURIComponent(m[1]));}catch(e){}
-    // Limpa o hash da URL sem recarregar a página
+    // Limpa o hash da URL sem recarregar a pÃ¡gina
     history.replaceState(null,'',window.location.pathname+window.location.search);
   }
 })();
@@ -860,7 +860,7 @@ function _pollinationsImage(carName, color, resolve, reject){
     })
     .catch(function(e){
       console.error('[Funparts] Pollinations error:', e);
-      reject(new Error('Sem conexão com o servidor de imagens. Verifique sua internet e tente novamente.'));
+      reject(new Error('Sem conexÃ£o com o servidor de imagens. Verifique sua internet e tente novamente.'));
     });
 }
 
@@ -868,21 +868,21 @@ function generateCarImage(brand, model, year, color){
   return new Promise(function(resolve, reject){
     var carName=(brand+' '+model+(year?' '+year:'')).trim();
     var _prompt=
-      'Crie uma imagem hiper-realista em alta resolução de uma miniatura em escala 1:18 de um carro da marca '+brand+', modelo '+model+(year?', ano '+year:'')+', na cor '+color+'.\n'+
-      'A imagem deve seguir como referência visual o cenário de um escritório executivo moderno, com uma mesa de madeira escura e superfície levemente brilhante, ambiente elegante, limpo e sofisticado.\n'+
-      'O carro deve estar posicionado sobre a mesa como peça principal da composição, em visão frontal 3/4, levemente na diagonal, com a dianteira apontada para o lado esquerdo da imagem e a traseira para o lado direito, mantendo proporções realistas de uma miniatura colecionável escala 1:18.\n'+
-      'O veículo deve ser extremamente detalhado, com aparência de miniatura premium die-cast, pintura brilhante na cor '+color+', reflexos realistas, rodas detalhadas, pneus realistas, faróis, lanternas, entradas de ar, grade frontal, retrovisores, interior visível quando aplicável, acabamento fiel ao modelo real '+model+(year?' '+year:'')+' da marca '+brand+'.\n'+
-      'Não alterar as proporções originais do carro. Não deixar o carro mais largo, mais estreito, mais alto ou mais baixo do que o modelo real. Manter fielmente a silhueta, comprimento, largura, altura, entre-eixos, formato dos faróis, lanternas, para-choques, rodas, portas, capô, teto e demais características do veículo original.\n'+
-      'A composição deve parecer uma fotografia profissional de produto dentro de um escritório.\n'+
-      'Cenário: Mesa executiva de madeira escura com textura realista e reflexos suaves. Cadeira de escritório preta em couro ao fundo, posicionada no lado esquerdo. Porta-canetas preto com canetas metálicas no lado esquerdo da mesa. Armário ou aparador de madeira ao fundo. Quadro decorativo preto e branco apoiado no aparador, levemente desfocado. Janela grande no lado direito, com vista desfocada para prédios comerciais. Planta verde em vaso preto no lado direito. Livro ou caderno escuro no canto direito da mesa. Caneta metálica sobre o caderno no primeiro plano.\n'+
-      'Iluminação: Luz natural suave entrando pela janela lateral direita. Reflexos realistas na pintura do carro e na mesa. Sombras naturais e suaves abaixo da miniatura. Profundidade de campo realista, com o carro em foco e o fundo levemente desfocado.\n'+
-      'Estilo visual: Hiper-realismo. Fotografia profissional de produto. Alta resolução. Ultra detailed. Realistic reflections. Realistic shadows. Premium collectible miniature. Executive office environment. Clean luxury composition.\n'+
-      'Formato: Proporção horizontal 16:9. Enquadramento centralizado no carro com espaço ao redor para mostrar o cenário. Não inserir pessoas. Não inserir textos aleatórios. Não distorcer logotipos ou emblemas do carro. Não criar um carro genérico; o veículo deve ser fiel ao modelo '+model+(year?' '+year:'')+' da marca '+brand+'.';
+      'Crie uma imagem hiper-realista em alta resoluÃ§Ã£o de uma miniatura em escala 1:18 de um carro da marca '+brand+', modelo '+model+(year?', ano '+year:'')+', na cor '+color+'.\n'+
+      'A imagem deve seguir como referÃªncia visual o cenÃ¡rio de um escritÃ³rio executivo moderno, com uma mesa de madeira escura e superfÃ­cie levemente brilhante, ambiente elegante, limpo e sofisticado.\n'+
+      'O carro deve estar posicionado sobre a mesa como peÃ§a principal da composiÃ§Ã£o, em visÃ£o frontal 3/4, levemente na diagonal, com a dianteira apontada para o lado esquerdo da imagem e a traseira para o lado direito, mantendo proporÃ§Ãµes realistas de uma miniatura colecionÃ¡vel escala 1:18.\n'+
+      'O veÃ­culo deve ser extremamente detalhado, com aparÃªncia de miniatura premium die-cast, pintura brilhante na cor '+color+', reflexos realistas, rodas detalhadas, pneus realistas, farÃ³is, lanternas, entradas de ar, grade frontal, retrovisores, interior visÃ­vel quando aplicÃ¡vel, acabamento fiel ao modelo real '+model+(year?' '+year:'')+' da marca '+brand+'.\n'+
+      'NÃ£o alterar as proporÃ§Ãµes originais do carro. NÃ£o deixar o carro mais largo, mais estreito, mais alto ou mais baixo do que o modelo real. Manter fielmente a silhueta, comprimento, largura, altura, entre-eixos, formato dos farÃ³is, lanternas, para-choques, rodas, portas, capÃ´, teto e demais caracterÃ­sticas do veÃ­culo original.\n'+
+      'A composiÃ§Ã£o deve parecer uma fotografia profissional de produto dentro de um escritÃ³rio.\n'+
+      'CenÃ¡rio: Mesa executiva de madeira escura com textura realista e reflexos suaves. Cadeira de escritÃ³rio preta em couro ao fundo, posicionada no lado esquerdo. Porta-canetas preto com canetas metÃ¡licas no lado esquerdo da mesa. ArmÃ¡rio ou aparador de madeira ao fundo. Quadro decorativo preto e branco apoiado no aparador, levemente desfocado. Janela grande no lado direito, com vista desfocada para prÃ©dios comerciais. Planta verde em vaso preto no lado direito. Livro ou caderno escuro no canto direito da mesa. Caneta metÃ¡lica sobre o caderno no primeiro plano.\n'+
+      'IluminaÃ§Ã£o: Luz natural suave entrando pela janela lateral direita. Reflexos realistas na pintura do carro e na mesa. Sombras naturais e suaves abaixo da miniatura. Profundidade de campo realista, com o carro em foco e o fundo levemente desfocado.\n'+
+      'Estilo visual: Hiper-realismo. Fotografia profissional de produto. Alta resoluÃ§Ã£o. Ultra detailed. Realistic reflections. Realistic shadows. Premium collectible miniature. Executive office environment. Clean luxury composition.\n'+
+      'Formato: ProporÃ§Ã£o horizontal 16:9. Enquadramento centralizado no carro com espaÃ§o ao redor para mostrar o cenÃ¡rio. NÃ£o inserir pessoas. NÃ£o inserir textos aleatÃ³rios. NÃ£o distorcer logotipos ou emblemas do carro. NÃ£o criar um carro genÃ©rico; o veÃ­culo deve ser fiel ao modelo '+model+(year?' '+year:'')+' da marca '+brand+'.';
 
     function _setStatus(txt){var el=document.getElementById('aiLoadingStatus');if(el)el.textContent=txt;}
 
-    // ── Proxy Cloudflare Worker — chave OpenAI fica server-side ──
-    _setStatus('Gerando com OpenAI (alta resolução)…');
+    // ââ Proxy Cloudflare Worker â chave OpenAI fica server-side ââ
+    _setStatus('Gerando com OpenAI (alta resoluÃ§Ã£o)â¦');
     var xhr=new XMLHttpRequest();
     xhr.open('POST','https://funparts-ai-proxy.rodox1209.workers.dev',true);
     xhr.setRequestHeader('Content-Type','application/json');
@@ -900,7 +900,7 @@ function generateCarImage(brand, model, year, color){
         else reject(new Error('Formato inesperado'));
       }catch(e){reject(new Error(e.message));}
     };
-    xhr.onerror=function(){reject(new Error('Erro de conexão com o servidor'));};
+    xhr.onerror=function(){reject(new Error('Erro de conexÃ£o com o servidor'));};
     xhr.ontimeout=function(){reject(new Error('Tempo esgotado. Tente novamente.'));};
     xhr.send(JSON.stringify({model:'gpt-image-1',prompt:_prompt,n:1,size:'1536x1024',quality:'medium'}));
   });
@@ -910,7 +910,7 @@ function salvarApiKey(){
   var k=document.getElementById('aiApiKey')?document.getElementById('aiApiKey').value.trim():'';
   if(!k||!k.startsWith('sk-')){
     setStyle('aiErrorState','display','block');
-    setEl('aiErrorState','⚠ Chave inválida. Deve começar com sk-');
+    setEl('aiErrorState','â  Chave invÃ¡lida. Deve comeÃ§ar com sk-');
     return;
   }
   OPENAI_API_KEY=k;
@@ -922,8 +922,8 @@ function salvarApiKey(){
 var AI_COLORS=[
   {name:'Vermelho Ferrari',hex:'#CC0000'},{name:'Vermelho Escuro',hex:'#8B0000'},
   {name:'Laranja',hex:'#FF6600'},{name:'Amarelo',hex:'#FFD700'},
-  {name:'Verde Britânico',hex:'#005C2E'},{name:'Verde Lima',hex:'#7DC26A'},
-  {name:'Azul Metálico',hex:'#1C4B9C'},{name:'Azul Celeste',hex:'#4DA6FF'},
+  {name:'Verde BritÃ¢nico',hex:'#005C2E'},{name:'Verde Lima',hex:'#7DC26A'},
+  {name:'Azul MetÃ¡lico',hex:'#1C4B9C'},{name:'Azul Celeste',hex:'#4DA6FF'},
   {name:'Turquesa',hex:'#00B5B0'},{name:'Roxo',hex:'#6B3FA0'},
   {name:'Rosa',hex:'#E8568A'},{name:'Preto',hex:'#111111'},
   {name:'Cinza Escuro',hex:'#444444'},{name:'Cinza Grafite',hex:'#777777'},
@@ -949,7 +949,7 @@ function initColorPalette(){
 }
 
 function initApenaColorPalette(){var palette=document.getElementById('apenaColorPalette');if(!palette||palette.children.length>0)return;AI_COLORS.forEach(function(c){var sw=document.createElement('div');sw.title=c.name;sw.style.cssText='aspect-ratio:1;border-radius:7px;background:'+c.hex+';cursor:pointer;border:2px solid #2a2a2a;transition:border .12s,transform .12s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);';sw.onclick=function(){palette.querySelectorAll('div').forEach(function(s){s.style.border='2px solid #2a2a2a';s.style.transform='scale(1)';});sw.style.border='2px solid #e07b00';sw.style.transform='scale(1.18)';document.getElementById('apenaCarColor').value=c.name;};palette.appendChild(sw);});}
-async function gerarVisualizacaoApenas(){initApenaColorPalette();var brand=(document.getElementById('apenaCarBrand')||{}).value||S.miniBrand||'';var model=(document.getElementById('apenaCarModel')||{}).value||S.miniModel||'';var year=(document.getElementById('apenaCarYear')||{}).value||'';var color=(document.getElementById('apenaCarColor')||{}).value||'';brand=brand.trim();model=model.trim();year=year.trim();color=color.trim();if(!brand||!model||!color){setStyle('apenaErrorState','display','block');hideAiPopup();setEl('apenaErrorState','⚠ Selecione uma marca, preencha o modelo e selecione uma cor.');return;}setStyle('apenaErrorState','display','none');setStyle('apenaGenerateBtn','display','none');setStyle('apenaGeneratedResult','display','none');setStyle('apenaLoadingState','display','block');showAiPopup();var carName=[brand,model,year].filter(Boolean).join(' ');S.miniBrand=brand;S.miniModel=model;S.aiCarName=carName;S.aiCarColor=color;_detTopViewUrl='';_detTopViewKey='';try{var imgUrl=await Promise.race([generateTopViewPromise((brand+' '+model+(year?' '+year:'')).trim(),color),new Promise(function(_r,rej){setTimeout(function(){rej(new Error('Tempo esgotado (90s). Verifique sua chave OpenAI.'));},90000);})]);setStyle('apenaLoadingState','display','none');setStyle('apenaGenerateBtn','display','block');setStyle('apenaGeneratedResult','display','block');hideAiPopup();var img=document.getElementById('apenaGeneratedImg');if(img)img.src=imgUrl;_detTopViewUrl=imgUrl;_detTopViewKey=([brand,model,year].filter(Boolean).join(' '))+'|'+color;var hero=document.getElementById('miniStep1HeroImg');if(hero){hero.style.display='flex';hero.style.padding='0';hero.style.background='#0d0d0d';hero.innerHTML='<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:0;display:block;">';}setEl('pvMod',brand+(model?' — '+model:''));goStep(3);}catch(e){setStyle('apenaLoadingState','display','none');setStyle('apenaGenerateBtn','display','block');setStyle('apenaErrorState','display','block');setEl('apenaErrorState','⚠ '+(e.message||'Erro desconhecido'));}}
+async function gerarVisualizacaoApenas(){initApenaColorPalette();var brand=(document.getElementById('apenaCarBrand')||{}).value||S.miniBrand||'';var model=(document.getElementById('apenaCarModel')||{}).value||S.miniModel||'';var year=(document.getElementById('apenaCarYear')||{}).value||'';var color=(document.getElementById('apenaCarColor')||{}).value||'';brand=brand.trim();model=model.trim();year=year.trim();color=color.trim();if(!brand||!model||!color){setStyle('apenaErrorState','display','block');hideAiPopup();setEl('apenaErrorState','â  Selecione uma marca, preencha o modelo e selecione uma cor.');return;}setStyle('apenaErrorState','display','none');setStyle('apenaGenerateBtn','display','none');setStyle('apenaGeneratedResult','display','none');setStyle('apenaLoadingState','display','block');showAiPopup();var carName=[brand,model,year].filter(Boolean).join(' ');S.miniBrand=brand;S.miniModel=model;S.aiCarName=carName;S.aiCarColor=color;_detTopViewUrl='';_detTopViewKey='';try{var imgUrl=await Promise.race([generateTopViewPromise((brand+' '+model+(year?' '+year:'')).trim(),color),new Promise(function(_r,rej){setTimeout(function(){rej(new Error('Tempo esgotado (90s). Verifique sua chave OpenAI.'));},90000);})]);setStyle('apenaLoadingState','display','none');setStyle('apenaGenerateBtn','display','block');setStyle('apenaGeneratedResult','display','block');hideAiPopup();var img=document.getElementById('apenaGeneratedImg');if(img)img.src=imgUrl;_detTopViewUrl=imgUrl;_detTopViewKey=([brand,model,year].filter(Boolean).join(' '))+'|'+color;var hero=document.getElementById('miniStep1HeroImg');if(hero){hero.style.display='flex';hero.style.padding='0';hero.style.background='#0d0d0d';hero.innerHTML='<img src="'+imgUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:0;display:block;">';}setEl('pvMod',brand+(model?' â '+model:''));goStep(3);}catch(e){setStyle('apenaLoadingState','display','none');setStyle('apenaGenerateBtn','display','block');setStyle('apenaErrorState','display','block');setEl('apenaErrorState','â  '+(e.message||'Erro desconhecido'));}}
 async function gerarVisualizacaoIA(){
   initColorPalette();
   var brand=(document.getElementById('aiCarBrand')||{}).value||'';
@@ -960,7 +960,7 @@ async function gerarVisualizacaoIA(){
   var carName=(brand+' '+model+(year?' '+year:'')).trim();
   if(!brand||!model||!color){
     setStyle('aiErrorState','display','block');
-    setEl('aiErrorState','⚠ Preencha a marca, o modelo e selecione uma cor.');
+    setEl('aiErrorState','â  Preencha a marca, o modelo e selecione uma cor.');
     return;
   }
 
@@ -973,7 +973,7 @@ async function gerarVisualizacaoIA(){
   S.incBrand=brand;
   try{
     var imgUrl=await generateCarImage(brand,model,year,color);
-    var fakeModel={name:color+' '+carName,imgs:[imgUrl],price:null,desc:'Visualização gerada por IA · '+color+' '+carName};
+    var fakeModel={name:color+' '+carName,imgs:[imgUrl],price:null,desc:'VisualizaÃ§Ã£o gerada por IA Â· '+color+' '+carName};
     setStyle('aiLoadingState','display','none');
     setStyle('aiGenerateBtn','display','block');
     hideAiPopup();
@@ -985,9 +985,9 @@ async function gerarVisualizacaoIA(){
     setStyle('aiErrorState','display','block');
     var msg=e.message||'Erro desconhecido';
     if(msg.includes('401')){
-      msg='Chave inválida ou expirada. Verifique a chave em platform.openai.com';
+      msg='Chave invÃ¡lida ou expirada. Verifique a chave em platform.openai.com';
     }
-    setEl('aiErrorState','⚠ '+msg);
+    setEl('aiErrorState','â  '+msg);
   }
 }
 
@@ -1007,12 +1007,12 @@ function selMiniChoice(choice){
   setStyle('miniChoiceSection','display','none');
   setStyle('miniSection','display','block');
   setEl('step1Title','QUADRO PARA MINIATURAS');
-  setEl('step1Sub','Selecione o quadro da sua preferência');
+  setEl('step1Sub','Selecione o quadro da sua preferÃªncia');
   setStyle('step1Title','display','');
   setStyle('step1Sub','display','');
 
   if(choice==='incluso'){
-    // Modo incluso: mostrar seção de IA em vez de brand logos
+    // Modo incluso: mostrar seÃ§Ã£o de IA em vez de brand logos
     setStyle('miniSection','display','none');
     setStyle('miniInclusoAISection','display','block');
     // o aviso dos "dois caminhos" so vale nas etapas anteriores
@@ -1023,7 +1023,7 @@ function selMiniChoice(choice){
     renderInclusoBrands();
 
   } else {
-    // Modo apenas: formulário AI
+    // Modo apenas: formulÃ¡rio AI
     setStyle('miniSection','display','none');
     setStyle('miniApenasSection','display','block');
     setStyle('step1NavBtns','display','none');
@@ -1038,12 +1038,12 @@ function selMiniBrand(card,brand){
   document.querySelectorAll('#miniBrands .bcard').forEach(c=>c.classList.remove('sel'));
   card.classList.add('sel');
   S.miniBrand=brand;
-  setEl('pvMod',brand+(S.miniModel?' — '+S.miniModel:''));
+  setEl('pvMod',brand+(S.miniModel?' â '+S.miniModel:''));
 }
 
 function updateMiniModel(){
   S.miniModel=document.getElementById('miniModelInput').value;
-  setEl('pvMod',S.miniBrand+(S.miniModel?' — '+S.miniModel:''));
+  setEl('pvMod',S.miniBrand+(S.miniModel?' â '+S.miniModel:''));
   setEl('carLbl',S.miniModel||S.miniBrand);
   updateBadgeTL(S.miniModel||S.miniBrand);
   const iF1=S.miniBrand==='Formula 1';
@@ -1057,7 +1057,7 @@ function renderMiniSizes(){
   MINI_SIZES.forEach((sz,i)=>{
     const d=document.createElement('div');
     d.className='ocard'+(i===0?' sel':'');
-    d.innerHTML=`<div class="ochk">${i===0?'✓':''}</div><div class="oname">${sz.label}</div><div class="odesc">Escala: ${sz.scale}</div>`;
+    d.innerHTML=`<div class="ochk">${i===0?'â':''}</div><div class="oname">${sz.label}</div><div class="odesc">Escala: ${sz.scale}</div>`;
     d.onclick=()=>selMiniSize(d,sz);
     el.appendChild(d);
   });
@@ -1068,13 +1068,13 @@ function renderMiniSizes(){
 function selMiniSize(card,sz){
   document.querySelectorAll('#miniSizeOpts .ocard').forEach(c=>{c.classList.remove('sel');c.querySelector('.ochk').textContent='';});
   card.classList.add('sel');
-  card.querySelector('.ochk').textContent='✓';
+  card.querySelector('.ochk').textContent='â';
   S.miniSize=sz.id;
   S.miniDim=sz.label;
   calcPrice();
 }
 
-// ── STEP 3: MINIATURA ──
+// ââ STEP 3: MINIATURA ââ
 function selMiniOpt(opt){
   S.miniOpt=opt;
   document.getElementById('mOwnCard').classList.toggle('sel',opt==='own');
@@ -1094,7 +1094,7 @@ function togCustom(row,label){
   row.classList.toggle('sel');
   const box=row.querySelector('.ckbox');
   const on=row.classList.contains('sel');
-  box.textContent=on?'✓':'';
+  box.textContent=on?'â':'';
   const extra=parseInt(row.querySelector('.ckextra').textContent.replace(/\D/g,''));
   if(on){S.customs.push(label);S.customExtra+=extra;}
   else{S.customs=S.customs.filter(c=>c!==label);S.customExtra-=extra;}
@@ -1105,12 +1105,12 @@ function trigUpload(){document.getElementById('fileInput').click();}
 function handleFile(e){
   if(e.target.files[0]){
     const z=document.querySelector('.upload-z');
-    z.querySelector('.utit').textContent='✅ '+e.target.files[0].name;
-    z.querySelector('.udesc').textContent='Foto recebida. Nossa equipe validará a escala.';
+    z.querySelector('.utit').textContent='â '+e.target.files[0].name;
+    z.querySelector('.udesc').textContent='Foto recebida. Nossa equipe validarÃ¡ a escala.';
   }
 }
 
-// ── STEP 4: DETALHAMENTO ──
+// ââ STEP 4: DETALHAMENTO ââ
 var SCALE_FRAMES={
   '1:43':['25x35cm'],
   '1:24':['25x35cm','49x49cm'],
@@ -1134,7 +1134,7 @@ var DIM_STYLE={
   '49x49cm':  {cls:'m-fibra', ratio:'525/527'},
   '40x66,5cm':{cls:'m-fibra', ratio:'800/1266'}
 };
-// Moldura images for miniatura preview (dimension × tipo)
+// Moldura images for miniatura preview (dimension Ã tipo)
 var MINI_MOLDURA_IMAGES={
   '25x35cm':  {fibra:'https://lh3.googleusercontent.com/d/1gISNsZWMTieUpIlOR8mXAEMfwcdxlnAY', laca:'https://lh3.googleusercontent.com/d/1AA0l-XiKaWFspkQYcEGqrnHQ2DC86PNX'},
   '40x66,5cm':{fibra:'https://lh3.googleusercontent.com/d/1Y2Pj3MoWsb75czP2alkPqBgbIIy0-4Eb', laca:'https://lh3.googleusercontent.com/d/1Yt_ldtRaI_TPGhPieFGsQ762A-3FXTT2'},
@@ -1153,11 +1153,11 @@ function updateMiniRefImg(){
   if(img){el.src=img;var wm=document.querySelector('#wallModalBox img');if(wm)wm.src=img;}
 }
 
-// ── DETALHAMENTO: top-view car overlay ──
+// ââ DETALHAMENTO: top-view car overlay ââ
 var _detTopViewUrl='';
 var _detTopViewKey='';
 
-// Multiplicadores calibrados pelo usuário para cada combinação escala × quadro
+// Multiplicadores calibrados pelo usuÃ¡rio para cada combinaÃ§Ã£o escala Ã quadro
 var DET_SIZE_MULT={
   '43_25x35':1.40,
   '24_25x35':1.20,
@@ -1178,40 +1178,40 @@ function getDetCarSize(scale,quadroDim){
 function generateTopViewPromise(carName,color){
   return new Promise(function(resolve,reject){
     var prompt=
-      'Gere uma imagem de vista superior (top view) de uma miniatura colecionável diecast premium do carro '+carName+', na cor '+color+'.\n'+
-      'POSICIONAMENTO OBRIGATÓRIO DA CÂMERA:\n'+
-      'A câmera deve estar posicionada exatamente acima do centro do veículo, apontada verticalmente para baixo em um ângulo exato de 90 graus.\n'+
-      'A lente deve estar perfeitamente paralela ao plano horizontal do veículo.\n'+
-      'Não utilizar perspectiva fotográfica. Não utilizar lente grande-angular. Não utilizar visão isométrica. Não utilizar vista diagonal. Não utilizar vista 3/4.\n'+
-      'Não mostrar excessivamente as laterais, a dianteira ou a traseira do veículo.\n'+
-      'ALINHAMENTO OBRIGATÓRIO:\n'+
-      'O eixo longitudinal central do veículo deve estar perfeitamente reto e vertical na imagem.\n'+
-      'ORIENTAÇÃO CRÍTICA — NÃO INVERTER: a DIANTEIRA do carro deve ficar na METADE SUPERIOR da imagem e a TRASEIRA na METADE INFERIOR.\n'+
-      'Na PARTE DE CIMA da imagem devem aparecer: capô, grade frontal, faróis dianteiros e para-choque dianteiro.\n'+
-      'Na PARTE DE BAIXO da imagem devem aparecer: porta-malas, aerofólio traseiro, lanternas traseiras e escapamento.\n'+
-      'O carro aponta para cima, como se estivesse avançando em direção ao topo da imagem.\n'+
-      'O centro do para-choque dianteiro, o centro do teto e o centro do para-choque traseiro devem formar uma única linha vertical reta.\n'+
-      'As rodas do lado esquerdo e direito devem permanecer perfeitamente alinhadas e simétricas.\n'+
-      'O veículo não pode estar rotacionado, inclinado ou posicionado diagonalmente.\n'+
-      'FIDELIDADE DO VEÍCULO:\n'+
-      'Preservar fielmente o modelo, carroceria, cor, proporções, teto, capô, vidros, aerofólio, entradas de ar, rodas e todos os detalhes visíveis da miniatura original.\n'+
-      'Não modificar o design do veículo. Não inventar peças. Não alterar o modelo das rodas.\n'+
-      'Não transformar a miniatura em um carro real em tamanho natural. Manter aparência hiper-realista de miniatura diecast premium.\n'+
-      'PROPORÇÕES REAIS (crítico): um carro é tipicamente 2,3 a 2,5 vezes mais comprido do que largo. Não esticar nem alargar o veículo para preencher a largura da imagem. A largura da carroceria deve ocupar aproximadamente 40% da largura da imagem, deixando espaço transparente nas laterais.\n'+
-      'COMPOSIÇÃO:\n'+
-      'Mostrar o veículo inteiro, sem cortar nenhuma parte. Centralizar perfeitamente o veículo na tela.\n'+
-      'Manter margens iguais nos quatro lados. Usar composição totalmente simétrica.\n'+
-      'Fundo transparente, uniforme e sem elementos adicionais. Não inserir piso, cenário, textos, logotipos adicionais ou objetos.\n'+
-      'OPACIDADE (crítico): todas as superfícies do veículo — carroceria, para-brisa, vidros laterais e teto — devem ser materiais sólidos e totalmente opacos (pintados ou vidro fumê). Nenhum furo, área vazada ou transparente dentro da silhueta do carro. A transparência deve existir apenas fora do contorno do veículo.\n'+
-      'ILUMINAÇÃO:\n'+
-      'Iluminação de estúdio suave e uniforme, distribuída igualmente pelos dois lados.\n'+
+      'Gere uma imagem de vista superior (top view) de uma miniatura colecionÃ¡vel diecast premium do carro '+carName+', na cor '+color+'.\n'+
+      'POSICIONAMENTO OBRIGATÃRIO DA CÃMERA:\n'+
+      'A cÃ¢mera deve estar posicionada exatamente acima do centro do veÃ­culo, apontada verticalmente para baixo em um Ã¢ngulo exato de 90 graus.\n'+
+      'A lente deve estar perfeitamente paralela ao plano horizontal do veÃ­culo.\n'+
+      'NÃ£o utilizar perspectiva fotogrÃ¡fica. NÃ£o utilizar lente grande-angular. NÃ£o utilizar visÃ£o isomÃ©trica. NÃ£o utilizar vista diagonal. NÃ£o utilizar vista 3/4.\n'+
+      'NÃ£o mostrar excessivamente as laterais, a dianteira ou a traseira do veÃ­culo.\n'+
+      'ALINHAMENTO OBRIGATÃRIO:\n'+
+      'O eixo longitudinal central do veÃ­culo deve estar perfeitamente reto e vertical na imagem.\n'+
+      'ORIENTAÃÃO CRÃTICA â NÃO INVERTER: a DIANTEIRA do carro deve ficar na METADE SUPERIOR da imagem e a TRASEIRA na METADE INFERIOR.\n'+
+      'Na PARTE DE CIMA da imagem devem aparecer: capÃ´, grade frontal, farÃ³is dianteiros e para-choque dianteiro.\n'+
+      'Na PARTE DE BAIXO da imagem devem aparecer: porta-malas, aerofÃ³lio traseiro, lanternas traseiras e escapamento.\n'+
+      'O carro aponta para cima, como se estivesse avanÃ§ando em direÃ§Ã£o ao topo da imagem.\n'+
+      'O centro do para-choque dianteiro, o centro do teto e o centro do para-choque traseiro devem formar uma Ãºnica linha vertical reta.\n'+
+      'As rodas do lado esquerdo e direito devem permanecer perfeitamente alinhadas e simÃ©tricas.\n'+
+      'O veÃ­culo nÃ£o pode estar rotacionado, inclinado ou posicionado diagonalmente.\n'+
+      'FIDELIDADE DO VEÃCULO:\n'+
+      'Preservar fielmente o modelo, carroceria, cor, proporÃ§Ãµes, teto, capÃ´, vidros, aerofÃ³lio, entradas de ar, rodas e todos os detalhes visÃ­veis da miniatura original.\n'+
+      'NÃ£o modificar o design do veÃ­culo. NÃ£o inventar peÃ§as. NÃ£o alterar o modelo das rodas.\n'+
+      'NÃ£o transformar a miniatura em um carro real em tamanho natural. Manter aparÃªncia hiper-realista de miniatura diecast premium.\n'+
+      'PROPORÃÃES REAIS (crÃ­tico): um carro Ã© tipicamente 2,3 a 2,5 vezes mais comprido do que largo. NÃ£o esticar nem alargar o veÃ­culo para preencher a largura da imagem. A largura da carroceria deve ocupar aproximadamente 40% da largura da imagem, deixando espaÃ§o transparente nas laterais.\n'+
+      'COMPOSIÃÃO:\n'+
+      'Mostrar o veÃ­culo inteiro, sem cortar nenhuma parte. Centralizar perfeitamente o veÃ­culo na tela.\n'+
+      'Manter margens iguais nos quatro lados. Usar composiÃ§Ã£o totalmente simÃ©trica.\n'+
+      'Fundo transparente, uniforme e sem elementos adicionais. NÃ£o inserir piso, cenÃ¡rio, textos, logotipos adicionais ou objetos.\n'+
+      'OPACIDADE (crÃ­tico): todas as superfÃ­cies do veÃ­culo â carroceria, para-brisa, vidros laterais e teto â devem ser materiais sÃ³lidos e totalmente opacos (pintados ou vidro fumÃª). Nenhum furo, Ã¡rea vazada ou transparente dentro da silhueta do carro. A transparÃªncia deve existir apenas fora do contorno do veÃ­culo.\n'+
+      'ILUMINAÃÃO:\n'+
+      'IluminaÃ§Ã£o de estÃºdio suave e uniforme, distribuÃ­da igualmente pelos dois lados.\n'+
       'Evitar sombras laterais fortes que prejudiquem a simetria.\n'+
-      'Utilizar apenas uma sombra muito suave e centralizada abaixo da miniatura, caso seja necessária para preservar o volume.\n'+
+      'Utilizar apenas uma sombra muito suave e centralizada abaixo da miniatura, caso seja necessÃ¡ria para preservar o volume.\n'+
       'RESULTADO FINAL:\n'+
-      'Imagem técnica, ortográfica, perfeitamente centralizada e simétrica, adequada para aplicação automática em um mockup digital.\n'+
-      'Vista superior pura. Top view exata. Câmera a 90 graus. Zero perspectiva. Zero rotação diagonal. Zero vista 3/4.\n'+
-      'Alta nitidez em todo o veículo. Fundo transparente.\n'+
-      'LEMBRETE FINAL DE ORIENTAÇÃO (obrigatório): o capô e os faróis dianteiros OBRIGATORIAMENTE na parte SUPERIOR da imagem; as lanternas traseiras na parte INFERIOR. Nunca inverter o carro.';
+      'Imagem tÃ©cnica, ortogrÃ¡fica, perfeitamente centralizada e simÃ©trica, adequada para aplicaÃ§Ã£o automÃ¡tica em um mockup digital.\n'+
+      'Vista superior pura. Top view exata. CÃ¢mera a 90 graus. Zero perspectiva. Zero rotaÃ§Ã£o diagonal. Zero vista 3/4.\n'+
+      'Alta nitidez em todo o veÃ­culo. Fundo transparente.\n'+
+      'LEMBRETE FINAL DE ORIENTAÃÃO (obrigatÃ³rio): o capÃ´ e os farÃ³is dianteiros OBRIGATORIAMENTE na parte SUPERIOR da imagem; as lanternas traseiras na parte INFERIOR. Nunca inverter o carro.';
     var xhr=new XMLHttpRequest();
     xhr.open('POST','https://funparts-ai-proxy.rodox1209.workers.dev',true);
     xhr.setRequestHeader('Content-Type','application/json');
@@ -1229,7 +1229,7 @@ function generateTopViewPromise(carName,color){
         else reject(new Error('Formato inesperado'));
       }catch(e){reject(e);}
     };
-    xhr.onerror=function(){reject(new Error('Erro de conexão com o servidor'));};
+    xhr.onerror=function(){reject(new Error('Erro de conexÃ£o com o servidor'));};
     xhr.ontimeout=function(){reject(new Error('Tempo esgotado. Tente novamente.'));};
     xhr.send(JSON.stringify({
       model:'gpt-image-1',
@@ -1273,7 +1273,7 @@ function removeImageBackground(dataUrl){
         var bgR=Math.round(rs/n),bgG=Math.round(gs/n),bgB=Math.round(bs/n);
         var tolerance=22;
         var feather=38;
-        // ── FLOOD-FILL from edges: only remove background pixels reachable from border ──
+        // ââ FLOOD-FILL from edges: only remove background pixels reachable from border ââ
         // Conservative tolerance preserves ALL interior areas (glass, windshield, trim)
         var visited=new Uint8Array(w*h);
         var qx=[],qy=[],qi=0;
@@ -1312,7 +1312,7 @@ function removeImageBackground(dataUrl){
           var cw=maxX-minX+1,ch=maxY-minY+1;
           var cc=document.createElement('canvas');cc.width=cw;cc.height=ch;
           cc.getContext('2d').putImageData(ctx.getImageData(minX,minY,cw,ch),0,0);
-          // Resize to physical car aspect ratio (width:height = 1900:4500 ≈ 0.422)
+          // Resize to physical car aspect ratio (width:height = 1900:4500 â 0.422)
           // so naturalWidth/naturalHeight always matches real car proportions
           var targetW=Math.round(ch*(1900/4500));
           var rc=document.createElement('canvas');rc.width=targetW;rc.height=ch;
@@ -1322,7 +1322,7 @@ function removeImageBackground(dataUrl){
           resolve(canvas.toDataURL('image/png'));
         }
       }catch(e){
-        // Canvas tainted or other error → return original
+        // Canvas tainted or other error â return original
         resolve(dataUrl);
       }
     };
@@ -1352,7 +1352,7 @@ function applyDetCarOverlay(){
   var natH=el.naturalHeight||1536;
   var carH=qH*sz.hPct;
   var carW=carH*(natW/natH);
-  // Place in interior: border ~12% top, ~12% bottom → interior center at 50%
+  // Place in interior: border ~12% top, ~12% bottom â interior center at 50%
   var top=qH*0.12+(qH*0.76-carH)/2;
   var left=(qW-carW)/2;
   el.style.width=carW+'px';
@@ -1378,7 +1378,7 @@ async function triggerDetTopView(){
   var el=document.getElementById('detPvCar');
   if(loader)loader.style.display='block';
   if(el)el.style.display='none';
-  showAiPopup('Fanático, essa miniatura é sensacional.<br>Já consegue imaginar ela em um quadro?<br>Em instantes iremos demonstrar alguns modelos para que consiga escolher qual irá combinar com o seu ambiente.','Aguarde! Estamos gerando uma nova imagem da vista superior da sua miniatura.');
+  showAiPopup('FanÃ¡tico, essa miniatura Ã© sensacional.<br>JÃ¡ consegue imaginar ela em um quadro?<br>Em instantes iremos demonstrar alguns modelos para que consiga escolher qual irÃ¡ combinar com o seu ambiente.','Aguarde! Estamos gerando uma nova imagem da vista superior da sua miniatura.');
   try{
     var rawUrl=await generateTopViewPromise(carName,color);
     var url=await removeImageBackground(rawUrl);
@@ -1389,26 +1389,26 @@ async function triggerDetTopView(){
   }catch(e){
     console.warn('[Funparts] top-view:',e.message);
     if(e.message==='sem-key'&&loader){
-      loader.innerHTML='<div style="color:rgba(255,200,100,.7);font-size:10px;letter-spacing:.3px;text-align:center;padding:4px;">Adicione sua chave OpenAI<br>via URL: #key=sk-…</div>';
+      loader.innerHTML='<div style="color:rgba(255,200,100,.7);font-size:10px;letter-spacing:.3px;text-align:center;padding:4px;">Adicione sua chave OpenAI<br>via URL: #key=sk-â¦</div>';
       loader.style.display='block';
       return;
     }
   }finally{
     hideAiPopup();
-    if(loader&&loader.style.display!=='none'){loader.innerHTML='<div style="color:rgba(255,255,255,.45);font-size:11px;letter-spacing:.5px;animation:aiPulse 2s ease infinite;">Gerando top-view…</div>';loader.style.display='none';}
+    if(loader&&loader.style.display!=='none'){loader.innerHTML='<div style="color:rgba(255,255,255,.45);font-size:11px;letter-spacing:.5px;animation:aiPulse 2s ease infinite;">Gerando top-viewâ¦</div>';loader.style.display='none';}
   }
 }
 
 function _legoLegacyRatio(dim){
-  // Compute CSS aspect-ratio from LEGO dim strings like "53×83cm"
+  // Compute CSS aspect-ratio from LEGO dim strings like "53Ã83cm"
   if(!dim) return '';
-  var sep=dim.indexOf('×')>=0?'×':'x';
+  var sep=dim.indexOf('Ã')>=0?'Ã':'x';
   var parts=dim.replace('cm','').replace(',','.').split(sep);
   if(parts.length===2) return parts[0].trim()+'/'+parts[1].trim();
   return '';
 }
 function updateDetPreview(){
-  // ── LEGO branch: no car overlay, use legoDim for aspect-ratio ──
+  // ââ LEGO branch: no car overlay, use legoDim for aspect-ratio ââ
   if(S.tipo==='lego'){
     var pvMod=document.getElementById('pvMod');
     if(pvMod) pvMod.textContent=S.legoModel||S.legoBrand||'LEGO';
@@ -1418,29 +1418,29 @@ function updateDetPreview(){
     if(_quadro&&S.legoDim){
       var ratio=_legoLegacyRatio(S.legoDim);
       if(ratio){_quadro.style.aspectRatio=ratio;_quadro.style.overflow='hidden';}
-      _quadro.classList.toggle('lego-53x83',/^53\s*[×x]\s*83/.test(S.legoDim));
+      _quadro.classList.toggle('lego-53x83',/^53\s*[Ãx]\s*83/.test(S.legoDim));
     }
     // === LEGO preview: update legoPreviewWrap elements ===
     // Fundo gradient
     updateDetPvFundo();
     // Moldura frame - use Drive CDN based on selected moldura
     var _LEGO_FRAMES={'fibra':'https://lh3.googleusercontent.com/d/1l-7-oVLTWJ2-9owSFXGSbCncvSGvjuzP','laca':'https://lh3.googleusercontent.com/d/1MAnDITKvxgmlQuMKTTofzdl-7UvIhmLq'};
-    // 49×49cm: a moldura padrão do LEGO é retrato (1022×1600 ≈ 53×83) e, esticada
+    // 49Ã49cm: a moldura padrÃ£o do LEGO Ã© retrato (1022Ã1600 â 53Ã83) e, esticada
     // por object-fit:fill num quadro quadrado, afinava as bordas de cima/baixo.
-    // Usa as molduras QUADRADAS do fluxo Miniatura (fibra/laca) só nessa dimensão.
+    // Usa as molduras QUADRADAS do fluxo Miniatura (fibra/laca) sÃ³ nessa dimensÃ£o.
     var _LEGO_FRAMES_49={'fibra':'https://lh3.googleusercontent.com/d/1SZLlOB6U2IKWYTr2CWC2G6craO8LgGv7','laca':'https://lh3.googleusercontent.com/d/1OXb1ET16x7qKrN5mxB8WTTPfKEFzpSbv'};
-    var _is4949=/^49\s*[×x]\s*49/.test(S.legoDim||'');
+    var _is4949=/^49\s*[Ãx]\s*49/.test(S.legoDim||'');
     var ldfr=document.getElementById('legoDetFrame');
     if(ldfr){
       var _fk=(S.moldura==='m-fibra')?'fibra':'laca';
       ldfr.src=(_is4949?_LEGO_FRAMES_49:_LEGO_FRAMES)[_fk];
       ldfr.style.display='block';
-      ldfr.style.height=''; ldfr.style.top=''; // moldura quadrada já fica proporcional; sem hack de +5px
+      ldfr.style.height=''; ldfr.style.top=''; // moldura quadrada jÃ¡ fica proporcional; sem hack de +5px
     }
-    // 49×49cm: encolhe o fundo 2px na altura para não vazar por baixo da moldura quadrada.
-    // Fora do 49×49 restaura 100% (altura base do HTML) — nunca '' (isso zerava o fundo).
+    // 49Ã49cm: encolhe o fundo 2px na altura para nÃ£o vazar por baixo da moldura quadrada.
+    // Fora do 49Ã49 restaura 100% (altura base do HTML) â nunca '' (isso zerava o fundo).
     var _lfu=document.getElementById('legoDetFundo');
-    if(_lfu){ var _is5383m=/^53\s*[×x]\s*83/.test(S.legoDim||'')&&window.innerWidth<=720; _lfu.style.height=_is4949?'calc(100% - 2px)':(_is5383m?'calc(100% - 13px)':'100%'); }
+    if(_lfu){ var _is5383m=/^53\s*[Ãx]\s*83/.test(S.legoDim||'')&&window.innerWidth<=720; _lfu.style.height=_is4949?'calc(100% - 2px)':(_is5383m?'calc(100% - 13px)':'100%'); }
     // Car image - top-view sobre o fundo. Banco (por modelo) tem prioridade.
     var lcar=document.getElementById('legoDetCar');
     if(lcar){
@@ -1453,7 +1453,7 @@ function updateDetPreview(){
     if(ldq&&S.legoDim){
       var _lr=_legoLegacyRatio(S.legoDim);
       if(_lr){ldq.style.aspectRatio=_lr;}
-      ldq.classList.toggle('lego-53x83',/^53\s*[×x]\s*83/.test(S.legoDim));
+      ldq.classList.toggle('lego-53x83',/^53\s*[Ãx]\s*83/.test(S.legoDim));
     }
     // Scale reference image (lazy-load from wallModal)
     var lsi=document.getElementById('legoScaleImg');
@@ -1482,8 +1482,8 @@ function updateDetPreview(){
     if(_dpcl) _dpcl.style.display='none';
     return;
   }
-  // ── MINI branch ──
-  // ── car name from form fields ──
+  // ââ MINI branch ââ
+  // ââ car name from form fields ââ
   var brand=(document.getElementById('aiCarBrand')||{}).value||'';
   var model=(document.getElementById('aiCarModel')||{}).value||'';
   var year =(document.getElementById('aiCarYear') ||{}).value||'';
@@ -1491,10 +1491,10 @@ function updateDetPreview(){
   brand=brand.trim(); model=model.trim(); year=year.trim(); color=color.trim();
   var carName=[brand,model,year].filter(Boolean).join(' ')||'Seu Carro';
 
-  // ── descrição: Marca / Nome do carro / Cor (3 linhas, ao vivo) ──
+  // ââ descriÃ§Ã£o: Marca / Nome do carro / Cor (3 linhas, ao vivo) ââ
   updateCarDesc();
 
-  // ── update frame appearance & preview image ──
+  // ââ update frame appearance & preview image ââ
   // Apply aspect-ratio directly to .quadro (no .frame-out in DOM)
   var _quadro=document.querySelector('#livePv .quadro');
   if(_quadro && S.quadroDim){
@@ -1504,7 +1504,7 @@ function updateDetPreview(){
       _quadro.style.overflow='hidden';
     }
   }
-  // show frame preview image: dimensão + moldura específica para mini
+  // show frame preview image: dimensÃ£o + moldura especÃ­fica para mini
   var dpf=document.getElementById('detPvFrame');
   if(dpf){
     var _mkDpf=(S.moldura==='m-fibra')?'fibra':'laca';
@@ -1531,11 +1531,11 @@ function initDetalhamento(){
   if(isLego){
     // populate LEGO info card
     var elMod=document.getElementById('legoDetModel');
-    if(elMod) elMod.textContent=S.legoModel||'Set não selecionado';
+    if(elMod) elMod.textContent=S.legoModel||'Set nÃ£o selecionado';
     var elBrand=document.getElementById('legoDetBrand');
     if(elBrand) elBrand.textContent=S.legoBrand||'';
     var elDim=document.getElementById('legoDetDim');
-    if(elDim) elDim.textContent=S.legoDim||'53×83cm';
+    if(elDim) elDim.textContent=S.legoDim||'53Ã83cm';
     updateDetPreview();
     return;
   }
@@ -1545,7 +1545,7 @@ function initDetalhamento(){
     var sc=c.getAttribute('data-scale');
     c.classList.toggle('sel',sc===S.miniScale);
     var chk=c.querySelector('.ochk');
-    if(chk)chk.textContent=(sc===S.miniScale)?'✓':'';
+    if(chk)chk.textContent=(sc===S.miniScale)?'â':'';
   });
   renderFrameCards();
   updateMiniRefImg();
@@ -1558,7 +1558,7 @@ function selMiniScale(el,scale){
     var chk=c.querySelector('.ochk');if(chk)chk.textContent='';
   });
   el.classList.add('sel');
-  var chk=el.querySelector('.ochk');if(chk)chk.textContent='✓';
+  var chk=el.querySelector('.ochk');if(chk)chk.textContent='â';
   S.miniScale=scale;
   renderFrameCards();
   updateDetPreview();
@@ -1577,7 +1577,7 @@ function renderFrameCards(){
   frames.forEach(function(dim){
     var d=document.createElement('div');
     d.className='ocard'+(dim===S.quadroDim?' sel':'');
-    d.innerHTML='<div class="ochk">'+(dim===S.quadroDim?'✓':'')+'</div>'
+    d.innerHTML='<div class="ochk">'+(dim===S.quadroDim?'â':'')+'</div>'
       +'<div class="oname" style="font-size:16px;font-weight:700;margin:6px 0 4px;">'+dim+'</div>';
     d.onclick=function(){selFrameSize(d,dim);};
     fc.appendChild(d);
@@ -1589,7 +1589,7 @@ function selFrameSize(el,dim){
     c.classList.remove('sel');var chk=c.querySelector('.ochk');if(chk)chk.textContent='';
   });
   el.classList.add('sel');
-  var chk=el.querySelector('.ochk');if(chk)chk.textContent='✓';
+  var chk=el.querySelector('.ochk');if(chk)chk.textContent='â';
   S.quadroDim=dim;
   updateDetPreview();
   applyDetCarOverlay();
@@ -1597,17 +1597,17 @@ function selFrameSize(el,dim){
   updateMiniRefImg();
 }
 
-// ── STEP 5: MOLDURA ──
+// ââ STEP 5: MOLDURA ââ
 function selMoldura(card,cls,lbl){
   document.querySelectorAll('#step-5 .ocard').forEach(c=>{c.classList.remove('sel');c.querySelector('.ochk').textContent='';});
-  card.classList.add('sel');card.querySelector('.ochk').textContent='✓';
+  card.classList.add('sel');card.querySelector('.ochk').textContent='â';
   S.moldura=cls;S.molduraLbl=lbl;
   const molduraKey={'m-fibra':'fibra','m-laca':'laca'};
   const iMold=document.getElementById('iMoldura');
   if(iMold){
     const _mk=molduraKey[cls];
     if(S.tipo==='mini'){
-      // Miniatura: #detPvFrame é o elemento visível no step 5 (iMoldura fica visibility:hidden)
+      // Miniatura: #detPvFrame Ã© o elemento visÃ­vel no step 5 (iMoldura fica visibility:hidden)
       const _mmi=(typeof MINI_MOLDURA_IMAGES!=='undefined')&&MINI_MOLDURA_IMAGES[S.quadroDim];
       const _dpf=document.getElementById('detPvFrame');
       if(_dpf&&_mmi&&_mmi[_mk]){_dpf.src=_mmi[_mk];_dpf.style.display='block';}
@@ -1625,7 +1625,7 @@ function togLED(){
   S.led=!S.led;
   if(S.led){ S.ledFio='sem'; S.ledTipo='rgb'; var _fs=document.getElementById('ledFioSem'); if(_fs)_fs.classList.add('sel'); var _cr=document.getElementById('ledCardRgb'); if(_cr){_cr.classList.add('on');} }
   document.getElementById('ledToggle').classList.toggle('sel',S.led);
-  setEl('ledPill',S.led?'Com LED ✨':'Sem LED');
+  setEl('ledPill',S.led?'Com LED â¨':'Sem LED');
   // Mostrar/ocultar seletor de tipo LED
   const ledTypesEl=document.getElementById('ledTypes');
   if(ledTypesEl) ledTypesEl.style.display=S.led?'block':'none';
@@ -1649,18 +1649,18 @@ function togLED(){
   calcPrice();
 }
 
-// ── STEP 5: FUNDO ──
+// ââ STEP 5: FUNDO ââ
 const IMG_FUNDO = {
   'fibra-carbono':     {thumb:'https://lh3.googleusercontent.com/d/180eU2lPrL_faVZx7Zxld9S8vNfjNh9fg', preview:'https://lh3.googleusercontent.com/d/180eU2lPrL_faVZx7Zxld9S8vNfjNh9fg'},
   'bicolor-fibra-uv':  {thumb:'https://lh3.googleusercontent.com/d/1W1P3gYF1NvhMI5vIgIVyEjFVFV_63vEM', preview:'https://lh3.googleusercontent.com/d/1W1P3gYF1NvhMI5vIgIVyEjFVFV_63vEM'},
   'bicolor-brilho':    {thumb:'https://lh3.googleusercontent.com/d/1oDg48Qoev0YluqczYT-vD933Xsh7dXz5', preview:'https://lh3.googleusercontent.com/d/1oDg48Qoev0YluqczYT-vD933Xsh7dXz5'},
   'listras-brilho':    {thumb:'https://lh3.googleusercontent.com/d/16K-JcLjn9N3bIFPGAr2bN3ApbDQLilEC', preview:'https://lh3.googleusercontent.com/d/16K-JcLjn9N3bIFPGAr2bN3ApbDQLilEC'},
   'listras-lat-brilho':{thumb:'https://lh3.googleusercontent.com/d/1pcaDa8IrlLvQV4_PKHibSxSDt369yBs1', preview:'https://lh3.googleusercontent.com/d/1pcaDa8IrlLvQV4_PKHibSxSDt369yBs1'},
-  'degradê-brilho':   {thumb:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo', preview:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo'},
+  'degradÃª-brilho':   {thumb:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo', preview:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo'},
   'bicolor-fosco':     {thumb:'https://lh3.googleusercontent.com/d/1dnIWj1KR2HaI7a03gln_DYRnp3a7Hz7Y', preview:'https://lh3.googleusercontent.com/d/1dnIWj1KR2HaI7a03gln_DYRnp3a7Hz7Y'},
   'listras-cent-fosco':{thumb:'https://lh3.googleusercontent.com/d/1E8-L1nkTe-MWYkbxWepmw_YBDfZNJYdf', preview:'https://lh3.googleusercontent.com/d/1E8-L1nkTe-MWYkbxWepmw_YBDfZNJYdf'},
   'listra-lat-fosco':  {thumb:'https://lh3.googleusercontent.com/d/1NDNeY-KiUQpn1nk4dEY2BFcsJvLDovMb', preview:'https://lh3.googleusercontent.com/d/1NDNeY-KiUQpn1nk4dEY2BFcsJvLDovMb'},
-  'degradê-fosco':    {thumb:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO', preview:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO'},
+  'degradÃª-fosco':    {thumb:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO', preview:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO'},
 };
 const LEGO_FUNDO_LAYOUTS = {
   'f-carbono': [
@@ -1668,13 +1668,13 @@ const LEGO_FUNDO_LAYOUTS = {
   ],
   'f-uv': [
     {name:'Bicolor',          img:'https://lh3.googleusercontent.com/d/1oDg48Qoev0YluqczYT-vD933Xsh7dXz5', preview:'https://lh3.googleusercontent.com/d/1oDg48Qoev0YluqczYT-vD933Xsh7dXz5'},
-    {name:'Degradê',          img:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo', preview:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo'},
+    {name:'DegradÃª',          img:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo', preview:'https://lh3.googleusercontent.com/d/16w20v9vYp1gNmaTaE2rZTKY4xdD6SHVo'},
     {name:'Listras Centrais', img:'https://lh3.googleusercontent.com/d/1AHeLsA7308V4u3ebwRSgGVBYPKq1WDFY', preview:'https://lh3.googleusercontent.com/d/1AHeLsA7308V4u3ebwRSgGVBYPKq1WDFY'},
     {name:'Listras Laterais', img:'https://lh3.googleusercontent.com/d/1pcaDa8IrlLvQV4_PKHibSxSDt369yBs1', preview:'https://lh3.googleusercontent.com/d/1pcaDa8IrlLvQV4_PKHibSxSDt369yBs1'},
   ],
   'f-fosco': [
     {name:'Bicolor',          img:'https://lh3.googleusercontent.com/d/1dnIWj1KR2HaI7a03gln_DYRnp3a7Hz7Y', preview:'https://lh3.googleusercontent.com/d/1dnIWj1KR2HaI7a03gln_DYRnp3a7Hz7Y'},
-    {name:'Degradê',          img:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO', preview:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO'},
+    {name:'DegradÃª',          img:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO', preview:'https://lh3.googleusercontent.com/d/14F-XmnGxf62jY3mXlbYIWNNPNYz90ojO'},
     {name:'Listras Centrais', img:'https://lh3.googleusercontent.com/d/1E8-L1nkTe-MWYkbxWepmw_YBDfZNJYdf', preview:'https://lh3.googleusercontent.com/d/1E8-L1nkTe-MWYkbxWepmw_YBDfZNJYdf'},
     {name:'Listras Laterais', img:'https://lh3.googleusercontent.com/d/1NDNeY-KiUQpn1nk4dEY2BFcsJvLDovMb', preview:'https://lh3.googleusercontent.com/d/1NDNeY-KiUQpn1nk4dEY2BFcsJvLDovMb'},
   ],
@@ -1687,13 +1687,13 @@ const FUNDO_LAYOUTS = {
     {name:'Bicolor', img:IMG_FUNDO['bicolor-brilho'].thumb, preview:IMG_FUNDO['bicolor-brilho'].preview},
     {name:'Listras Centrais', img:IMG_FUNDO['listras-brilho'].thumb, preview:IMG_FUNDO['listras-brilho'].preview},
     {name:'Listras Laterais', img:IMG_FUNDO['listras-lat-brilho'].thumb, preview:IMG_FUNDO['listras-lat-brilho'].preview},
-    {name:'Degradê', img:IMG_FUNDO['degradê-brilho'].thumb, preview:IMG_FUNDO['degradê-brilho'].preview},
+    {name:'DegradÃª', img:IMG_FUNDO['degradÃª-brilho'].thumb, preview:IMG_FUNDO['degradÃª-brilho'].preview},
   ],
   'f-fosco': [
     {name:'Bicolor', img:IMG_FUNDO['bicolor-fosco'].thumb, preview:IMG_FUNDO['bicolor-fosco'].preview},
     {name:'Listras Centrais', img:IMG_FUNDO['listras-cent-fosco'].thumb, preview:IMG_FUNDO['listras-cent-fosco'].preview},
     {name:'Listras Laterais', img:IMG_FUNDO['listra-lat-fosco'].thumb, preview:IMG_FUNDO['listra-lat-fosco'].preview},
-    {name:'Degradê', img:IMG_FUNDO['degradê-fosco'].thumb, preview:IMG_FUNDO['degradê-fosco'].preview},
+    {name:'DegradÃª', img:IMG_FUNDO['degradÃª-fosco'].thumb, preview:IMG_FUNDO['degradÃª-fosco'].preview},
   ],
 };
 
@@ -1711,7 +1711,7 @@ function _imgSrc(s){
   return 'data:image/jpeg;base64,'+s;
 }
 function renderFundoLayouts(fundo){
-  // Fase 4: fundos do modelo vindos do banco têm prioridade
+  // Fase 4: fundos do modelo vindos do banco tÃªm prioridade
   var _dbOpts=null;
   if(S.tipo==='lego' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[S.legoModel]){
     var _tipoMap={'f-carbono':'carbono','f-uv':'brilho','f-fosco':'fosco'};
@@ -1791,8 +1791,8 @@ var UV_PALETTE=[
   {color:'#00CCFF',name:'Azul Turbo'},
   {color:'#9900CC',name:'Roxo'},
   {color:'#FF0099',name:'Rosa Neon'},
-  {color:'#FFFFFF',name:'Branco Pérola'},
-  {color:'#C0C0C0',name:'Prata Metálico'},
+  {color:'#FFFFFF',name:'Branco PÃ©rola'},
+  {color:'#C0C0C0',name:'Prata MetÃ¡lico'},
 ];
 
 function renderUvColorPalette(){
@@ -1802,7 +1802,7 @@ function renderUvColorPalette(){
   var label=document.createElement('div');
   label.className='sec-sub';
   label.style.cssText='font-size:9px;letter-spacing:1.2px;margin-bottom:10px;';
-  label.textContent='Cor do Degradê Central';
+  label.textContent='Cor do DegradÃª Central';
   el.appendChild(label);
   var grid=document.createElement('div');
   grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:4px 0;';
@@ -1853,7 +1853,7 @@ function renderUvMiniOptions(){
   var el=document.getElementById('fundoLayoutOpts');
   if(!el)return;
   el.innerHTML='';
-  var tabs=[{k:'deg',l:'Degradê Central'},{k:'stripe',l:'Listra Central'},{k:'diagonal',l:'Diagonal Sport'},{k:'faixa',l:'Faixa Deslocada'},{k:'meio',l:'Meio a Meio'},{k:'img',l:'Sua Imagem'}];
+  var tabs=[{k:'deg',l:'DegradÃª Central'},{k:'stripe',l:'Listra Central'},{k:'diagonal',l:'Diagonal Sport'},{k:'faixa',l:'Faixa Deslocada'},{k:'meio',l:'Meio a Meio'},{k:'img',l:'Sua Imagem'}];
   var tabsDiv=document.createElement('div');
   tabsDiv.style.cssText='display:flex;flex-direction:column;gap:6px;margin-bottom:14px;';
   tabs.forEach(function(t){
@@ -1866,7 +1866,7 @@ function renderUvMiniOptions(){
   });
   el.appendChild(tabsDiv);
   var degDiv=document.createElement('div');
-  degDiv.id='uvDegPanel';degDiv.style.display=S.uvLayoutType==='deg'?'':'none';_renderMiniPickerSection(degDiv,'uvColor','#FF2200','Cor do Degradê Central','cpSwatch_uvDeg');
+  degDiv.id='uvDegPanel';degDiv.style.display=S.uvLayoutType==='deg'?'':'none';_renderMiniPickerSection(degDiv,'uvColor','#FF2200','Cor do DegradÃª Central','cpSwatch_uvDeg');
   el.appendChild(degDiv);
   var swHtml=function(fn,cls){
     var h='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:4px">';
@@ -1882,7 +1882,7 @@ function renderUvMiniOptions(){
   imgDiv.id='uvImgPanel';imgDiv.style.display=S.uvLayoutType==='img'?'flex':'none';imgDiv.style.flexDirection='column';imgDiv.style.alignItems='center';
   var btn=document.createElement('button');
   btn.className='btn-wall-example';btn.style.cssText='width:100%;margin:12px 0;font-size:9px;letter-spacing:0.8px;padding:12px;';
-  btn.textContent='ENVIE A IMAGEM DA SUA PREFERÊNCIA';
+  btn.textContent='ENVIE A IMAGEM DA SUA PREFERÃNCIA';
   btn.onclick=function(){document.getElementById('uvFileIn').click();};
   var fi=document.createElement('input');
   fi.type='file';fi.id='uvFileIn';fi.accept='image/*';fi.style.display='none';
@@ -1903,7 +1903,7 @@ function selUvLayout(type){
   var dp=document.getElementById('uvDegPanel');if(dp)dp.style.display=type==='deg'?'block':'none';
   var sp=document.getElementById('uvStripePanel');if(sp)sp.style.display=_fam.indexOf(type)>=0?'block':'none';
   var ip=document.getElementById('uvImgPanel');if(ip)ip.style.display=type==='img'?'flex':'none';
-  var _lbls={deg:'Degradê Central',stripe:'Listra Central',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
+  var _lbls={deg:'DegradÃª Central',stripe:'Listra Central',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
   if(_lbls[type]&&typeof setEl==='function')setEl('fAtual',_lbls[type]);
   updateDetPvFundo();
 }
@@ -1982,7 +1982,7 @@ function updateFundoLayoutsVisibility(){
 
 function selFundo(card,cls,lbl){
   document.querySelectorAll('#step-4 .ocard').forEach(c=>{c.classList.remove('sel');c.querySelector('.ochk').textContent='';});
-  card.classList.add('sel');card.querySelector('.ochk').textContent='✓';
+  card.classList.add('sel');card.querySelector('.ochk').textContent='â';
   S.fundo=cls;S.fundoLbl=lbl;
   const fundoKey={'f-carbono':'fibra','f-uv':'brilho','f-fosco':'fosco'};
   const iFund=document.getElementById('iFundo');
@@ -1997,11 +1997,11 @@ function selFundo(card,cls,lbl){
   calcPrice();
 }
 
-// ── Biblioteca de logos reais por marca (Mini) — chave normalizada (minusculas, sem espacos/pontuacao) ──
+// ââ Biblioteca de logos reais por marca (Mini) â chave normalizada (minusculas, sem espacos/pontuacao) ââ
 // build: logos v2 (31 marcas) + IA de reserva corrigida
 // Chave = nome EXATO da marca no dropdown. w = largura calibrada pela proporcao do logo.
 var BRAND_LOGOS={
- 'Fórmula 1':{src:'images/logo_formula1.png',w:'23.0%'},
+ 'FÃ³rmula 1':{src:'images/logo_formula1.png',w:'23.0%'},
  'Ferrari':{src:'images/logo_ferrari.png',w:'13.5%'},
  'Porsche':{src:'images/logo_porsche.png',w:'13.4%'},
  'Lamborghini':{src:'images/logo_lamborghini.png',w:'16.1%'},
@@ -2034,8 +2034,8 @@ var BRAND_LOGOS={
  'Cadillac':{src:'images/logo_cadillac.png',w:'23.0%'}
 };
 
-// ── Dropdown de marcas (Mini) — controla exatamente quais marcas existem ──
-var MINI_BRANDS=['Fórmula 1','Ferrari','Porsche','Lamborghini','McLaren','Mercedes-Benz','BMW','Audi','Aston Martin','Bugatti','Nissan','Toyota','Ford','Chevrolet','Dodge','Honda','Bentley','Rolls-Royce','Maserati','Jaguar','Alfa Romeo','Koenigsegg','Pagani','Lotus','Subaru','Mitsubishi','Land Rover','Volkswagen','Mini','Tesla','Cadillac'];
+// ââ Dropdown de marcas (Mini) â controla exatamente quais marcas existem ââ
+var MINI_BRANDS=['FÃ³rmula 1','Ferrari','Porsche','Lamborghini','McLaren','Mercedes-Benz','BMW','Audi','Aston Martin','Bugatti','Nissan','Toyota','Ford','Chevrolet','Dodge','Honda','Bentley','Rolls-Royce','Maserati','Jaguar','Alfa Romeo','Koenigsegg','Pagani','Lotus','Subaru','Mitsubishi','Land Rover','Volkswagen','Mini','Tesla','Cadillac'];
 function populateBrandSelect(id){
   var sel=document.getElementById(id);
   if(!sel||sel.dataset.filled)return;
@@ -2069,7 +2069,7 @@ function brandOtherChanged(prefix){
   function _fillBrands(){ populateBrandSelect('aiCarBrandSelect'); populateBrandSelect('apenaCarBrandSelect'); }
   if(document.readyState!=='loading'){ _fillBrands(); } else { document.addEventListener('DOMContentLoaded',_fillBrands); }
 })();
-// ── AI LOGO GENERATION — mini step 6 ──
+// ââ AI LOGO GENERATION â mini step 6 ââ
 var _aiLogoCache={};
 function generateLogoAI(subject,type,targetElId,loaderId,pvLoaderId){
   if(!subject||!targetElId)return;
@@ -2110,9 +2110,9 @@ function generateLogoAI(subject,type,targetElId,loaderId,pvLoaderId){
   xhr.send(JSON.stringify({model:'gpt-image-1',prompt:prompt,n:1,size:'1024x1024',quality:'high',background:'transparent',output_format:'png'}));
 }
 
-// ── Descrição do preview (Mini): Marca / Nome do carro / Cor — atualiza ao vivo ──
+// ââ DescriÃ§Ã£o do preview (Mini): Marca / Nome do carro / Cor â atualiza ao vivo ââ
 function updateCarDesc(){
-  // le do formulario ativo: 'aiCar…' (quadro incluso) ou 'apenaCar…' (somente quadro)
+  // le do formulario ativo: 'aiCarâ¦' (quadro incluso) ou 'apenaCarâ¦' (somente quadro)
   function _v(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
   var b=_v('aiCarBrand','apenaCarBrand');
   var m=_v('aiCarModel','apenaCarModel');
@@ -2125,7 +2125,7 @@ function updateCarDesc(){
   var ec=document.getElementById('pvCarColor'); if(ec){ ec.textContent=c||''; ec.style.display=c?'':'none'; }
 }
 
-// ── STEP 6: ALTO-RELEVO ──
+// ââ STEP 6: ALTO-RELEVO ââ
 function updateFixedRelevo(){
   const tlEl=document.getElementById('fixedTL');
   const brEl=document.getElementById('brandRelDesc');
@@ -2145,13 +2145,13 @@ function updateFixedRelevo(){
   ['fixedTLLoad','fixedBRLoad','logoTLLoad','logoBRLoad'].forEach(function(id){var L=document.getElementById(id);if(L)L.style.display='none';});
   ['logoF1','logoBR'].forEach(function(id){var I=document.getElementById(id);if(I){I.style.display='';I.style.opacity='1';}});
   if(S.tipo!=='mini' && S.legoF1){
-    tlEl.textContent='🏁 Logo Fórmula 1 — Canto superior esquerdo';
+    tlEl.textContent='ð Logo FÃ³rmula 1 â Canto superior esquerdo';
     updateBadgeTL('F1');
   } else if(S.tipo==='mini'){
-    // Mini: gera logo da MARCA do carro via IA (TL) e modelo (BR) — mesma marca usada na geração da imagem
+    // Mini: gera logo da MARCA do carro via IA (TL) e modelo (BR) â mesma marca usada na geraÃ§Ã£o da imagem
     const brand=((document.getElementById('aiCarBrand')||{}).value||'').trim()||((document.getElementById('apenaCarBrand')||{}).value||'').trim()||S.miniBrand||'';
     const model=((document.getElementById('aiCarModel')||{}).value||'').trim()||((document.getElementById('apenaCarModel')||{}).value||'').trim()||S.miniModel||S.miniBrand||'';
-    tlEl.textContent='🏷️ Logotipo com marca do carro';
+    tlEl.textContent='ð·ï¸ Logotipo com marca do carro';
     // Mini: desloca o logo da marca um pouco para baixo e para a direita (padrao CSS: 7% / 9%)
     var _btlM=(_lfR&&_lfR.closest)?_lfR.closest('.b-tl'):null;
     if(_btlM){ _btlM.style.top='11%'; _btlM.style.left='13%'; }
@@ -2167,7 +2167,7 @@ function updateFixedRelevo(){
       }
       var _tld=document.getElementById('fixedTLDesc');
       if(_entry&&_lf){
-        // logo real da marca — cores originais, sem filtro de cor, largura calibrada
+        // logo real da marca â cores originais, sem filtro de cor, largura calibrada
         _lf.src=(typeof _entry==='string')?_entry:_entry.src;
         _lf.style.width=(typeof _entry==='string')?'17%':(_entry.w||'17%');
         _lf.style.filter='drop-shadow(1px 2px 3px rgba(0,0,0,0.6))';
@@ -2181,7 +2181,7 @@ function updateFixedRelevo(){
       }
     }
     var _brEl2=document.getElementById('fixedBR');
-    if(_brEl2) _brEl2.textContent='🏎️ Logo do Modelo — Canto inferior direito';
+    if(_brEl2) _brEl2.textContent='ðï¸ Logo do Modelo â Canto inferior direito';
     if(model){
       var _lb=document.getElementById('logoBR');
       // Mini: aumenta o logo do modelo (o CSS .b-br img limita a 13%, entao destravamos aqui)
@@ -2192,7 +2192,7 @@ function updateFixedRelevo(){
     setEl('badgeTLtxt','');setEl('badgeBRtxt','');
   } else {
     const nome=S.legoModel||S.miniModel||S.miniBrand||'Modelo';
-    tlEl.textContent='🏎️ Nome do modelo — Canto superior esquerdo';
+    tlEl.textContent='ðï¸ Nome do modelo â Canto superior esquerdo';
     updateBadgeTL(nome.split(' ').slice(0,2).join(' ').toUpperCase());
   }
   const marca=S.tipo==='lego'?S.legoBrand:S.miniBrand;
@@ -2236,17 +2236,17 @@ function selRelColor(pos,dot,color){
   }
 }
 function togRelevoOpt(row,key,label,price){
-  // preço do banco tem prioridade sobre o valor fixo do HTML
+  // preÃ§o do banco tem prioridade sobre o valor fixo do HTML
   if(/Bandeira/i.test(label)) price=_preco('opt_relevo_bandeira', price);
   else if(/Piloto/i.test(label)) price=_preco('opt_relevo_piloto', price);
   row.classList.toggle('sel');
   const on=row.classList.contains('sel');
   const badge=row.querySelector('.rbadge');
-  badge.textContent=on?`✓ ${label}`:`+ R$ ${price}`;
+  badge.textContent=on?`â ${label}`:`+ R$ ${price}`;
   if(on){S.relOpts.push(label);S.relOptsExtra+=price;}
   else{S.relOpts=S.relOpts.filter(r=>r!==label);S.relOptsExtra-=price;}
   setStyle('pilotoInput','display',S.relOpts.includes('Nome do Piloto')?'block':'none');
-  setStyle('bandeiraInput','display',S.relOpts.includes('Bandeira do País')?'block':'none');
+  setStyle('bandeiraInput','display',S.relOpts.includes('Bandeira do PaÃ­s')?'block':'none');
   // Relevos de imagem fixa por modelo
   if(key==='placa'||key==='tracado'){
     var _old2=document.querySelector('.rel-'+key);
@@ -2268,7 +2268,7 @@ function togRelevoOpt(row,key,label,price){
 }
 
 function updateBadgeTL(text){
-  // imagem personalizada do relevo (LEGO): não aplicar filtro de cor, senão vira silhueta
+  // imagem personalizada do relevo (LEGO): nÃ£o aplicar filtro de cor, senÃ£o vira silhueta
   var _imgRelevo=(typeof _relevoModoLego==='function' && S.tipo==='lego' && _relevoModoLego()==='imagem');
   setEl('badgeTLtxt',text||'FUNPARTS');
   setStyle('badgeTLtxt','color',S.relTL||'#fff');
@@ -2319,7 +2319,7 @@ function _aplicaRelevoLego(){
   }
 }
 // Oculta opcionais (bandeira / nome do piloto) por modelo LEGO, do banco.
-// Some da etapa Alto-relevo E do preview (desmarcando se estava selecionado). Só LEGO.
+// Some da etapa Alto-relevo E do preview (desmarcando se estava selecionado). SÃ³ LEGO.
 function _aplicaRelevoOcultosLego(){
   if(typeof S==='undefined' || S.tipo!=='lego') return;
   var cfg=(typeof LEGO_FUNDOS_DB!=='undefined' && LEGO_FUNDOS_DB && LEGO_FUNDOS_DB[S.legoModel]) || null;
@@ -2330,7 +2330,7 @@ function _aplicaRelevoOcultosLego(){
   var rPil=document.querySelector('.rrow[data-rel="piloto"]');
   if(rBand){
     if(ocBand){
-      if(rBand.classList.contains('sel')){ try{ togRelevoOpt(rBand,null,'Bandeira do País',0); }catch(e){} }
+      if(rBand.classList.contains('sel')){ try{ togRelevoOpt(rBand,null,'Bandeira do PaÃ­s',0); }catch(e){} }
       rBand.style.display='none';
       var _bi=document.getElementById('bandeiraInput'); if(_bi)_bi.style.display='none';
     } else { rBand.style.display=''; }
@@ -2340,14 +2340,14 @@ function _aplicaRelevoOcultosLego(){
     rPil.style.display='none';
     var _pi=document.getElementById('pilotoInput'); if(_pi)_pi.style.display='none';
   }
-  // se não oculto, quem decide a visibilidade do piloto é a regra de placa (já existente)
+  // se nÃ£o oculto, quem decide a visibilidade do piloto Ã© a regra de placa (jÃ¡ existente)
   if(typeof _relevoStep7Layout==='function')_relevoStep7Layout();
 }
 // Ajusta a ETAPA Alto-relevo (LEGO): esconde a caixa de relevo fixo quando o topo
-// é "nenhum", esconde o rótulo de opcionais quando não há opção, e mostra a frase
-// "Este produto não contém a opção de alto relevo" quando não sobra nenhum relevo.
+// Ã© "nenhum", esconde o rÃ³tulo de opcionais quando nÃ£o hÃ¡ opÃ§Ã£o, e mostra a frase
+// "Este produto nÃ£o contÃ©m a opÃ§Ã£o de alto relevo" quando nÃ£o sobra nenhum relevo.
 function _relevoStep7Layout(){
-  // acha o rótulo "Relevos opcionais" pelo texto (a ordem no DOM não é confiável)
+  // acha o rÃ³tulo "Relevos opcionais" pelo texto (a ordem no DOM nÃ£o Ã© confiÃ¡vel)
   function _achaOpcLabel(){
     var r=null;
     document.querySelectorAll('.sec-sub').forEach(function(e){ if(!r && e.textContent.trim().toLowerCase().indexOf('relevos opcionais')===0) r=e; });
@@ -2360,7 +2360,7 @@ function _relevoStep7Layout(){
   var flexCol=card.parentElement;
   var fixedLabel=flexCol?flexCol.previousElementSibling:null;
   var msgEx=document.getElementById('relevoNenhumMsg');
-  // fora do LEGO: garante tudo visível e sem a frase (evita resíduo ao trocar de categoria)
+  // fora do LEGO: garante tudo visÃ­vel e sem a frase (evita resÃ­duo ao trocar de categoria)
   if(typeof S==='undefined' || S.tipo!=='lego'){
     if(card)card.style.display='';
     if(fixedLabel)fixedLabel.style.display='';
@@ -2378,23 +2378,23 @@ function _relevoStep7Layout(){
     msg=document.createElement('div');
     msg.id='relevoNenhumMsg';
     msg.style.cssText='padding:12px 14px;border:1px solid var(--border,#2c2c2c);border-radius:5px;background:var(--s2,#1a1a1a);color:var(--t2,#aaa);font-size:12px;line-height:1.5;';
-    msg.textContent='Este produto não contém a opção de alto relevo.';
+    msg.textContent='Este produto nÃ£o contÃ©m a opÃ§Ã£o de alto relevo.';
     flexCol.parentElement.insertBefore(msg, flexCol.nextSibling);
   }
-  // a caixa editável (logo + cor) só aparece no modo Padrão
+  // a caixa editÃ¡vel (logo + cor) sÃ³ aparece no modo PadrÃ£o
   var ehPadrao=(topoModo==='padrao');
   if(card)card.style.display=ehPadrao?'':'none';
   if(fixedLabel)fixedLabel.style.display=ehPadrao?'':'none';
-  // opcionais realmente visíveis agora
+  // opcionais realmente visÃ­veis agora
   function _vis(sel){ var e=document.querySelector(sel); return !!(e && getComputedStyle(e).display!=='none'); }
   var algumaOpc=_vis('.rrow[onclick*="\'bandeira\'"]')||_vis('.rrow[data-rel="piloto"]')||_vis('.rrow[data-rel="placa"]')||_vis('.rrow[data-rel="tracado"]');
   var opcLabel=_achaOpcLabel();
   if(opcLabel)opcLabel.style.display=algumaOpc?'':'none';
   // frase conforme o modo:
-  // imagem -> não há edição do relevo; nenhum sem opcionais -> não há relevo
+  // imagem -> nÃ£o hÃ¡ ediÃ§Ã£o do relevo; nenhum sem opcionais -> nÃ£o hÃ¡ relevo
   var frase='';
-  if(topoModo==='imagem') frase='Este produto não contém a opção de edição para o alto relevo.';
-  else if(topoModo==='nenhum' && !algumaOpc) frase='Este produto não contém a opção de alto relevo.';
+  if(topoModo==='imagem') frase='Este produto nÃ£o contÃ©m a opÃ§Ã£o de ediÃ§Ã£o para o alto relevo.';
+  else if(topoModo==='nenhum' && !algumaOpc) frase='Este produto nÃ£o contÃ©m a opÃ§Ã£o de alto relevo.';
   if(msg){ if(frase){ msg.textContent=frase; msg.style.display=''; } else { msg.style.display='none'; } }
 }
 function updateBadgeBR(text,color){
@@ -2406,7 +2406,7 @@ function updateBadgeBR(text,color){
   if(color){setStyle('legoBadgeBRtxt','color',color);setStyle('legoBadgeBRline','background',color);}
 }
 
-// ── PREÇO ──
+// ââ PREÃO ââ
 function selLedFio(fio){
   S.ledFio=fio;
   var _fc=document.getElementById('ledFioCom'); if(_fc)_fc.classList.toggle('sel',fio==='com');
@@ -2446,7 +2446,7 @@ var LEGO_MODEL_SKU={
   'Renault F1':'FP-015',
   'McLaren F1 MCL35':'FP-016',
   'McLaren F1 MCL39':'FP-017',
-  'Batmóvel':'FP-018',
+  'BatmÃ³vel':'FP-018',
   'Ford Raptor':'FP-019',
   'Ford GT':'FP-020',
   'Nissan GTR Skyline':'FP-021',
@@ -2470,13 +2470,13 @@ function calcPrice(){
     var _db=document.getElementById('deskBarPrice'); if(_db)_db.textContent=_f;
     return;
   }
-  // 1. Base pelo produto (Medida × Fundo para LEGO, Escala × Medida para Mini)
+  // 1. Base pelo produto (Medida Ã Fundo para LEGO, Escala Ã Medida para Mini)
   const LEGO_PRICE={
-    '53×83cm':{c:689,f:589},'83×53cm':{c:689,f:589},
-    '49×49cm':{c:689,f:589},'25×35cm':{c:689,f:589},
-    '63×128cm':{c:689,f:589},'60×125cm':{c:689,f:589},
-    '114×49cm':{c:689,f:589},'34×134cm':{c:689,f:589},
-    '40×66,5cm':{c:689,f:589},
+    '53Ã83cm':{c:689,f:589},'83Ã53cm':{c:689,f:589},
+    '49Ã49cm':{c:689,f:589},'25Ã35cm':{c:689,f:589},
+    '63Ã128cm':{c:689,f:589},'60Ã125cm':{c:689,f:589},
+    '114Ã49cm':{c:689,f:589},'34Ã134cm':{c:689,f:589},
+    '40Ã66,5cm':{c:689,f:589},
   };
   let base=479;
   if(S.tipo==='lego'){
@@ -2486,7 +2486,7 @@ function calcPrice(){
     const sz=MINI_SIZES.find(s=>s.id===S.miniSize);
     base=_preco('mini_base_'+S.miniSize, sz?sz.base:1990);
   }
-  // 2. Upgrades (preços vindos do banco, com reserva)
+  // 2. Upgrades (preÃ§os vindos do banco, com reserva)
   if(S.moldura==='m-fibra')base+=_preco('opt_moldura_fibra',75);
   if(S.led){
     const rgb=(S.ledTipo==='rgb');
@@ -2508,10 +2508,10 @@ function calcPrice(){
 }
 
 
-// ══════ CATÁLOGO DE PRODUTOS PRONTOS — "Quadro incluso miniatura" (somente Mini) ══════
+// ââââââ CATÃLOGO DE PRODUTOS PRONTOS â "Quadro incluso miniatura" (somente Mini) ââââââ
 var INCLUSO_CATALOG={
- "Ferrari":{logo:'images/logo_ferrari.png',itens:[{n:"Ferrari 296 GTB listras amarelas",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari 458 Speciale vermelha",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari 499P Lemans",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Ferrari 499P Lemans",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari Coleção Burago",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:299},{n:"Ferrari F1 SF24",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Ferrari F1 SF24 - Hamilton",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari F50",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari FXXK",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari LaFerrari",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari SF24 - Mini",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399}]},
- "Fórmula 1":{logo:'images/logo_formula1.png',itens:[{n:"Red Bull F1 RB21",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Redbull F1 RB20 - Max Verstappen",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari SF25 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"McLaren MCL39 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"McLaren Senna",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:4350},{n:"Mercedes W16 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Red Bull RB21 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Set Mercedes F1 - 7 carros",esc:"1:43",dim:"66,5x40cm",mol:"Fibra de carbono",p:2250},{n:"Set Red Bull F1 - 7 carros",esc:"1:43",dim:"66,5x40cm",mol:"Fibra de carbono",p:2250}]},
+ "Ferrari":{logo:'images/logo_ferrari.png',itens:[{n:"Ferrari 296 GTB listras amarelas",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari 458 Speciale vermelha",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari 499P Lemans",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Ferrari 499P Lemans",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari ColeÃ§Ã£o Burago",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:299},{n:"Ferrari F1 SF24",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Ferrari F1 SF24 - Hamilton",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari F50",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari FXXK",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari LaFerrari",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari SF24 - Mini",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399}]},
+ "FÃ³rmula 1":{logo:'images/logo_formula1.png',itens:[{n:"Red Bull F1 RB21",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Redbull F1 RB20 - Max Verstappen",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Ferrari SF25 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"McLaren MCL39 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"McLaren Senna",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:4350},{n:"Mercedes W16 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Red Bull RB21 F1",esc:"1:43",dim:"25x35cm",mol:"Fibra de carbono",p:399},{n:"Set Mercedes F1 - 7 carros",esc:"1:43",dim:"66,5x40cm",mol:"Fibra de carbono",p:2250},{n:"Set Red Bull F1 - 7 carros",esc:"1:43",dim:"66,5x40cm",mol:"Fibra de carbono",p:2250}]},
  "Porsche":{logo:'images/logo_porsche.png',itens:[{n:"Porsche 911 GT3 - Azul",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Porsche 911 GT3 - Azul Tiffany",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 911 GT3 - Laranja",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 911 GT3 - Preta",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Porsche 911 RSR Martini",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 963 Lemans",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche GT2rs Fibra - Amarela",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"Porsche 911 Carrera RS - Branca",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990}]},
  "BMW":{logo:'images/logo_bmw.png',itens:[{n:"BMW GS1250",esc:"1:9",dim:"66,5x40cm",mol:"Fibra de carbono",p:1990},{n:"BMW M2 Azul",esc:"1:18",dim:"40x66,5cm",mol:"Laca Preto",p:1990},{n:"BMW M3",esc:"1:24",dim:"49x49cm",mol:"Fibra de carbono",p:1290},{n:"BMW M6 GT3 - Azul",esc:"1:32",dim:"49x49cm",mol:"Fibra de carbono",p:399}]},
  "Chevrolet":{logo:'images/logo_chevrolet.png',itens:[{n:"Opala Chevrolet - Amarelo",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290},{n:"Opala Chevrolet - Bege",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290},{n:"Opala Chevrolet - Laranja",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290}]},
@@ -2521,7 +2521,7 @@ var INCLUSO_CATALOG={
  "Lamborghini":{logo:'images/logo_lamborghini.png',itens:[{n:"Lamborghini Huracan Performante Vermelha",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990},{n:"Lamborghini Countach Laranja",esc:"1:18",dim:"40x66,5cm",mol:"Fibra de carbono",p:1990}]},
  "Volkswagen":{logo:'images/logo_volkswagen.png',itens:[{n:"Gol GTI Volkswagen",esc:"1:24",dim:"49x49cm",mol:"Laca Preto",p:1290},{n:"Fusca Volkswagen 1955 - Creme",esc:"1:18",dim:"49x49cm",mol:"Fibra de carbono",p:1290}]},
  "Audi":{logo:'images/logo_audi.png',itens:[{n:"Audi R8 Preto Fosco",esc:"1:18",dim:"49x49cm",mol:"Laca Preto",p:1290}]},
- "Filmes":{logo:'',itens:[{n:"Relâmpago McQueen",esc:"1:24",dim:"25x35cm",mol:"Fibra de carbono",p:299}]},
+ "Filmes":{logo:'',itens:[{n:"RelÃ¢mpago McQueen",esc:"1:24",dim:"25x35cm",mol:"Fibra de carbono",p:299}]},
  "Harley Davidson":{logo:'',itens:[{n:"Moto Harley Davidson Street Glide - Preta",esc:"1:12",dim:"25x35cm",mol:"Laca Preto",p:399}]},
  "McLaren":{logo:'images/logo_mclaren.png',itens:[{n:"Mclaren MCL35",esc:"1:12",dim:"40x66,5cm",mol:"Fibra de carbono",p:2360}]},
  "Mercedes-Benz":{logo:'images/logo_mercedes.png',itens:[{n:"Mercedes W14",esc:"1:12",dim:"40x66,5cm",mol:"Fibra de carbono",p:2360}]},
@@ -2535,7 +2535,7 @@ function _fotoUrl(f){
   if(/^(https?:|data:|images\/)/.test(f)) return f;
   return 'https://funparts-ai-proxy.rodox1209.workers.dev/img/'+encodeURIComponent(f);
 }
-// ═══════════ AJUDA "?" POR OPÇÃO (do banco) ═══════════
+// âââââââââââ AJUDA "?" POR OPÃÃO (do banco) âââââââââââ
 function _ajudaSeletores(){
   return {
     fundo_carbono:'.ocard[onclick*="f-carbono"]',
@@ -2551,7 +2551,7 @@ function _ajudaSeletores(){
     relevo_piloto:'.rrow[data-rel="piloto"]'
   };
 }
-var _AJUDA_TITULOS={fundo_carbono:'Fibra de Carbono',fundo_uv:'Acrílico Brilho — UV',fundo_fosco:'Fosco',moldura_laca:'Moldura Laca Preto',moldura_fibra:'Moldura Fibra de Carbono',led_warm:'LED Neutro',led_rgb:'LED RGB',led_comfio:'LED com fio',led_semfio:'LED sem fio',relevo_bandeira:'Bandeira do país',relevo_piloto:'Nome do piloto'};
+var _AJUDA_TITULOS={fundo_carbono:'Fibra de Carbono',fundo_uv:'AcrÃ­lico Brilho â UV',fundo_fosco:'Fosco',moldura_laca:'Moldura Laca Preto',moldura_fibra:'Moldura Fibra de Carbono',led_warm:'LED Neutro',led_rgb:'LED RGB',led_comfio:'LED com fio',led_semfio:'LED sem fio',relevo_bandeira:'Bandeira do paÃ­s',relevo_piloto:'Nome do piloto'};
 function _injetaAjuda(){
   if(!INFOS) return;
   var sels=_ajudaSeletores();
@@ -2559,7 +2559,7 @@ function _injetaAjuda(){
     if(!INFOS[chave]) return;
     var els=document.querySelectorAll(sels[chave]);
     Array.prototype.forEach.call(els,function(el){
-      if(el.querySelector('.ajuda-q')) return; // já injetado
+      if(el.querySelector('.ajuda-q')) return; // jÃ¡ injetado
       if(getComputedStyle(el).position==='static') el.style.position='relative';
       var b=document.createElement('button');
       b.className='ajuda-q'; b.type='button'; b.textContent='?'; b.title='Saiba mais';
@@ -2586,7 +2586,7 @@ function abreAjuda(chave){
   }
   var img=document.getElementById('ajudaImg');
   if(info.img){ img.src=_fotoUrl(info.img); img.style.display=''; } else { img.style.display='none'; }
-  document.getElementById('ajudaTit').textContent=_AJUDA_TITULOS[chave]||'Informação';
+  document.getElementById('ajudaTit').textContent=_AJUDA_TITULOS[chave]||'InformaÃ§Ã£o';
   document.getElementById('ajudaTxt').textContent=info.texto||'';
   ov.style.display='flex';
 }
@@ -2599,13 +2599,13 @@ function _catFotos(){
   return INCLUSO_FOTOS;
 }
 
-/* ═══════════ CATÁLOGO VINDO DO BANCO (Fase 2) ═══════════ */
-/* O site tenta ler o catálogo do banco. Se conseguir, substitui o embutido.  */
-/* Se falhar (rede, banco fora), mantém o embutido — o site NUNCA quebra.     */
-var CAT_PRECOS=null; // preços do banco (editáveis no painel)
+/* âââââââââââ CATÃLOGO VINDO DO BANCO (Fase 2) âââââââââââ */
+/* O site tenta ler o catÃ¡logo do banco. Se conseguir, substitui o embutido.  */
+/* Se falhar (rede, banco fora), mantÃ©m o embutido â o site NUNCA quebra.     */
+var CAT_PRECOS=null; // preÃ§os do banco (editÃ¡veis no painel)
 var LEGO_FUNDOS_DB=null; // fundos LEGO por modelo, vindos do banco (Fase 4)
-var INFOS=null; // textos/imagens de ajuda ("?") por opção, do banco
-// preço de uma chave do banco, com valor de reserva se o banco não respondeu
+var INFOS=null; // textos/imagens de ajuda ("?") por opÃ§Ã£o, do banco
+// preÃ§o de uma chave do banco, com valor de reserva se o banco nÃ£o respondeu
 function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT_PRECOS[chave] : fb; }
 function _aplicaCatalogoBanco(c){
   if(!c) return;
@@ -2620,7 +2620,7 @@ function _aplicaCatalogoBanco(c){
   if(c.precos) CAT_PRECOS=c.precos;
   if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
   if(c.infos){ INFOS=c.infos; if(typeof _injetaAjuda==='function') setTimeout(_injetaAjuda,60); }
-  // se alguma lista já estiver na tela, atualiza sem exigir novo clique
+  // se alguma lista jÃ¡ estiver na tela, atualiza sem exigir novo clique
   try{
     var lm=document.getElementById('legoModels');
     if(lm && lm.children.length && typeof renderLegoModels==='function' && S && S.legoBrand) renderLegoModels(S.legoBrand);
@@ -2641,7 +2641,7 @@ function carregarCatalogoDoBanco(){
   else { document.addEventListener('DOMContentLoaded', carregarCatalogoDoBanco); }
 })();
 
-function _brl(v){return 'R$ '+Number(v).toLocaleString('pt-BR');}
+function _brl(v){var _r=(window.FP&&window.FP.region)||'BR';var _n=Number(v);if(_r==='US')return '$ '+_n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});if(_r==='EU')return '€'+_n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});return 'R$ '+_n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function _linProd(k,v){return '<div style="display:flex;justify-content:space-between;gap:12px;"><span style="color:#888;">'+k+'</span><span style="color:#ddd;text-align:right;">'+v+'</span></div>';}
 
 function renderInclusoBrands(){
@@ -2788,7 +2788,7 @@ function voltarInclusoCatalogo(){
   calcPrice();
 }
 
-// ── SUMÁRIO ──
+// ââ SUMÃRIO ââ
 function buildSummary(){
   // Produto pronto do catalogo: resumo com todos os dados para cobranca
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
@@ -2810,50 +2810,50 @@ function buildSummary(){
   function _fv(a,b){var x=((document.getElementById(a)||{}).value||'').trim();return x||((document.getElementById(b)||{}).value||'').trim();}
   const _mB=(S.tipo==='lego')?'':(_fv('aiCarBrand','apenaCarBrand')||S.miniBrand||'');
   const _mM=(S.tipo==='lego')?'':(_fv('aiCarModel','apenaCarModel')||S.miniModel||'');
-  const mod=S.tipo==='lego'?(S.legoModel||'—'):((_mB||'—')+(_mM?' — '+_mM:''));
+  const mod=S.tipo==='lego'?(S.legoModel||'â'):((_mB||'â')+(_mM?' â '+_mM:''));
   const dim=S.tipo==='lego'?S.legoDim:S.miniDim;
   setEl('sumCat',cat);
   setEl('sumMod',mod);
   setEl('sumDim',dim);
-  // Moldura — badge se for upgrade pago; cinza se removido
+  // Moldura â badge se for upgrade pago; cinza se removido
   if(S.moldura==='m-fibra'){
-    document.getElementById('sumMold').innerHTML=S.molduraLbl+'<span class="sum-badge">+R$75 <button class="sum-rm" onclick="removeSumItem(\'moldura\')">×</button></span>';
+    document.getElementById('sumMold').innerHTML=S.molduraLbl+'<span class="sum-badge">+R$75 <button class="sum-rm" onclick="removeSumItem(\'moldura\')">Ã</button></span>';
   } else if(_sumRemoved.moldura){
-    document.getElementById('sumMold').innerHTML='<span class="sum-val-del">Fibra de Carbono</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'moldura\')">↩ desfazer</button></span>';
+    document.getElementById('sumMold').innerHTML='<span class="sum-val-del">Fibra de Carbono</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'moldura\')">â© desfazer</button></span>';
   } else { setEl('sumMold',S.molduraLbl); }
   setEl('sumFund',S.fundoLbl);
-  // LED — badge com preço real; cinza se removido
+  // LED â badge com preÃ§o real; cinza se removido
   if(S.led){
     var _rgb=(S.ledTipo==='rgb'),_sem=(S.ledFio==='sem');
     var _lp=_rgb?(_sem?589:489):(_sem?489:389);
-    document.getElementById('sumLed').innerHTML='Com iluminação LED ✨<span class="sum-badge">+R$'+_lp+' <button class="sum-rm" onclick="removeSumItem(\'led\')">×</button></span>';
+    document.getElementById('sumLed').innerHTML='Com iluminaÃ§Ã£o LED â¨<span class="sum-badge">+R$'+_lp+' <button class="sum-rm" onclick="removeSumItem(\'led\')">Ã</button></span>';
   } else if(_sumRemoved.led){
-    document.getElementById('sumLed').innerHTML='<span class="sum-val-del">Com iluminação LED ✨</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'led\')">↩ desfazer</button></span>';
+    document.getElementById('sumLed').innerHTML='<span class="sum-val-del">Com iluminaÃ§Ã£o LED â¨</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'led\')">â© desfazer</button></span>';
   } else { setEl('sumLed','Sem LED'); }
-  let mini='—';
-  if(S.miniOpt==='own')mini='Envio próprio';
-  else mini='Comprar conosco ('+({exist:'Die-cast',notsure:'A confirmar',_3d:'Impressão 3D'}[S.disp]||'Die-cast')+')';
-  if(S.customs.length)mini+='\nPersonalizações: '+S.customs.join(', ');
+  let mini='â';
+  if(S.miniOpt==='own')mini='Envio prÃ³prio';
+  else mini='Comprar conosco ('+({exist:'Die-cast',notsure:'A confirmar',_3d:'ImpressÃ£o 3D'}[S.disp]||'Die-cast')+')';
+  if(S.customs.length)mini+='\nPersonalizaÃ§Ãµes: '+S.customs.join(', ');
   setEl('sumMini',mini);
-  // Mini: logos fixos sempre incluídos no sumário
+  // Mini: logos fixos sempre incluÃ­dos no sumÃ¡rio
   var _fixedRelHtml='';
   if(S.tipo==='mini'){
-    _fixedRelHtml='<span style="display:block;margin-bottom:2px;color:#aaa;">✓ Logo da Marca — canto sup. esq.</span><span style="display:block;margin-bottom:4px;color:#aaa;">✓ Logo do Modelo — canto inf. dir.</span>';
+    _fixedRelHtml='<span style="display:block;margin-bottom:2px;color:#aaa;">â Logo da Marca â canto sup. esq.</span><span style="display:block;margin-bottom:4px;color:#aaa;">â Logo do Modelo â canto inf. dir.</span>';
   }
-  // Alto-relevo — ativos com badge; removidos em cinza com ↩
+  // Alto-relevo â ativos com badge; removidos em cinza com â©
   var _actRel=S.relOpts.map(function(opt){
-    var _k=opt==='Bandeira do País'?'bandeira':'piloto';
-    return '<span style="display:block;margin-bottom:2px;">'+opt+'<span class="sum-badge">+R$89 <button class="sum-rm" onclick="removeSumItem(\'rel\',\''+_k+'\',\''+opt.replace(/'/g,"\\'")+'\'  )">×</button></span></span>';
+    var _k=opt==='Bandeira do PaÃ­s'?'bandeira':'piloto';
+    return '<span style="display:block;margin-bottom:2px;">'+opt+'<span class="sum-badge">+R$89 <button class="sum-rm" onclick="removeSumItem(\'rel\',\''+_k+'\',\''+opt.replace(/'/g,"\\'")+'\'  )">Ã</button></span></span>';
   });
   var _remRel=_sumRemoved.rel.map(function(r){
-    return '<span style="display:block;margin-bottom:2px;"><span class="sum-val-del">'+r.label+'</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'rel\',\''+r.key+'\',\''+r.label.replace(/'/g,"\\'")+'\'  )">↩ desfazer</button></span></span>';
+    return '<span style="display:block;margin-bottom:2px;"><span class="sum-val-del">'+r.label+'</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'rel\',\''+r.key+'\',\''+r.label.replace(/'/g,"\\'")+'\'  )">â© desfazer</button></span></span>';
   });
   var _allRel=_actRel.concat(_remRel);
   if(_fixedRelHtml||_allRel.length){ document.getElementById('sumRel').innerHTML=_fixedRelHtml+_allRel.join(''); }
   else { setEl('sumRel','Nenhum'); }
   setEl('sumTotal','R$ '+S._total.toLocaleString('pt-BR'));
   // SKU
-  let sku='—';
+  let sku='â';
   if(S.tipo==='lego'){
     const bSku=LEGO_MODEL_SKU[S.legoModel]||'FP-???';
     const upgs=[];
@@ -2862,7 +2862,7 @@ function buildSummary(){
       const rgb=(S.ledTipo==='rgb'),sem=(S.ledFio==='sem');
       upgs.push(rgb?(sem?'FP-UPG-LSR':'FP-UPG-LCR'):(sem?'FP-UPG-LSN':'FP-UPG-LCN'));
     }
-    if(S.relOpts.includes('Bandeira do País'))upgs.push('FP-UPG-BAN');
+    if(S.relOpts.includes('Bandeira do PaÃ­s'))upgs.push('FP-UPG-BAN');
     if(S.relOpts.includes('Nome do Piloto'))upgs.push('FP-UPG-NOM');
     sku=upgs.length?bSku+' + '+upgs.join(' + '):bSku;
   } else if(S.tipo==='mini'){
@@ -2874,30 +2874,30 @@ function buildSummary(){
       const rgb=(S.ledTipo==='rgb'),sem=(S.ledFio==='sem');
       upgs.push(rgb?(sem?'FP-UPG-LSR':'FP-UPG-LCR'):(sem?'FP-UPG-LSN':'FP-UPG-LCN'));
     }
-    sku=sz?(sz.scale+' / '+sz.label+(upgs.length?' + '+upgs.join(' + '):'')):'—';
+    sku=sz?(sz.scale+' / '+sz.label+(upgs.length?' + '+upgs.join(' + '):'')):'â';
   }
   setEl('pvSku',sku);
 }
 
-// ── FINALIZAR ──
+// ââ FINALIZAR ââ
 function finalizar(){
-  alert('🏁 Pedido recebido!\n\nNossa equipe entrará em contato via WhatsApp em até 2h para confirmar os detalhes e iniciar a produção.\n\n📦 Prazo: 7–12 dias úteis\n🏆 Embalagem premium inclusa');
+  alert('ð Pedido recebido!\n\nNossa equipe entrarÃ¡ em contato via WhatsApp em atÃ© 2h para confirmar os detalhes e iniciar a produÃ§Ã£o.\n\nð¦ Prazo: 7â12 dias Ãºteis\nð Embalagem premium inclusa');
 }
 
 function abrirWpp(){
-  const mod=S.tipo==='lego'?(S.legoModel||'—'):(S.miniBrand+(S.miniModel?' — '+S.miniModel:''));
+  const mod=S.tipo==='lego'?(S.legoModel||'â'):(S.miniBrand+(S.miniModel?' â '+S.miniModel:''));
   const dim=S.tipo==='lego'?S.legoDim:S.miniDim;
   const msg=encodeURIComponent(
-    'Olá! Configurei meu quadro Funparts:\n'+
-    '• Tipo: '+(S.tipo==='lego'?'LEGO':'Miniatura')+'\n'+
-    '• Modelo: '+mod+'\n'+
-    '• Dimensão: '+dim+'\n'+
-    '• Moldura: '+S.molduraLbl+'\n'+
-    '• Fundo: '+S.fundoLbl+'\n'+
-    '• LED: '+(S.led?'Sim':'Não')+'\n'+
-    '• Miniatura: '+(S.miniOpt==='own'?'Envio próprio':'Comprar conosco')+'\n'+
-    (S.relOpts.length?'• Relevos extras: '+S.relOpts.join(', ')+'\n':'')+
-    '• Total estimado: R$ '+S._total.toLocaleString('pt-BR')+'\n\n'+
+    'OlÃ¡! Configurei meu quadro Funparts:\n'+
+    'â¢ Tipo: '+(S.tipo==='lego'?'LEGO':'Miniatura')+'\n'+
+    'â¢ Modelo: '+mod+'\n'+
+    'â¢ DimensÃ£o: '+dim+'\n'+
+    'â¢ Moldura: '+S.molduraLbl+'\n'+
+    'â¢ Fundo: '+S.fundoLbl+'\n'+
+    'â¢ LED: '+(S.led?'Sim':'NÃ£o')+'\n'+
+    'â¢ Miniatura: '+(S.miniOpt==='own'?'Envio prÃ³prio':'Comprar conosco')+'\n'+
+    (S.relOpts.length?'â¢ Relevos extras: '+S.relOpts.join(', ')+'\n':'')+
+    'â¢ Total estimado: R$ '+S._total.toLocaleString('pt-BR')+'\n\n'+
     'Gostaria de finalizar o pedido!'
   );
   window.open('https://wa.me/5511910646157?text='+msg,'_blank');
@@ -2914,9 +2914,9 @@ renderFundoLayouts(S.fundo);
 // PREVIEW JS
 const F={brilho:'images/img_005.jpg',fosco:'images/img_058.jpg',fibra:'images/img_059.jpg'};
 const M={fibra:'images/img_007.webp',laca:'images/img_060.png'};
-function setF(c,k,n){document.querySelectorAll('.fc').forEach(x=>{x.classList.remove('on');x.querySelector('.fk').textContent='';});c.classList.add('on');c.querySelector('.fk').textContent='✓';document.getElementById('iFundo').src=F[k];setEl('fAtual',n);}
+function setF(c,k,n){document.querySelectorAll('.fc').forEach(x=>{x.classList.remove('on');x.querySelector('.fk').textContent='';});c.classList.add('on');c.querySelector('.fk').textContent='â';document.getElementById('iFundo').src=F[k];setEl('fAtual',n);}
 function setM(c,k){document.querySelectorAll('.mc').forEach(x=>x.classList.remove('on'));c.classList.add('on');document.getElementById('iMoldura').src=M[k];}
-// Init: sync previews with defaults (S.fundo='f-carbono'→F.fibra, S.moldura='m-fibra'→M.fibra)
+// Init: sync previews with defaults (S.fundo='f-carbono'âF.fibra, S.moldura='m-fibra'âM.fibra)
 (function(){var eF=document.getElementById('iFundo');if(eF&&F.fibra)eF.src=F.fibra;})();
 
 // Filtros CSS para colorir SVG F1
@@ -2931,16 +2931,16 @@ function setF1Color(d, key) {
   setStyle('logoF1','filter',F1_FILTERS[key]);
 }
 
-// ── RELEVOS EXTRAS ──
+// ââ RELEVOS EXTRAS ââ
 const BANDEIRA_MODELO = 'images/img_061.png';
 let pilotColor = '#FFFFFF';
 let extraItems = [];
 
 
-// Adicionar elemento arrastável ao quadro
+// Adicionar elemento arrastÃ¡vel ao quadro
 function addRelevo(dataUrl, label, w, h, position) {
   const wrap = document.getElementById('relExtras');
-  if (!wrap) { alert('Elemento relExtras não encontrado'); return; }
+  if (!wrap) { alert('Elemento relExtras nÃ£o encontrado'); return; }
   const legoWrap = document.getElementById('legoRelExtras');
 
   const div = document.createElement('div');
@@ -3017,62 +3017,62 @@ const BANDEIRAS = {
   'germany': 'images/img_063.svg',
   'italia': 'images/img_064.svg',
   'italy': 'images/img_064.svg',
-  'itália': 'images/img_064.svg',
+  'itÃ¡lia': 'images/img_064.svg',
   'franca': 'images/img_065.svg',
   'france': 'images/img_065.svg',
-  'frança': 'images/img_065.svg',
+  'franÃ§a': 'images/img_065.svg',
   'espanha': 'images/img_066.svg',
   'spain': 'images/img_066.svg',
   'holanda': 'images/img_067.svg',
   'netherlands': 'images/img_067.svg',
-  'países baixos': 'images/img_067.svg',
+  'paÃ­ses baixos': 'images/img_067.svg',
   'reino unido': 'images/img_068.svg',
   'uk': 'images/img_068.svg',
   'inglaterra': 'images/img_068.svg',
   'australia': 'images/img_069.svg',
-  'austrália': 'images/img_069.svg',
+  'austrÃ¡lia': 'images/img_069.svg',
   'canada': 'images/img_070.svg',
-  'canadá': 'images/img_070.svg',
+  'canadÃ¡': 'images/img_070.svg',
   'mexico': 'images/img_071.svg',
-  'méxico': 'images/img_071.svg',
+  'mÃ©xico': 'images/img_071.svg',
   'japao': 'images/img_072.svg',
-  'japão': 'images/img_072.svg',
+  'japÃ£o': 'images/img_072.svg',
   'japan': 'images/img_072.svg',
   'eua': 'images/img_073.svg',
   'usa': 'images/img_073.svg',
   'estados unidos': 'images/img_073.svg',
   'austria': 'images/img_074.svg',
-  'áustria': 'images/img_074.svg',
+  'Ã¡ustria': 'images/img_074.svg',
   'belgica': 'images/img_075.svg',
-  'bélgica': 'images/img_075.svg',
+  'bÃ©lgica': 'images/img_075.svg',
   'belgium': 'images/img_075.svg',
   'suica': 'images/img_076.svg',
-  'suíça': 'images/img_076.svg',
+  'suÃ­Ã§a': 'images/img_076.svg',
   'switzerland': 'images/img_076.svg',
   'finlandia': 'images/img_077.svg',
-  'finlândia': 'images/img_077.svg',
+  'finlÃ¢ndia': 'images/img_077.svg',
   'dinamarca': 'images/img_078.svg',
   'denmark': 'images/img_078.svg',
   'monaco': 'images/img_079.svg',
-  'mônaco': 'images/img_079.svg',
+  'mÃ´naco': 'images/img_079.svg',
   'portugal': 'images/img_080.svg',
   'argentina': 'images/img_081.svg',
   'china': 'images/img_082.svg',
   'noruega': 'images/img_083.svg',
   'norway': 'images/img_083.svg',
   'suecia': 'images/img_084.svg',
-  'suécia': 'images/img_084.svg',
+  'suÃ©cia': 'images/img_084.svg',
   'sweden': 'images/img_084.svg',
   'tailandia': 'images/img_085.svg',
-  'tailândia': 'images/img_085.svg',
+  'tailÃ¢ndia': 'images/img_085.svg',
   'grecia': 'images/img_086.svg',
-  'grécia': 'images/img_086.svg',
+  'grÃ©cia': 'images/img_086.svg',
   'greece': 'images/img_086.svg',
   'polonia': 'images/img_087.svg',
-  'polônia': 'images/img_087.svg',
+  'polÃ´nia': 'images/img_087.svg',
   'poland': 'images/img_087.svg',
 };
-const PAISES_DISPONIVEIS = ["Argentina", "Austrália", "Áustria", "Bélgica", "Brasil", "Canadá", "China", "Dinamarca", "Espanha", "EUA", "Finlândia", "França", "Grécia", "Holanda", "Inglaterra", "Itália", "Japão", "México", "Mônaco", "Noruega", "Polônia", "Portugal", "Reino Unido", "Suécia", "Suíça", "Tailândia"];
+const PAISES_DISPONIVEIS = ["Argentina", "AustrÃ¡lia", "Ãustria", "BÃ©lgica", "Brasil", "CanadÃ¡", "China", "Dinamarca", "Espanha", "EUA", "FinlÃ¢ndia", "FranÃ§a", "GrÃ©cia", "Holanda", "Inglaterra", "ItÃ¡lia", "JapÃ£o", "MÃ©xico", "MÃ´naco", "Noruega", "PolÃ´nia", "Portugal", "Reino Unido", "SuÃ©cia", "SuÃ­Ã§a", "TailÃ¢ndia"];
 
 var _pilotoTimer=null;
 function debAddPiloto(){clearTimeout(_pilotoTimer);_pilotoTimer=setTimeout(addPiloto,400);}
@@ -3103,18 +3103,18 @@ function addBandeira() {
   const imgUrl = BANDEIRAS[key] || BANDEIRAS[pais.toLowerCase()];
 
   if (!imgUrl) {
-    // Mensagem personalizada para país não disponível
+    // Mensagem personalizada para paÃ­s nÃ£o disponÃ­vel
     const msg = document.getElementById('bandeiraMsgBox');
     if (msg) {
-      msg.innerHTML = `<strong>Bandeira de "${pais}" não disponível para visualização.</strong><br>
-        Mas não se preocupe! Ao efetuar a compra, nossa equipe irá personalizar o seu quadro com a bandeira de <strong>${pais}</strong>. 🏁`;
+      msg.innerHTML = `<strong>Bandeira de "${pais}" nÃ£o disponÃ­vel para visualizaÃ§Ã£o.</strong><br>
+        Mas nÃ£o se preocupe! Ao efetuar a compra, nossa equipe irÃ¡ personalizar o seu quadro com a bandeira de <strong>${pais}</strong>. ð`;
       msg.style.display = 'block';
       setTimeout(() => { msg.style.display = 'none'; }, 6000);
     }
     return;
   }
 
-  // Esconder mensagem se estava visível
+  // Esconder mensagem se estava visÃ­vel
   const msg = document.getElementById('bandeiraMsgBox');
   if (msg) msg.style.display = 'none';
 
@@ -3132,7 +3132,7 @@ function addBandeira() {
   const el=addRelevo(imgUrl, pais, _fW, Math.round(_fW*16/24), _bPos);
   if (el) {
     el.classList.add('rel-bandeira');
-    // Marcar clone no legoRelExtras também
+    // Marcar clone no legoRelExtras tambÃ©m
     var _lre=document.getElementById('legoRelExtras');
     if(_lre&&_lre.lastElementChild) _lre.lastElementChild.classList.add('rel-bandeira');
   }
@@ -3187,7 +3187,7 @@ function addPiloto() {
     var elP = addRelevo(imgUrl, nome, Math.round(cvs.width * 0.55), Math.round(cvs.height * 0.55), _pPos);
     if (elP) {
       elP.classList.add('rel-piloto');
-      // Marcar clone em legoRelExtras também (addRelevo sempre appenda ao final)
+      // Marcar clone em legoRelExtras tambÃ©m (addRelevo sempre appenda ao final)
       var _lr=document.getElementById('legoRelExtras');
       if(_lr&&_lr.lastElementChild)_lr.lastElementChild.classList.add('rel-piloto');
     }
@@ -3248,7 +3248,7 @@ function _mobUpdateNav(){
     var bckC=document.getElementById('mobBtnBack');
     if(btnC){
       if(_mobStep>=7){btnC.style.display='none';}
-      else{btnC.style.display='';btnC.textContent='Ver Resumo →';}
+      else{btnC.style.display='';btnC.textContent='Ver Resumo â';}
     }
     if(bckC)bckC.style.display=_mobStep>0?'':'none';
     var passo={0:1,1:2,2:3,7:4}[_mobStep]||3;
@@ -3258,23 +3258,23 @@ function _mobUpdateNav(){
     return;
   }
   var isLego=(typeof S!=='undefined'&&S.tipo==='lego');
-  var labels=['Modelo','Dimensão','Detalhamento','Fundo','Moldura + LED','Alto-relevo','Ver Resumo',''];
+  var labels=['Modelo','DimensÃ£o','Detalhamento','Fundo','Moldura + LED','Alto-relevo','Ver Resumo',''];
   if(!isLego)labels[1]='Miniatura';
   var btn=document.getElementById('mobBtnNext');
   var bck=document.getElementById('mobBtnBack');
   var secs=document.querySelectorAll('.cfg-sec').length;
   if(btn){
     if(_mobStep>=secs-1){btn.style.display='none';}
-    else{btn.style.display='';btn.textContent=(labels[_mobStep]||'Próximo')+' →';}
+    else{btn.style.display='';btn.textContent=(labels[_mobStep]||'PrÃ³ximo')+' â';}
   }
   if(bck){bck.style.display=_mobStep>0?'':'none';}
 }
 
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 //  CARRINHO DE COMPRAS
 //  Guarda a CONFIGURACAO de cada item, nunca a imagem cheia.
 //  A miniatura visual e uma thumb de ~10KB gerada por canvas.
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 var CART_KEY='funparts_cart_v1';
 var CART=[];
 
@@ -3344,7 +3344,7 @@ function _cartMontaItem(){
       id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
       via:'catalogo', tipo:'mini',
       titulo:p.n, sub:(S.incBrand||S.incBrandSel||''),
-      linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
+      linhas:[p.esc+' Â· '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
@@ -3363,8 +3363,8 @@ function _cartMontaItem(){
       })();
   var linhas=[];
   linhas.push(ehLego?S.legoDim:S.miniDim);
-  linhas.push('Moldura '+(S.molduraLbl||'—'));
-  linhas.push('Fundo '+(S.fundoLbl||'—'));
+  linhas.push('Moldura '+(S.molduraLbl||'â'));
+  linhas.push('Fundo '+(S.fundoLbl||'â'));
   if(S.led)linhas.push('Com LED');
   if(S.relOpts&&S.relOpts.length)linhas.push('Relevos: '+S.relOpts.join(', '));
   // imagem que melhor representa o item
@@ -3487,19 +3487,19 @@ function _cartRender(){
   var foot=document.getElementById('cartFoot');
   if(!body)return;
   if(!n){
-    body.innerHTML='<div class="cart-empty">Seu carrinho está vazio.<br>Monte um quadro e adicione aqui.</div>';
+    body.innerHTML='<div class="cart-empty">Seu carrinho estÃ¡ vazio.<br>Monte um quadro e adicione aqui.</div>';
     if(foot)foot.style.display='none';
     return;
   }
   body.innerHTML=CART.map(function(i){
     var img=i.thumb
       ? '<img src="'+i.thumb+'" alt="">'
-      : '<div class="ph">'+(i.tipo==='lego'?'🧱':'🏎️')+'</div>';
+      : '<div class="ph">'+(i.tipo==='lego'?'ð§±':'ðï¸')+'</div>';
     return '<div class="cart-item">'
       +'<div class="cart-thumb">'+img+'</div>'
       +'<div class="cart-info">'
         +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
-        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
+        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' Â· ')+'</div>'
         +'<div class="cart-foot-row">'
           +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
           +'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">remover</button>'
@@ -3549,7 +3549,7 @@ function fecharPedidoWpp(){
 
   // abre a aba JA, no clique, senao o navegador bloqueia como popup
   var aba=window.open('','_blank');
-  if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+  if(btn){ btn.disabled=true; btn.textContent='Enviandoâ¦'; }
 
   function _abrirZap(txt){
     var url='https://wa.me/5511910646157?text='+encodeURIComponent(txt);
@@ -3606,14 +3606,14 @@ function fecharPedidoWpp(){
       if(typeof _rascLimpa==='function')_rascLimpa();
       CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
       if(pg && pg.ok && pg.url){
-        // redireciona a aba já aberta para o checkout Pagar.me
+        // redireciona a aba jÃ¡ aberta para o checkout Pagar.me
         if(aba && !aba.closed){ aba.location.href=pg.url; }
         else { window.open(pg.url,'_blank'); }
-        if(btn){ btn.disabled=false; btn.textContent='Finalizar e pagar →'; }
+        if(btn){ btn.disabled=false; btn.textContent='Finalizar e pagar â'; }
       } else {
-        // Pagar.me falhou: fallback WhatsApp para não perder a venda
+        // Pagar.me falhou: fallback WhatsApp para nÃ£o perder a venda
         _abrirZap(
-          'Olá! Fechei meu pedido na Funparts.\n\n'+
+          'OlÃ¡! Fechei meu pedido na Funparts.\n\n'+
           '*Pedido:* '+d.codigo+'\n'+
           '*Cliente:* '+c.nome+'\n'+
           '*Itens:* '+CART.length+'\n'+
@@ -3628,7 +3628,7 @@ function fecharPedidoWpp(){
     // servidor fora do ar nao pode impedir a venda: manda o resumo completo no texto
     _abrirZap(_resumoLongo());
   });
-}// ── handler de retorno de pagamento (?pago=1) ──
+}// ââ handler de retorno de pagamento (?pago=1) ââ
 (function(){
   var sp=new URLSearchParams(window.location.search);
   if(sp.get('pago')==='1'){
@@ -3643,10 +3643,10 @@ function _fpgtoMsgSucesso(cod){
   var box=document.createElement('div');
   box.style.cssText='background:#1a1a1a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:40px 32px;max-width:420px;width:90%;text-align:center;color:#fff;font-family:inherit;';
   box.innerHTML=
-    '<div style="font-size:48px;margin-bottom:16px">✅</div>'+
+    '<div style="font-size:48px;margin-bottom:16px">â</div>'+
     '<div style="font-size:22px;font-weight:700;margin-bottom:8px">Pagamento confirmado!</div>'+
     (cod?'<div style="font-size:14px;color:#e07b00;margin-bottom:16px">Pedido '+cod+'</div>':'')+
-    '<div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px">Você receberá as atualizações pelo WhatsApp. Obrigado por comprar na Funparts!</div>'+
+    '<div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px">VocÃª receberÃ¡ as atualizaÃ§Ãµes pelo WhatsApp. Obrigado por comprar na Funparts!</div>'+
     '<button onclick="this.closest(\'[data-pgto-ov]\').remove()" style="background:#e07b00;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;cursor:pointer;">Fechar</button>';
   ov.setAttribute('data-pgto-ov','1');
   ov.appendChild(box);
@@ -3658,14 +3658,14 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape')fecharCarri
 _cartLoad();
 _cartRender();
 
-// ═══════════════════════════════════════════════════════════
-//  DADOS DO CLIENTE — passo 2 do carrinho
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+//  DADOS DO CLIENTE â passo 2 do carrinho
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 var CLI_KEY='funparts_cliente_v1';
 
 function _so(v){ return String(v||'').replace(/\D/g,''); }
 
-// ── mascaras ──
+// ââ mascaras ââ
 function _mascCpf(v){
   v=_so(v).slice(0,11);
   if(v.length>9) return v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/,'$1.$2.$3-$4');
@@ -3686,7 +3686,7 @@ function _mascTel(v){
   return v;
 }
 
-// ── validacao de CPF (digitos verificadores) ──
+// ââ validacao de CPF (digitos verificadores) ââ
 function _cpfValido(cpf){
   cpf=_so(cpf);
   if(cpf.length!==11)return false;
@@ -3704,15 +3704,15 @@ function _emailValido(e){
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(String(e||'').trim());
 }
 
-// ── regras de cada campo ──
+// ââ regras de cada campo ââ
 var FRM_CAMPOS=[
   {id:'fNome',  err:'eNome',   obrig:true,  chk:function(v){ return v.trim().split(/\s+/).length>=2 || 'Informe nome e sobrenome'; }},
-  {id:'fCpf',   err:'eCpf',    obrig:true,  chk:function(v){ return _cpfValido(v) || 'CPF inválido'; }},
+  {id:'fCpf',   err:'eCpf',    obrig:true,  chk:function(v){ return _cpfValido(v) || 'CPF invÃ¡lido'; }},
   {id:'fZap',   err:'eZap',    obrig:true,  chk:function(v){ var d=_so(v); return (d.length===10||d.length===11) || 'Telefone incompleto'; }},
   {id:'fCep',   err:'eCep',    obrig:true,  chk:function(v){ return _so(v).length===8 || 'CEP incompleto'; }},
-  {id:'fEmail', err:'eEmail',  obrig:true,  chk:function(v){ return _emailValido(v) || 'E-mail inválido'; }},
-  {id:'fRua',   err:'eRua',    obrig:true,  chk:function(v){ return v.trim().length>2 || 'Informe o endereço'; }},
-  {id:'fNum',   err:'eNum',    obrig:true,  chk:function(v){ return v.trim().length>0 || 'Informe o número'; }},
+  {id:'fEmail', err:'eEmail',  obrig:true,  chk:function(v){ return _emailValido(v) || 'E-mail invÃ¡lido'; }},
+  {id:'fRua',   err:'eRua',    obrig:true,  chk:function(v){ return v.trim().length>2 || 'Informe o endereÃ§o'; }},
+  {id:'fNum',   err:'eNum',    obrig:true,  chk:function(v){ return v.trim().length>0 || 'Informe o nÃºmero'; }},
   {id:'fBairro',err:'eBairro', obrig:true,  chk:function(v){ return v.trim().length>1 || 'Informe o bairro'; }},
   {id:'fCidade',err:'eCidade', obrig:true,  chk:function(v){ return v.trim().length>1 || 'Informe a cidade'; }},
   {id:'fUf',    err:'eUf',     obrig:true,  chk:function(v){ return /^[A-Za-z]{2}$/.test(v.trim()) || 'UF'; }},
@@ -3726,7 +3726,7 @@ function _frmValidaCampo(c,mostrar){
   var v=el.value||'';
   var vazio=!v.trim();
   var ok, msg='';
-  if(vazio){ ok=!c.obrig; if(!ok)msg='Campo obrigatório'; }
+  if(vazio){ ok=!c.obrig; if(!ok)msg='Campo obrigatÃ³rio'; }
   else { var r=c.chk(v); ok=(r===true); if(!ok)msg=r; }
   if(mostrar){
     el.classList.toggle('erro',!ok);
@@ -3745,7 +3745,7 @@ function _frmValidaTudo(mostrar){
   return ok;
 }
 
-// ── cotação de frete (SuperFrete via Worker /frete) ──
+// ââ cotaÃ§Ã£o de frete (SuperFrete via Worker /frete) ââ
 var _freteEscolhido=null;
 var _freteCarrierAtual='superfrete';
 var _freteCurrencyAtual='R$';
@@ -3779,7 +3779,7 @@ function _fpFreteRender(options,carrier,currency){
   var bloco=document.getElementById('fpFreteBloco');
   if(!opts||!bloco)return;
   if(!options||!options.length){
-    if(msg)msg.textContent='Nenhuma opção disponível para este CEP.';
+    if(msg)msg.textContent='Nenhuma opÃ§Ã£o disponÃ­vel para este CEP.';
     bloco.style.display='';
     return;
   }
@@ -3789,8 +3789,8 @@ function _fpFreteRender(options,carrier,currency){
   }
   opts.innerHTML=options.map(function(op){
     var sel=_freteEscolhido&&_freteEscolhido.label===op.label;
-    var prazo=op.days?(op.days===1?'1 dia útil':op.days+' dias úteis'):'';
-    var precoFmt=(_freteCurrencyAtual==='€')?'€ '+Number(op.price).toFixed(2).replace('.',','):'R$ '+Number(op.price).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    var prazo=op.days?(op.days===1?'1 dia Ãºtil':op.days+' dias Ãºteis'):'';
+    var precoFmt=(_freteCurrencyAtual==='â¬')?'â¬ '+Number(op.price).toFixed(2).replace('.',','):'R$ '+Number(op.price).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
     return '<div class="fp-frete-opt'+(sel?' on':'')
       +'" onclick="_fpFreteSel(\''+op.label.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
       +'\','+op.price+')">'
@@ -3814,7 +3814,7 @@ function _fpFreteCalc(){
   var msg=document.getElementById('fpFreteMsg');
   var bloco=document.getElementById('fpFreteBloco');
   if(opts)opts.innerHTML='';
-  if(msg)msg.textContent='Calculando frete…';
+  if(msg)msg.textContent='Calculando freteâ¦';
   if(bloco)bloco.style.display='';
   var items=CART.map(function(i){
     var dim=(i.cfg&&i.cfg.dim)||(i.linhas&&i.linhas.length?i.linhas[0]:'');
@@ -3828,7 +3828,7 @@ function _fpFreteCalc(){
   .then(function(d){
     _freteCalcEmCurso=false;
     if(!d||!d.ok||!Array.isArray(d.options)||!d.options.length){
-      if(msg)msg.textContent='Não foi possível calcular o frete para este CEP.';
+      if(msg)msg.textContent='NÃ£o foi possÃ­vel calcular o frete para este CEP.';
       if(bloco)bloco.style.display='';
       return;
     }
@@ -3841,21 +3841,21 @@ function _fpFreteCalc(){
   });
 }
 
-// ── busca de endereco pelo CEP (ViaCEP) ──
+// ââ busca de endereco pelo CEP (ViaCEP) ââ
 var _cepUltimo='';
 function _buscaCep(){
   var cep=_so(_frmVal('fCep'));
   if(cep.length!==8 || cep===_cepUltimo)return;
   _cepUltimo=cep;
   var e=document.getElementById('eCep');
-  if(e){ e.textContent='Buscando endereço…'; e.style.color='#e07b00'; }
+  if(e){ e.textContent='Buscando endereÃ§oâ¦'; e.style.color='#e07b00'; }
   var t=setTimeout(function(){ if(e){e.textContent='';e.style.color='';} },9000);
   fetch('https://viacep.com.br/ws/'+cep+'/json/')
     .then(function(r){ return r.json(); })
     .then(function(d){
       clearTimeout(t);
       if(e){ e.textContent=''; e.style.color=''; }
-      if(!d || d.erro){ if(e)e.textContent='CEP não encontrado'; return; }
+      if(!d || d.erro){ if(e)e.textContent='CEP nÃ£o encontrado'; return; }
       function _set(id,val){
         var el=document.getElementById(id);
         if(el && val && !el.value.trim()){ el.value=val; }
@@ -3873,7 +3873,7 @@ function _buscaCep(){
     });
 }
 
-// ── liga mascaras e validacao aos campos ──
+// ââ liga mascaras e validacao aos campos ââ
 var _frmLigado=false;
 function _frmLiga(){
   if(_frmLigado)return; _frmLigado=true;
@@ -3902,7 +3902,7 @@ function _frmLiga(){
   if(cep)cep.addEventListener('input',function(){ if(_so(cep.value).length===8){ _buscaCep(); _fpFreteCalc(); } });
 }
 
-// ── guarda os dados para o cliente nao redigitar ──
+// ââ guarda os dados para o cliente nao redigitar ââ
 function _cliSalva(){
   try{
     var d={};
@@ -3930,7 +3930,7 @@ function dadosCliente(){
   };
 }
 
-// ── navegacao entre os dois passos do painel ──
+// ââ navegacao entre os dois passos do painel ââ
 function carrinhoPasso(n){
   if(n===2 && !CART.length)return;
   var body=document.getElementById('cartBody'), form=document.getElementById('cartForm');
@@ -3957,14 +3957,14 @@ function carrinhoPasso(n){
   }
 }
 
-// ═══ botoes da etapa de resumo: adicionar -> finalizar (verde) + continuar ═══
+// âââ botoes da etapa de resumo: adicionar -> finalizar (verde) + continuar âââ
 function _botoesResumo(adicionado){
   [['btnAddCart','btnContinuar'],['btnAddCartInc','btnContinuarInc']].forEach(function(par){
     var add=document.getElementById(par[0]);
     var cont=document.getElementById(par[1]);
     if(add){
       add.classList.toggle('finalizar',!!adicionado);
-      add.textContent=adicionado?'Finalizar pedido →':'Adicionar ao carrinho →';
+      add.textContent=adicionado?'Finalizar pedido â':'Adicionar ao carrinho â';
       add.onclick=adicionado?finalizarPeloResumo:adicionarAoCarrinho;
     }
     if(cont)cont.style.display=adicionado?'':'none';
@@ -3981,14 +3981,14 @@ function continuarComprando(){
   var _hs=document.getElementById('headerSub');
   if(_hs)_hs.textContent='Visualizador';
   ['sumTotal','deskBarPrice','mobBarPrice'].forEach(function(id){
-    var e=document.getElementById(id); if(e)e.textContent='—';
+    var e=document.getElementById(id); if(e)e.textContent='â';
   });
 }
 
-// ═══════════════════════════════════════════════════════════
-//  CAPTURA DO PREVIEW — copia o HTML real da composicao
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+//  CAPTURA DO PREVIEW â copia o HTML real da composicao
 //  para reconstruir o quadro exatamente na pagina do pedido
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 var SITE_BASE='https://funparts-v12.pages.dev/';
 
 function _absUrl(u){
@@ -4099,7 +4099,7 @@ function _capturaPreview(){
 // copia fiel das linhas do resumo, como o cliente viu
 function _capturaResumo(){
   var campos=[
-    ['Categoria','sumCat'],['Modelo','sumMod'],['Dimensão','sumDim'],
+    ['Categoria','sumCat'],['Modelo','sumMod'],['DimensÃ£o','sumDim'],
     ['Moldura','sumMold'],['Fundo','sumFund'],['LED','sumLed'],
     ['Miniatura','sumMini'],['Alto-relevo extra','sumRel'],['SKU','pvSku']
   ];
@@ -4117,7 +4117,7 @@ function _capturaResumo(){
   campos.forEach(function(p){
     var e=document.getElementById(p[1]);
     var v=e?_limpa(e.textContent):'';
-    if(v&&v!=='—')out.push({k:p[0],v:v});
+    if(v&&v!=='â')out.push({k:p[0],v:v});
   });
   // detalhes que nao aparecem no resumo mas a producao precisa
   try{
@@ -4131,13 +4131,13 @@ function _capturaResumo(){
       if(cor)out.push({k:'Cor',v:cor});
     }
     if(S.fundo==='f-uv'){
-      var lbl={deg:'Degradê Central',stripe:'Listra Central',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
+      var lbl={deg:'DegradÃª Central',stripe:'Listra Central',diagonal:'Diagonal Sport',faixa:'Faixa Deslocada',meio:'Meio a Meio',img:'Sua Imagem'};
       if(S.uvLayoutType)out.push({k:'Layout do fundo',v:lbl[S.uvLayoutType]||S.uvLayoutType});
       if(S.uvStripeMain)out.push({k:'Cor principal',v:S.uvStripeMain});
       if(S.uvStripeAccent)out.push({k:'Cor de destaque',v:S.uvStripeAccent});
       if(S.uvColor&&S.uvLayoutType==='deg')out.push({k:'Cor do fundo',v:S.uvColor});
     }
-    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' · '+(S.ledFio==='sem'?'sem fio':'com fio')});
+    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' Â· '+(S.ledFio==='sem'?'sem fio':'com fio')});
     var pil=(document.getElementById('relPilotoNome')||{}).value;
     if(pil&&pil.trim())out.push({k:'Nome do piloto',v:pil.trim()});
     if(S.relTL)out.push({k:'Cor do relevo superior',v:S.relTL});
@@ -4146,10 +4146,10 @@ function _capturaResumo(){
   return out;
 }
 
-// ═══════════════════════════════════════════════════════════
-//  RASCUNHO — grava quem preencheu os dados e nao fechou.
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+//  RASCUNHO â grava quem preencheu os dados e nao fechou.
 //  Vira lista de recuperacao de venda no painel.
-// ═══════════════════════════════════════════════════════════
+// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 var RASC_KEY='funparts_rascunho_v1';
 var _rascTimer=null, _rascEnviando=false;
 
@@ -4191,10 +4191,10 @@ function _rascEnvia(){
   .then(function(){ _rascEnviando=false; });
 }
 
-// ═══ FUNPARTS PATCH v1: nova etapa de frete + RETIRAR NA FÁBRICA ═══
+// âââ FUNPARTS PATCH v1: nova etapa de frete + RETIRAR NA FÃBRICA âââ
 ;(function(){
   var _step=1;
-  var RETIRADA='RETIRAR NA FÁBRICA';
+  var RETIRADA='RETIRAR NA FÃBRICA';
 
   window._selRetirada=function(){
     window._freteEscolhido={label:RETIRADA,price:0,carrier:null,currency:'BRL'};
@@ -4211,7 +4211,7 @@ function _rascEnvia(){
     +'<div class="fp-frete-radio"></div>'
     +'<div class="fp-frete-info"><div class="fp-frete-nome">'+RETIRADA+'</div>'
     +'<div class="fp-frete-prazo">Combinar retirada</div>'
-    +'</div><div class="fp-frete-preco">Grátis</div>'
+    +'</div><div class="fp-frete-preco">GrÃ¡tis</div>'
     +'</div>';
 
   function _ensureRetirada(){
@@ -4265,7 +4265,7 @@ function _rascEnvia(){
       if(tit)tit.textContent='Escolha o frete';
       if(volta)volta.style.display='';
       var bG=f1?f1.querySelector('.btn-cart-go'):null;
-      if(bG)bG.textContent='Continuar →';
+      if(bG)bG.textContent='Continuar â';
       var bM=f1?f1.querySelector('.btn-cart-more'):null;
       if(bM)bM.style.display='none';
       _fpFreteCalc();
@@ -4274,7 +4274,7 @@ function _rascEnvia(){
       if(n!==2){
         var f1r=document.getElementById('cartFoot');
         var bGr=f1r?f1r.querySelector('.btn-cart-go'):null;
-        if(bGr)bGr.textContent='Fechar pedido →';
+        if(bGr)bGr.textContent='Fechar pedido â';
         var bMr=f1r?f1r.querySelector('.btn-cart-more'):null;
         if(bMr)bMr.style.display='';
       }
