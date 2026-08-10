@@ -47,21 +47,32 @@ cpBind();
 })();
 
 
-// Multi-currency: corrigir símbolo de moeda em todas as atualizações de preço
+// Multi-currency: corrigir sÃ­mbolo de moeda em todas as atualizaÃ§Ãµes de preÃ§o
 (function(){
   var lastSym='R$';
   setInterval(function(){
     var reg=(window.FP&&window.FP.region)||'BR';
-    var sym=reg==='US'?'$':reg==='EU'?'€':'R$';
+    var sym=reg==='US'?'$':reg==='EU'?'â¬':'R$';
     if(sym===lastSym) return; // BR: nada a fazer
     lastSym=sym;
     ['pvPrice','mobBarPrice','deskBarPrice'].forEach(function(id){
       var el=document.getElementById(id);
       if(!el||!el.textContent) return;
-      // Troca símbolo se ainda estiver como R$
+      // Troca sÃ­mbolo se ainda estiver como R$
       if(el.textContent.indexOf('R$')>=0 && sym!=='R$'){
         el.textContent=el.textContent.replace(/R\$/g,sym);
       }
     });
   },300);
+})();
+
+;(function(){
+  var _origBrl = window._brl;
+  window._brl = function(v){
+    var reg = (window.FP && window.FP.region) || 'BR';
+    var n = Number(v);
+    if(reg === 'US') return '$ ' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    if(reg === 'EU') return '€' + n.toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2});
+    return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  };
 })();
