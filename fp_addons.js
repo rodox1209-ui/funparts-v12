@@ -491,6 +491,11 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   T("Finalizar e pagar →","Checkout →","Finalizar y pagar →","Finaliser et payer →");
   T("Fundo","Background","Fondo","Arrière-plan");
   T("Modelo","Model","Modelo","Modèle");
+  T("Miniatura","Model","Miniatura","Miniature");
+  T("Detalhamento","Details","Detalles","Détails");
+  T("Moldura + LED","Frame + LED","Marco + LED","Cadre + LED");
+  T("Alto-relevo","Relief","Relieve","Relief");
+  T("Produto","Product","Producto","Produit");
   function traduzTudo(lang){
     var body=document.body; if(!body)return;
     _traduzindo=true;
