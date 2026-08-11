@@ -496,6 +496,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   T("Moldura + LED","Frame + LED","Marco + LED","Cadre + LED");
   T("Alto-relevo","Relief","Relieve","Relief");
   T("Produto","Product","Producto","Produit");
+  T("Preencha o CEP para calcular o frete","Enter your ZIP code to calculate shipping","Ingrese su código postal para calcular el envío","Entrez votre code postal pour calculer la livraison");
   function traduzTudo(lang){
     var body=document.body; if(!body)return;
     _traduzindo=true;
