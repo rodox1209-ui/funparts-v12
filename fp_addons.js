@@ -974,21 +974,21 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   st.setAttribute('data-fp','anchor-top');
   st.textContent=css;
   (document.head||document.documentElement).appendChild(st);
-
-// EMOJI FIX: charset-safe re-registro de chaves FULL
+// EMOJI FIX v2: charset-safe re-registro de chaves FULL
 (function(){
 var fix=[
-['\uD83D\uDCA1',String.fromCharCode(240,159,146,161)],
-['\uD83D\uDD0B',String.fromCharCode(240,159,148,139)],
-['\uD83D\uDD0C',String.fromCharCode(240,159,148,140)],
-['\uD83C\uDFF7\uFE0F',String.fromCharCode(240,159,143,183,239,184,143)],
-['\uD83C\uDFCE\uFE0F',String.fromCharCode(240,159,143,142,239,184,143)],
-['\uD83C\uDFF4',String.fromCharCode(240,159,143,180)],
-['\uD83D\uDC64',String.fromCharCode(240,159,145,164)],
-['\uD83D\uDCCB',String.fromCharCode(240,159,147,139)],
-['\uD83D\uDDFA\uFE0F',String.fromCharCode(240,159,151,186,239,184,143)],
-['\uD83D\uDCE6',String.fromCharCode(240,159,147,166)]
+[String.fromCharCode(55357,56481),String.fromCharCode(240,159,146,161)],
+[String.fromCharCode(55357,56587),String.fromCharCode(240,159,148,139)],
+[String.fromCharCode(55357,56588),String.fromCharCode(240,159,148,140)],
+[String.fromCharCode(55356,57335,65039),String.fromCharCode(240,159,143,183,239,184,143)],
+[String.fromCharCode(55356,57294,65039),String.fromCharCode(240,159,143,142,239,184,143)],
+[String.fromCharCode(55356,57332),String.fromCharCode(240,159,143,180)],
+[String.fromCharCode(55357,56420),String.fromCharCode(240,159,145,164)],
+[String.fromCharCode(55357,56523),String.fromCharCode(240,159,147,139)],
+[String.fromCharCode(55357,56826,65039),String.fromCharCode(240,159,151,186,239,184,143)],
+[String.fromCharCode(55357,56550),String.fromCharCode(240,159,147,166)]
 ];
+var added=0;
 var ks=Object.keys(FULL);
 fix.forEach(function(p){
   var good=p[0],bad=p[1];
@@ -998,25 +998,32 @@ fix.forEach(function(p){
       var v=FULL[k],nv={};
       ['en','es','fr'].forEach(function(l){if(v[l])nv[l]=v[l].split(bad).join(good);});
       FULL[nk]=nv;
+      added++;
     }
   });
 });
+window._emojiFix={ran:true,added:added,fullSize:ks.length};
 })();
-// PRICE FIX: moeda regional para .tdesc dos ledFio
+// PRICE FIX v2: moeda regional para .tdesc dos ledFio
 (function(){
 function _f(n,r){if(r==='EU')return'\u20AC '+n.toFixed(2).replace('.',',');if(r==='US')return'$ '+n.toFixed(2);return'R$ '+n.toFixed(2).replace('.',',');}
 function fix(){
-  var r=FP.region||'BR';
+  var r=(window.FP&&window.FP.region)||'BR';
   [['ledFioSem',199]].forEach(function(p){
     var d=document.querySelector('#'+p[0]+' .tdesc');
     if(!d)return;
     var t=(d.textContent||'');
-    var n=parseFloat(t.replace(/[^\d,\.]/g,'').replace(',','.'))||p[1];
+    var n=parseFloat(t.replace(/[^\d,.]/g,'').replace(',','.'))||p[1];
     if(n>0)d.textContent=_f(n,r);
   });
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fix);}else{setTimeout(fix,0);}
-var _o=FP.setRegion;
-FP.setRegion=function(r){_o.call(FP,r);setTimeout(fix,0);};
+document.addEventListener('DOMContentLoaded',function(){
+  if(window.FP&&window.FP.setRegion){
+    var _o=window.FP.setRegion;
+    window.FP.setRegion=function(r){_o.call(window.FP,r);setTimeout(fix,0);};
+  }
+});
+window._priceFix={ran:true};
 })();
 })();
