@@ -497,6 +497,38 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   T("Alto-relevo","Relief","Relieve","Relief");
   T("Produto","Product","Producto","Produit");
   T("Preencha o CEP para calcular o frete","Enter your ZIP code to calculate shipping","Ingrese su código postal para calcular el envío","Entrez votre code postal pour calculer la livraison");
+// CHARSET FIX: corrige double-encoded UTF-8 nos text nodes do DOM
+(function(){
+function _dec(s){
+try{
+var b=new Uint8Array(s.length),ok=true;
+for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c>255){ok=false;break;}b[i]=c;}
+return ok?new TextDecoder('utf-8',{fatal:false}).decode(b):s;
+}catch(e){return s;}}
+function fixNode(n){
+if(n.nodeType!==3)return;
+var t=n.textContent;
+if(!/[\xC0-\xFF][\x80-\xBF]/.test(t))return;
+var f=_dec(_dec(t));
+if(f!==t)n.textContent=f;}
+function fixAll(root){
+var w=document.createTreeWalker(root||document.body,NodeFilter.SHOW_TEXT);
+var n;while((n=w.nextNode()))fixNode(n);}
+function setup(){
+fixAll();
+try{
+var obs=new MutationObserver(function(muts){
+muts.forEach(function(m){
+m.addedNodes.forEach(function(nd){if(nd.nodeType===3)fixNode(nd);else if(nd.nodeType===1)fixAll(nd);});
+if(m.type==='characterData')fixNode(m.target);
+});});
+obs.observe(document.body,{childList:true,subtree:true,characterData:true});
+}catch(e){}}
+if(document.readyState==='loading'){
+document.addEventListener('DOMContentLoaded',setup);
+}else{setup();}
+window._charsetFix={ran:true};
+})();
 // EMOJI FIX v2: charset-safe re-registro de chaves FULL
 (function(){
 var fix=[
