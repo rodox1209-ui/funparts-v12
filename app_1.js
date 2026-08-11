@@ -502,7 +502,7 @@ function renderLegoModels(brand){
   models.forEach(m=>{
     const d=document.createElement('div');
     d.className='mrow';
-    d.innerHTML=`<span>${m.name}</span><span class="mrow-tag">${m.dim} ÃÂ· ${m.scale}</span>`;
+    d.innerHTML=`<span>${m.name}</span><span class="mrow-tag">${m.dim} · ${m.scale}</span>`;
     d.onclick=()=>selLegoModel(d,m);
     el.appendChild(d);
   });
@@ -610,7 +610,7 @@ function selLegoModel(row,model){
     if(_mm2&&_mm2[_mk2]) _iMold.src=_mm2[_mk2];
   }
   var hSub=document.getElementById('headerSub');
-  if(hSub)hSub.textContent='Visualizador ÃÂ· '+model.name+' LEGO';
+  if(hSub)hSub.textContent='Visualizador · '+model.name+' LEGO';
   document.querySelectorAll('#legoModels .mrow').forEach(r=>r.classList.remove('sel'));
   row.classList.add('sel');
   S.legoModel=model.name;
@@ -772,7 +772,7 @@ function confirmarInclusoModel(){
   setEl('iSumBrand', brand);
   setEl('iSumName', m.name||'');
   setEl('iSumDesc', m.desc||'');
-  setEl('iSumPrice', m.price ? 'R$ '+m.price.toFixed(2).replace('.',',') : 'Consulte o preÃÂ§o');
+  setEl('iSumPrice', m.price ? _brl(m.price) : 'Consulte o preÃÂ§o');
 
   // Imagem
   var imgWrap=document.getElementById('iSumImg');
@@ -793,7 +793,7 @@ function confirmarInclusoModel(){
   setEl('sumMini','Inclusa no produto');
   setEl('sumRel','Ã¢ÂÂ');
   setEl('pvSku','Ã¢ÂÂ');
-  setEl('sumTotal', m.price ? 'R$ '+m.price.toFixed(2).replace('.',',') : 'Consulte o preÃÂ§o');
+  setEl('sumTotal', m.price ? _brl(m.price) : 'Consulte o preÃÂ§o');
 
   // Navegar para step-7
   goStep(7);
@@ -973,7 +973,7 @@ async function gerarVisualizacaoIA(){
   S.incBrand=brand;
   try{
     var imgUrl=await generateCarImage(brand,model,year,color);
-    var fakeModel={name:color+' '+carName,imgs:[imgUrl],price:null,desc:'VisualizaÃÂ§ÃÂ£o gerada por IA ÃÂ· '+color+' '+carName};
+    var fakeModel={name:color+' '+carName,imgs:[imgUrl],price:null,desc:'VisualizaÃÂ§ÃÂ£o gerada por IA · '+color+' '+carName};
     setStyle('aiLoadingState','display','none');
     setStyle('aiGenerateBtn','display','block');
     hideAiPopup();
@@ -3344,7 +3344,7 @@ function _cartMontaItem(){
       id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
       via:'catalogo', tipo:'mini',
       titulo:p.n, sub:(S.incBrand||S.incBrandSel||''),
-      linhas:[p.esc+' ÃÂ· '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
+      linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
@@ -3499,7 +3499,7 @@ function _cartRender(){
       +'<div class="cart-thumb">'+img+'</div>'
       +'<div class="cart-info">'
         +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
-        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' ÃÂ· ')+'</div>'
+        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
         +'<div class="cart-foot-row">'
           +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
           +'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">remover</button>'
@@ -3790,7 +3790,7 @@ function _fpFreteRender(options,carrier,currency){
   opts.innerHTML=options.map(function(op){
     var sel=_freteEscolhido&&_freteEscolhido.label===op.label;
     var prazo=op.days?(op.days===1?'1 dia ÃÂºtil':op.days+' dias ÃÂºteis'):'';
-    var precoFmt=(_freteCurrencyAtual==='Ã¢ÂÂ¬')?'Ã¢ÂÂ¬ '+Number(op.price).toFixed(2).replace('.',','):'R$ '+Number(op.price).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    var precoFmt=(_freteCurrencyAtual==='Ã¢ÂÂ¬')?'Ã¢ÂÂ¬ '+Number(op.price).toFixed(2).replace('.',','):_brl(op.price);
     return '<div class="fp-frete-opt'+(sel?' on':'')
       +'" onclick="_fpFreteSel(\''+op.label.replace(/\\/g,'\\\\').replace(/'/g,"\\'")
       +'\','+op.price+')">'
@@ -4137,7 +4137,7 @@ function _capturaResumo(){
       if(S.uvStripeAccent)out.push({k:'Cor de destaque',v:S.uvStripeAccent});
       if(S.uvColor&&S.uvLayoutType==='deg')out.push({k:'Cor do fundo',v:S.uvColor});
     }
-    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' ÃÂ· '+(S.ledFio==='sem'?'sem fio':'com fio')});
+    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' · '+(S.ledFio==='sem'?'sem fio':'com fio')});
     var pil=(document.getElementById('relPilotoNome')||{}).value;
     if(pil&&pil.trim())out.push({k:'Nome do piloto',v:pil.trim()});
     if(S.relTL)out.push({k:'Cor do relevo superior',v:S.relTL});
