@@ -542,6 +542,7 @@ function fix(){
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fix);}else{setTimeout(fix,0);}
 document.addEventListener('DOMContentLoaded',function(){
+setTimeout(fix,2500);
   if(window.FP&&window.FP.setRegion){
     var _o=window.FP.setRegion;
     window.FP.setRegion=function(r){_o.call(window.FP,r);setTimeout(fix,0);};
