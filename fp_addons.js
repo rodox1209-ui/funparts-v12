@@ -527,27 +527,23 @@ fix.forEach(function(p){
 });
 window._emojiFix={ran:true,added:added,fullSize:ks.length};
 })();
-// PRICE FIX v2: moeda regional para .tdesc dos ledFio
+// PRICE FIX v3: moeda regional para .tdesc dos ledFio
 (function(){
+var _r='BR';
 function _f(n,r){if(r==='EU')return'\u20AC '+n.toFixed(2).replace('.',',');if(r==='US')return'$ '+n.toFixed(2);return'R$ '+n.toFixed(2).replace('.',',');}
-function fix(){
-  var r=(window.FP&&window.FP.region)||'BR';
-  [['ledFioSem',199]].forEach(function(p){
-    var d=document.querySelector('#'+p[0]+' .tdesc');
-    if(!d)return;
-    var t=(d.textContent||'');
-    var n=parseFloat(t.replace(/[^\d,.]/g,'').replace(',','.'))||p[1];
-    if(n>0)d.textContent=_f(n,r);
-  });
+function fix(){var r=(window.FP&&window.FP.region)||'BR';[['ledFioSem',199]].forEach(function(p){var d=document.querySelector('#'+p[0]+' .tdesc');if(!d)return;var t=(d.textContent||'');var n=parseFloat(t.replace(/[^\d,.]/g,'').replace(',','.'))||p[1];if(n>0)d.textContent=_f(n,r);});}
+function hook(){
+if(!window.FP)return;
+if(window.FP.__ph)return;
+window.FP.__ph=1;
+_r=window.FP.region||'BR';
+try{Object.defineProperty(window.FP,'region',{get:function(){return _r;},set:function(v){_r=v;fix();},configurable:true,enumerable:true});}catch(e){}
+if(window.FP.setRegion){var _o=window.FP.setRegion;window.FP.setRegion=function(r){_o.call(window.FP,r);fix();};}
+fix();
 }
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fix);}else{setTimeout(fix,0);}
-document.addEventListener('DOMContentLoaded',function(){
-setTimeout(fix,2500);
-  if(window.FP&&window.FP.setRegion){
-    var _o=window.FP.setRegion;
-    window.FP.setRegion=function(r){_o.call(window.FP,r);setTimeout(fix,0);};
-  }
-});
+hook();
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){hook();fix();});}else{hook();fix();}
+window.addEventListener('load',function(){hook();fix();});
 window._priceFix={ran:true};
 })();
 
