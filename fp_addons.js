@@ -1205,3 +1205,38 @@ window.FP_traduzTudo=function(lang){
   }
 };
 })();
+
+;(function(){
+'use strict';
+if(typeof window.FP_traduzTudo!=='function')return;
+var _orig2=window.FP_traduzTudo;
+var EXTRA_EN={
+  'Clique no botão':'Click the button',
+  ', abaixo e dê continuidade na experiência':', below and continue the experience',
+  'Padrão':'Standard',
+  'Número de corrida na carroceria':'Race number on the bodywork',
+  '⏱ 7–12 dias úteis':'⏱ 7–12 business days',
+  'Super Heróis':'Super Heroes'
+};
+var EXTRA_PT={};
+Object.keys(EXTRA_EN).forEach(function(k){EXTRA_PT[EXTRA_EN[k]]=k;});
+function applyExtraMap(map){
+  var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,batch=[];
+  while((n=walker.nextNode())){
+    var t=n.textContent.trim();
+    if(Object.prototype.hasOwnProperty.call(map,t)){
+      var orig=n.textContent;
+      var lead=orig.match(/^[\s]*/)[0];
+      var trail=orig.match(/[\s]*$/)[0];
+      batch.push({n:n,v:lead+map[t]+trail});
+    }
+  }
+  batch.forEach(function(x){x.n.textContent=x.v;});
+}
+window.FP_traduzTudo=function(lang){
+  _orig2.call(this,lang);
+  if(lang==='en')applyExtraMap(EXTRA_EN);
+  else if(lang==='pt')applyExtraMap(EXTRA_PT);
+};
+})();
