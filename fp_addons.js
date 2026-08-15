@@ -1517,3 +1517,122 @@ window.FP_traduzTudo=function(lang){
   ob4.observe(document.body,{childList:true,subtree:true});
 };
 })();
+
+;(function(){
+'use strict';
+if(typeof window.FP_traduzTudo!=='function')return;
+var _p5=window.FP_traduzTudo;
+var _lang5='pt';
+var _tmr5=null;
+
+/* Exact text node map — in new entries not covered by patches 1-4 */
+var EN5={
+  /* Model step header */
+  'QUADRO PARA MINIATURAS':'MINIATURE FRAME',
+  'Selecione o quadro da sua preferência':'Select your preferred frame',
+  'SELECIONE O QUADRO DA SUA PREFERÊNCIA':'SELECT YOUR PREFERRED FRAME',
+  'Quadro para LEGO':'Frame for LEGO',
+  /* Relief step */
+  'LOGOTIPO COM MARCA DO CARRO':'BRAND LOGO',
+  '🏷️ Logotipo com marca do carro':'🏷️ Brand Logo',
+  'Logotipo com marca do carro':'Brand Logo',
+  'Logotipo oficial da marca selecionada':'Official logo of the selected brand',
+  '🏆 Artesanal':'🏆 Handcrafted',
+  'Artesanal':'Handcrafted',
+  /* Order summary rows */
+  'Miniatura Die-cast / 3D':'Miniature Die-cast / 3D',
+  '✓ Logo da Marca — canto sup. esq.':'✓ Brand Logo — top-left corner',
+  '✓ Logo do Modelo — canto inf. dir.':'✓ Model Logo — bottom-right corner',
+  'Logo da Marca — canto sup. esq.':'Brand Logo — top-left corner',
+  'Logo do Modelo — canto inf. dir.':'Model Logo — bottom-right corner',
+  /* Background options */
+  'Degradê Central':'Center Gradient',
+  'Cor do Degradê Central':'Center Gradient Color',
+  'ENVIE A IMAGEM DA SUA PREFERÊNCIA':'SEND YOUR PREFERRED IMAGE',
+  'Envie a imagem da sua preferência':'Send your preferred image',
+  /* Miniature availability wizard */
+  'Verificação de disponibilidade':'Availability check',
+  'Disponibilidade da miniatura':'Miniature availability',
+  'Personalização da miniatura':'Miniature customization',
+  'Dimensão da miniatura':'Miniature dimensions',
+  'Dimensão do quadro':'Frame dimensions',
+  /* Compound label parts (also handled by substrApply below) */
+  'Moldura Laca Preto':'Black Lacquer Frame',
+  'Fundo Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl) Background',
+  'Fundo Fibra de Carbono':'Carbon Fiber Background',
+};
+
+var PT5={};
+Object.keys(EN5).forEach(function(k){PT5[EN5[k]]=k;});
+
+/* Substring map — for compound cart/label strings not matched exactly */
+var SUBSTR_EN={
+  'Moldura Laca Preto':'Black Lacquer Frame',
+  'Moldura Fibra de Carbono' :'Carbon Fiber Frame',
+  'Fundo Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl) Background',
+  'Fundo Fibra de Carbono' :'Carbon Fiber Background',
+  'Fundo Acrílico UV':'UV Acrylic Background',
+  'Logo da Marca':'Brand Logo',
+  'Logo do Modelo':'Model Logo',
+  'canto sup. esq.':'top-left corner',
+  'canto inf. dir.':'bottom-right corner',
+  'Miniatura Die-cast':'Miniature Die-cast',
+};
+var SUBSTR_PT={};
+Object.keys(SUBSTR_EN).forEach(function(k){SUBSTR_PT[SUBSTR_EN[k]]=k;});
+
+/* Exact text-node walker — safe for MutationObserver (no innerHTML) */
+function walkApply(map){
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,q=[];
+  while((n=w.nextNode())){
+    var t=n.textContent.trim();
+    if(Object.prototype.hasOwnProperty.call(map,t)){
+      var s=n.textContent;
+      var l=s.match(/^[\s]*/)[0];
+      var r=s.match(/[\s]*$/)[0];
+      q.push({n:n,v:l+map[t]+r});
+    }
+  }
+  q.forEach(function(x){x.n.textContent=x.v;});
+}
+
+/* Substring walker — handles compound strings in cart/label nodes */
+function substrApply(subMap){
+  var keys=Object.keys(subMap);
+  if(!keys.length)return;
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,q=[];
+  while((n=w.nextNode())){
+    var t=n.textContent;
+    var changed=false;
+    for(var i=0;i<keys.length;i++){
+      var pt=keys[i];
+      if(t.indexOf(pt)!==-1){
+        t=t.split(pt).join(subMap[pt]);
+        changed=true;
+      }
+    }
+    if(changed)q.push({n:n,v:t});
+  }
+  q.forEach(function(x){x.n.textContent=x.v;});
+}
+
+var ob5=new MutationObserver(function(ms){
+  var ok=ms.some(function(m){return m.addedNodes.length>0;});
+  if(!ok)return;
+  clearTimeout(_tmr5);
+  _tmr5=setTimeout(function(){
+    if(_lang5==='en'){walkApply(EN5);substrApply(SUBSTR_EN);}
+    else if(_lang5==='pt'){walkApply(PT5);substrApply(SUBSTR_PT);}
+  },80);
+});
+
+window.FP_traduzTudo=function(lang){
+  _lang5=lang;
+  _p5.call(this,lang);          /* full upstream chain */
+  if(lang==='en'){walkApply(EN5);substrApply(SUBSTR_EN);}
+  else if(lang==='pt'){walkApply(PT5);substrApply(SUBSTR_PT);}
+  ob5.observe(document.body,{childList:true,subtree:true});
+};
+})();
