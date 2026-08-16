@@ -2205,3 +2205,91 @@ window.FP_traduzTudo=function(lang){
 })();
 
 })();
+
+;(function(){
+'use strict';
+
+/* PATCH 11 — Retry pump for React re-render timing.
+   Root cause: React re-renders components AFTER FP_traduzTudo(lang)
+   returns, resetting text nodes back to PT. Patches 9-10 run once
+   and the MutationObserver (childList only) may miss direct text-node
+   mutations. This patch schedules 4 retries at 150 / 400 / 900 / 2000ms
+   with a per-language guard so stale retries are cancelled on lang change.
+
+   Covers confirmed-failing nodes (verified in-browser):
+   - "Se escolher essa opção voce tera " (LEGO card, concat node)
+   - ". Assim, na proxima etapa, voce podera comparar..." (viz note)
+   - Remaining LEGO-path fragments and prop/step sentences. */
+
+if(typeof window.FP_traduzTudo!=='function')return;
+var _p11=window.FP_traduzTudo;
+var _lang11='pt';
+var _tmrs11=[];
+
+var _RETRY11={
+  'Se escolher essa opção você terá dois caminhos:':"By choosing this option, you'll have two paths:",
+  'Se escolher essa opção você terá':"By choosing this option, you'll have",
+  '. Assim, na próxima etapa, você poderá comparar os diferentes tamanhos disponíveis e escolher com mais segurança o modelo que melhor valoriza e acomoda a sua miniatura.':"In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
+  'Nesta etapa, o objetivo principal é demonstrar a':"At this stage, the main goal is to show the vehicle’s",
+  'proporção do veículo em relação ao quadro':'scale relative to the frame',
+  'Escolher quadros para sua miniatura(s);':'Choose frames for your miniature(s);',
+  'Escolher quadros prontos que já contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
+  'dois caminhos:':'two paths:',
+  'dezenas de modelos de quadros':'dozens of frame models',
+  'para fixar sua miniatura de Lego.':'to mount your Lego miniature.',
+  'para Lego.':'frames for Lego.',
+  'Clique no botão':'Click the button',
+  ', abaixo e dê continuidade na experiência':', below and continue the experience',
+  'Observação:':'Note:'
+};
+
+function _substrApply11(subMap){
+  try{
+    var keys=Object.keys(subMap);
+    if(!keys.length)return;
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    var n,q=[];
+    while((n=w.nextNode())){
+      var t=n.textContent;
+      var changed=false;
+      for(var i=0;i<keys.length;i++){
+        var pt=keys[i];
+        if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+      }
+      if(changed)q.push({n:n,v:t});
+    }
+    q.forEach(function(x){x.n.textContent=x.v;});
+  }catch(e){}
+}
+
+function _runRetry11(capturedLang){
+  if(_lang11!==capturedLang)return;
+  if(capturedLang!=='pt')_substrApply11(_RETRY11);
+}
+
+window.FP_traduzTudo=function(lang){
+  _lang11=lang;
+  _p11.call(this,lang);
+  for(var k=0;k<_tmrs11.length;k++)clearTimeout(_tmrs11[k]);
+  _tmrs11=[];
+  if(lang!=='pt'){
+    _substrApply11(_RETRY11);
+    var cl=lang;
+    _tmrs11.push(setTimeout(function(){_runRetry11(cl);},150));
+    _tmrs11.push(setTimeout(function(){_runRetry11(cl);},400));
+    _tmrs11.push(setTimeout(function(){_runRetry11(cl);},900));
+    _tmrs11.push(setTimeout(function(){_runRetry11(cl);},2000));
+  }
+};
+
+(function(){
+  function _p11Init(){
+    var lang=localStorage.getItem('fp_lang')||'pt';
+    if(lang!=='pt')_substrApply11(_RETRY11);
+  }
+  setTimeout(_p11Init,800);
+  setTimeout(_p11Init,1500);
+  setTimeout(_p11Init,3000);
+})();
+
+})();
