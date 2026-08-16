@@ -2412,3 +2412,134 @@ function _startOb12(){
 })();
 
 })();
+
+;(function(){
+'use strict';
+
+/* PATCH 13 — LED field, FINALIZAR PEDIDO button, shipping subtitle & Grátis.
+   Four confirmed PT strings in EN mode:
+   1. Order summary LED field: "Com iluminação LED" stays PT
+      → Fix: intercept selLED (if present) + substr map
+   2. Wizard step 8 bottom button: "FINALIZAR PEDIDO" stays PT
+      → Root cause: existing _EN9 maps 'Finalizar pedido' but not the ALL-CAPS variant
+      → Fix: add uppercase variant to substr map
+   3. Shipping subtitle: "Combinar retirada" stays PT under FACTORY PICKUP
+      → Fix: substr map + MutationObserver already running from patch12
+   4. Shipping cost: "Grátis" stays PT
+      → Fix: substr map */
+
+var _lang13 = (localStorage.getItem('fp_lang') || 'pt');
+
+/* ── MAP 1: sel* function 3rd-argument names ── */
+var _SELMAP13 = {
+  /* selLED / selIluminacao */
+  'Com iluminação LED':'With LED lighting',
+  'Sem iluminação':'Without lighting',
+  'Sem Iluminação':'Without lighting',
+  'SEM ILUMINAÇÃO':'WITHOUT LIGHTING',
+  'Com Iluminação LED':'With LED lighting',
+  'COM ILUMINAÇÃO LED':'WITH LED LIGHTING'
+};
+
+/* ── MAP 2: DOM text-node substr replacements ── */
+var _SUBSTR13 = {
+  /* LED / lighting */
+  'Com iluminação LED':'With LED lighting',
+  'Com Iluminação LED':'With LED lighting',
+  'COM ILUMINAÇÃO LED':'WITH LED LIGHTING',
+  'Sem iluminação':'Without lighting',
+  'Sem Iluminação':'Without lighting',
+  'SEM ILUMINAÇÃO':'WITHOUT LIGHTING',
+  /* Finalizar pedido — all case variants */
+  'FINALIZAR PEDIDO':'COMPLETE ORDER',
+  'Finalizar Pedido':'Complete Order',
+  /* Shipping subtitle */
+  'Combinar retirada':'Schedule pickup',
+  'COMBINAR RETIRADA':'SCHEDULE PICKUP',
+  /* Shipping cost */
+  'Grátis':'Free',
+  'GRÁTIS':'FREE',
+  'grátis':'free'
+};
+
+function _substrApply13(subMap){
+  try{
+    var keys=Object.keys(subMap);
+    if(!keys.length)return;
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    var n,q=[];
+    while((n=w.nextNode())){
+      var t=n.textContent;
+      var changed=false;
+      for(var i=0;i<keys.length;i++){
+        var pt=keys[i];
+        if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+      }
+      if(changed)q.push({n:n,v:t});
+    }
+    q.forEach(function(x){x.n.textContent=x.v;});
+  }catch(e){}
+}
+
+/* ── INTERCEPT sel* FUNCTIONS ── */
+function _patchSelFn13(fnName){
+  if(typeof window[fnName]!=='function')return;
+  var orig=window[fnName];
+  window[fnName]=function(el,key,name){
+    if(_lang13!=='pt'&&name&&_SELMAP13[name]){
+      name=_SELMAP13[name];
+    }
+    return orig.call(this,el,key,name);
+  };
+}
+
+function _applySelPatches13(){
+  ['selLED','selIluminacao','selIluminação'].forEach(_patchSelFn13);
+}
+
+/* ── INTERCEPT FP_traduzTudo ── */
+if(typeof window.FP_traduzTudo==='function'){
+  var _p13=window.FP_traduzTudo;
+  window.FP_traduzTudo=function(lang){
+    _lang13=lang;
+    _p13.call(this,lang);
+    if(lang!=='pt'){
+      _substrApply13(_SUBSTR13);
+      var cl=lang;
+      setTimeout(function(){if(_lang13===cl)_substrApply13(_SUBSTR13);},200);
+      setTimeout(function(){if(_lang13===cl)_substrApply13(_SUBSTR13);},600);
+      setTimeout(function(){if(_lang13===cl)_substrApply13(_SUBSTR13);},1500);
+    }
+    _applySelPatches13();
+  };
+}
+
+/* ── PERSISTENT MUTATION OBSERVER ── */
+var _ob13=null;
+var _tmr13=null;
+function _startOb13(){
+  if(_ob13)return;
+  _ob13=new MutationObserver(function(ms){
+    if(!ms.some(function(m){return m.addedNodes.length>0;}))return;
+    if(_lang13==='pt')return;
+    clearTimeout(_tmr13);
+    _tmr13=setTimeout(function(){
+      _substrApply13(_SUBSTR13);
+      _applySelPatches13();
+    },80);
+  });
+  _ob13.observe(document.body,{childList:true,subtree:true});
+}
+
+/* ── INITIAL LOAD ── */
+(function(){
+  _applySelPatches13();
+  if(_lang13!=='pt'){
+    _substrApply13(_SUBSTR13);
+    setTimeout(function(){_substrApply13(_SUBSTR13);},500);
+    setTimeout(function(){_substrApply13(_SUBSTR13);},1200);
+  }
+  _startOb13();
+})();
+
+})();
