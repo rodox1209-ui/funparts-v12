@@ -1810,3 +1810,53 @@ window.FP_traduzTudo=function(lang){
   ob7.observe(document.body,{childList:true,subtree:true});
 };
 })();
+
+;(function(){
+'use strict';
+
+/* PATCH 8 — Language-change detector.
+   Root cause: the EN/PT toggle button writes 'fp_lang' to localStorage
+   but does NOT call window.FP_traduzTudo. Patches 1-7 all hook into
+   FP_traduzTudo and are therefore never triggered by the UI toggle.
+   This patch polls localStorage every 150 ms and calls FP_traduzTudo
+   whenever the language changes, including retries for late React renders. */
+
+function _getLang8(){
+  try{return localStorage.getItem('fp_lang')||'pt';}catch(e){return 'pt';}
+}
+
+var _p8_lastLang=_getLang8();
+var _p8_timers=[];
+
+function _applyLang8(lang){
+  if(typeof window.FP_traduzTudo==='function'){
+    try{window.FP_traduzTudo(lang);}catch(e){}
+  }
+}
+
+function _onLangChange8(lang){
+  /* Cancel any pending retries from the last change */
+  _p8_timers.forEach(function(t){clearTimeout(t);});
+  _p8_timers=[];
+  /* Apply immediately, then retry to catch content rendered after React settles */
+  _applyLang8(lang);
+  _p8_timers.push(setTimeout(function(){_applyLang8(lang);},150));
+  _p8_timers.push(setTimeout(function(){_applyLang8(lang);},400));
+  _p8_timers.push(setTimeout(function(){_applyLang8(lang);},900));
+}
+
+/* Poll localStorage every 150 ms — cheap (single string comparison) */
+setInterval(function(){
+  var cur=_getLang8();
+  if(cur!==_p8_lastLang){
+    _p8_lastLang=cur;
+    _onLangChange8(cur);
+  }
+},150);
+
+/* Also apply on initial page load after React finishes its first renders */
+setTimeout(function(){_applyLang8(_getLang8());},400);
+setTimeout(function(){_applyLang8(_getLang8());},900);
+setTimeout(function(){_applyLang8(_getLang8());},1800);
+
+})();
