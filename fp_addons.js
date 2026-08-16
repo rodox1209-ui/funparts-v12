@@ -1636,3 +1636,92 @@ window.FP_traduzTudo=function(lang){
   ob5.observe(document.body,{childList:true,subtree:true});
 };
 })();
+
+;(function(){
+'use strict';
+if(typeof window.FP_traduzTudo!=='function')return;
+var _p6=window.FP_traduzTudo;
+var _lang6='pt';
+var _tmr6=null;
+
+/* New entries not covered by patches 1-5:
+   Unabbreviated corner labels used in RELIEF step cards and order summary */
+var EN6={
+  /* RELIEF step card titles (all-caps compound) */
+  'MODEL LOGO — CANTO INFERIOR DIREITO':'MODEL LOGO — BOTTOM RIGHT CORNER',
+  'BRAND LOGO — CANTO SUPERIOR ESQUERDO':'BRAND LOGO — TOP LEFT CORNER',
+  'Logo do Modelo — canto inferior direito':'Model Logo — bottom-right corner',
+  'Logo da Marca — canto superior esquerdo':'Brand Logo — top-left corner',
+  '✓ Logo da Marca — canto superior esquerdo':'✓ Brand Logo — top-left corner',
+  '✓ Logo do Modelo — canto inferior direito':'✓ Model Logo — bottom-right corner',
+  /* Standalone corner label strings */
+  'CANTO INFERIOR DIREITO':'BOTTOM RIGHT CORNER',
+  'CANTO SUPERIOR ESQUERDO':'TOP LEFT CORNER',
+  'canto inferior direito':'bottom-right corner',
+  'canto superior esquerdo':'top-left corner',
+  /* Abbreviated reverse map (EN→PT) handled automatically via PT6 below */
+};
+
+var PT6={};
+Object.keys(EN6).forEach(function(k){PT6[EN6[k]]=k;});
+
+/* Substring map for compound strings containing corner labels */
+var SUBSTR_EN6={
+  'CANTO INFERIOR DIREITO':'BOTTOM RIGHT CORNER',
+  'CANTO SUPERIOR ESQUERDO':'TOP LEFT CORNER',
+  'canto inferior direito':'bottom-right corner',
+  'canto superior esquerdo':'top-left corner',
+};
+var SUBSTR_PT6={};
+Object.keys(SUBSTR_EN6).forEach(function(k){SUBSTR_PT6[SUBSTR_EN6[k]]=k;});
+
+function walkApply(map){
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,q=[];
+  while((n=w.nextNode())){
+    var t=n.textContent.trim();
+    if(Object.prototype.hasOwnProperty.call(map,t)){
+      var s=n.textContent;
+      var l=s.match(/^[\s]*/)[0];
+      var r=s.match(/[\s]*$/)[0];
+      q.push({n:n,v:l+map[t]+r});
+    }
+  }
+  q.forEach(function(x){x.n.textContent=x.v;});
+}
+
+function substrApply(subMap){
+  var keys=Object.keys(subMap);
+  if(!keys.length)return;
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,q=[];
+  while((n=w.nextNode())){
+    var t=n.textContent;
+    var changed=false;
+    for(var i=0;i<keys.length;i++){
+      var pt=keys[i];
+      if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+    }
+    if(changed)q.push({n:n,v:t});
+  }
+  q.forEach(function(x){x.n.textContent=x.v;});
+}
+
+var ob6=new MutationObserver(function(ms){
+  var ok=ms.some(function(m){return m.addedNodes.length>0;});
+  if(!ok)return;
+  clearTimeout(_tmr6);
+  _tmr6=setTimeout(function(){
+    if(_lang6==='en'){walkApply(EN6);substrApply(SUBSTR_EN6);}
+    else if(_lang6==='pt'){walkApply(PT6);substrApply(SUBSTR_PT6);}
+  },80);
+});
+
+window.FP_traduzTudo=function(lang){
+  _lang6=lang;
+  _p6.call(this,lang);          /* full upstream chain */
+  if(lang==='en'){walkApply(EN6);substrApply(SUBSTR_EN6);}
+  else if(_lang6==='pt'){walkApply(PT6);substrApply(SUBSTR_PT6);}
+  ob6.observe(document.body,{childList:true,subtree:true});
+};
+})();
