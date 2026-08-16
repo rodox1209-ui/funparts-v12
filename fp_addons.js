@@ -2131,3 +2131,77 @@ window.FP_traduzTudo=function(lang){
 })();
 
 })();
+
+;(function(){
+'use strict';
+
+/* PATCH 10 — Fix remaining LEGO card PT fragment.
+   "Se escolher essa opção você terá" appears as part of a single
+   concatenated text node, so _walkApply9 (exact-match) never fires.
+   Adding it to a new SUBSTR pass fixes the partial translation. */
+
+if(typeof window.FP_traduzTudo!=='function')return;
+var _p10=window.FP_traduzTudo;
+var _lang10='pt';
+var _tmr10=null;
+var _ob10=null;
+
+var _SUBSTR10={
+  'Se escolher essa opção você terá dois caminhos:':"By choosing this option, you'll have two paths:",
+  'Se escolher essa opção você terá':"By choosing this option, you'll have",
+  'Escolher quadros para sua miniatura(s);':'Choose frames for your miniature(s);',
+  'Escolher quadros prontos que já contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
+  'dois caminhos:':'two paths:'
+};
+
+function _substrApply10(subMap){
+  try{
+    var keys=Object.keys(subMap);
+    if(!keys.length)return;
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    var n,q=[];
+    while((n=w.nextNode())){
+      var t=n.textContent;
+      var changed=false;
+      for(var i=0;i<keys.length;i++){
+        var pt=keys[i];
+        if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+      }
+      if(changed)q.push({n:n,v:t});
+    }
+    q.forEach(function(x){x.n.textContent=x.v;});
+  }catch(e){}
+}
+
+function _startOb10(){
+  if(_ob10)return;
+  _ob10=new MutationObserver(function(ms){
+    var ok=ms.some(function(m){return m.addedNodes.length>0;});
+    if(!ok)return;
+    clearTimeout(_tmr10);
+    _tmr10=setTimeout(function(){
+      if(_lang10!=='pt')_substrApply10(_SUBSTR10);
+    },80);
+  });
+  _ob10.observe(document.body,{childList:true,subtree:true});
+}
+
+window.FP_traduzTudo=function(lang){
+  _lang10=lang;
+  _p10.call(this,lang);
+  if(lang!=='pt')_substrApply10(_SUBSTR10);
+  _startOb10();
+};
+
+(function(){
+  function _p10Init(){
+    var lang=localStorage.getItem('fp_lang')||'pt';
+    if(lang!=='pt')_substrApply10(_SUBSTR10);
+    _startOb10();
+  }
+  setTimeout(_p10Init,600);
+  setTimeout(_p10Init,1200);
+  setTimeout(_p10Init,2500);
+})();
+
+})();
