@@ -2293,3 +2293,122 @@ window.FP_traduzTudo=function(lang){
 })();
 
 })();
+
+;(function(){
+'use strict';
+
+/* PATCH 12 — sel* intercept + missing display-name translations.
+   Three confirmed issues (EN mode):
+   1. Order summary BACKGROUND stays PT — selFundo stores PT 3rd arg
+   2. Preview "Textura Rexy" stays PT — LEGO_FUNDOS_DB nome field
+   3. Cart "Retirar na fabrica" stays PT — _fpFreteRender injects PT HTML
+   Fix: intercept selFundo/selMoldura/selDisp at source + substr observer */
+
+var _lang12=(localStorage.getItem('fp_lang')||'pt');
+
+var _SELMAP12={
+  'Acrílico Brilho com Impressão UV':'Glossy Acrylic — UV',
+  'Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl)',
+  'Fosco':'Matte',
+  'Fibra de Carbono':'Carbon Fiber',
+  'Laca Preto':'Black Lacquer',
+  'Die-cast — disponível no mercado':'Die-cast — available on market',
+  'A verificar pela equipe Funparts':'To be verified by Funparts team',
+  'Impressão 3D + Pintura Automotiva':'3D Printing + Automotive Paint'
+};
+
+var _SUBSTR12={
+  'Acrílico Brilho com Impressão UV':'Glossy Acrylic — UV',
+  'Fosco':'Matte',
+  'Textura Rexy':'Texture Rexy',
+  'TEXTURA REXY':'TEXTURE REXY',
+  'Degrê Linear':'Linear Gradient',
+  'Degrê':'Gradient',
+  'Abstrato':'Abstract',
+  'Setas':'Arrows',
+  'Listra Central':'Center Stripe',
+  'Listras':'Stripes',
+  'Retirar na fábrica':'Factory pickup',
+  'Retirar na Fábrica':'Factory pickup',
+  'RETIRAR NA FÁBRICA':'FACTORY PICKUP',
+  'Seu carrinho':'Your cart',
+  'Fechar pedido':'Complete order',
+  'Die-cast — disponível no mercado':'Die-cast — available on market',
+  'A verificar pela equipe Funparts':'To be verified by Funparts team',
+  'Impressão 3D + Pintura Automotiva':'3D Printing + Automotive Paint'
+};
+
+function _substrApply12(subMap){
+  try{
+    var keys=Object.keys(subMap);
+    if(!keys.length)return;
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    var n,q=[];
+    while((n=w.nextNode())){
+      var t=n.textContent;
+      var changed=false;
+      for(var i=0;i<keys.length;i++){
+        var pt=keys[i];
+        if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+      }
+      if(changed)q.push({n:n,v:t});
+    }
+    q.forEach(function(x){x.n.textContent=x.v;});
+  }catch(e){}
+}
+
+function _patchSelFn12(fnName){
+  if(typeof window[fnName]!=='function')return;
+  var orig=window[fnName];
+  window[fnName]=function(el,key,name){
+    if(_lang12!=='pt'&&name&&_SELMAP12[name])name=_SELMAP12[name];
+    return orig.call(this,el,key,name);
+  };
+}
+
+function _applySelPatches12(){
+  ['selFundo','selMoldura','selDisp'].forEach(_patchSelFn12);
+}
+
+if(typeof window.FP_traduzTudo==='function'){
+  var _p12=window.FP_traduzTudo;
+  window.FP_traduzTudo=function(lang){
+    _lang12=lang;
+    _p12.call(this,lang);
+    if(lang!=='pt'){
+      _substrApply12(_SUBSTR12);
+      var cl=lang;
+      setTimeout(function(){if(_lang12===cl)_substrApply12(_SUBSTR12);},200);
+      setTimeout(function(){if(_lang12===cl)_substrApply12(_SUBSTR12);},600);
+      setTimeout(function(){if(_lang12===cl)_substrApply12(_SUBSTR12);},1500);
+    }
+    _applySelPatches12();
+  };
+}
+
+var _ob12=null,_tmr12=null;
+function _startOb12(){
+  if(_ob12)return;
+  _ob12=new MutationObserver(function(ms){
+    if(!ms.some(function(m){return m.addedNodes.length>0;}))return;
+    if(_lang12==='pt')return;
+    clearTimeout(_tmr12);
+    _tmr12=setTimeout(function(){
+      _substrApply12(_SUBSTR12);
+      _applySelPatches12();
+    },80);
+  });
+  _ob12.observe(document.body,{childList:true,subtree:true});
+}
+
+(function(){
+  _applySelPatches12();
+  if(_lang12!=='pt'){
+    _substrApply12(_SUBSTR12);
+    setTimeout(function(){_substrApply12(_SUBSTR12);},500);
+    setTimeout(function(){_substrApply12(_SUBSTR12);},1200);
+  }
+  _startOb12();
+})();
+
+})();
