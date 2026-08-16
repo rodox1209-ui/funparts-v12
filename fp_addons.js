@@ -1725,3 +1725,88 @@ window.FP_traduzTudo=function(lang){
   ob6.observe(document.body,{childList:true,subtree:true});
 };
 })();
+
+;(function(){
+'use strict';
+if(typeof window.FP_traduzTudo!=='function')return;
+var _p7=window.FP_traduzTudo;
+var _lang7='pt';
+var _tmr7=null;
+
+/* Fix for patch6: actual DOM text is mixed-case "Canto inferior direito" (capital C),
+   not "CANTO INFERIOR DIREITO". Also the card title includes the emoji prefix. */
+var EN7={
+  /* RELIEF step card — exact node with emoji */
+  '🏎️ Model Logo — Canto inferior direito':'🏎️ Model Logo — Bottom right corner',
+  '🏎️ Model Logo — Canto superior esquerdo':'🏎️ Model Logo — Top left corner',
+  /* Without emoji */
+  'Model Logo — Canto inferior direito':'Model Logo — Bottom right corner',
+  'Model Logo — Canto superior esquerdo':'Model Logo — Top left corner',
+  'Brand Logo — Canto superior esquerdo':'Brand Logo — Top left corner',
+  'Brand Logo — Canto inferior direito':'Brand Logo — Bottom right corner',
+  /* Order summary rows */
+  '✓ Brand Logo — Canto superior esquerdo':'✓ Brand Logo — top-left corner',
+  '✓ Model Logo — Canto inferior direito':'✓ Model Logo — bottom-right corner',
+};
+
+var PT7={};
+Object.keys(EN7).forEach(function(k){PT7[EN7[k]]=k;});
+
+/* Substring map — capital-C variants */
+var SUBSTR_EN7={
+  'Canto inferior direito':'bottom-right corner',
+  'Canto superior esquerdo':'top-left corner',
+};
+var SUBSTR_PT7={};
+Object.keys(SUBSTR_EN7).forEach(function(k){SUBSTR_PT7[SUBSTR_EN7[k]]=k;});
+
+function walkApply(map){
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,q=[];
+  while((n=w.nextNode())){
+    var t=n.textContent.trim();
+    if(Object.prototype.hasOwnProperty.call(map,t)){
+      var s=n.textContent;
+      var l=s.match(/^[\s]*/)[0];
+      var r=s.match(/[\s]*$/)[0];
+      q.push({n:n,v:l+map[t]+r});
+    }
+  }
+  q.forEach(function(x){x.n.textContent=x.v;});
+}
+
+function substrApply(subMap){
+  var keys=Object.keys(subMap);
+  if(!keys.length)return;
+  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n,q=[];
+  while((n=w.nextNode())){
+    var t=n.textContent;
+    var changed=false;
+    for(var i=0;i<keys.length;i++){
+      var pt=keys[i];
+      if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+    }
+    if(changed)q.push({n:n,v:t});
+  }
+  q.forEach(function(x){x.n.textContent=x.v;});
+}
+
+var ob7=new MutationObserver(function(ms){
+  var ok=ms.some(function(m){return m.addedNodes.length>0;});
+  if(!ok)return;
+  clearTimeout(_tmr7);
+  _tmr7=setTimeout(function(){
+    if(_lang7==='en'){walkApply(EN7);substrApply(SUBSTR_EN7);}
+    else if(_lang7==='pt'){walkApply(PT7);substrApply(SUBSTR_PT7);}
+  },80);
+});
+
+window.FP_traduzTudo=function(lang){
+  _lang7=lang;
+  _p7.call(this,lang);          /* full upstream chain */
+  if(lang==='en'){walkApply(EN7);substrApply(SUBSTR_EN7);}
+  else if(lang==='pt'){walkApply(PT7);substrApply(SUBSTR_PT7);}
+  ob7.observe(document.body,{childList:true,subtree:true});
+};
+})();
