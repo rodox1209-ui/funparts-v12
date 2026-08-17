@@ -17,7 +17,7 @@ const LEGO_CATALOG = {
     {name:'Stake Sauber F1',dim:'53ÃÂ83cm',scale:'1:8',f1:true},
     {name:'Renault F1',dim:'49ÃÂ49cm',scale:'1:13',f1:true},
     {name:'Toleman F1',dim:'53ÃÂ83cm',scale:'1:8',f1:true},
-    {name:'McLaren MP4/4 Senna',dim:'53ÃÂ83cm',scale:'1:8',f1:true},
+    {name:'McLaren MP4/4 Senna',dim:'49ÃÂ49cm',scale:'1:13',f1:true},
     {name:'Mini F1 Speed Champions',dim:'49ÃÂ49cm',scale:'1:13',f1:true},
   ],
   'Ferrari': [
