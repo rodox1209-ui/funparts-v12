@@ -2543,3 +2543,89 @@ function _startOb13(){
 })();
 
 })();
+
+;(function(){
+'use strict';
+
+/* PATCH 14 — ESCOLHA O FRETE, CONTINUAR, FINALIZAR PEDIDO.
+   Three confirmed PT strings in EN mode:
+   1. Shipping modal header: "ESCOLHA O FRETE"
+   2. Shipping modal button: "CONTINUAR"
+   3. Order summary green button: "FINALIZAR PEDIDO" (patch13 added it but
+      React re-renders the button AFTER the observer debounce window) */
+
+var _lang14 = (localStorage.getItem('fp_lang') || 'pt');
+
+var _SUBSTR14 = {
+  'ESCOLHA O FRETE':'SELECT SHIPPING',
+  'Escolha o frete':'Select shipping',
+  'Escolha o Frete':'Select shipping',
+  'CONTINUAR':'CONTINUE',
+  'Continuar':'Continue',
+  'FINALIZAR PEDIDO':'COMPLETE ORDER',
+  'Finalizar Pedido':'Complete Order',
+  'Finalizar pedido':'Complete order',
+  'Digite seu CEP':'Enter your ZIP code'
+};
+
+function _substrApply14(subMap){
+  try{
+    var keys=Object.keys(subMap);
+    if(!keys.length)return;
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    var n,q=[];
+    while((n=w.nextNode())){
+      var t=n.textContent;
+      var changed=false;
+      for(var i=0;i<keys.length;i++){
+        var pt=keys[i];
+        if(t.indexOf(pt)!==-1){t=t.split(pt).join(subMap[pt]);changed=true;}
+      }
+      if(changed)q.push({n:n,v:t});
+    }
+    q.forEach(function(x){x.n.textContent=x.v;});
+  }catch(e){}
+}
+
+/* ── INTERCEPT FP_traduzTudo ── */
+if(typeof window.FP_traduzTudo==='function'){
+  var _p14=window.FP_traduzTudo;
+  window.FP_traduzTudo=function(lang){
+    _lang14=lang;
+    _p14.call(this,lang);
+    if(lang!=='pt'){
+      var cl=lang;
+      /* Aggressive retry schedule — React re-renders buttons late */
+      [50,150,300,600,1000,1800,3000].forEach(function(ms){
+        setTimeout(function(){if(_lang14===cl)_substrApply14(_SUBSTR14);},ms);
+      });
+    }
+  };
+}
+
+/* ── PERSISTENT MUTATION OBSERVER — 40ms debounce (tighter window) ── */
+var _ob14=null;
+var _tmr14=null;
+function _startOb14(){
+  if(_ob14)return;
+  _ob14=new MutationObserver(function(ms){
+    if(!ms.some(function(m){return m.addedNodes.length>0;}))return;
+    if(_lang14==='pt')return;
+    clearTimeout(_tmr14);
+    _tmr14=setTimeout(function(){_substrApply14(_SUBSTR14);},40);
+  });
+  _ob14.observe(document.body,{childList:true,subtree:true});
+}
+
+/* ── INITIAL LOAD ── */
+(function(){
+  if(_lang14!=='pt'){
+    _substrApply14(_SUBSTR14);
+    [300,800,1600,3000].forEach(function(ms){
+      setTimeout(function(){_substrApply14(_SUBSTR14);},ms);
+    });
+  }
+  _startOb14();
+})();
+
+})();
