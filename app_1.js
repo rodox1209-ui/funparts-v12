@@ -27,7 +27,7 @@ const LEGO_CATALOG = {
   ],
   'McLaren': [
     {name:'McLaren P1',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
-    {name:'McLaren GTR',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
+    {name:'McLaren GTR',dim:'49ÃÂ49cm',scale:'1:13',f1:false},
     {name:'McLaren MP4/4 Senna',dim:'49ÃÂ49cm',scale:'1:13',f1:true},
     {name:'McLaren F1 MCL35',dim:'53ÃÂ83cm',scale:'1:8',f1:true},
     {name:'McLaren F1 MCL39',dim:'53ÃÂ83cm',scale:'1:8',f1:true},
@@ -35,7 +35,7 @@ const LEGO_CATALOG = {
   'Porsche': [
     {name:'Porsche 911 RSR',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
     {name:'Porsche GT3rs',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
-    {name:'Porsche 911 Targa 1970',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
+    {name:'Porsche 911 Targa 1970',dim:'49ÃÂ49cm',scale:'1:13',f1:false},
   ],
   'Lamborghini': [
     {name:'Lamborghini Sian',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
