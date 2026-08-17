@@ -1,17 +1,17 @@
-/* Funparts â mÃ³dulos add-on (carregados apÃ³s app_1.js/app_2.js) */
-/* Reset da personalizaÃ§Ã£o (fallback inline, garante disponibilidade mesmo com cache do app_1.js).
-   Recarrega a pÃ¡gina: zera o estado S (em memÃ³ria) e volta Ã  etapa TIPO;
-   o carrinho fica salvo no localStorage e Ã© preservado. */
+/* Funparts Ã¢ÂÂ mÃÂ³dulos add-on (carregados apÃÂ³s app_1.js/app_2.js) */
+/* Reset da personalizaÃÂ§ÃÂ£o (fallback inline, garante disponibilidade mesmo com cache do app_1.js).
+   Recarrega a pÃÂ¡gina: zera o estado S (em memÃÂ³ria) e volta ÃÂ  etapa TIPO;
+   o carrinho fica salvo no localStorage e ÃÂ© preservado. */
 if(typeof window.iniciarNovaPersonalizacao!=='function'){
   window.iniciarNovaPersonalizacao=function(){
     try{ location.reload(); }catch(e){ location.href=location.pathname+location.search; }
   };
 }
 
-/* "Continuar comprando" (botÃ£o que aparece depois de adicionar o item ao carrinho) deve
-   REINICIAR a personalizaÃ§Ã£o por completo â exatamente como "Iniciar nova personalizaÃ§Ã£o" â,
-   e nÃ£o apenas voltar Ã  etapa 1 mantendo as configuraÃ§Ãµes do item anterior gravadas no estado S.
-   O carrinho Ã© preservado (fica salvo no localStorage e Ã© relido ao recarregar). */
+/* "Continuar comprando" (botÃÂ£o que aparece depois de adicionar o item ao carrinho) deve
+   REINICIAR a personalizaÃÂ§ÃÂ£o por completo Ã¢ÂÂ exatamente como "Iniciar nova personalizaÃÂ§ÃÂ£o" Ã¢ÂÂ,
+   e nÃÂ£o apenas voltar ÃÂ  etapa 1 mantendo as configuraÃÂ§ÃÂµes do item anterior gravadas no estado S.
+   O carrinho ÃÂ© preservado (fica salvo no localStorage e ÃÂ© relido ao recarregar). */
 (function(){
   window.continuarComprando=function(){
     if(typeof window.iniciarNovaPersonalizacao==='function'){ window.iniciarNovaPersonalizacao(); return; }
@@ -19,7 +19,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   };
 })();
 
-/* Ã¢ÂÂÃ¢ÂÂ EDITAR PRODUTO NO CARRINHO (recarrega a personalizacao salva e atualiza o item) Ã¢ÂÂÃ¢ÂÂ
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ EDITAR PRODUTO NO CARRINHO (recarrega a personalizacao salva e atualiza o item) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
    Implementado aqui inline para nao depender de novo deploy do app_1.js.
    Cada item guarda cfg com a configuracao completa; restauramos e voltamos ao resumo. */
 (function(){
@@ -35,19 +35,19 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(!body)return;
     var _T=function(k,fb){return (window.FP&&FP.t)?FP.t(k):fb;};
     if(!n){
-      body.innerHTML='<div class="cart-empty">'+_T('cart.empty','Seu carrinho estÃ¡ vazio.')+'<br>'+_T('cart.emptyHint','Monte um quadro e adicione aqui.')+'</div>';
+      body.innerHTML='<div class="cart-empty">'+_T('cart.empty','Seu carrinho estÃÂ¡ vazio.')+'<br>'+_T('cart.emptyHint','Monte um quadro e adicione aqui.')+'</div>';
       if(foot)foot.style.display='none';
       return;
     }
     body.innerHTML=CART.map(function(i){
-      var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'Ã°ÂÂ§Â±':'Ã°ÂÂÂÃ¯Â¸Â')+'</div>';
+      var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'ÃÂ°ÃÂÃÂ§ÃÂ±':'ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ')+'</div>';
       var editavel=(i.cfg && i.via!=='catalogo' && (i.tipo==='lego' || (i.tipo==='mini' && i.cfg.miniScale!==undefined)));
       var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">'+_T('cart.edit','editar produto')+'</button>' : '';
       return '<div class="cart-item">'
         +'<div class="cart-thumb">'+img+'</div>'
         +'<div class="cart-info">'
           +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
-          +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' Â· ')+'</div>'
+          +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' ÃÂ· ')+'</div>'
           +'<div class="cart-foot-row">'
             +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
             +'<div class="cart-acts">'+edBtn+'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">'+_T('cart.remove','remover')+'</button></div>'
@@ -66,7 +66,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(window._editandoId){
       var add=document.getElementById('btnAddCart');
       var cont=document.getElementById('btnContinuar');
-      if(add){ add.classList.add('finalizar'); add.textContent='Atualizar pedido â'; add.onclick=window.atualizarPedido; }
+      if(add){ add.classList.add('finalizar'); add.textContent='Atualizar pedido Ã¢ÂÂ'; add.onclick=window.atualizarPedido; }
       if(cont)cont.style.display='none';
       return;
     }
@@ -152,10 +152,10 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     var cfg=item.cfg;
     if(cfg.tipo==='lego'){ _editarLego(item,cfg); return; }
     if(cfg.tipo==='mini' && cfg.miniScale!==undefined){ _editarMini(item,cfg); return; }
-    alert('Este item foi adicionado antes desta atualizaÃ§Ã£o e nÃ£o guardou os dados necessÃ¡rios para ediÃ§Ã£o. Remova e monte novamente para poder editÃ¡-lo.');
+    alert('Este item foi adicionado antes desta atualizaÃÂ§ÃÂ£o e nÃÂ£o guardou os dados necessÃÂ¡rios para ediÃÂ§ÃÂ£o. Remova e monte novamente para poder editÃÂ¡-lo.');
   };
 
-  // Enriquece o cfg dos itens Miniatura (escala, dimensÃ£o, carro, cores) p/ permitir edicao
+  // Enriquece o cfg dos itens Miniatura (escala, dimensÃÂ£o, carro, cores) p/ permitir edicao
   var _origMonta = window._cartMontaItem;
   if(typeof _origMonta==='function'){
     window._cartMontaItem = function(){
@@ -201,7 +201,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(typeof abrirCarrinho==='function')abrirCarrinho();
   };
 
-  // Mobile: marca o quadro LEGO 49x49 p/ o CSS deixÃ¡-lo quadrado e contido (igual desktop)
+  // Mobile: marca o quadro LEGO 49x49 p/ o CSS deixÃÂ¡-lo quadrado e contido (igual desktop)
   var _origUpd = window.updateDetPreview;
   if(typeof _origUpd==='function'){
     window.updateDetPreview = function(){
@@ -209,7 +209,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       try{
         var q=document.getElementById('legoDetQuadro');
         if(q){
-          var is4949 = (typeof S!=='undefined' && S.tipo==='lego') && /^49\s*[Ãx]\s*49/.test((S.legoDim)||'');
+          var is4949 = (typeof S!=='undefined' && S.tipo==='lego') && /^49\s*[ÃÂx]\s*49/.test((S.legoDim)||'');
           q.classList.toggle('dim4949', !!is4949);
         }
       }catch(e){}
@@ -217,9 +217,9 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     };
   }
 
-  // Mobile: manter a barra inferior (avanÃ§ar/voltar) sincronizada com a etapa REAL.
+  // Mobile: manter a barra inferior (avanÃÂ§ar/voltar) sincronizada com a etapa REAL.
   // Bug: "continuar comprando" e cliques no menu do topo trocam de etapa via goStep,
-  // mas a barra mobile sÃ³ era atualizada pelos botÃµes avanÃ§ar/voltar -> sumia o "avanÃ§ar".
+  // mas a barra mobile sÃÂ³ era atualizada pelos botÃÂµes avanÃÂ§ar/voltar -> sumia o "avanÃÂ§ar".
   var _origMobUpd = window._mobUpdateNav;
   if(typeof _origMobUpd==='function'){
     window._mobUpdateNav = function(){
@@ -246,9 +246,9 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 
 (function(){
   var CFG={
-    BR:{lang:'pt',currency:'BRL',symbol:'R$',frete:'superfrete',gateway:'pagarme',flag:'Ã°ÂÂÂ§Ã°ÂÂÂ·',reg:{pt:'Brasil',en:'Brazil'},prices:{lego_base_carbono:689,lego_base_fosco:589,mini_base_P:1990,mini_base_M:2490,mini_base_G:2990,opt_moldura_fibra:75,opt_led_rgb_sem:489,opt_led_rgb_com:589,opt_led_warm_sem:389,opt_led_warm_com:489,opt_relevo_bandeira:90,opt_relevo_piloto:90}},
-    EU:{lang:'en',currency:'EUR',symbol:'Ã¢ÂÂ¬',frete:'sendcloud',gateway:'stripe',flag:'Ã°ÂÂÂªÃ°ÂÂÂº',reg:{pt:'Europa',en:'Europe'},prices:{lego_base_carbono:119,lego_base_fosco:102,mini_base_P:343,mini_base_M:429,mini_base_G:515,opt_moldura_fibra:13,opt_led_rgb_sem:84,opt_led_rgb_com:102,opt_led_warm_sem:67,opt_led_warm_com:84,opt_relevo_bandeira:16,opt_relevo_piloto:16}},
-    US:{lang:'en',currency:'USD',symbol:'$',frete:'sendcloud',gateway:'stripe',flag:'Ã°ÂÂÂºÃ°ÂÂÂ¸',reg:{pt:'EUA',en:'USA'},prices:{lego_base_carbono:130,lego_base_fosco:111,mini_base_P:375,mini_base_M:470,mini_base_G:564,opt_moldura_fibra:14,opt_led_rgb_sem:92,opt_led_rgb_com:111,opt_led_warm_sem:73,opt_led_warm_com:92,opt_relevo_bandeira:17,opt_relevo_piloto:17}}
+    BR:{lang:'pt',currency:'BRL',symbol:'R$',frete:'superfrete',gateway:'pagarme',flag:'ÃÂ°ÃÂÃÂÃÂ§ÃÂ°ÃÂÃÂÃÂ·',reg:{pt:'Brasil',en:'Brazil'},prices:{lego_base_carbono:689,lego_base_fosco:589,mini_base_P:1990,mini_base_M:2490,mini_base_G:2990,opt_moldura_fibra:75,opt_led_rgb_sem:489,opt_led_rgb_com:589,opt_led_warm_sem:389,opt_led_warm_com:489,opt_relevo_bandeira:90,opt_relevo_piloto:90}},
+    EU:{lang:'en',currency:'EUR',symbol:'ÃÂ¢ÃÂÃÂ¬',frete:'sendcloud',gateway:'stripe',flag:'ÃÂ°ÃÂÃÂÃÂªÃÂ°ÃÂÃÂÃÂº',reg:{pt:'Europa',en:'Europe'},prices:{lego_base_carbono:119,lego_base_fosco:102,mini_base_P:343,mini_base_M:429,mini_base_G:515,opt_moldura_fibra:13,opt_led_rgb_sem:84,opt_led_rgb_com:102,opt_led_warm_sem:67,opt_led_warm_com:84,opt_relevo_bandeira:16,opt_relevo_piloto:16}},
+    US:{lang:'en',currency:'USD',symbol:'$',frete:'sendcloud',gateway:'stripe',flag:'ÃÂ°ÃÂÃÂÃÂºÃÂ°ÃÂÃÂÃÂ¸',reg:{pt:'EUA',en:'USA'},prices:{lego_base_carbono:130,lego_base_fosco:111,mini_base_P:375,mini_base_M:470,mini_base_G:564,opt_moldura_fibra:14,opt_led_rgb_sem:92,opt_led_rgb_com:111,opt_led_warm_sem:73,opt_led_warm_com:92,opt_relevo_bandeira:17,opt_relevo_piloto:17}}
   };
   var EUcc=['PT','ES','FR','DE','IT','BE','NL','LU','IE','AT','FI','GR','CY','MT','EE','LV','LT','SK','SI','HR','PL','CZ','HU','RO','BG','DK','SE','GB','CH','NO','IS'];
   function regiaoDe(cc){cc=(cc||'').toUpperCase();if(cc==='BR')return'BR';if(cc==='US')return'US';if(EUcc.indexOf(cc)>-1)return'EU';return'BR';}
@@ -268,32 +268,32 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 
   var DICT={
     pt:{
-      'nav.newCustom':'Iniciar nova personalizaÃ§Ã£o','nav.cart':'Carrinho',
+      'nav.newCustom':'Iniciar nova personalizaÃÂ§ÃÂ£o','nav.cart':'Carrinho',
       'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Produto','step.detalhe':'Detalhamento','step.fundo':'Fundo','step.moldura':'Moldura + LED','step.relevo':'Alto-relevo','step.pedido':'Pedido',
-      'cart.title':'Seu carrinho','cart.total':'Total','cart.note':'Sem frete Â· Combinamos o envio pelo WhatsApp','cart.checkout':'Fechar pedido â','cart.more':'Continuar comprando',
-      'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho estÃ¡ vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.',
-      'frete.title':'Frete / Entrega','frete.cep':'Digite seu CEP','frete.calc':'Calcular','frete.calculating':'Calculandoâ¦','frete.eco':'EconÃ´mico','frete.exp':'Expresso','frete.days':'dias Ãºteis','frete.invalid':'Informe um CEP vÃ¡lido','frete.totalShip':'Total com frete','frete.mock':'','frete.none':'Nenhuma opÃ§Ã£o de frete para este endereÃ§o.','frete.fail':'NÃ£o foi possÃ­vel calcular o frete agora. Tente novamente.','frete.emptyCart':'Adicione um item ao carrinho para calcular o frete.'
+      'cart.title':'Seu carrinho','cart.total':'Total','cart.note':'Sem frete ÃÂ· Combinamos o envio pelo WhatsApp','cart.checkout':'Fechar pedido Ã¢ÂÂ','cart.more':'Continuar comprando',
+      'cart.remove':'remover','cart.edit':'editar produto','cart.empty':'Seu carrinho estÃÂ¡ vazio.','cart.emptyHint':'Monte um quadro e adicione aqui.',
+      'frete.title':'Frete / Entrega','frete.cep':'Digite seu CEP','frete.calc':'Calcular','frete.calculating':'CalculandoÃ¢ÂÂ¦','frete.eco':'EconÃÂ´mico','frete.exp':'Expresso','frete.days':'dias ÃÂºteis','frete.invalid':'Informe um CEP vÃÂ¡lido','frete.totalShip':'Total com frete','frete.mock':'','frete.none':'Nenhuma opÃÂ§ÃÂ£o de frete para este endereÃÂ§o.','frete.fail':'NÃÂ£o foi possÃÂ­vel calcular o frete agora. Tente novamente.','frete.emptyCart':'Adicione um item ao carrinho para calcular o frete.'
     },
     en:{
       'nav.newCustom':'Start new customization','nav.cart':'Cart',
       'step.tipo':'Type','step.modelo':'Model','step.produto':'Product','step.detalhe':'Details','step.fundo':'Background','step.moldura':'Frame + LED','step.relevo':'Relief','step.pedido':'Order',
-      'cart.title':'Your cart','cart.total':'Total','cart.note':'Shipping calculated at checkout','cart.checkout':'Checkout â','cart.more':'Continue shopping',
+      'cart.title':'Your cart','cart.total':'Total','cart.note':'Shipping calculated at checkout','cart.checkout':'Checkout Ã¢ÂÂ','cart.more':'Continue shopping',
       'cart.remove':'remove','cart.edit':'edit product','cart.empty':'Your cart is empty.','cart.emptyHint':'Build a frame and add it here.',
-      'frete.title':'Shipping / Delivery','frete.cep':'Enter your postal code','frete.calc':'Calculate','frete.calculating':'Calculatingâ¦','frete.eco':'Standard','frete.exp':'Express','frete.days':'business days','frete.invalid':'Enter a valid postal code','frete.totalShip':'Total with shipping','frete.mock':'','frete.none':'No shipping options for this address.','frete.fail':'Could not calculate shipping right now. Please try again.','frete.emptyCart':'Add an item to the cart to calculate shipping.'
+      'frete.title':'Shipping / Delivery','frete.cep':'Enter your postal code','frete.calc':'Calculate','frete.calculating':'CalculatingÃ¢ÂÂ¦','frete.eco':'Standard','frete.exp':'Express','frete.days':'business days','frete.invalid':'Enter a valid postal code','frete.totalShip':'Total with shipping','frete.mock':'','frete.none':'No shipping options for this address.','frete.fail':'Could not calculate shipping right now. Please try again.','frete.emptyCart':'Add an item to the cart to calculate shipping.'
     },
     es:{
-      'nav.newCustom':'Iniciar nueva personalizaciÃ³n','nav.cart':'Carrito',
+      'nav.newCustom':'Iniciar nueva personalizaciÃÂ³n','nav.cart':'Carrito',
       'step.tipo':'Tipo','step.modelo':'Modelo','step.produto':'Producto','step.detalhe':'Detalles','step.fundo':'Fondo','step.moldura':'Marco + LED','step.relevo':'Relieve','step.pedido':'Pedido',
-      'cart.title':'Tu carrito','cart.total':'Total','cart.note':'EnvÃ­o calculado al finalizar la compra','cart.checkout':'Finalizar pedido â','cart.more':'Seguir comprando',
-      'cart.remove':'quitar','cart.edit':'editar producto','cart.empty':'Tu carrito estÃ¡ vacÃ­o.','cart.emptyHint':'Crea un cuadro y agrÃ©galo aquÃ­.',
-      'frete.title':'EnvÃ­o / Entrega','frete.cep':'Ingresa tu cÃ³digo postal','frete.calc':'Calcular','frete.calculating':'Calculandoâ¦','frete.eco':'EstÃ¡ndar','frete.exp':'ExprÃ©s','frete.days':'dÃ­as hÃ¡biles','frete.invalid':'Ingresa un cÃ³digo postal vÃ¡lido','frete.totalShip':'Total con envÃ­o','frete.mock':'','frete.none':'No hay opciones de envÃ­o para esta direcciÃ³n.','frete.fail':'No se pudo calcular el envÃ­o ahora. IntÃ©ntalo de nuevo.','frete.emptyCart':'Agrega un artÃ­culo al carrito para calcular el envÃ­o.'
+      'cart.title':'Tu carrito','cart.total':'Total','cart.note':'EnvÃÂ­o calculado al finalizar la compra','cart.checkout':'Finalizar pedido Ã¢ÂÂ','cart.more':'Seguir comprando',
+      'cart.remove':'quitar','cart.edit':'editar producto','cart.empty':'Tu carrito estÃÂ¡ vacÃÂ­o.','cart.emptyHint':'Crea un cuadro y agrÃÂ©galo aquÃÂ­.',
+      'frete.title':'EnvÃÂ­o / Entrega','frete.cep':'Ingresa tu cÃÂ³digo postal','frete.calc':'Calcular','frete.calculating':'CalculandoÃ¢ÂÂ¦','frete.eco':'EstÃÂ¡ndar','frete.exp':'ExprÃÂ©s','frete.days':'dÃÂ­as hÃÂ¡biles','frete.invalid':'Ingresa un cÃÂ³digo postal vÃÂ¡lido','frete.totalShip':'Total con envÃÂ­o','frete.mock':'','frete.none':'No hay opciones de envÃÂ­o para esta direcciÃÂ³n.','frete.fail':'No se pudo calcular el envÃÂ­o ahora. IntÃÂ©ntalo de nuevo.','frete.emptyCart':'Agrega un artÃÂ­culo al carrito para calcular el envÃÂ­o.'
     },
     fr:{
       'nav.newCustom':'Nouvelle personnalisation','nav.cart':'Panier',
-      'step.tipo':'Type','step.modelo':'ModÃ¨le','step.produto':'Produit','step.detalhe':'DÃ©tails','step.fundo':'Fond','step.moldura':'Cadre + LED','step.relevo':'Relief','step.pedido':'Commande',
-      'cart.title':'Votre panier','cart.total':'Total','cart.note':'Livraison calculÃ©e au paiement','cart.checkout':'Finaliser la commande â','cart.more':'Continuer les achats',
-      'cart.remove':'retirer','cart.edit':'modifier le produit','cart.empty':'Votre panier est vide.','cart.emptyHint':'CrÃ©ez un cadre et ajoutez-le ici.',
-      'frete.title':'Livraison','frete.cep':'Saisissez votre code postal','frete.calc':'Calculer','frete.calculating':'Calculâ¦','frete.eco':'Standard','frete.exp':'Express','frete.days':'jours ouvrÃ©s','frete.invalid':'Saisissez un code postal valide','frete.totalShip':'Total avec livraison','frete.mock':'','frete.none':'Aucune option de livraison pour cette adresse.','frete.fail':'Impossible de calculer la livraison pour le moment. RÃ©essayez.','frete.emptyCart':'Ajoutez un article au panier pour calculer la livraison.'
+      'step.tipo':'Type','step.modelo':'ModÃÂ¨le','step.produto':'Produit','step.detalhe':'DÃÂ©tails','step.fundo':'Fond','step.moldura':'Cadre + LED','step.relevo':'Relief','step.pedido':'Commande',
+      'cart.title':'Votre panier','cart.total':'Total','cart.note':'Livraison calculÃÂ©e au paiement','cart.checkout':'Finaliser la commande Ã¢ÂÂ','cart.more':'Continuer les achats',
+      'cart.remove':'retirer','cart.edit':'modifier le produit','cart.empty':'Votre panier est vide.','cart.emptyHint':'CrÃÂ©ez un cadre et ajoutez-le ici.',
+      'frete.title':'Livraison','frete.cep':'Saisissez votre code postal','frete.calc':'Calculer','frete.calculating':'CalculÃ¢ÂÂ¦','frete.eco':'Standard','frete.exp':'Express','frete.days':'jours ouvrÃÂ©s','frete.invalid':'Saisissez un code postal valide','frete.totalShip':'Total avec livraison','frete.mock':'','frete.none':'Aucune option de livraison pour cette adresse.','frete.fail':'Impossible de calculer la livraison pour le moment. RÃÂ©essayez.','frete.emptyCart':'Ajoutez un article au panier pour calculer la livraison.'
     }
   };
 
@@ -301,174 +301,174 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   FP.t=function(k){var d=DICT[FP.lang]||DICT.pt;return (d[k]!=null)?d[k]:((DICT.pt[k]!=null)?DICT.pt[k]:k);};
   function save(){try{localStorage.setItem('fp_lang',FP.lang);localStorage.setItem('fp_region',FP.region);}catch(e){}}
 
-  // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ TRADUÃÃO COMPLETA DO SITE (PT/EN/ES/FR) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ TRADUÃÂÃÂO COMPLETA DO SITE (PT/EN/ES/FR) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   var FULL={};
   function T(pt,en,es,fr){FULL[pt]={en:en,es:es,fr:fr};}
-  // CabeÃ§alho / navegaÃ§Ã£o / carrinho / checkout
+  // CabeÃÂ§alho / navegaÃÂ§ÃÂ£o / carrinho / checkout
   T("Total:","Total:","Total:","Total :");
-  T("Iniciar nova personalizaÃ§Ã£o","Start new customization","Iniciar nueva personalizaciÃ³n","Nouvelle personnalisation");
+  T("Iniciar nova personalizaÃÂ§ÃÂ£o","Start new customization","Iniciar nueva personalizaciÃÂ³n","Nouvelle personnalisation");
   T("Seu carrinho","Your cart","Tu carrito","Votre panier");
-  T("Sem frete Â· Combinamos o envio pelo WhatsApp","Shipping arranged via WhatsApp","EnvÃ­o coordinado por WhatsApp","Livraison convenue via WhatsApp");
-  T("Fechar pedido â","Checkout â","Finalizar pedido â","Finaliser la commande â");
+  T("Sem frete ÃÂ· Combinamos o envio pelo WhatsApp","Shipping arranged via WhatsApp","EnvÃÂ­o coordinado por WhatsApp","Livraison convenue via WhatsApp");
+  T("Fechar pedido Ã¢ÂÂ","Checkout Ã¢ÂÂ","Finalizar pedido Ã¢ÂÂ","Finaliser la commande Ã¢ÂÂ");
   T("Continuar comprando","Continue shopping","Seguir comprando","Continuer les achats");
-  T("Precisamos desses dados para emitir a nota e combinar a entrega.","We need this information to issue the invoice and arrange delivery.","Necesitamos estos datos para emitir la factura y coordinar la entrega.","Nous avons besoin de ces informations pour Ã©mettre la facture et organiser la livraison.");
+  T("Precisamos desses dados para emitir a nota e combinar a entrega.","We need this information to issue the invoice and arrange delivery.","Necesitamos estos datos para emitir la factura y coordinar la entrega.","Nous avons besoin de ces informations pour ÃÂ©mettre la facture et organiser la livraison.");
   T("Nome completo","Full name","Nombre completo","Nom complet");
   T("WhatsApp","WhatsApp","WhatsApp","WhatsApp");
-  T("E-mail","Email","Correo electrÃ³nico","E-mail");
-  T("EndereÃ§o","Address","DirecciÃ³n","Adresse");
-  T("NÃºmero","Number","NÃºmero","NumÃ©ro");
-  T("Complemento","Address line 2","Complemento","ComplÃ©ment");
+  T("E-mail","Email","Correo electrÃÂ³nico","E-mail");
+  T("EndereÃÂ§o","Address","DirecciÃÂ³n","Adresse");
+  T("NÃÂºmero","Number","NÃÂºmero","NumÃÂ©ro");
+  T("Complemento","Address line 2","Complemento","ComplÃÂ©ment");
   T("(opcional)","(optional)","(opcional)","(facultatif)");
   T("Bairro","District","Barrio","Quartier");
   T("Cidade","City","Ciudad","Ville");
-  T("Seus dados sÃ£o usados apenas para emitir a nota fiscal e realizar a entrega.","Your data is used only to issue the invoice and complete delivery.","Tus datos se usan solo para emitir la factura y realizar la entrega.","Vos donnÃ©es servent uniquement Ã  Ã©mettre la facture et Ã  effectuer la livraison.");
+  T("Seus dados sÃÂ£o usados apenas para emitir a nota fiscal e realizar a entrega.","Your data is used only to issue the invoice and complete delivery.","Tus datos se usan solo para emitir la factura y realizar la entrega.","Vos donnÃÂ©es servent uniquement ÃÂ  ÃÂ©mettre la facture et ÃÂ  effectuer la livraison.");
   T("Fechar pedido via WhatsApp","Checkout via WhatsApp","Finalizar pedido por WhatsApp","Finaliser via WhatsApp");
-  T("â Voltar aos itens","â Back to items","â Volver a los artÃ­culos","â Retour aux articles");
-  T("Item adicionado ao carrinho","Item added to cart","ArtÃ­culo aÃ±adido al carrito","Article ajoutÃ© au panier");
+  T("Ã¢ÂÂ Voltar aos itens","Ã¢ÂÂ Back to items","Ã¢ÂÂ Volver a los artÃÂ­culos","Ã¢ÂÂ Retour aux articles");
+  T("Item adicionado ao carrinho","Item added to cart","ArtÃÂ­culo aÃÂ±adido al carrito","Article ajoutÃÂ© au panier");
   T("Ver carrinho","View cart","Ver carrito","Voir le panier");
   // Home / etapa Tipo
-  T("CHEGOU A HORA","IT'S TIME","LLEGÃ EL MOMENTO","C'EST LE MOMENT");
+  T("CHEGOU A HORA","IT'S TIME","LLEGÃÂ EL MOMENTO","C'EST LE MOMENT");
   T("DE PERSONALIZAR","TO CUSTOMIZE","DE PERSONALIZAR","DE PERSONNALISER");
   T("SEU QUADRO","YOUR FRAME","TU CUADRO","VOTRE CADRE");
-  T("SIGA AS ORIENTAÃÃES","FOLLOW THE STEPS","SIGUE LAS INSTRUCCIONES","SUIVEZ LES INDICATIONS");
-  T("DO MENU ABAIXO","IN THE MENU BELOW","DEL MENÃ DE ABAJO","DU MENU CI-DESSOUS");
-  T("Preview em tempo real","Real-time preview","Vista previa en tiempo real","AperÃ§u en temps rÃ©el");
-  T("Gerando top-viewâ¦","Generating top viewâ¦","Generando vista superiorâ¦","GÃ©nÃ©ration de la vue de dessusâ¦");
-  T("â² Girar carro 180Â°","â² Rotate car 180Â°","â² Girar coche 180Â°","â² Pivoter la voiture 180Â°");
-  T("PREVIEW EM TEMPO REAL","REAL-TIME PREVIEW","VISTA PREVIA EN TIEMPO REAL","APERÃU EN TEMPS RÃEL");
-  T("VEJA O EXEMPLO DA PROPORÃÃO (DIMENSÃO) DO QUADRO","SEE AN EXAMPLE OF THE FRAME PROPORTION (SIZE)","MIRA UN EJEMPLO DE LA PROPORCIÃN (TAMAÃO) DEL CUADRO","VOYEZ UN EXEMPLE DE LA PROPORTION (TAILLE) DU CADRE");
-  T("A partir do exemplo acima, vocÃª conseguirÃ¡ ter a noÃ§Ã£o geral da dimensÃ£o do quadro comparado a dimensÃ£o de uma pessoa com 1,75m de altura","From the example above, you can get a general sense of the frame size compared to a person 1.75 m tall","Con el ejemplo de arriba podrÃ¡s hacerte una idea del tamaÃ±o del cuadro comparado con una persona de 1,75 m de altura","Ã partir de l'exemple ci-dessus, vous aurez une idÃ©e gÃ©nÃ©rale de la taille du cadre par rapport Ã  une personne d'1,75 m");
-  T("FanÃ¡tico, vocÃª estÃ¡ prestes a criar","Fan, you're about to create","FanÃ¡tico, estÃ¡s a punto de crear","PassionnÃ©, vous Ãªtes sur le point de crÃ©er");
-  T("um quadro exclusivo!","an exclusive frame!","Â¡un cuadro exclusivo!","un cadre exclusif !");
-  T("Aguarde, estamos gerando a imagem da sua miniatura em alta resoluÃ§Ã£o.","Please wait, we're generating your model image in high resolution.","Espera, estamos generando la imagen de tu miniatura en alta resoluciÃ³n.","Veuillez patienter, nous gÃ©nÃ©rons l'image de votre miniature en haute rÃ©solution.");
-  T("Preparandoâ¦","Preparingâ¦","Preparandoâ¦","PrÃ©parationâ¦");
-  T("Qual Ã© o seu colecionÃ¡vel? Tudo comeÃ§a aqui.","What's your collectible? It all starts here.","Â¿CuÃ¡l es tu coleccionable? Todo empieza aquÃ­.","Quel est votre objet de collection ? Tout commence ici.");
+  T("SIGA AS ORIENTAÃÂÃÂES","FOLLOW THE STEPS","SIGUE LAS INSTRUCCIONES","SUIVEZ LES INDICATIONS");
+  T("DO MENU ABAIXO","IN THE MENU BELOW","DEL MENÃÂ DE ABAJO","DU MENU CI-DESSOUS");
+  T("Preview em tempo real","Real-time preview","Vista previa en tiempo real","AperÃÂ§u en temps rÃÂ©el");
+  T("Gerando top-viewÃ¢ÂÂ¦","Generating top viewÃ¢ÂÂ¦","Generando vista superiorÃ¢ÂÂ¦","GÃÂ©nÃÂ©ration de la vue de dessusÃ¢ÂÂ¦");
+  T("Ã¢ÂÂ² Girar carro 180ÃÂ°","Ã¢ÂÂ² Rotate car 180ÃÂ°","Ã¢ÂÂ² Girar coche 180ÃÂ°","Ã¢ÂÂ² Pivoter la voiture 180ÃÂ°");
+  T("PREVIEW EM TEMPO REAL","REAL-TIME PREVIEW","VISTA PREVIA EN TIEMPO REAL","APERÃÂU EN TEMPS RÃÂEL");
+  T("VEJA O EXEMPLO DA PROPORÃÂÃÂO (DIMENSÃÂO) DO QUADRO","SEE AN EXAMPLE OF THE FRAME PROPORTION (SIZE)","MIRA UN EJEMPLO DE LA PROPORCIÃÂN (TAMAÃÂO) DEL CUADRO","VOYEZ UN EXEMPLE DE LA PROPORTION (TAILLE) DU CADRE");
+  T("A partir do exemplo acima, vocÃÂª conseguirÃÂ¡ ter a noÃÂ§ÃÂ£o geral da dimensÃÂ£o do quadro comparado a dimensÃÂ£o de uma pessoa com 1,75m de altura","From the example above, you can get a general sense of the frame size compared to a person 1.75 m tall","Con el ejemplo de arriba podrÃÂ¡s hacerte una idea del tamaÃÂ±o del cuadro comparado con una persona de 1,75 m de altura","ÃÂ partir de l'exemple ci-dessus, vous aurez une idÃÂ©e gÃÂ©nÃÂ©rale de la taille du cadre par rapport ÃÂ  une personne d'1,75 m");
+  T("FanÃÂ¡tico, vocÃÂª estÃÂ¡ prestes a criar","Fan, you're about to create","FanÃÂ¡tico, estÃÂ¡s a punto de crear","PassionnÃÂ©, vous ÃÂªtes sur le point de crÃÂ©er");
+  T("um quadro exclusivo!","an exclusive frame!","ÃÂ¡un cuadro exclusivo!","un cadre exclusif !");
+  T("Aguarde, estamos gerando a imagem da sua miniatura em alta resoluÃÂ§ÃÂ£o.","Please wait, we're generating your model image in high resolution.","Espera, estamos generando la imagen de tu miniatura en alta resoluciÃÂ³n.","Veuillez patienter, nous gÃÂ©nÃÂ©rons l'image de votre miniature en haute rÃÂ©solution.");
+  T("PreparandoÃ¢ÂÂ¦","PreparingÃ¢ÂÂ¦","PreparandoÃ¢ÂÂ¦","PrÃÂ©parationÃ¢ÂÂ¦");
+  T("Qual ÃÂ© o seu colecionÃÂ¡vel? Tudo comeÃÂ§a aqui.","What's your collectible? It all starts here.","ÃÂ¿CuÃÂ¡l es tu coleccionable? Todo empieza aquÃÂ­.","Quel est votre objet de collection ? Tout commence ici.");
   T("QUADROS PARA LEGO","FRAMES FOR LEGO","CUADROS PARA LEGO","CADRES POUR LEGO");
   T("Quadros para sets LEGO Technic, Creator, Icons e F1","Frames for LEGO Technic, Creator, Icons and F1 sets","Cuadros para sets LEGO Technic, Creator, Icons y F1","Cadres pour sets LEGO Technic, Creator, Icons et F1");
   T("Quadros para Miniaturas","Frames for Models","Cuadros para Miniaturas","Cadres pour Miniatures");
-  T("Die-cast em escalas 1:12, 1:18, 1:24 e 1:43","Die-cast in 1:12, 1:18, 1:24 and 1:43 scales","Die-cast en escalas 1:12, 1:18, 1:24 y 1:43","Die-cast aux Ã©chelles 1:12, 1:18, 1:24 et 1:43");
-  T("PrÃ³ximo: Escolher Modelo â","Next: Choose Model â","Siguiente: Elegir modelo â","Suivant : Choisir le modÃ¨le â");
+  T("Die-cast em escalas 1:12, 1:18, 1:24 e 1:43","Die-cast in 1:12, 1:18, 1:24 and 1:43 scales","Die-cast en escalas 1:12, 1:18, 1:24 y 1:43","Die-cast aux ÃÂ©chelles 1:12, 1:18, 1:24 et 1:43");
+  T("PrÃÂ³ximo: Escolher Modelo Ã¢ÂÂ","Next: Choose Model Ã¢ÂÂ","Siguiente: Elegir modelo Ã¢ÂÂ","Suivant : Choisir le modÃÂ¨le Ã¢ÂÂ");
   // etapa Modelo
-  T("Modelo LEGO","LEGO Model","Modelo LEGO","ModÃ¨le LEGO");
-  T("Selecione a marca e depois o modelo especÃ­fico","Select the brand and then the specific model","Selecciona la marca y luego el modelo especÃ­fico","SÃ©lectionnez la marque puis le modÃ¨le prÃ©cis");
-  T("Com ou Sem Miniatura?","With or Without Model?","Â¿Con o sin miniatura?","Avec ou sans miniature ?");
+  T("Modelo LEGO","LEGO Model","Modelo LEGO","ModÃÂ¨le LEGO");
+  T("Selecione a marca e depois o modelo especÃÂ­fico","Select the brand and then the specific model","Selecciona la marca y luego el modelo especÃÂ­fico","SÃÂ©lectionnez la marque puis le modÃÂ¨le prÃÂ©cis");
+  T("Com ou Sem Miniatura?","With or Without Model?","ÃÂ¿Con o sin miniatura?","Avec ou sans miniature ?");
   T("SOMENTE QUADRO","FRAME ONLY","SOLO CUADRO","CADRE SEUL");
-  T("Nessa opÃ§Ã£o vocÃª terÃ¡ a oportunidade de personalizar um quadro para a sua miniatura especial","In this option you can customize a frame for your special model","En esta opciÃ³n podrÃ¡s personalizar un cuadro para tu miniatura especial","Dans cette option, vous pourrez personnaliser un cadre pour votre miniature");
+  T("Nessa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ a oportunidade de personalizar um quadro para a sua miniatura especial","In this option you can customize a frame for your special model","En esta opciÃÂ³n podrÃÂ¡s personalizar un cuadro para tu miniatura especial","Dans cette option, vous pourrez personnaliser un cadre pour votre miniature");
   T("QUADRO INCLUSO MINIATURA","FRAME WITH MODEL INCLUDED","CUADRO CON MINIATURA INCLUIDA","CADRE AVEC MINIATURE INCLUSE");
-  T("Nessa opÃ§Ã£o vocÃª encontrarÃ¡ quadros que jÃ¡ sÃ£o vendidos completos. Contendo o quadro e a miniatura","In this option you'll find frames sold complete, including the frame and the model","En esta opciÃ³n encontrarÃ¡s cuadros que se venden completos: el cuadro y la miniatura","Dans cette option, vous trouverez des cadres vendus complets, avec le cadre et la miniature");
-  T("â Voltar","â Back","â Volver","â Retour");
-  T("Modelos disponÃ­veis","Available models","Modelos disponibles","ModÃ¨les disponibles");
-  T("Foto em breve","Photo coming soon","Foto prÃ³ximamente","Photo bientÃ´t");
-  T("â CONCLUIR ESCOLHA","â CONFIRM CHOICE","â CONFIRMAR ELECCIÃN","â VALIDER LE CHOIX");
+  T("Nessa opÃÂ§ÃÂ£o vocÃÂª encontrarÃÂ¡ quadros que jÃÂ¡ sÃÂ£o vendidos completos. Contendo o quadro e a miniatura","In this option you'll find frames sold complete, including the frame and the model","En esta opciÃÂ³n encontrarÃÂ¡s cuadros que se venden completos: el cuadro y la miniatura","Dans cette option, vous trouverez des cadres vendus complets, avec le cadre et la miniature");
+  T("Ã¢ÂÂ Voltar","Ã¢ÂÂ Back","Ã¢ÂÂ Volver","Ã¢ÂÂ Retour");
+  T("Modelos disponÃÂ­veis","Available models","Modelos disponibles","ModÃÂ¨les disponibles");
+  T("Foto em breve","Photo coming soon","Foto prÃÂ³ximamente","Photo bientÃÂ´t");
+  T("Ã¢ÂÂ CONCLUIR ESCOLHA","Ã¢ÂÂ CONFIRM CHOICE","Ã¢ÂÂ CONFIRMAR ELECCIÃÂN","Ã¢ÂÂ VALIDER LE CHOIX");
   T("Escolha a marca","Choose the brand","Elige la marca","Choisissez la marque");
-  T("Marca / Categoria","Brand / Category","Marca / CategorÃ­a","Marque / CatÃ©gorie");
+  T("Marca / Categoria","Brand / Category","Marca / CategorÃÂ­a","Marque / CatÃÂ©gorie");
   T("Outros","Others","Otros","Autres");
-  T("â¦ VisualizaÃ§Ã£o gerada por InteligÃªncia Artificial","â¦ Preview generated by Artificial Intelligence","â¦ Vista previa generada por Inteligencia Artificial","â¦ AperÃ§u gÃ©nÃ©rÃ© par Intelligence Artificielle");
+  T("Ã¢ÂÂ¦ VisualizaÃÂ§ÃÂ£o gerada por InteligÃÂªncia Artificial","Ã¢ÂÂ¦ Preview generated by Artificial Intelligence","Ã¢ÂÂ¦ Vista previa generada por Inteligencia Artificial","Ã¢ÂÂ¦ AperÃÂ§u gÃÂ©nÃÂ©rÃÂ© par Intelligence Artificielle");
   T("Marca do carro","Car brand","Marca del coche","Marque de la voiture");
-  T("Modelo do carro","Car model","Modelo del coche","ModÃ¨le de la voiture");
-  T("Ano","Year","AÃ±o","AnnÃ©e");
+  T("Modelo do carro","Car model","Modelo del coche","ModÃÂ¨le de la voiture");
+  T("Ano","Year","AÃÂ±o","AnnÃÂ©e");
   T("Cor","Color","Color","Couleur");
-  T("Selecionada:","Selected:","Seleccionada:","SÃ©lectionnÃ©e :");
-  T("â¦ GERAR VISUALIZAÃÃO COM IA","â¦ GENERATE AI PREVIEW","â¦ GENERAR VISTA PREVIA CON IA","â¦ GÃNÃRER L'APERÃU PAR IA");
-  T("Gerando sua visualizaÃ§Ã£o...","Generating your preview...","Generando tu vista previa...","GÃ©nÃ©ration de votre aperÃ§u...");
-  T("A IA estÃ¡ criando uma imagem exclusiva do seu carro","AI is creating an exclusive image of your car","La IA estÃ¡ creando una imagen exclusiva de tu coche","L'IA crÃ©e une image exclusive de votre voiture");
-  T("â¦ Sua miniatura â visualizaÃ§Ã£o gerada","â¦ Your model â generated preview","â¦ Tu miniatura â vista previa generada","â¦ Votre miniature â aperÃ§u gÃ©nÃ©rÃ©");
-  T("â» GERAR NOVA VARIAÃÃO","â» GENERATE NEW VARIATION","â» GENERAR NUEVA VARIACIÃN","â» GÃNÃRER UNE NOUVELLE VARIANTE");
-  T("Geramos a imagem da sua miniatura com inteligÃªncia Artificial, para que confirme o modelo e consiga personalizar seu quadro o mais prÃ³ximo da realidade possÃ­vel.","We generated your model image with Artificial Intelligence so you can confirm the model and customize your frame as close to reality as possible.","Generamos la imagen de tu miniatura con Inteligencia Artificial para que confirmes el modelo y personalices tu cuadro lo mÃ¡s fiel posible.","Nous avons gÃ©nÃ©rÃ© l'image de votre miniature par Intelligence Artificielle afin que vous confirmiez le modÃ¨le et personnalisiez votre cadre au plus prÃ¨s de la rÃ©alitÃ©.");
-  T("PERSONALIZAR QUADRO â","CUSTOMIZE FRAME â","PERSONALIZAR CUADRO â","PERSONNALISER LE CADRE â");
-  T("Marca do veÃ­culo","Vehicle brand","Marca del vehÃ­culo","Marque du vÃ©hicule");
+  T("Selecionada:","Selected:","Seleccionada:","SÃÂ©lectionnÃÂ©e :");
+  T("Ã¢ÂÂ¦ GERAR VISUALIZAÃÂÃÂO COM IA","Ã¢ÂÂ¦ GENERATE AI PREVIEW","Ã¢ÂÂ¦ GENERAR VISTA PREVIA CON IA","Ã¢ÂÂ¦ GÃÂNÃÂRER L'APERÃÂU PAR IA");
+  T("Gerando sua visualizaÃÂ§ÃÂ£o...","Generating your preview...","Generando tu vista previa...","GÃÂ©nÃÂ©ration de votre aperÃÂ§u...");
+  T("A IA estÃÂ¡ criando uma imagem exclusiva do seu carro","AI is creating an exclusive image of your car","La IA estÃÂ¡ creando una imagen exclusiva de tu coche","L'IA crÃÂ©e une image exclusive de votre voiture");
+  T("Ã¢ÂÂ¦ Sua miniatura Ã¢ÂÂ visualizaÃÂ§ÃÂ£o gerada","Ã¢ÂÂ¦ Your model Ã¢ÂÂ generated preview","Ã¢ÂÂ¦ Tu miniatura Ã¢ÂÂ vista previa generada","Ã¢ÂÂ¦ Votre miniature Ã¢ÂÂ aperÃÂ§u gÃÂ©nÃÂ©rÃÂ©");
+  T("Ã¢ÂÂ» GERAR NOVA VARIAÃÂÃÂO","Ã¢ÂÂ» GENERATE NEW VARIATION","Ã¢ÂÂ» GENERAR NUEVA VARIACIÃÂN","Ã¢ÂÂ» GÃÂNÃÂRER UNE NOUVELLE VARIANTE");
+  T("Geramos a imagem da sua miniatura com inteligÃÂªncia Artificial, para que confirme o modelo e consiga personalizar seu quadro o mais prÃÂ³ximo da realidade possÃÂ­vel.","We generated your model image with Artificial Intelligence so you can confirm the model and customize your frame as close to reality as possible.","Generamos la imagen de tu miniatura con Inteligencia Artificial para que confirmes el modelo y personalices tu cuadro lo mÃÂ¡s fiel posible.","Nous avons gÃÂ©nÃÂ©rÃÂ© l'image de votre miniature par Intelligence Artificielle afin que vous confirmiez le modÃÂ¨le et personnalisiez votre cadre au plus prÃÂ¨s de la rÃÂ©alitÃÂ©.");
+  T("PERSONALIZAR QUADRO Ã¢ÂÂ","CUSTOMIZE FRAME Ã¢ÂÂ","PERSONALIZAR CUADRO Ã¢ÂÂ","PERSONNALISER LE CADRE Ã¢ÂÂ");
+  T("Marca do veÃÂ­culo","Vehicle brand","Marca del vehÃÂ­culo","Marque du vÃÂ©hicule");
   T("Outra","Other","Otra","Autre");
-  T("Modelo exato","Exact model","Modelo exacto","ModÃ¨le exact");
-  T("Tamanho do quadro (sincronizado com a escala)","Frame size (synced with scale)","TamaÃ±o del cuadro (sincronizado con la escala)","Taille du cadre (synchronisÃ©e avec l'Ã©chelle)");
-  T("PrÃ³ximo: Miniatura â","Next: Model â","Siguiente: Miniatura â","Suivant : Miniature â");
+  T("Modelo exato","Exact model","Modelo exacto","ModÃÂ¨le exact");
+  T("Tamanho do quadro (sincronizado com a escala)","Frame size (synced with scale)","TamaÃÂ±o del cuadro (sincronizado con la escala)","Taille du cadre (synchronisÃÂ©e avec l'ÃÂ©chelle)");
+  T("PrÃÂ³ximo: Miniatura Ã¢ÂÂ","Next: Model Ã¢ÂÂ","Siguiente: Miniatura Ã¢ÂÂ","Suivant : Miniature Ã¢ÂÂ");
   // etapa Produto / miniatura
-  T("Confirme que jÃ¡ possui a miniatura para montagem no quadro.","Confirm you already own the model to mount in the frame.","Confirma que ya tienes la miniatura para montarla en el cuadro.","Confirmez que vous possÃ©dez dÃ©jÃ  la miniature Ã  monter dans le cadre.");
-  T("FOTOS EM BREVE","PHOTOS COMING SOON","FOTOS PRÃXIMAMENTE","PHOTOS BIENTÃT");
-  T("DescriÃ§Ã£o do produto","Product description","DescripciÃ³n del producto","Description du produit");
-  T("DescriÃ§Ã£o em breve...","Description coming soon...","DescripciÃ³n prÃ³ximamente...","Description bientÃ´t...");
-  T("Ver resumo â","View summary â","Ver resumen â","Voir le rÃ©sumÃ© â");
-  T("EU JÃ TENHO A MINIATURA","I ALREADY HAVE THE MODEL","YA TENGO LA MINIATURA","J'AI DÃJÃ LA MINIATURE");
-  T("Confirmo que jÃ¡ tenho a miniatura e gostaria de comprar apenas o quadro.","I confirm I already have the model and would like to buy only the frame.","Confirmo que ya tengo la miniatura y deseo comprar solo el cuadro.","Je confirme avoir dÃ©jÃ  la miniature et souhaite acheter uniquement le cadre.");
-  T("PrÃ³ximo: Detalhamento â","Next: Details â","Siguiente: Detalles â","Suivant : DÃ©tails â");
+  T("Confirme que jÃÂ¡ possui a miniatura para montagem no quadro.","Confirm you already own the model to mount in the frame.","Confirma que ya tienes la miniatura para montarla en el cuadro.","Confirmez que vous possÃÂ©dez dÃÂ©jÃÂ  la miniature ÃÂ  monter dans le cadre.");
+  T("FOTOS EM BREVE","PHOTOS COMING SOON","FOTOS PRÃÂXIMAMENTE","PHOTOS BIENTÃÂT");
+  T("DescriÃÂ§ÃÂ£o do produto","Product description","DescripciÃÂ³n del producto","Description du produit");
+  T("DescriÃÂ§ÃÂ£o em breve...","Description coming soon...","DescripciÃÂ³n prÃÂ³ximamente...","Description bientÃÂ´t...");
+  T("Ver resumo Ã¢ÂÂ","View summary Ã¢ÂÂ","Ver resumen Ã¢ÂÂ","Voir le rÃÂ©sumÃÂ© Ã¢ÂÂ");
+  T("EU JÃÂ TENHO A MINIATURA","I ALREADY HAVE THE MODEL","YA TENGO LA MINIATURA","J'AI DÃÂJÃÂ LA MINIATURE");
+  T("Confirmo que jÃÂ¡ tenho a miniatura e gostaria de comprar apenas o quadro.","I confirm I already have the model and would like to buy only the frame.","Confirmo que ya tengo la miniatura y deseo comprar solo el cuadro.","Je confirme avoir dÃÂ©jÃÂ  la miniature et souhaite acheter uniquement le cadre.");
+  T("PrÃÂ³ximo: Detalhamento Ã¢ÂÂ","Next: Details Ã¢ÂÂ","Siguiente: Detalles Ã¢ÂÂ","Suivant : DÃÂ©tails Ã¢ÂÂ");
   T("Miniatura compacta","Compact model","Miniatura compacta","Miniature compacte");
-  T("Tamanho mÃ©dio","Medium size","TamaÃ±o mediano","Taille moyenne");
-  T("Tamanho grande","Large size","TamaÃ±o grande","Grande taille");
-  T("Extra grande","Extra large","Extra grande","TrÃ¨s grande");
-  T("PrÃ³ximo: Fundo â","Next: Background â","Siguiente: Fondo â","Suivant : Fond â");
+  T("Tamanho mÃÂ©dio","Medium size","TamaÃÂ±o mediano","Taille moyenne");
+  T("Tamanho grande","Large size","TamaÃÂ±o grande","Grande taille");
+  T("Extra grande","Extra large","Extra grande","TrÃÂ¨s grande");
+  T("PrÃÂ³ximo: Fundo Ã¢ÂÂ","Next: Background Ã¢ÂÂ","Siguiente: Fondo Ã¢ÂÂ","Suivant : Fond Ã¢ÂÂ");
   // etapa Fundo
   T("Fundo do Quadro","Frame Background","Fondo del cuadro","Fond du cadre");
-  T("Material que reveste o interior do quadro, ao redor da miniatura","Material lining the inside of the frame, around the model","Material que reviste el interior del cuadro, alrededor de la miniatura","MatÃ©riau qui habille l'intÃ©rieur du cadre, autour de la miniature");
+  T("Material que reveste o interior do quadro, ao redor da miniatura","Material lining the inside of the frame, around the model","Material que reviste el interior del cuadro, alrededor de la miniatura","MatÃÂ©riau qui habille l'intÃÂ©rieur du cadre, autour de la miniature");
   T("Fibra de Carbono","Carbon Fiber","Fibra de carbono","Fibre de carbone");
-  T("Revestimento em vinil texturizado. Visual esportivo profundo.","Textured vinyl finish. Deep sporty look.","Revestimiento de vinilo texturizado. Aspecto deportivo profundo.","RevÃªtement en vinyle texturÃ©. Allure sportive profonde.");
-  T("AcrÃ­lico Brilho â UV","Glossy Acrylic â UV","AcrÃ­lico brillo â UV","Acrylique brillant â UV");
-  T("ImpressÃ£o UV em acrÃ­lico de alto brilho. Cores profundas, acabamento espelhado.","UV printing on high-gloss acrylic. Deep colors, mirror finish.","ImpresiÃ³n UV en acrÃ­lico de alto brillo. Colores profundos, acabado espejado.","Impression UV sur acrylique trÃ¨s brillant. Couleurs profondes, finition miroir.");
+  T("Revestimento em vinil texturizado. Visual esportivo profundo.","Textured vinyl finish. Deep sporty look.","Revestimiento de vinilo texturizado. Aspecto deportivo profundo.","RevÃÂªtement en vinyle texturÃÂ©. Allure sportive profonde.");
+  T("AcrÃÂ­lico Brilho Ã¢ÂÂ UV","Glossy Acrylic Ã¢ÂÂ UV","AcrÃÂ­lico brillo Ã¢ÂÂ UV","Acrylique brillant Ã¢ÂÂ UV");
+  T("ImpressÃÂ£o UV em acrÃÂ­lico de alto brilho. Cores profundas, acabamento espelhado.","UV printing on high-gloss acrylic. Deep colors, mirror finish.","ImpresiÃÂ³n UV en acrÃÂ­lico de alto brillo. Colores profundos, acabado espejado.","Impression UV sur acrylique trÃÂ¨s brillant. Couleurs profondes, finition miroir.");
   T("Fosco","Matte","Mate","Mat");
-  T("Acabamento fosco com layouts exclusivos. Visual elegante e sofisticado.","Matte finish with exclusive layouts. Elegant, sophisticated look.","Acabado mate con diseÃ±os exclusivos. Aspecto elegante y sofisticado.","Finition mate avec des motifs exclusifs. Allure Ã©lÃ©gante et raffinÃ©e.");
-  T("Modelo do Layout","Layout Style","DiseÃ±o del layout","Style de motif");
-  T("PrÃ³ximo: Moldura + LED â","Next: Frame + LED â","Siguiente: Marco + LED â","Suivant : Cadre + LED â");
+  T("Acabamento fosco com layouts exclusivos. Visual elegante e sofisticado.","Matte finish with exclusive layouts. Elegant, sophisticated look.","Acabado mate con diseÃÂ±os exclusivos. Aspecto elegante y sofisticado.","Finition mate avec des motifs exclusifs. Allure ÃÂ©lÃÂ©gante et raffinÃÂ©e.");
+  T("Modelo do Layout","Layout Style","DiseÃÂ±o del layout","Style de motif");
+  T("PrÃÂ³ximo: Moldura + LED Ã¢ÂÂ","Next: Frame + LED Ã¢ÂÂ","Siguiente: Marco + LED Ã¢ÂÂ","Suivant : Cadre + LED Ã¢ÂÂ");
   // etapa Moldura + LED
   T("Acabamento da estrutura externa do quadro","Finish of the frame's outer structure","Acabado de la estructura externa del cuadro","Finition de la structure externe du cadre");
-  T("Moldura revestida com vinil texturizado de fibra de carbono. Acabamento esportivo premium.","Frame wrapped in textured carbon-fiber vinyl. Premium sporty finish.","Marco revestido con vinilo texturizado de fibra de carbono. Acabado deportivo premium.","Cadre habillÃ© de vinyle texturÃ© fibre de carbone. Finition sportive premium.");
+  T("Moldura revestida com vinil texturizado de fibra de carbono. Acabamento esportivo premium.","Frame wrapped in textured carbon-fiber vinyl. Premium sporty finish.","Marco revestido con vinilo texturizado de fibra de carbono. Acabado deportivo premium.","Cadre habillÃÂ© de vinyle texturÃÂ© fibre de carbone. Finition sportive premium.");
   T("Laca Preto","Black Lacquer","Laca negra","Laque noire");
-  T("Revestimento em laca preta. Acabamento liso, sofisticado e atemporal.","Black lacquer finish. Smooth, sophisticated and timeless.","Revestimiento en laca negra. Acabado liso, sofisticado y atemporal.","RevÃªtement en laque noire. Finition lisse, raffinÃ©e et intemporelle.");
+  T("Revestimento em laca preta. Acabamento liso, sofisticado e atemporal.","Black lacquer finish. Smooth, sophisticated and timeless.","Revestimiento en laca negra. Acabado liso, sofisticado y atemporal.","RevÃÂªtement en laque noire. Finition lisse, raffinÃÂ©e et intemporelle.");
   T("Incluso","Included","Incluido","Inclus");
-  T("IluminaÃ§Ã£o LED","LED Lighting","IluminaciÃ³n LED","Ãclairage LED");
-  T("Ã°ÂÂÂ¡ IluminaÃ§Ã£o LED interna","Ã°ÂÂÂ¡ Internal LED lighting","Ã°ÂÂÂ¡ IluminaciÃ³n LED interna","Ã°ÂÂÂ¡ Ãclairage LED intÃ©rieur");
+  T("IluminaÃÂ§ÃÂ£o LED","LED Lighting","IluminaciÃÂ³n LED","ÃÂclairage LED");
+  T("ÃÂ°ÃÂÃÂÃÂ¡ IluminaÃÂ§ÃÂ£o LED interna","ÃÂ°ÃÂÃÂÃÂ¡ Internal LED lighting","ÃÂ°ÃÂÃÂÃÂ¡ IluminaciÃÂ³n LED interna","ÃÂ°ÃÂÃÂÃÂ¡ ÃÂclairage LED intÃÂ©rieur");
   T("Selecione o tipo abaixo","Select the type below","Selecciona el tipo abajo","Choisissez le type ci-dessous");
-  T("RetroiluminaÃ§Ã£o no interior do quadro â efeito espetacular no ambiente","Backlighting inside the frame â a stunning effect in the room","RetroiluminaciÃ³n en el interior del cuadro â efecto espectacular en el ambiente","RÃ©troÃ©clairage Ã  l'intÃ©rieur du cadre â effet spectaculaire dans la piÃ¨ce");
+  T("RetroiluminaÃÂ§ÃÂ£o no interior do quadro Ã¢ÂÂ efeito espetacular no ambiente","Backlighting inside the frame Ã¢ÂÂ a stunning effect in the room","RetroiluminaciÃÂ³n en el interior del cuadro Ã¢ÂÂ efecto espectacular en el ambiente","RÃÂ©troÃÂ©clairage ÃÂ  l'intÃÂ©rieur du cadre Ã¢ÂÂ effet spectaculaire dans la piÃÂ¨ce");
   T("Sem LED","No LED","Sin LED","Sans LED");
   T("Tipo de LED","LED Type","Tipo de LED","Type de LED");
-  T("Ã°ÂÂÂ Com Fio","Ã°ÂÂÂ Wired","Ã°ÂÂÂ Con cable","Ã°ÂÂÂ Filaire");
-  T("Ã°ÂÂÂ Sem Fio","Ã°ÂÂÂ Wireless","Ã°ÂÂÂ InalÃ¡mbrico","Ã°ÂÂÂ Sans fil");
+  T("ÃÂ°ÃÂÃÂÃÂ Com Fio","ÃÂ°ÃÂÃÂÃÂ Wired","ÃÂ°ÃÂÃÂÃÂ Con cable","ÃÂ°ÃÂÃÂÃÂ Filaire");
+  T("ÃÂ°ÃÂÃÂÃÂ Sem Fio","ÃÂ°ÃÂÃÂÃÂ Wireless","ÃÂ°ÃÂÃÂÃÂ InalÃÂ¡mbrico","ÃÂ°ÃÂÃÂÃÂ Sans fil");
   T("Neutro","Neutral","Neutro","Neutre");
-  T("Luz 3000K","3000K light","Luz 3000K","LumiÃ¨re 3000K");
+  T("Luz 3000K","3000K light","Luz 3000K","LumiÃÂ¨re 3000K");
   T("RGB","RGB","RGB","RGB");
   T("Multicolor","Multicolor","Multicolor","Multicolore");
-  T("PrÃ³ximo: Alto-relevo â","Next: Relief â","Siguiente: Relieve â","Suivant : Relief â");
+  T("PrÃÂ³ximo: Alto-relevo Ã¢ÂÂ","Next: Relief Ã¢ÂÂ","Siguiente: Relieve Ã¢ÂÂ","Suivant : Relief Ã¢ÂÂ");
   // etapa Alto-relevo
-  T("Elementos em alto relevo aplicados no quadro","Raised relief elements applied to the frame","Elementos en altorrelieve aplicados al cuadro","ÃlÃ©ments en relief appliquÃ©s au cadre");
+  T("Elementos em alto relevo aplicados no quadro","Raised relief elements applied to the frame","Elementos en altorrelieve aplicados al cuadro","ÃÂlÃÂ©ments en relief appliquÃÂ©s au cadre");
   T("Relevos fixos","Fixed reliefs","Relieves fijos","Reliefs fixes");
-  T("(sempre incluÃ­dos)","(always included)","(siempre incluidos)","(toujours inclus)");
-  T("Ã°ÂÂÂ·Ã¯Â¸Â Logotipo Marca","Ã°ÂÂÂ·Ã¯Â¸Â Brand Logo","Ã°ÂÂÂ·Ã¯Â¸Â Logotipo de la marca","Ã°ÂÂÂ·Ã¯Â¸Â Logo de la marque");
-  T("Gerado com IA conforme marca selecionada","AI-generated based on the selected brand","Generado con IA segÃºn la marca seleccionada","GÃ©nÃ©rÃ© par IA selon la marque choisie");
-  T("Gerando o logo da marca com IAâ¦","Generating the brand logo with AIâ¦","Generando el logo de la marca con IAâ¦","GÃ©nÃ©ration du logo de la marque par IAâ¦");
+  T("(sempre incluÃÂ­dos)","(always included)","(siempre incluidos)","(toujours inclus)");
+  T("ÃÂ°ÃÂÃÂÃÂ·ÃÂ¯ÃÂ¸ÃÂ Logotipo Marca","ÃÂ°ÃÂÃÂÃÂ·ÃÂ¯ÃÂ¸ÃÂ Brand Logo","ÃÂ°ÃÂÃÂÃÂ·ÃÂ¯ÃÂ¸ÃÂ Logotipo de la marca","ÃÂ°ÃÂÃÂÃÂ·ÃÂ¯ÃÂ¸ÃÂ Logo de la marque");
+  T("Gerado com IA conforme marca selecionada","AI-generated based on the selected brand","Generado con IA segÃÂºn la marca seleccionada","GÃÂ©nÃÂ©rÃÂ© par IA selon la marque choisie");
+  T("Gerando o logo da marca com IAÃ¢ÂÂ¦","Generating the brand logo with AIÃ¢ÂÂ¦","Generando el logo de la marca con IAÃ¢ÂÂ¦","GÃÂ©nÃÂ©ration du logo de la marque par IAÃ¢ÂÂ¦");
   T("Branco","White","Blanco","Blanc");
   T("Preto","Black","Negro","Noir");
   T("Vermelho","Red","Rojo","Rouge");
   T("Escolher cor","Choose color","Elegir color","Choisir la couleur");
-  T("Ã°ÂÂÂÃ¯Â¸Â Logo do Modelo â Canto inferior direito","Ã°ÂÂÂÃ¯Â¸Â Model Logo â Bottom right corner","Ã°ÂÂÂÃ¯Â¸Â Logo del modelo â Esquina inferior derecha","Ã°ÂÂÂÃ¯Â¸Â Logo du modÃ¨le â Coin infÃ©rieur droit");
-  T("Gerado com IA conforme modelo selecionado","AI-generated based on the selected model","Generado con IA segÃºn el modelo seleccionado","GÃ©nÃ©rÃ© par IA selon le modÃ¨le choisi");
-  T("Gerando o logo do modelo com IAâ¦","Generating the model logo with AIâ¦","Generando el logo del modelo con IAâ¦","GÃ©nÃ©ration du logo du modÃ¨le par IAâ¦");
+  T("ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Logo do Modelo Ã¢ÂÂ Canto inferior direito","ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Model Logo Ã¢ÂÂ Bottom right corner","ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Logo del modelo Ã¢ÂÂ Esquina inferior derecha","ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Logo du modÃÂ¨le Ã¢ÂÂ Coin infÃÂ©rieur droit");
+  T("Gerado com IA conforme modelo selecionado","AI-generated based on the selected model","Generado con IA segÃÂºn el modelo seleccionado","GÃÂ©nÃÂ©rÃÂ© par IA selon le modÃÂ¨le choisi");
+  T("Gerando o logo do modelo com IAÃ¢ÂÂ¦","Generating the model logo with AIÃ¢ÂÂ¦","Generando el logo del modelo con IAÃ¢ÂÂ¦","GÃÂ©nÃÂ©ration du logo du modÃÂ¨le par IAÃ¢ÂÂ¦");
   T("Relevos opcionais","Optional reliefs","Relieves opcionales","Reliefs optionnels");
-  T("Ã°ÂÂÂ´ Bandeira do PaÃ­s","Ã°ÂÂÂ´ Country Flag","Ã°ÂÂÂ´ Bandera del paÃ­s","Ã°ÂÂÂ´ Drapeau du pays");
-  T("Canto superior direito â bandeira do piloto ou escuderia em relevo","Top right corner â driver or team flag in relief","Esquina superior derecha â bandera del piloto o escuderÃ­a en relieve","Coin supÃ©rieur droit â drapeau du pilote ou de l'Ã©curie en relief");
-  T("Ã°ÂÂÂ¤ Nome do Piloto","Ã°ÂÂÂ¤ Driver Name","Ã°ÂÂÂ¤ Nombre del piloto","Ã°ÂÂÂ¤ Nom du pilote");
-  T("Canto inferior esquerdo â atÃ© 20 caracteres gravados em relevo","Bottom left corner â up to 20 characters engraved in relief","Esquina inferior izquierda â hasta 20 caracteres grabados en relieve","Coin infÃ©rieur gauche â jusqu'Ã  20 caractÃ¨res gravÃ©s en relief");
-  T("Ã°ÂÂÂ Placa com informaÃ§Ãµes do Carro","Ã°ÂÂÂ Plate with Car information","Ã°ÂÂÂ Placa con informaciÃ³n del coche","Ã°ÂÂÂ Plaque avec informations de la voiture");
-  T("Placa tÃ©cnica em alto relevo com dados do veÃ­culo","Technical plate in relief with the vehicle's data","Placa tÃ©cnica en altorrelieve con los datos del vehÃ­culo","Plaque technique en relief avec les donnÃ©es du vÃ©hicule");
-  T("Ã°ÂÂÂºÃ¯Â¸Â TraÃ§ado do circuito","Ã°ÂÂÂºÃ¯Â¸Â Circuit Layout","Ã°ÂÂÂºÃ¯Â¸Â Trazado del circuito","Ã°ÂÂÂºÃ¯Â¸Â TracÃ© du circuit");
-  T("Mapa em alto relevo do circuito oficial do modelo","Relief map of the model's official circuit","Mapa en altorrelieve del circuito oficial del modelo","Carte en relief du circuit officiel du modÃ¨le");
+  T("ÃÂ°ÃÂÃÂÃÂ´ Bandeira do PaÃÂ­s","ÃÂ°ÃÂÃÂÃÂ´ Country Flag","ÃÂ°ÃÂÃÂÃÂ´ Bandera del paÃÂ­s","ÃÂ°ÃÂÃÂÃÂ´ Drapeau du pays");
+  T("Canto superior direito Ã¢ÂÂ bandeira do piloto ou escuderia em relevo","Top right corner Ã¢ÂÂ driver or team flag in relief","Esquina superior derecha Ã¢ÂÂ bandera del piloto o escuderÃÂ­a en relieve","Coin supÃÂ©rieur droit Ã¢ÂÂ drapeau du pilote ou de l'ÃÂ©curie en relief");
+  T("ÃÂ°ÃÂÃÂÃÂ¤ Nome do Piloto","ÃÂ°ÃÂÃÂÃÂ¤ Driver Name","ÃÂ°ÃÂÃÂÃÂ¤ Nombre del piloto","ÃÂ°ÃÂÃÂÃÂ¤ Nom du pilote");
+  T("Canto inferior esquerdo Ã¢ÂÂ atÃÂ© 20 caracteres gravados em relevo","Bottom left corner Ã¢ÂÂ up to 20 characters engraved in relief","Esquina inferior izquierda Ã¢ÂÂ hasta 20 caracteres grabados en relieve","Coin infÃÂ©rieur gauche Ã¢ÂÂ jusqu'ÃÂ  20 caractÃÂ¨res gravÃÂ©s en relief");
+  T("ÃÂ°ÃÂÃÂÃÂ Placa com informaÃÂ§ÃÂµes do Carro","ÃÂ°ÃÂÃÂÃÂ Plate with Car information","ÃÂ°ÃÂÃÂÃÂ Placa con informaciÃÂ³n del coche","ÃÂ°ÃÂÃÂÃÂ Plaque avec informations de la voiture");
+  T("Placa tÃÂ©cnica em alto relevo com dados do veÃÂ­culo","Technical plate in relief with the vehicle's data","Placa tÃÂ©cnica en altorrelieve con los datos del vehÃÂ­culo","Plaque technique en relief avec les donnÃÂ©es du vÃÂ©hicule");
+  T("ÃÂ°ÃÂÃÂÃÂºÃÂ¯ÃÂ¸ÃÂ TraÃÂ§ado do circuito","ÃÂ°ÃÂÃÂÃÂºÃÂ¯ÃÂ¸ÃÂ Circuit Layout","ÃÂ°ÃÂÃÂÃÂºÃÂ¯ÃÂ¸ÃÂ Trazado del circuito","ÃÂ°ÃÂÃÂÃÂºÃÂ¯ÃÂ¸ÃÂ TracÃÂ© du circuit");
+  T("Mapa em alto relevo do circuito oficial do modelo","Relief map of the model's official circuit","Mapa en altorrelieve del circuito oficial del modelo","Carte en relief du circuit officiel du modÃÂ¨le");
   T("COR DO NOME:","NAME COLOR:","COLOR DEL NOMBRE:","COULEUR DU NOM :");
-  T("Ver Resumo â","View Summary â","Ver resumen â","Voir le rÃ©sumÃ© â");
+  T("Ver Resumo Ã¢ÂÂ","View Summary Ã¢ÂÂ","Ver resumen Ã¢ÂÂ","Voir le rÃÂ©sumÃÂ© Ã¢ÂÂ");
   // etapa Pedido / resumo
   T("Seu Quadro","Your Frame","Tu cuadro","Votre cadre");
-  T("Revise a configuraÃ§Ã£o e finalize o pedido","Review your setup and complete the order","Revisa la configuraciÃ³n y finaliza el pedido","VÃ©rifiez la configuration et finalisez la commande");
+  T("Revise a configuraÃÂ§ÃÂ£o e finalize o pedido","Review your setup and complete the order","Revisa la configuraciÃÂ³n y finaliza el pedido","VÃÂ©rifiez la configuration et finalisez la commande");
   T("Foto","Photo","Foto","Photo");
   T("Quadro completo com miniatura","Complete frame with model","Cuadro completo con miniatura","Cadre complet avec miniature");
-  T("Adicionar ao carrinho â","Add to cart â","AÃ±adir al carrito â","Ajouter au panier â");
-  T("Tirar dÃºvidas no WhatsApp","Questions on WhatsApp","Consultas por WhatsApp","Questions sur WhatsApp");
-  T("â Voltar ao produto","â Back to product","â Volver al producto","â Retour au produit");
-  T("Categoria","Category","CategorÃ­a","CatÃ©gorie");
-  T("DimensÃ£o","Dimensions","DimensiÃ³n","Dimensions");
+  T("Adicionar ao carrinho Ã¢ÂÂ","Add to cart Ã¢ÂÂ","AÃÂ±adir al carrito Ã¢ÂÂ","Ajouter au panier Ã¢ÂÂ");
+  T("Tirar dÃÂºvidas no WhatsApp","Questions on WhatsApp","Consultas por WhatsApp","Questions sur WhatsApp");
+  T("Ã¢ÂÂ Voltar ao produto","Ã¢ÂÂ Back to product","Ã¢ÂÂ Volver al producto","Ã¢ÂÂ Retour au produit");
+  T("Categoria","Category","CategorÃÂ­a","CatÃÂ©gorie");
+  T("DimensÃÂ£o","Dimensions","DimensiÃÂ³n","Dimensions");
   T("Moldura","Frame","Marco","Cadre");
   T("LED","LED","LED","LED");
-  T("Alto-relevo extra","Extra relief","Relieve extra","Relief supplÃ©mentaire");
+  T("Alto-relevo extra","Extra relief","Relieve extra","Relief supplÃÂ©mentaire");
   T("Nenhum","None","Ninguno","Aucun");
   T("SKU","SKU","SKU","SKU");
-  T("Total estimado","Estimated total","Total estimado","Total estimÃ©");
-  T("Ã°ÂÂÂ¦ Embalagem Premium","Ã°ÂÂÂ¦ Premium Packaging","Ã°ÂÂÂ¦ Embalaje premium","Ã°ÂÂÂ¦ Emballage premium");
-  T("â Editar configuraÃ§Ã£o","â Edit configuration","â Editar configuraciÃ³n","â Modifier la configuration");
-  T("Sem frete â¢ PreÃ§o pode variar","Shipping not included â¢ Price may vary","EnvÃ­o no incluido â¢ El precio puede variar","Livraison non incluse â¢ Le prix peut varier");
+  T("Total estimado","Estimated total","Total estimado","Total estimÃÂ©");
+  T("ÃÂ°ÃÂÃÂÃÂ¦ Embalagem Premium","ÃÂ°ÃÂÃÂÃÂ¦ Premium Packaging","ÃÂ°ÃÂÃÂÃÂ¦ Embalaje premium","ÃÂ°ÃÂÃÂÃÂ¦ Emballage premium");
+  T("Ã¢ÂÂ Editar configuraÃÂ§ÃÂ£o","Ã¢ÂÂ Edit configuration","Ã¢ÂÂ Editar configuraciÃÂ³n","Ã¢ÂÂ Modifier la configuration");
+  T("Sem frete Ã¢ÂÂ¢ PreÃÂ§o pode variar","Shipping not included Ã¢ÂÂ¢ Price may vary","EnvÃÂ­o no incluido Ã¢ÂÂ¢ El precio puede variar","Livraison non incluse Ã¢ÂÂ¢ Le prix peut varier");
   T("novo","new","nuevo","nouveau");
   T("atual","current","actual","actuel");
   T("Cancelar","Cancel","Cancelar","Annuler");
@@ -476,27 +476,27 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   // placeholders
   T("Como no documento","As on your ID","Como en el documento","Comme sur le document");
   T("voce@email.com","you@email.com","tu@email.com","vous@email.com");
-  T("Rua, avenidaâ¦","Street, avenueâ¦","Calle, avenidaâ¦","Rue, avenueâ¦");
-  T("Apto, blocoâ¦","Apt, blockâ¦","Depto, bloqueâ¦","Appt, bÃ¢timentâ¦");
+  T("Rua, avenidaÃ¢ÂÂ¦","Street, avenueÃ¢ÂÂ¦","Calle, avenidaÃ¢ÂÂ¦","Rue, avenueÃ¢ÂÂ¦");
+  T("Apto, blocoÃ¢ÂÂ¦","Apt, blockÃ¢ÂÂ¦","Depto, bloqueÃ¢ÂÂ¦","Appt, bÃÂ¢timentÃ¢ÂÂ¦");
   T("Digite a marca do carro...","Type the car brand...","Escribe la marca del coche...","Saisissez la marque de la voiture...");
-  T("Selecione acima ou digite...","Select above or type...","Selecciona arriba o escribe...","SÃ©lectionnez ci-dessus ou saisissez...");
-  T("Digite o paÃ­s (ex: Brasil, ItÃ¡lia, Reino Unido...)","Type the country (e.g. Brazil, Italy, UK...)","Escribe el paÃ­s (ej: Brasil, Italia, Reino Unido...)","Saisissez le pays (ex : BrÃ©sil, Italie, Royaume-Uni...)");
-  T("Nome do piloto (mÃ¡x. 20 caracteres)","Driver name (max. 20 characters)","Nombre del piloto (mÃ¡x. 20 caracteres)","Nom du pilote (max. 20 caractÃ¨res)");
-  T("ComeÃ§ar uma personalizaÃ§Ã£o do zero (mantÃ©m o carrinho)","Start a customization from scratch (keeps the cart)","Empezar una personalizaciÃ³n desde cero (mantiene el carrito)","DÃ©marrer une personnalisation de zÃ©ro (conserve le panier)");
-  T("Se o carro vier de cabeÃ§a para baixo, clique para corrigir","If the car appears upside down, click to fix","Si el coche aparece al revÃ©s, haz clic para corregir","Si la voiture est Ã  l'envers, cliquez pour corriger");
+  T("Selecione acima ou digite...","Select above or type...","Selecciona arriba o escribe...","SÃÂ©lectionnez ci-dessus ou saisissez...");
+  T("Digite o paÃÂ­s (ex: Brasil, ItÃÂ¡lia, Reino Unido...)","Type the country (e.g. Brazil, Italy, UK...)","Escribe el paÃÂ­s (ej: Brasil, Italia, Reino Unido...)","Saisissez le pays (ex : BrÃÂ©sil, Italie, Royaume-Uni...)");
+  T("Nome do piloto (mÃÂ¡x. 20 caracteres)","Driver name (max. 20 characters)","Nombre del piloto (mÃÂ¡x. 20 caracteres)","Nom du pilote (max. 20 caractÃÂ¨res)");
+  T("ComeÃÂ§ar uma personalizaÃÂ§ÃÂ£o do zero (mantÃÂ©m o carrinho)","Start a customization from scratch (keeps the cart)","Empezar una personalizaciÃÂ³n desde cero (mantiene el carrito)","DÃÂ©marrer une personnalisation de zÃÂ©ro (conserve le panier)");
+  T("Se o carro vier de cabeÃÂ§a para baixo, clique para corrigir","If the car appears upside down, click to fix","Si el coche aparece al revÃÂ©s, haz clic para corregir","Si la voiture est ÃÂ  l'envers, cliquez pour corriger");
 
   var _traduzindo=false, _mo=null;
   T("Tipo de Quadro","Frame Type","Tipo de Marco","Type de Cadre");
-  T("Modelo â","Model â","Modelo â","ModÃ¨le â");
-  T("Finalizar e pagar â","Checkout â","Finalizar y pagar â","Finaliser et payer â");
-  T("Fundo","Background","Fondo","ArriÃ¨re-plan");
-  T("Modelo","Model","Modelo","ModÃ¨le");
+  T("Modelo Ã¢ÂÂ","Model Ã¢ÂÂ","Modelo Ã¢ÂÂ","ModÃÂ¨le Ã¢ÂÂ");
+  T("Finalizar e pagar Ã¢ÂÂ","Checkout Ã¢ÂÂ","Finalizar y pagar Ã¢ÂÂ","Finaliser et payer Ã¢ÂÂ");
+  T("Fundo","Background","Fondo","ArriÃÂ¨re-plan");
+  T("Modelo","Model","Modelo","ModÃÂ¨le");
   T("Miniatura","Model","Miniatura","Miniature");
-  T("Detalhamento","Details","Detalles","DÃ©tails");
+  T("Detalhamento","Details","Detalles","DÃÂ©tails");
   T("Moldura + LED","Frame + LED","Marco + LED","Cadre + LED");
   T("Alto-relevo","Relief","Relieve","Relief");
   T("Produto","Product","Producto","Produit");
-  T("Preencha o CEP para calcular o frete","Enter your ZIP code to calculate shipping","Ingrese su cÃ³digo postal para calcular el envÃ­o","Entrez votre code postal pour calculer la livraison");
+  T("Preencha o CEP para calcular o frete","Enter your ZIP code to calculate shipping","Ingrese su cÃÂ³digo postal para calcular el envÃÂ­o","Entrez votre code postal pour calculer la livraison");
 // CHARSET FIX: corrige double-encoded UTF-8 nos text nodes do DOM
 (function(){
 function _dec(s){
@@ -599,7 +599,7 @@ window._priceFix={ran:true};
       if(!alvo){ if(n.__tr){ if(n.nodeValue!==n.__pt)n.nodeValue=n.__pt; n.__tr=false; } return; }
       var tr=FULL[baseT]||FULL[curT];
       if(tr&&tr[alvo]){ var src=FULL[baseT]?n.__pt:cur; var lead=src.match(/^\s*/)[0],tail=src.match(/\s*$/)[0]; var v=lead+tr[alvo]+tail; if(n.nodeValue!==v)n.nodeValue=v; n.__tr=true; return; }
-      var m=curT.match(/^Passo (\d+) de (\d+)$/); if(m){ var pw={en:'Step %1 of %2',es:'Paso %1 de %2',fr:'Ãtape %1 sur %2'}[alvo]; n.nodeValue=cur.replace(curT,pw.replace('%1',m[1]).replace('%2',m[2])); }
+      var m=curT.match(/^Passo (\d+) de (\d+)$/); if(m){ var pw={en:'Step %1 of %2',es:'Paso %1 de %2',fr:'ÃÂtape %1 sur %2'}[alvo]; n.nodeValue=cur.replace(curT,pw.replace('%1',m[1]).replace('%2',m[2])); }
     });
     document.querySelectorAll('[placeholder]').forEach(function(el){
       if(el.closest('#fpLang'))return;
@@ -613,18 +613,18 @@ window._priceFix={ran:true};
   function iniObserverI18n(){
     if(_mo||!document.body)return;
     _mo=new MutationObserver(function(){ if(_traduzindo||FP.lang==='pt')return; clearTimeout(window.__i18nT); window.__i18nT=setTimeout(function(){traduzTudo(FP.lang);
-    // Multi-currency: injetar preÃ§os regionais em CAT_PRECOS + recalcular
+    // Multi-currency: injetar preÃÂ§os regionais em CAT_PRECOS + recalcular
     (function(){
       var reg=FP.region||'BR';
       if(reg==='BR'){
-        // Restaurar preÃ§os originais do banco (BR)
+        // Restaurar preÃÂ§os originais do banco (BR)
         if(window._origCAT_PRECOS!==undefined) window.CAT_PRECOS=window._origCAT_PRECOS;
       } else if(CFG[reg]&&CFG[reg].prices){
         // Salvar original apenas uma vez
         if(window._origCAT_PRECOS===undefined) window._origCAT_PRECOS=window.CAT_PRECOS;
         window.CAT_PRECOS=CFG[reg].prices;
       }
-      // Recalcular preÃ§o exibido e corrigir sÃ­mbolo
+      // Recalcular preÃÂ§o exibido e corrigir sÃÂ­mbolo
       setTimeout(function(){
         if(typeof calcPrice==='function') calcPrice();
         var sym=(CFG[reg]&&CFG[reg].symbol)||'R$';
@@ -665,15 +665,15 @@ window._priceFix={ran:true};
     var header=document.querySelector('header'); if(!header||document.getElementById('fpLang'))return;
     var cartBtn=document.getElementById('cartBtn');
     var wrap=document.createElement('div'); wrap.className='fp-lang'; wrap.id='fpLang';
-    wrap.innerHTML='<button class="fp-lang-btn" id="fpLangBtn" aria-label="Idioma e regiÃ£o"><span class="fp-flag" id="fpLangFlag"></span><span class="fp-lang-txt" id="fpLangTxt">PT</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'
+    wrap.innerHTML='<button class="fp-lang-btn" id="fpLangBtn" aria-label="Idioma e regiÃÂ£o"><span class="fp-flag" id="fpLangFlag"></span><span class="fp-lang-txt" id="fpLangTxt">PT</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>'
       +'<div class="fp-lang-menu" id="fpLangMenu">'
       +'<div class="fp-lang-h" id="fpH1">Idioma</div>'
-      +'<div class="fp-lang-opt" data-lang="pt"><span class="fp-flag">'+flagSVG('BR')+'</span> PortuguÃªs</div>'
+      +'<div class="fp-lang-opt" data-lang="pt"><span class="fp-flag">'+flagSVG('BR')+'</span> PortuguÃÂªs</div>'
       +'<div class="fp-lang-opt" data-lang="en"><span class="fp-flag">'+flagSVG('GB')+'</span> English</div>'
-      +'<div class="fp-lang-opt" data-lang="es"><span class="fp-flag">'+flagSVG('ES')+'</span> EspaÃ±ol</div>'
-      +'<div class="fp-lang-opt" data-lang="fr"><span class="fp-flag">'+flagSVG('FR')+'</span> FranÃ§ais</div>'
+      +'<div class="fp-lang-opt" data-lang="es"><span class="fp-flag">'+flagSVG('ES')+'</span> EspaÃÂ±ol</div>'
+      +'<div class="fp-lang-opt" data-lang="fr"><span class="fp-flag">'+flagSVG('FR')+'</span> FranÃÂ§ais</div>'
       +'<div class="fp-lang-div"></div>'
-      +'<div class="fp-lang-h" id="fpH2">RegiÃ£o / Entrega</div>'
+      +'<div class="fp-lang-h" id="fpH2">RegiÃÂ£o / Entrega</div>'
       +'<div class="fp-lang-opt" data-reg="BR"><span class="fp-flag">'+flagSVG('BR')+'</span> <span data-rk="BR">Brasil</span></div>'
       +'<div class="fp-lang-opt" data-reg="EU"><span class="fp-flag">'+flagSVG('EU')+'</span> <span data-rk="EU">Europa</span></div>'
       +'<div class="fp-lang-opt" data-reg="US"><span class="fp-flag">'+flagSVG('US')+'</span> <span data-rk="US">EUA</span></div>'
@@ -687,7 +687,7 @@ window._priceFix={ran:true};
   function atualizaSeletor(){
     var fl=document.getElementById('fpLangFlag'); if(fl)fl.innerHTML=flagSVG(FP.region);
     var tx=document.getElementById('fpLangTxt'); if(tx)tx.textContent=FP.lang.toUpperCase();
-    var _h1={pt:'Idioma',en:'Language',es:'Idioma',fr:'Langue'}, _h2={pt:'RegiÃ£o / Entrega',en:'Region / Delivery',es:'RegiÃ³n / EnvÃ­o',fr:'RÃ©gion / Livraison'};
+    var _h1={pt:'Idioma',en:'Language',es:'Idioma',fr:'Langue'}, _h2={pt:'RegiÃÂ£o / Entrega',en:'Region / Delivery',es:'RegiÃÂ³n / EnvÃÂ­o',fr:'RÃÂ©gion / Livraison'};
     var h1=document.getElementById('fpH1'); if(h1)h1.textContent=_h1[FP.lang]||_h1.pt;
     var h2=document.getElementById('fpH2'); if(h2)h2.textContent=_h2[FP.lang]||_h2.pt;
     document.querySelectorAll('#fpLang [data-lang]').forEach(function(o){o.classList.toggle('on',o.getAttribute('data-lang')===FP.lang);});
@@ -695,15 +695,15 @@ window._priceFix={ran:true};
     document.querySelectorAll('#fpLang [data-rk]').forEach(function(s){var r=s.getAttribute('data-rk');if(CFG[r])s.textContent=CFG[r].reg[FP.lang]||CFG[r].reg.pt;});
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ FRETE: cÃ¡lculo REAL â SuperFrete (BR Ã¢ÂÂ¤100cm) Â· Melhor Envio/Jadlog (BR >100cm) Â· Sendcloud (EU) Ã¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ FRETE: cÃÂ¡lculo REAL Ã¢ÂÂ SuperFrete (BR ÃÂ¢ÃÂÃÂ¤100cm) ÃÂ· Melhor Envio/Jadlog (BR >100cm) ÃÂ· Sendcloud (EU) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   FP.frete=null;
-  var FRETE_EU_PAISES=[['BE','BÃ©lgica'],['FR','FranÃ§a'],['DE','Alemanha'],['NL','PaÃ­ses Baixos'],['LU','Luxemburgo'],['IT','ItÃ¡lia'],['ES','Espanha'],['PT','Portugal'],['AT','Ãustria'],['IE','Irlanda']];
+  var FRETE_EU_PAISES=[['BE','BÃÂ©lgica'],['FR','FranÃÂ§a'],['DE','Alemanha'],['NL','PaÃÂ­ses Baixos'],['LU','Luxemburgo'],['IT','ItÃÂ¡lia'],['ES','Espanha'],['PT','Portugal'],['AT','ÃÂustria'],['IE','Irlanda']];
   function fmt(v){var loc={pt:'pt-BR',en:'en-US',es:'es-ES',fr:'fr-FR'}[FP.lang]||'pt-BR';return Number(v||0).toLocaleString(loc,{minimumFractionDigits:2,maximumFractionDigits:2});}
   function _freteDim(i){
     if(i&&i.cfg){ if(i.cfg.legoDim)return i.cfg.legoDim; if(i.cfg.quadroDim)return i.cfg.quadroDim; if(i.cfg.dim)return i.cfg.dim; }
     if(i&&i.dim)return i.dim;
     var txt=((i&&i.sub)||'')+' '+(((i&&i.linhas)||[]).join(' '));
-    var m=txt.match(/\d{1,3}(?:[.,]\d)?\s*[Ãx]\s*\d{1,3}(?:[.,]\d)?\s*cm/i);
+    var m=txt.match(/\d{1,3}(?:[.,]\d)?\s*[ÃÂx]\s*\d{1,3}(?:[.,]\d)?\s*cm/i);
     return m?m[0]:'';
   }
   function _freteItens(){ return (window.CART||[]).map(function(i){return {dim:_freteDim(i),qty:1};}).filter(function(x){return x.dim;}); }
@@ -756,7 +756,7 @@ window._priceFix={ran:true};
     var foot=document.getElementById('cartFoot'); if(!foot||document.getElementById('fpFrete'))return;
     var box=document.createElement('div'); box.className='fp-frete'; box.id='fpFrete';
     var paisOpts=FRETE_EU_PAISES.map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>';}).join('');
-    box.innerHTML='<div class="fp-frete-h"><span>Ã°ÂÂÂ</span> <span id="fpFreteT"></span></div>'
+    box.innerHTML='<div class="fp-frete-h"><span>ÃÂ°ÃÂÃÂÃÂ</span> <span id="fpFreteT"></span></div>'
       +'<div id="fpFretePais" style="display:none;margin-bottom:8px"><select id="fpFretePaisSel" style="width:100%;background:#101010;border:1px solid #2c2c2c;color:#eee;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px">'+paisOpts+'</select></div>'
       +'<div class="fp-frete-row"><input id="fpCep" inputmode="numeric" maxlength="9" autocomplete="postal-code"><button id="fpCalcBtn" type="button"></button></div>'
       +'<div id="fpFreteOpts"></div>'
@@ -797,17 +797,17 @@ window._priceFix={ran:true};
   if(document.readyState!=='loading')init(); else document.addEventListener('DOMContentLoaded',init);
 })();
 
-/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ CUPOM DE DESCONTO (carrinho) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
-   Inline para nÃ£o depender de novo deploy do app_1.js.
-   Valida no Worker (/cupom), aplica o desconto no total (fonte Ãºnica = _cartTotal)
-   e injeta o cÃ³digo no POST /pedido para o servidor recalcular e contar o uso. */
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ CUPOM DE DESCONTO (carrinho) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+   Inline para nÃÂ£o depender de novo deploy do app_1.js.
+   Valida no Worker (/cupom), aplica o desconto no total (fonte ÃÂºnica = _cartTotal)
+   e injeta o cÃÂ³digo no POST /pedido para o servidor recalcular e contar o uso. */
 (function(){
   var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
   var LS='fp_cupom_v1';
   window._cupom=null;
   var L={
-    pt:{title:'Cupom de desconto',ph:'Digite seu cupom',apply:'Aplicar',remove:'remover',applied:'aplicado',freeship:'+ frete grÃ¡tis',invalid:'Cupom invÃ¡lido',checking:'Verificandoâ¦',empty:'Informe um cupom'},
-    en:{title:'Discount coupon',ph:'Enter your coupon',apply:'Apply',remove:'remove',applied:'applied',freeship:'+ free shipping',invalid:'Invalid coupon',checking:'Checkingâ¦',empty:'Enter a coupon'}
+    pt:{title:'Cupom de desconto',ph:'Digite seu cupom',apply:'Aplicar',remove:'remover',applied:'aplicado',freeship:'+ frete grÃÂ¡tis',invalid:'Cupom invÃÂ¡lido',checking:'VerificandoÃ¢ÂÂ¦',empty:'Informe um cupom'},
+    en:{title:'Discount coupon',ph:'Enter your coupon',apply:'Apply',remove:'remove',applied:'applied',freeship:'+ free shipping',invalid:'Invalid coupon',checking:'CheckingÃ¢ÂÂ¦',empty:'Enter a coupon'}
   };
   function lg(k){var l=(window.FP&&FP.lang==='en')?'en':'pt';return (L[l]&&L[l][k])||L.pt[k];}
   function sym(){return (window.CFG&&window.FP&&CFG[FP.region])?CFG[FP.region].symbol:'R$';}
@@ -822,7 +822,7 @@ window._priceFix={ran:true};
     var d=(c.tipo==='fixo')?Math.min(Number(c.valor)||0,sub):(sub*(Number(c.valor)||0)/100);
     d=Math.round(d*100)/100; if(d>sub)d=sub; if(d<0)d=0; return d;
   }
-  // a partir daqui _cartTotal Ã© o total COM desconto (o site inteiro passa a usar este)
+  // a partir daqui _cartTotal ÃÂ© o total COM desconto (o site inteiro passa a usar este)
   window._cartTotal=function(){ var s=subtotalBruto(); return Math.max(0,Math.round((s-descontoDe(s))*100)/100); };
   window._cupomDesconto=function(){ return descontoDe(subtotalBruto()); };
 
@@ -839,13 +839,13 @@ window._priceFix={ran:true};
   function boxHTML(){
     if(window._cupom){
       var c=window._cupom, desc=descontoDe(subtotalBruto());
-      return '<div class="fp-cup-h"><span>Ã°ÂÂÂÃ¯Â¸Â</span> '+lg('title')+'</div>'
+      return '<div class="fp-cup-h"><span>ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ</span> '+lg('title')+'</div>'
         +'<div class="fp-cup-applied"><div class="fp-cup-tag">'+esc(c.codigo)+' '+lg('applied')
           +(c.frete_gratis?' <em>'+lg('freeship')+'</em>':'')+'</div>'
-          +'<div class="fp-cup-val">Ã¢ÂÂ '+sym()+' '+fmt(desc)+'</div>'
+          +'<div class="fp-cup-val">ÃÂ¢ÃÂÃÂ '+sym()+' '+fmt(desc)+'</div>'
           +'<button type="button" class="fp-cup-rm" id="fpCupRm">'+lg('remove')+'</button></div>';
     }
-    return '<div class="fp-cup-h"><span>Ã°ÂÂÂÃ¯Â¸Â</span> '+lg('title')+'</div>'
+    return '<div class="fp-cup-h"><span>ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ</span> '+lg('title')+'</div>'
       +'<div class="fp-cup-row"><input id="fpCupIn" autocomplete="off" placeholder="'+esc(lg('ph'))+'" style="text-transform:uppercase"><button type="button" id="fpCupBtn">'+lg('apply')+'</button></div>'
       +'<div class="fp-cup-msg" id="fpCupMsg"></div>';
   }
@@ -892,11 +892,11 @@ window._priceFix={ran:true};
     var sel=document.querySelector('#fpFreteOpts .fp-frete-opt.on'); if(sel)sel.click(); // recomputa "Total com frete"
   }
 
-  // re-renderiza a caixa sempre que o carrinho Ã© redesenhado
+  // re-renderiza a caixa sempre que o carrinho ÃÂ© redesenhado
   var _cr=window._cartRender;
   window._cartRender=function(){ if(typeof _cr==='function')_cr.apply(this,arguments); render(); };
 
-  // injeta o cupom no POST /pedido (o app_1.js nÃ£o conhece o cupom)
+  // injeta o cupom no POST /pedido (o app_1.js nÃÂ£o conhece o cupom)
   var _of=window.fetch;
   window.fetch=function(input,init){
     try{
@@ -928,7 +928,7 @@ window._priceFix={ran:true};
   if(document.readyState!=='loading')setTimeout(init,250); else document.addEventListener('DOMContentLoaded',function(){setTimeout(init,250);});
 })();
 
-/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ FRETE na mensagem do WhatsApp (fechamento) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ FRETE na mensagem do WhatsApp (fechamento) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
    Injeta a transportadora escolhida + "Total com frete" na mensagem, sem tocar no app_1.js. */
 (function(){
   var _open=window.open;
@@ -937,9 +937,9 @@ window._priceFix={ran:true};
   function bloco(){
     var f=(window.FP&&FP.frete)?FP.frete:null; if(!f||f.price==null)return '';
     var sym=f.currency||'R$'; var carr=(CN[f.carrier]||f.carrier||'').toString().trim();
-    var nome=(carr?carr+' Â· ':'')+(f.label||'');
+    var nome=(carr?carr+' ÃÂ· ':'')+(f.label||'');
     var sub=(typeof _cartTotal==='function')?_cartTotal():0;
-    var b='\n*Frete:* '+nome+' â '+fmtM(f.price,sym);
+    var b='\n*Frete:* '+nome+' Ã¢ÂÂ '+fmtM(f.price,sym);
     if(sym==='R$') b+='\n*Total com frete:* '+fmtM(sub+Number(f.price),sym);
     return b;
   }
@@ -974,14 +974,14 @@ window._priceFix={ran:true};
 })();
 
 /* Bloqueia clique direto nas etapas do topo (stepper).
-   O cliente Ã© forÃ§ado a seguir o passo a passo: navega sÃ³ pelos botÃµes "PrÃ³ximo â" e "â Voltar". */
+   O cliente ÃÂ© forÃÂ§ado a seguir o passo a passo: navega sÃÂ³ pelos botÃÂµes "PrÃÂ³ximo Ã¢ÂÂ" e "Ã¢ÂÂ Voltar". */
 (function(){
   document.addEventListener('click', function(e){
     var t=e.target; var tab=(t&&t.closest)?t.closest('.stab'):null;
     if(tab){ e.preventDefault(); e.stopPropagation(); }
   }, true);
   document.addEventListener('keydown', function(e){
-    // impede ativar a etapa por teclado (Enter/EspaÃ§o) caso esteja focada
+    // impede ativar a etapa por teclado (Enter/EspaÃÂ§o) caso esteja focada
     if((e.key==='Enter'||e.key===' ')&&document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.stab')){ e.preventDefault(); e.stopPropagation(); }
   }, true);
   var st=document.createElement('style');
@@ -989,10 +989,10 @@ window._priceFix={ran:true};
   (document.head||document.documentElement).appendChild(st);
 })();
 
-/* Ã¢ÂÂÃ¢ÂÂ Galeria do produto (Quadro com miniatura): 4 miniaturas SEMPRE coladas Ã  imagem principal Ã¢ÂÂÃ¢ÂÂ
-   Antes o box da imagem "esticava" (flex:1) e centralizava a foto numa Ã¡rea alta, deixando as
-   miniaturas grudadas na base (vÃ£o grande em telas maiores). Agora imagem + miniaturas viram um
-   bloco Ãºnico, centralizado, com as fotinhas logo abaixo â igual em qualquer resoluÃ§Ã£o. */
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Galeria do produto (Quadro com miniatura): 4 miniaturas SEMPRE coladas ÃÂ  imagem principal ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+   Antes o box da imagem "esticava" (flex:1) e centralizava a foto numa ÃÂ¡rea alta, deixando as
+   miniaturas grudadas na base (vÃÂ£o grande em telas maiores). Agora imagem + miniaturas viram um
+   bloco ÃÂºnico, centralizado, com as fotinhas logo abaixo Ã¢ÂÂ igual em qualquer resoluÃÂ§ÃÂ£o. */
 (function(){
   if(typeof window._catGaleriaHTML!=='function')return;
   window._catGaleriaHTML=function(soFoto){
@@ -1005,7 +1005,7 @@ window._priceFix={ran:true};
     var _wrap=_mobG
       ? 'width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;'
       : 'width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;';
-    // box da imagem NÃO cresce (flex:0) -> a foto encosta nas miniaturas e o bloco fica centralizado
+    // box da imagem NÃÂO cresce (flex:0) -> a foto encosta nas miniaturas e o bloco fica centralizado
     var _box=_mobG
       ? 'width:100%;display:flex;align-items:flex-start;justify-content:center;'
       : 'flex:0 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;';
@@ -1021,35 +1021,35 @@ window._priceFix={ran:true};
   };
 })();
 
-/* Ã¢ÂÂÃ¢ÂÂ Imagem de entrada (home/Tipo): ancorar no topo, perto do menu Ã¢ÂÂÃ¢ÂÂ
-   Antes #heroImg centralizava vertical (align-items:center;height:100%), entÃ£o em monitores
-   mais verticais a imagem descia demais. Agora fica colada ao topo, prÃ³xima do menu, em qualquer tela. */
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Imagem de entrada (home/Tipo): ancorar no topo, perto do menu ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+   Antes #heroImg centralizava vertical (align-items:center;height:100%), entÃÂ£o em monitores
+   mais verticais a imagem descia demais. Agora fica colada ao topo, prÃÂ³xima do menu, em qualquer tela. */
 (function(){
   function anchorHero(){
     var h=document.getElementById('heroImg');
     if(h){ h.style.alignItems='flex-start'; h.style.paddingTop='30px'; }
   }
   if(document.readyState!=='loading')anchorHero(); else document.addEventListener('DOMContentLoaded',anchorHero);
-  // reforÃ§a caso o painel seja re-renderizado ao voltar pra home
+  // reforÃÂ§a caso o painel seja re-renderizado ao voltar pra home
   setTimeout(anchorHero,400);
 })();
 
-/* Ã¢ÂÂÃ¢ÂÂ Ancoragem geral no topo: coluna esquerda (todas as etapas) + resumo/TOTAL do checkout Ã¢ÂÂÃ¢ÂÂ
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Ancoragem geral no topo: coluna esquerda (todas as etapas) + resumo/TOTAL do checkout ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
    1) .pv-panel usava justify-content:center -> em monitores altos/verticais todo preview da
       esquerda (produto, LEGO, Mini, preview em tempo real) descia demais. Agora cola no topo,
-      logo abaixo do menu superior, em qualquer resoluÃ§Ã£o.
-   2) #cartForm (dados do cliente) tinha flex:1 e crescia, empurrando o bloco TOTAL/botÃ£o do
-      WhatsApp para o rodapÃ©. Agora o form nÃ£o estica (flex:0 1 auto): o resumo/TOTAL fica
-      colado logo apÃ³s o Ãºltimo campo. Se a tela for baixa, o form rola normalmente. */
+      logo abaixo do menu superior, em qualquer resoluÃÂ§ÃÂ£o.
+   2) #cartForm (dados do cliente) tinha flex:1 e crescia, empurrando o bloco TOTAL/botÃÂ£o do
+      WhatsApp para o rodapÃÂ©. Agora o form nÃÂ£o estica (flex:0 1 auto): o resumo/TOTAL fica
+      colado logo apÃÂ³s o ÃÂºltimo campo. Se a tela for baixa, o form rola normalmente. */
 (function(){
   var css=''
     + '.pv-panel{justify-content:flex-start!important;}'
     + '#cartForm.cart-body{flex:0 1 auto!important;}'
     // Previews de altura fixa (fluxo LEGO/Miniatura) encostavam a imagem no centro do painel.
-    // Com height:auto o container "abraÃ§a" a imagem e o .pv-panel (flex-start) o cola no topo.
-    // O texto sobreposto do #legoHeroImg (top:50%) passa a centralizar na prÃ³pria imagem.
+    // Com height:auto o container "abraÃÂ§a" a imagem e o .pv-panel (flex-start) o cola no topo.
+    // O texto sobreposto do #legoHeroImg (top:50%) passa a centralizar na prÃÂ³pria imagem.
     + '#legoHeroImg,#miniHeroImg,#miniStep1HeroImg{height:auto!important;align-items:flex-start!important;}'
-    // Pares de preview (catÃ¡logo Produto e "somente quadro" Detalhamento): o app coloca o
+    // Pares de preview (catÃÂ¡logo Produto e "somente quadro" Detalhamento): o app coloca o
     // .pv-panel em row com align-items:center, o que centralizava verticalmente o bloco
     // "homem + quadro". No modo row: centraliza na HORIZONTAL e ancora no TOPO (junto ao menu).
     + '.pv-panel[style*="flex-direction: row"]{justify-content:center!important;align-items:flex-start!important;}';
@@ -1064,10 +1064,10 @@ window._priceFix={ran:true};
 if(typeof window.FP_traduzTudo!=='function')return;
 var _orig=window.FP_traduzTudo;
 
-/* ââ PT to EN text-node map (keys are trimmed text-node content) ââ */
+/* Ã¢ÂÂÃ¢ÂÂ PT to EN text-node map (keys are trimmed text-node content) Ã¢ÂÂÃ¢ÂÂ */
 var EN={
   'Carrinho':'Cart',
-  'Seu carrinho estÃ¡ vazio.':'Your cart is empty.',
+  'Seu carrinho estÃÂ¡ vazio.':'Your cart is empty.',
   'Monte um quadro e adicione aqui.':'Build a frame and add it here.',
   'Pedido':'Order',
   'PERSONALIZAR QUADRO':'CUSTOMIZE FRAME',
@@ -1211,12 +1211,12 @@ window.FP_traduzTudo=function(lang){
 if(typeof window.FP_traduzTudo!=='function')return;
 var _orig2=window.FP_traduzTudo;
 var EXTRA_EN={
-  'Clique no botÃ£o':'Click the button',
-  ', abaixo e dÃª continuidade na experiÃªncia':', below and continue the experience',
-  'PadrÃ£o':'Standard',
-  'NÃºmero de corrida na carroceria':'Race number on the bodywork',
-  'â± 7â12 dias Ãºteis':'â± 7â12 business days',
-  'Super HerÃ³is':'Super Heroes'
+  'Clique no botÃÂ£o':'Click the button',
+  ', abaixo e dÃÂª continuidade na experiÃÂªncia':', below and continue the experience',
+  'PadrÃÂ£o':'Standard',
+  'NÃÂºmero de corrida na carroceria':'Race number on the bodywork',
+  'Ã¢ÂÂ± 7Ã¢ÂÂ12 dias ÃÂºteis':'Ã¢ÂÂ± 7Ã¢ÂÂ12 business days',
+  'Super HerÃÂ³is':'Super Heroes'
 };
 var EXTRA_PT={};
 Object.keys(EXTRA_EN).forEach(function(k){EXTRA_PT[EXTRA_EN[k]]=k;});
@@ -1370,9 +1370,9 @@ function applyFpFreteHNode(lang){
 }
 
 window.FP_traduzTudo=function(lang){
-  /* chama a cadeia original â ignora erro de TreeWalker do original */
+  /* chama a cadeia original Ã¢ÂÂ ignora erro de TreeWalker do original */
   try{_fp_chain.call(window,lang);}catch(e){}
-  /* reaplica nossas traduÃ§Ãµes de forma garantida */
+  /* reaplica nossas traduÃÂ§ÃÂµes de forma garantida */
   if(lang==='en'){
     setEl('fpH2','Region / Delivery');
     setEl('fpFreteT','Shipping / Delivery');
@@ -1405,76 +1405,76 @@ var _tmr4=null;
 /* Full EN map: all patch3 entries + new dynamic-content entries */
 var EN4={
   'Carrinho':'Cart',
-  'Seu carrinho estÃ¡ vazio.':'Your cart is empty.',
+  'Seu carrinho estÃÂ¡ vazio.':'Your cart is empty.',
   'Monte um quadro e adicione aqui.':'Build a frame and add it here.',
   'Pedido':'Order',
   'PERSONALIZAR QUADRO':'CUSTOMIZE FRAME',
   'Selecione a marca...':'Select brand...',
-  'â  ATENÃÃO: MINIATURA NÃO INCLUSA':'â  NOTICE: MINIATURE NOT INCLUDED',
-  'Esta opÃ§Ã£o de personalizaÃ§Ã£o refere-se exclusivamente Ã  produÃ§Ã£o do quadro. A miniatura diecast exibida nas imagens (via inteligÃªncia artificial) nÃ£o acompanha o produto e nÃ£o estÃ¡ inclusa na compra.':'This customization option refers exclusively to the production of the frame. The diecast miniature shown in the images (via artificial intelligence) does not accompany the product and is not included in the purchase.',
-  'Este serviÃ§o Ã© destinado a clientes que jÃ¡ possuem a prÃ³pria miniatura e desejam transformÃ¡-la em uma peÃ§a decorativa exclusiva, fixando-a na parede de maneira inovadora e elegante.':'This service is intended for customers who already own their own miniature and wish to transform it into an exclusive decorative piece, mounting it on the wall in an innovative and elegant way.',
-  'O quadro serÃ¡ enviado pronto para que vocÃª faÃ§a a instalaÃ§Ã£o da miniatura utilizando parafusos, de forma simples e prÃ¡tica. O kit inclui: quadro personalizado, buchas, parafusos e gabarito de instalaÃ§Ã£o, facilitando tanto a fixaÃ§Ã£o da miniatura no quadro quanto a instalaÃ§Ã£o do quadro na parede.':'The frame will be shipped ready for you to install the miniature using screws, in a simple and practical manner. The kit includes: custom frame, wall plugs, screws, and an installation template â making it easy to both mount the miniature to the frame and hang the frame on the wall.',
-  'VerificaÃ§Ã£o de disponibilidade':'Availability check',
-  'Miniaturas disponÃ­veis no mercado sÃ£o fornecidas em die-cast (ferro fundido) nas escalas 1:18 ou 1:24.':'Miniatures available on the market are supplied in die-cast (iron) at 1:18 or 1:24 scale.',
-  'Modelos raros ou exclusivos sÃ£o produzidos via':'Rare or exclusive models are produced via',
-  'impressÃ£o 3D + pintura automotiva':'3D printing + automotive paint',
+  'Ã¢ÂÂ  ATENÃÂÃÂO: MINIATURA NÃÂO INCLUSA':'Ã¢ÂÂ  NOTICE: MINIATURE NOT INCLUDED',
+  'Esta opÃÂ§ÃÂ£o de personalizaÃÂ§ÃÂ£o refere-se exclusivamente ÃÂ  produÃÂ§ÃÂ£o do quadro. A miniatura diecast exibida nas imagens (via inteligÃÂªncia artificial) nÃÂ£o acompanha o produto e nÃÂ£o estÃÂ¡ inclusa na compra.':'This customization option refers exclusively to the production of the frame. The diecast miniature shown in the images (via artificial intelligence) does not accompany the product and is not included in the purchase.',
+  'Este serviÃÂ§o ÃÂ© destinado a clientes que jÃÂ¡ possuem a prÃÂ³pria miniatura e desejam transformÃÂ¡-la em uma peÃÂ§a decorativa exclusiva, fixando-a na parede de maneira inovadora e elegante.':'This service is intended for customers who already own their own miniature and wish to transform it into an exclusive decorative piece, mounting it on the wall in an innovative and elegant way.',
+  'O quadro serÃÂ¡ enviado pronto para que vocÃÂª faÃÂ§a a instalaÃÂ§ÃÂ£o da miniatura utilizando parafusos, de forma simples e prÃÂ¡tica. O kit inclui: quadro personalizado, buchas, parafusos e gabarito de instalaÃÂ§ÃÂ£o, facilitando tanto a fixaÃÂ§ÃÂ£o da miniatura no quadro quanto a instalaÃÂ§ÃÂ£o do quadro na parede.':'The frame will be shipped ready for you to install the miniature using screws, in a simple and practical manner. The kit includes: custom frame, wall plugs, screws, and an installation template Ã¢ÂÂ making it easy to both mount the miniature to the frame and hang the frame on the wall.',
+  'VerificaÃÂ§ÃÂ£o de disponibilidade':'Availability check',
+  'Miniaturas disponÃÂ­veis no mercado sÃÂ£o fornecidas em die-cast (ferro fundido) nas escalas 1:18 ou 1:24.':'Miniatures available on the market are supplied in die-cast (iron) at 1:18 or 1:24 scale.',
+  'Modelos raros ou exclusivos sÃÂ£o produzidos via':'Rare or exclusive models are produced via',
+  'impressÃÂ£o 3D + pintura automotiva':'3D printing + automotive paint',
   'Disponibilidade da miniatura':'Miniature availability',
-  'PersonalizaÃ§Ã£o da miniatura':'Miniature customization',
-  'EspecificaÃ§Ãµes da miniatura e do quadro':'Miniature and frame specifications',
-  'DimensÃ£o da miniatura':'Miniature dimensions',
-  'DimensÃ£o do quadro':'Frame dimensions',
+  'PersonalizaÃÂ§ÃÂ£o da miniatura':'Miniature customization',
+  'EspecificaÃÂ§ÃÂµes da miniatura e do quadro':'Miniature and frame specifications',
+  'DimensÃÂ£o da miniatura':'Miniature dimensions',
+  'DimensÃÂ£o do quadro':'Frame dimensions',
   'Set Selecionado':'Selected Set',
-  'ð¦ Quadro + Miniatura':'ð¦ Frame + Miniature',
-  'â Todo o Brasil':'â Across Brazil',
-  'NÃ£o tenho certeza':"I'm not sure",
-  'NÃ£o existe â modelo exclusivo':"Doesn't exist â exclusive model",
-  'Die-cast 1:18 ou 1:24 â fundiÃ§Ã£o em ferro':'Die-cast 1:18 or 1:24 â iron casting',
-  'ImpressÃ£o 3D com acabamento pintura automotiva':'3D printing with automotive paint finish',
+  'Ã°ÂÂÂ¦ Quadro + Miniatura':'Ã°ÂÂÂ¦ Frame + Miniature',
+  'Ã¢ÂÂ Todo o Brasil':'Ã¢ÂÂ Across Brazil',
+  'NÃÂ£o tenho certeza':"I'm not sure",
+  'NÃÂ£o existe Ã¢ÂÂ modelo exclusivo':"Doesn't exist Ã¢ÂÂ exclusive model",
+  'Die-cast 1:18 ou 1:24 Ã¢ÂÂ fundiÃÂ§ÃÂ£o em ferro':'Die-cast 1:18 or 1:24 Ã¢ÂÂ iron casting',
+  'ImpressÃÂ£o 3D com acabamento pintura automotiva':'3D printing with automotive paint finish',
   'Cor personalizada (aerografia)':'Custom color (airbrushing)',
   'Placa personalizada':'Custom license plate',
   'Figura de piloto inclusa':'Pilot figure included',
-  'â Produto pronto para entrega Â Â·Â  â Quadro + Miniatura inclusos Â Â·Â  â Embalagem premium':'â Ready for delivery Â Â·Â  â Frame + Miniature included Â Â·Â  â Premium packaging',
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
+  'Ã¢ÂÂ Produto pronto para entrega ÃÂ ÃÂ·ÃÂ  Ã¢ÂÂ Quadro + Miniatura inclusos ÃÂ ÃÂ·ÃÂ  Ã¢ÂÂ Embalagem premium':'Ã¢ÂÂ Ready for delivery ÃÂ ÃÂ·ÃÂ  Ã¢ÂÂ Frame + Miniature included ÃÂ ÃÂ·ÃÂ  Ã¢ÂÂ Premium packaging',
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
   'Escolher quadros para sua miniatura(s);':'Choose frames for your miniature(s);',
-  'Escolher quadros prontos que jÃ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
-  'Sobre esta visualizaÃ§Ã£o':'About this visualization',
-  'A imagem do veÃ­culo foi gerada por InteligÃªncia Artificial para facilitar a visualizaÃ§Ã£o de como a sua miniatura ficarÃ¡ aplicada no quadro.':'The vehicle image was generated by Artificial Intelligence to help visualize how your miniature will look mounted in the frame.',
-  'Por esse motivo, alguns detalhes, como rodas, farÃ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃ§as em relaÃ§Ã£o Ã  miniatura que vocÃª possui.':'For this reason, some details such as wheels, headlights, tones, and finishes may show slight differences from the miniature you own.',
-  'Nesta etapa, o objetivo principal Ã© demonstrar a':'At this stage, the main goal is to show the vehicleâs',
-  'proporÃ§Ã£o do veÃ­culo em relaÃ§Ã£o ao quadro':'scale relative to the frame',
-  '. Assim, na prÃ³xima etapa, vocÃª poderÃ¡ comparar os diferentes tamanhos disponÃ­veis e escolher com mais seguranÃ§a o modelo que melhor valoriza e acomoda a sua miniatura.':".Â In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡':"By choosing this option, you'll have",
+  'Escolher quadros prontos que jÃÂ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
+  'Sobre esta visualizaÃÂ§ÃÂ£o':'About this visualization',
+  'A imagem do veÃÂ­culo foi gerada por InteligÃÂªncia Artificial para facilitar a visualizaÃÂ§ÃÂ£o de como a sua miniatura ficarÃÂ¡ aplicada no quadro.':'The vehicle image was generated by Artificial Intelligence to help visualize how your miniature will look mounted in the frame.',
+  'Por esse motivo, alguns detalhes, como rodas, farÃÂ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃÂ§as em relaÃÂ§ÃÂ£o ÃÂ  miniatura que vocÃÂª possui.':'For this reason, some details such as wheels, headlights, tones, and finishes may show slight differences from the miniature you own.',
+  'Nesta etapa, o objetivo principal ÃÂ© demonstrar a':'At this stage, the main goal is to show the vehicleÃ¢ÂÂs',
+  'proporÃÂ§ÃÂ£o do veÃÂ­culo em relaÃÂ§ÃÂ£o ao quadro':'scale relative to the frame',
+  '. Assim, na prÃÂ³xima etapa, vocÃÂª poderÃÂ¡ comparar os diferentes tamanhos disponÃÂ­veis e escolher com mais seguranÃÂ§a o modelo que melhor valoriza e acomoda a sua miniatura.':".ÃÂ In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡':"By choosing this option, you'll have",
   'dezenas de modelos de quadros':'dozens of frame models',
   'para fixar sua miniatura de Lego.':'to mount your Lego miniature.',
-  'ObservaÃ§Ã£o:':'Note:',
+  'ObservaÃÂ§ÃÂ£o:':'Note:',
   'para Lego.':'frames for Lego.',
-  'Clique no botÃ£o':'Click the button',
-  ', abaixo e dÃª continuidade na experiÃªncia':', below and continue the experience',
-  'PadrÃ£o':'Standard',
-  'NÃºmero de corrida na carroceria':'Race number on the bodywork',
-  'â± 7â12 dias Ãºteis':'â± 7â12 business days',
-  'Super HerÃ³is':'Super Heroes',
-  /* ââ NEW entries for dynamically rendered wizard content ââ */
+  'Clique no botÃÂ£o':'Click the button',
+  ', abaixo e dÃÂª continuidade na experiÃÂªncia':', below and continue the experience',
+  'PadrÃÂ£o':'Standard',
+  'NÃÂºmero de corrida na carroceria':'Race number on the bodywork',
+  'Ã¢ÂÂ± 7Ã¢ÂÂ12 dias ÃÂºteis':'Ã¢ÂÂ± 7Ã¢ÂÂ12 business days',
+  'Super HerÃÂ³is':'Super Heroes',
+  /* Ã¢ÂÂÃ¢ÂÂ NEW entries for dynamically rendered wizard content Ã¢ÂÂÃ¢ÂÂ */
   'Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl)',
   'Fibra de Carbono':'Carbon Fiber',
-  'Envio prÃ³prio':'Self-provided',
-  /* DETAILS subtitle â may appear all-caps in DOM or via CSS */
-  'EspecificaÃ§Ãµes da miniatura e do quadro':'Miniature and frame specifications',
-  'ESPECIFICAÃÃES DA MINIATURA E DO QUADRO':'MINIATURE AND FRAME SPECIFICATIONS',
+  'Envio prÃÂ³prio':'Self-provided',
+  /* DETAILS subtitle Ã¢ÂÂ may appear all-caps in DOM or via CSS */
+  'EspecificaÃÂ§ÃÂµes da miniatura e do quadro':'Miniature and frame specifications',
+  'ESPECIFICAÃÂÃÂES DA MINIATURA E DO QUADRO':'MINIATURE AND FRAME SPECIFICATIONS',
   /* Lego / option card texts */
-  'Nessa opÃ§Ã£o nÃ£o estÃ¡ incluso a miniatura. Produzimos e vendemos apenas os quadros':'This option does not include the miniature. We only produce and sell',
+  'Nessa opÃÂ§ÃÂ£o nÃÂ£o estÃÂ¡ incluso a miniatura. Produzimos e vendemos apenas os quadros':'This option does not include the miniature. We only produce and sell',
   /* Common wizard labels */
   'Selecione o modelo...':'Select model...',
   'Selecione o tamanho...':'Select size...',
   'Selecione a cor...':'Select color...',
   'Selecione o acabamento...':'Select finish...',
-  'Selecione a opÃ§Ã£o...':'Select option...',
+  'Selecione a opÃÂ§ÃÂ£o...':'Select option...',
   /* Shipping/checkout */
   'Calcular':'Calculate',
   'Calcular frete':'Calculate shipping',
-  'Frete grÃ¡tis':'Free shipping',
+  'Frete grÃÂ¡tis':'Free shipping',
   'Prazo de entrega':'Delivery time',
-  'Dias Ãºteis':'Business days',
+  'Dias ÃÂºteis':'Business days',
   'Entrega':'Delivery',
   'Finalizar pedido':'Complete order',
   'Continuar comprando':'Continue shopping'
@@ -1483,7 +1483,7 @@ var EN4={
 var PT4={};
 Object.keys(EN4).forEach(function(k){PT4[EN4[k]]=k;});
 
-/* Text-only walker â safe from MutationObserver (no innerHTML â no loops) */
+/* Text-only walker Ã¢ÂÂ safe from MutationObserver (no innerHTML Ã¢ÂÂ no loops) */
 function walkApply(map){
   var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
   var n,q=[];
@@ -1525,37 +1525,37 @@ var _p5=window.FP_traduzTudo;
 var _lang5='pt';
 var _tmr5=null;
 
-/* Exact text node map â in new entries not covered by patches 1-4 */
+/* Exact text node map Ã¢ÂÂ in new entries not covered by patches 1-4 */
 var EN5={
   /* Model step header */
   'QUADRO PARA MINIATURAS':'MINIATURE FRAME',
-  'Selecione o quadro da sua preferÃªncia':'Select your preferred frame',
-  'SELECIONE O QUADRO DA SUA PREFERÃNCIA':'SELECT YOUR PREFERRED FRAME',
+  'Selecione o quadro da sua preferÃÂªncia':'Select your preferred frame',
+  'SELECIONE O QUADRO DA SUA PREFERÃÂNCIA':'SELECT YOUR PREFERRED FRAME',
   'Quadro para LEGO':'Frame for LEGO',
   /* Relief step */
   'LOGOTIPO COM MARCA DO CARRO':'BRAND LOGO',
-  'ð·ï¸ Logotipo com marca do carro':'ð·ï¸ Brand Logo',
+  'Ã°ÂÂÂ·Ã¯Â¸Â Logotipo com marca do carro':'Ã°ÂÂÂ·Ã¯Â¸Â Brand Logo',
   'Logotipo com marca do carro':'Brand Logo',
   'Logotipo oficial da marca selecionada':'Official logo of the selected brand',
-  'ð Artesanal':'ð Handcrafted',
+  'Ã°ÂÂÂ Artesanal':'Ã°ÂÂÂ Handcrafted',
   'Artesanal':'Handcrafted',
   /* Order summary rows */
   'Miniatura Die-cast / 3D':'Miniature Die-cast / 3D',
-  'â Logo da Marca â canto sup. esq.':'â Brand Logo â top-left corner',
-  'â Logo do Modelo â canto inf. dir.':'â Model Logo â bottom-right corner',
-  'Logo da Marca â canto sup. esq.':'Brand Logo â top-left corner',
-  'Logo do Modelo â canto inf. dir.':'Model Logo â bottom-right corner',
+  'Ã¢ÂÂ Logo da Marca Ã¢ÂÂ canto sup. esq.':'Ã¢ÂÂ Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Logo do Modelo Ã¢ÂÂ canto inf. dir.':'Ã¢ÂÂ Model Logo Ã¢ÂÂ bottom-right corner',
+  'Logo da Marca Ã¢ÂÂ canto sup. esq.':'Brand Logo Ã¢ÂÂ top-left corner',
+  'Logo do Modelo Ã¢ÂÂ canto inf. dir.':'Model Logo Ã¢ÂÂ bottom-right corner',
   /* Background options */
-  'DegradÃª Central':'Center Gradient',
-  'Cor do DegradÃª Central':'Center Gradient Color',
-  'ENVIE A IMAGEM DA SUA PREFERÃNCIA':'SEND YOUR PREFERRED IMAGE',
-  'Envie a imagem da sua preferÃªncia':'Send your preferred image',
+  'DegradÃÂª Central':'Center Gradient',
+  'Cor do DegradÃÂª Central':'Center Gradient Color',
+  'ENVIE A IMAGEM DA SUA PREFERÃÂNCIA':'SEND YOUR PREFERRED IMAGE',
+  'Envie a imagem da sua preferÃÂªncia':'Send your preferred image',
   /* Miniature availability wizard */
-  'VerificaÃ§Ã£o de disponibilidade':'Availability check',
+  'VerificaÃÂ§ÃÂ£o de disponibilidade':'Availability check',
   'Disponibilidade da miniatura':'Miniature availability',
-  'PersonalizaÃ§Ã£o da miniatura':'Miniature customization',
-  'DimensÃ£o da miniatura':'Miniature dimensions',
-  'DimensÃ£o do quadro':'Frame dimensions',
+  'PersonalizaÃÂ§ÃÂ£o da miniatura':'Miniature customization',
+  'DimensÃÂ£o da miniatura':'Miniature dimensions',
+  'DimensÃÂ£o do quadro':'Frame dimensions',
   /* Compound label parts (also handled by substrApply below) */
   'Moldura Laca Preto':'Black Lacquer Frame',
   'Fundo Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl) Background',
@@ -1565,13 +1565,13 @@ var EN5={
 var PT5={};
 Object.keys(EN5).forEach(function(k){PT5[EN5[k]]=k;});
 
-/* Substring map â for compound cart/label strings not matched exactly */
+/* Substring map Ã¢ÂÂ for compound cart/label strings not matched exactly */
 var SUBSTR_EN={
   'Moldura Laca Preto':'Black Lacquer Frame',
   'Moldura Fibra de Carbono' :'Carbon Fiber Frame',
   'Fundo Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl) Background',
   'Fundo Fibra de Carbono' :'Carbon Fiber Background',
-  'Fundo AcrÃ­lico UV':'UV Acrylic Background',
+  'Fundo AcrÃÂ­lico UV':'UV Acrylic Background',
   'Logo da Marca':'Brand Logo',
   'Logo do Modelo':'Model Logo',
   'canto sup. esq.':'top-left corner',
@@ -1581,7 +1581,7 @@ var SUBSTR_EN={
 var SUBSTR_PT={};
 Object.keys(SUBSTR_EN).forEach(function(k){SUBSTR_PT[SUBSTR_EN[k]]=k;});
 
-/* Exact text-node walker â safe for MutationObserver (no innerHTML) */
+/* Exact text-node walker Ã¢ÂÂ safe for MutationObserver (no innerHTML) */
 function walkApply(map){
   var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
   var n,q=[];
@@ -1597,7 +1597,7 @@ function walkApply(map){
   q.forEach(function(x){x.n.textContent=x.v;});
 }
 
-/* Substring walker â handles compound strings in cart/label nodes */
+/* Substring walker Ã¢ÂÂ handles compound strings in cart/label nodes */
 function substrApply(subMap){
   var keys=Object.keys(subMap);
   if(!keys.length)return;
@@ -1648,18 +1648,18 @@ var _tmr6=null;
    Unabbreviated corner labels used in RELIEF step cards and order summary */
 var EN6={
   /* RELIEF step card titles (all-caps compound) */
-  'MODEL LOGO â CANTO INFERIOR DIREITO':'MODEL LOGO â BOTTOM RIGHT CORNER',
-  'BRAND LOGO â CANTO SUPERIOR ESQUERDO':'BRAND LOGO â TOP LEFT CORNER',
-  'Logo do Modelo â canto inferior direito':'Model Logo â bottom-right corner',
-  'Logo da Marca â canto superior esquerdo':'Brand Logo â top-left corner',
-  'â Logo da Marca â canto superior esquerdo':'â Brand Logo â top-left corner',
-  'â Logo do Modelo â canto inferior direito':'â Model Logo â bottom-right corner',
+  'MODEL LOGO Ã¢ÂÂ CANTO INFERIOR DIREITO':'MODEL LOGO Ã¢ÂÂ BOTTOM RIGHT CORNER',
+  'BRAND LOGO Ã¢ÂÂ CANTO SUPERIOR ESQUERDO':'BRAND LOGO Ã¢ÂÂ TOP LEFT CORNER',
+  'Logo do Modelo Ã¢ÂÂ canto inferior direito':'Model Logo Ã¢ÂÂ bottom-right corner',
+  'Logo da Marca Ã¢ÂÂ canto superior esquerdo':'Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Logo da Marca Ã¢ÂÂ canto superior esquerdo':'Ã¢ÂÂ Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Logo do Modelo Ã¢ÂÂ canto inferior direito':'Ã¢ÂÂ Model Logo Ã¢ÂÂ bottom-right corner',
   /* Standalone corner label strings */
   'CANTO INFERIOR DIREITO':'BOTTOM RIGHT CORNER',
   'CANTO SUPERIOR ESQUERDO':'TOP LEFT CORNER',
   'canto inferior direito':'bottom-right corner',
   'canto superior esquerdo':'top-left corner',
-  /* Abbreviated reverse map (ENâPT) handled automatically via PT6 below */
+  /* Abbreviated reverse map (ENÃ¢ÂÂPT) handled automatically via PT6 below */
 };
 
 var PT6={};
@@ -1736,23 +1736,23 @@ var _tmr7=null;
 /* Fix for patch6: actual DOM text is mixed-case "Canto inferior direito" (capital C),
    not "CANTO INFERIOR DIREITO". Also the card title includes the emoji prefix. */
 var EN7={
-  /* RELIEF step card â exact node with emoji */
-  'ðï¸ Model Logo â Canto inferior direito':'ðï¸ Model Logo â Bottom right corner',
-  'ðï¸ Model Logo â Canto superior esquerdo':'ðï¸ Model Logo â Top left corner',
+  /* RELIEF step card Ã¢ÂÂ exact node with emoji */
+  'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Canto inferior direito':'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Bottom right corner',
+  'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Canto superior esquerdo':'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Top left corner',
   /* Without emoji */
-  'Model Logo â Canto inferior direito':'Model Logo â Bottom right corner',
-  'Model Logo â Canto superior esquerdo':'Model Logo â Top left corner',
-  'Brand Logo â Canto superior esquerdo':'Brand Logo â Top left corner',
-  'Brand Logo â Canto inferior direito':'Brand Logo â Bottom right corner',
+  'Model Logo Ã¢ÂÂ Canto inferior direito':'Model Logo Ã¢ÂÂ Bottom right corner',
+  'Model Logo Ã¢ÂÂ Canto superior esquerdo':'Model Logo Ã¢ÂÂ Top left corner',
+  'Brand Logo Ã¢ÂÂ Canto superior esquerdo':'Brand Logo Ã¢ÂÂ Top left corner',
+  'Brand Logo Ã¢ÂÂ Canto inferior direito':'Brand Logo Ã¢ÂÂ Bottom right corner',
   /* Order summary rows */
-  'â Brand Logo â Canto superior esquerdo':'â Brand Logo â top-left corner',
-  'â Model Logo â Canto inferior direito':'â Model Logo â bottom-right corner',
+  'Ã¢ÂÂ Brand Logo Ã¢ÂÂ Canto superior esquerdo':'Ã¢ÂÂ Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Model Logo Ã¢ÂÂ Canto inferior direito':'Ã¢ÂÂ Model Logo Ã¢ÂÂ bottom-right corner',
 };
 
 var PT7={};
 Object.keys(EN7).forEach(function(k){PT7[EN7[k]]=k;});
 
-/* Substring map â capital-C variants */
+/* Substring map Ã¢ÂÂ capital-C variants */
 var SUBSTR_EN7={
   'Canto inferior direito':'bottom-right corner',
   'Canto superior esquerdo':'top-left corner',
@@ -1814,7 +1814,7 @@ window.FP_traduzTudo=function(lang){
 ;(function(){
 'use strict';
 
-/* PATCH 8 â Language-change detector.
+/* PATCH 8 Ã¢ÂÂ Language-change detector.
    Root cause: the EN/PT toggle button writes 'fp_lang' to localStorage
    but does NOT call window.FP_traduzTudo. Patches 1-7 all hook into
    FP_traduzTudo and are therefore never triggered by the UI toggle.
@@ -1845,7 +1845,7 @@ function _onLangChange8(lang){
   _p8_timers.push(setTimeout(function(){_applyLang8(lang);},900));
 }
 
-/* Poll localStorage every 150 ms â cheap (single string comparison) */
+/* Poll localStorage every 150 ms Ã¢ÂÂ cheap (single string comparison) */
 setInterval(function(){
   var cur=_getLang8();
   if(cur!==_p8_lastLang){
@@ -1869,131 +1869,131 @@ var _lang9='pt';
 var _tmr9=null;
 var _ob9=null;
 
-/* PATCH 9 â Multi-language translation + flag icon fix.
+/* PATCH 9 Ã¢ÂÂ Multi-language translation + flag icon fix.
 
    Problem 1: Patches 4-7 only apply EN maps when lang==='en'. For lang='fr' or
-   lang='es', they call walkApply(PTn) which tries to map ENâPT â a no-op since
+   lang='es', they call walkApply(PTn) which tries to map ENÃ¢ÂÂPT Ã¢ÂÂ a no-op since
    the dynamic content is already in PT. Fix: for any non-PT language, run the
-   combined EN translation maps after the chain, translating PTâEN as fallback.
+   combined EN translation maps after the chain, translating PTÃ¢ÂÂEN as fallback.
 
    Problem 2: The .fp-flag SVG in .fp-lang-btn stays as the Brazil flag regardless
    of the selected language. Fix: clone the matching flag SVG from the
    .fp-lang-opt dropdown item that corresponds to the active language. */
 
-/* ââ COMBINED EN MAP â union of EN4 + EN5 + EN6 + EN7 ââ */
+/* Ã¢ÂÂÃ¢ÂÂ COMBINED EN MAP Ã¢ÂÂ union of EN4 + EN5 + EN6 + EN7 Ã¢ÂÂÃ¢ÂÂ */
 var _EN9={
   /* patch4 entries */
   'Carrinho':'Cart',
-  'Seu carrinho estÃ¡ vazio.':'Your cart is empty.',
+  'Seu carrinho estÃÂ¡ vazio.':'Your cart is empty.',
   'Monte um quadro e adicione aqui.':'Build a frame and add it here.',
   'Pedido':'Order',
   'PERSONALIZAR QUADRO':'CUSTOMIZE FRAME',
   'Selecione a marca...':'Select brand...',
-  'â  ATENÃÃO: MINIATURA NÃO INCLUSA':'â  NOTICE: MINIATURE NOT INCLUDED',
-  'Esta opÃ§Ã£o de personalizaÃ§Ã£o refere-se exclusivamente Ã  produÃ§Ã£o do quadro. A miniatura diecast exibida nas imagens (via inteligÃªncia artificial) nÃ£o acompanha o produto e nÃ£o estÃ¡ inclusa na compra.':'This customization option refers exclusively to the production of the frame. The diecast miniature shown in the images (via artificial intelligence) does not accompany the product and is not included in the purchase.',
-  'Este serviÃ§o Ã© destinado a clientes que jÃ¡ possuem a prÃ³pria miniatura e desejam transformÃ¡-la em uma peÃ§a decorativa exclusiva, fixando-a na parede de maneira inovadora e elegante.':'This service is intended for customers who already own their own miniature and wish to transform it into an exclusive decorative piece, mounting it on the wall in an innovative and elegant way.',
-  'O quadro serÃ¡ enviado pronto para que vocÃª faÃ§a a instalaÃ§Ã£o da miniatura utilizando parafusos, de forma simples e prÃ¡tica. O kit inclui: quadro personalizado, buchas, parafusos e gabarito de instalaÃ§Ã£o, facilitando tanto a fixaÃ§Ã£o da miniatura no quadro quanto a instalaÃ§Ã£o do quadro na parede.':'The frame will be shipped ready for you to install the miniature using screws, in a simple and practical manner. The kit includes: custom frame, wall plugs, screws, and an installation template â making it easy to both mount the miniature to the frame and hang the frame on the wall.',
-  'VerificaÃ§Ã£o de disponibilidade':'Availability check',
-  'Miniaturas disponÃ­veis no mercado sÃ£o fornecidas em die-cast (ferro fundido) nas escalas 1:18 ou 1:24.':'Miniatures available on the market are supplied in die-cast (iron) at 1:18 or 1:24 scale.',
-  'Modelos raros ou exclusivos sÃ£o produzidos via':'Rare or exclusive models are produced via',
-  'impressÃ£o 3D + pintura automotiva':'3D printing + automotive paint',
+  'Ã¢ÂÂ  ATENÃÂÃÂO: MINIATURA NÃÂO INCLUSA':'Ã¢ÂÂ  NOTICE: MINIATURE NOT INCLUDED',
+  'Esta opÃÂ§ÃÂ£o de personalizaÃÂ§ÃÂ£o refere-se exclusivamente ÃÂ  produÃÂ§ÃÂ£o do quadro. A miniatura diecast exibida nas imagens (via inteligÃÂªncia artificial) nÃÂ£o acompanha o produto e nÃÂ£o estÃÂ¡ inclusa na compra.':'This customization option refers exclusively to the production of the frame. The diecast miniature shown in the images (via artificial intelligence) does not accompany the product and is not included in the purchase.',
+  'Este serviÃÂ§o ÃÂ© destinado a clientes que jÃÂ¡ possuem a prÃÂ³pria miniatura e desejam transformÃÂ¡-la em uma peÃÂ§a decorativa exclusiva, fixando-a na parede de maneira inovadora e elegante.':'This service is intended for customers who already own their own miniature and wish to transform it into an exclusive decorative piece, mounting it on the wall in an innovative and elegant way.',
+  'O quadro serÃÂ¡ enviado pronto para que vocÃÂª faÃÂ§a a instalaÃÂ§ÃÂ£o da miniatura utilizando parafusos, de forma simples e prÃÂ¡tica. O kit inclui: quadro personalizado, buchas, parafusos e gabarito de instalaÃÂ§ÃÂ£o, facilitando tanto a fixaÃÂ§ÃÂ£o da miniatura no quadro quanto a instalaÃÂ§ÃÂ£o do quadro na parede.':'The frame will be shipped ready for you to install the miniature using screws, in a simple and practical manner. The kit includes: custom frame, wall plugs, screws, and an installation template Ã¢ÂÂ making it easy to both mount the miniature to the frame and hang the frame on the wall.',
+  'VerificaÃÂ§ÃÂ£o de disponibilidade':'Availability check',
+  'Miniaturas disponÃÂ­veis no mercado sÃÂ£o fornecidas em die-cast (ferro fundido) nas escalas 1:18 ou 1:24.':'Miniatures available on the market are supplied in die-cast (iron) at 1:18 or 1:24 scale.',
+  'Modelos raros ou exclusivos sÃÂ£o produzidos via':'Rare or exclusive models are produced via',
+  'impressÃÂ£o 3D + pintura automotiva':'3D printing + automotive paint',
   'Disponibilidade da miniatura':'Miniature availability',
-  'PersonalizaÃ§Ã£o da miniatura':'Miniature customization',
-  'EspecificaÃ§Ãµes da miniatura e do quadro':'Miniature and frame specifications',
-  'DimensÃ£o da miniatura':'Miniature dimensions',
-  'DimensÃ£o do quadro':'Frame dimensions',
+  'PersonalizaÃÂ§ÃÂ£o da miniatura':'Miniature customization',
+  'EspecificaÃÂ§ÃÂµes da miniatura e do quadro':'Miniature and frame specifications',
+  'DimensÃÂ£o da miniatura':'Miniature dimensions',
+  'DimensÃÂ£o do quadro':'Frame dimensions',
   'Set Selecionado':'Selected Set',
-  'ð¦ Quadro + Miniatura':'ð¦ Frame + Miniature',
-  'â Todo o Brasil':'â Across Brazil',
-  'NÃ£o tenho certeza':"I'm not sure",
-  'NÃ£o existe â modelo exclusivo':"Doesn't exist â exclusive model",
-  'Die-cast 1:18 ou 1:24 â fundiÃ§Ã£o em ferro':'Die-cast 1:18 or 1:24 â iron casting',
-  'ImpressÃ£o 3D com acabamento pintura automotiva':'3D printing with automotive paint finish',
+  'Ã°ÂÂÂ¦ Quadro + Miniatura':'Ã°ÂÂÂ¦ Frame + Miniature',
+  'Ã¢ÂÂ Todo o Brasil':'Ã¢ÂÂ Across Brazil',
+  'NÃÂ£o tenho certeza':"I'm not sure",
+  'NÃÂ£o existe Ã¢ÂÂ modelo exclusivo':"Doesn't exist Ã¢ÂÂ exclusive model",
+  'Die-cast 1:18 ou 1:24 Ã¢ÂÂ fundiÃÂ§ÃÂ£o em ferro':'Die-cast 1:18 or 1:24 Ã¢ÂÂ iron casting',
+  'ImpressÃÂ£o 3D com acabamento pintura automotiva':'3D printing with automotive paint finish',
   'Cor personalizada (aerografia)':'Custom color (airbrushing)',
   'Placa personalizada':'Custom license plate',
   'Figura de piloto inclusa':'Pilot figure included',
-  'â Produto pronto para entrega  Â·  â Quadro + Miniatura inclusos  Â·  â Embalagem premium':'â Ready for delivery  Â·  â Frame + Miniature included  Â·  â Premium packaging',
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
+  'Ã¢ÂÂ Produto pronto para entrega  ÃÂ·  Ã¢ÂÂ Quadro + Miniatura inclusos  ÃÂ·  Ã¢ÂÂ Embalagem premium':'Ã¢ÂÂ Ready for delivery  ÃÂ·  Ã¢ÂÂ Frame + Miniature included  ÃÂ·  Ã¢ÂÂ Premium packaging',
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
   'Escolher quadros para sua miniatura(s);':'Choose frames for your miniature(s);',
-  'Escolher quadros prontos que jÃ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
-  'Sobre esta visualizaÃ§Ã£o':'About this visualization',
-  'A imagem do veÃ­culo foi gerada por InteligÃªncia Artificial para facilitar a visualizaÃ§Ã£o de como a sua miniatura ficarÃ¡ aplicada no quadro.':'The vehicle image was generated by Artificial Intelligence to help visualize how your miniature will look mounted in the frame.',
-  'Por esse motivo, alguns detalhes, como rodas, farÃ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃ§as em relaÃ§Ã£o Ã  miniatura que vocÃ  possui.':'For this reason, some details such as wheels, headlights, tones, and finishes may show slight differences from the miniature you own.',
-  'Nesta etapa, o objetivo principal Ã© demonstrar a':'At this stage, the main goal is to show the vehicleâs',
-  'proporÃ§Ã£o do veÃ­culo em relaÃ§Ã£o ao quadro':'scale relative to the frame',
-  '. Assim, na prÃ³xima etapa, vocÃ  poderÃ¡ comparar os diferentes tamanhos disponÃ­veis e escolher com mais seguranÃ§a o modelo que melhor valoriza e acomoda a sua miniatura.':".Â In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
-  'Se escolher essa opÃ§Ã£o vocÃ  terÃ¡':"By choosing this option, you'll have",
+  'Escolher quadros prontos que jÃÂ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
+  'Sobre esta visualizaÃÂ§ÃÂ£o':'About this visualization',
+  'A imagem do veÃÂ­culo foi gerada por InteligÃÂªncia Artificial para facilitar a visualizaÃÂ§ÃÂ£o de como a sua miniatura ficarÃÂ¡ aplicada no quadro.':'The vehicle image was generated by Artificial Intelligence to help visualize how your miniature will look mounted in the frame.',
+  'Por esse motivo, alguns detalhes, como rodas, farÃÂ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃÂ§as em relaÃÂ§ÃÂ£o ÃÂ  miniatura que vocÃÂ  possui.':'For this reason, some details such as wheels, headlights, tones, and finishes may show slight differences from the miniature you own.',
+  'Nesta etapa, o objetivo principal ÃÂ© demonstrar a':'At this stage, the main goal is to show the vehicleÃ¢ÂÂs',
+  'proporÃÂ§ÃÂ£o do veÃÂ­culo em relaÃÂ§ÃÂ£o ao quadro':'scale relative to the frame',
+  '. Assim, na prÃÂ³xima etapa, vocÃÂ  poderÃÂ¡ comparar os diferentes tamanhos disponÃÂ­veis e escolher com mais seguranÃÂ§a o modelo que melhor valoriza e acomoda a sua miniatura.':".ÃÂ In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂ  terÃÂ¡':"By choosing this option, you'll have",
   'dezenas de modelos de quadros':'dozens of frame models',
   'para fixar sua miniatura de Lego.':'to mount your Lego miniature.',
-  'ObservaÃ§Ã£o:':'Note:',
+  'ObservaÃÂ§ÃÂ£o:':'Note:',
   'para Lego.':'frames for Lego.',
-  'Clique no botÃ£o':'Click the button',
-  ', abaixo e dÃª continuidade na experiÃªncia':', below and continue the experience',
-  'PadrÃ£o':'Standard',
-  'NÃºmero de corrida na carroceria':'Race number on the bodywork',
-  'â± 7â12 dias Ãºteis':'â± 7â12 business days',
-  'Super HerÃ³is':'Super Heroes',
+  'Clique no botÃÂ£o':'Click the button',
+  ', abaixo e dÃÂª continuidade na experiÃÂªncia':', below and continue the experience',
+  'PadrÃÂ£o':'Standard',
+  'NÃÂºmero de corrida na carroceria':'Race number on the bodywork',
+  'Ã¢ÂÂ± 7Ã¢ÂÂ12 dias ÃÂºteis':'Ã¢ÂÂ± 7Ã¢ÂÂ12 business days',
+  'Super HerÃÂ³is':'Super Heroes',
   'Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl)',
   'Fibra de Carbono':'Carbon Fiber',
-  'Envio prÃ³prio':'Self-provided',
-  'ESPECIFICAÃÃES DA MINIATURA E DO QUADRO':'MINIATURE AND FRAME SPECIFICATIONS',
-  'Nessa opÃ§Ã£o nÃ£o estÃ¡ incluso a miniatura. Produzimos e vendemos apenas os quadros':'This option does not include the miniature. We only produce and sell',
+  'Envio prÃÂ³prio':'Self-provided',
+  'ESPECIFICAÃÂÃÂES DA MINIATURA E DO QUADRO':'MINIATURE AND FRAME SPECIFICATIONS',
+  'Nessa opÃÂ§ÃÂ£o nÃÂ£o estÃÂ¡ incluso a miniatura. Produzimos e vendemos apenas os quadros':'This option does not include the miniature. We only produce and sell',
   'Selecione o modelo...':'Select model...',
   'Selecione o tamanho...':'Select size...',
   'Selecione a cor...':'Select color...',
   'Selecione o acabamento...':'Select finish...',
-  'Selecione a opÃ§Ã£o...':'Select option...',
+  'Selecione a opÃÂ§ÃÂ£o...':'Select option...',
   'Calcular':'Calculate',
   'Calcular frete':'Calculate shipping',
-  'Frete grÃ¡tis':'Free shipping',
+  'Frete grÃÂ¡tis':'Free shipping',
   'Prazo de entrega':'Delivery time',
-  'Dias Ãºteis':'Business days',
+  'Dias ÃÂºteis':'Business days',
   'Entrega':'Delivery',
   'Finalizar pedido':'Complete order',
   'Continuar comprando':'Continue shopping',
   /* patch5 entries */
   'QUADRO PARA MINIATURAS':'MINIATURE FRAME',
-  'Selecione o quadro da sua preferÃªncia':'Select your preferred frame',
-  'SELECIONE O QUADRO DA SUA PREFERÃNCIA':'SELECT YOUR PREFERRED FRAME',
+  'Selecione o quadro da sua preferÃÂªncia':'Select your preferred frame',
+  'SELECIONE O QUADRO DA SUA PREFERÃÂNCIA':'SELECT YOUR PREFERRED FRAME',
   'Quadro para LEGO':'Frame for LEGO',
   'LOGOTIPO COM MARCA DO CARRO':'BRAND LOGO',
-  'ð·ï¸ Logotipo com marca do carro':'ð·ï¸ Brand Logo',
+  'Ã°ÂÂÂ·Ã¯Â¸Â Logotipo com marca do carro':'Ã°ÂÂÂ·Ã¯Â¸Â Brand Logo',
   'Logotipo com marca do carro':'Brand Logo',
   'Logotipo oficial da marca selecionada':'Official logo of the selected brand',
-  'ð Artesanal':'ð Handcrafted',
+  'Ã°ÂÂÂ Artesanal':'Ã°ÂÂÂ Handcrafted',
   'Artesanal':'Handcrafted',
   'Miniatura Die-cast / 3D':'Miniature Die-cast / 3D',
-  'â Logo da Marca â canto sup. esq.':'â Brand Logo â top-left corner',
-  'â Logo do Modelo â canto inf. dir.':'â Model Logo â bottom-right corner',
-  'Logo da Marca â canto sup. esq.':'Brand Logo â top-left corner',
-  'Logo do Modelo â canto inf. dir.':'Model Logo â bottom-right corner',
-  'DegradÃª Central':'Center Gradient',
-  'Cor do DegradÃª Central':'Center Gradient Color',
-  'ENVIE A IMAGEM DA SUA PREFERÃNCIA':'SEND YOUR PREFERRED IMAGE',
-  'Envie a imagem da sua preferÃªncia':'Send your preferred image',
+  'Ã¢ÂÂ Logo da Marca Ã¢ÂÂ canto sup. esq.':'Ã¢ÂÂ Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Logo do Modelo Ã¢ÂÂ canto inf. dir.':'Ã¢ÂÂ Model Logo Ã¢ÂÂ bottom-right corner',
+  'Logo da Marca Ã¢ÂÂ canto sup. esq.':'Brand Logo Ã¢ÂÂ top-left corner',
+  'Logo do Modelo Ã¢ÂÂ canto inf. dir.':'Model Logo Ã¢ÂÂ bottom-right corner',
+  'DegradÃÂª Central':'Center Gradient',
+  'Cor do DegradÃÂª Central':'Center Gradient Color',
+  'ENVIE A IMAGEM DA SUA PREFERÃÂNCIA':'SEND YOUR PREFERRED IMAGE',
+  'Envie a imagem da sua preferÃÂªncia':'Send your preferred image',
   'Moldura Laca Preto':'Black Lacquer Frame',
   'Fundo Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl) Background',
   'Fundo Fibra de Carbono':'Carbon Fiber Background',
   /* patch6 entries */
-  'MODEL LOGO â CANTO INFERIOR DIREITO':'MODEL LOGO â BOTTOM RIGHT CORNER',
-  'BRAND LOGO â CANTO SUPERIOR ESQUERDO':'BRAND LOGO â TOP LEFT CORNER',
-  'Logo do Modelo â canto inferior direito':'Model Logo â bottom-right corner',
-  'Logo da Marca â canto superior esquerdo':'Brand Logo â top-left corner',
-  'â Logo da Marca â canto superior esquerdo':'â Brand Logo â top-left corner',
-  'â Logo do Modelo â canto inferior direito':'â Model Logo â bottom-right corner',
+  'MODEL LOGO Ã¢ÂÂ CANTO INFERIOR DIREITO':'MODEL LOGO Ã¢ÂÂ BOTTOM RIGHT CORNER',
+  'BRAND LOGO Ã¢ÂÂ CANTO SUPERIOR ESQUERDO':'BRAND LOGO Ã¢ÂÂ TOP LEFT CORNER',
+  'Logo do Modelo Ã¢ÂÂ canto inferior direito':'Model Logo Ã¢ÂÂ bottom-right corner',
+  'Logo da Marca Ã¢ÂÂ canto superior esquerdo':'Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Logo da Marca Ã¢ÂÂ canto superior esquerdo':'Ã¢ÂÂ Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Logo do Modelo Ã¢ÂÂ canto inferior direito':'Ã¢ÂÂ Model Logo Ã¢ÂÂ bottom-right corner',
   'CANTO INFERIOR DIREITO':'BOTTOM RIGHT CORNER',
   'CANTO SUPERIOR ESQUERDO':'TOP LEFT CORNER',
   'canto inferior direito':'bottom-right corner',
   'canto superior esquerdo':'top-left corner',
   /* patch7 entries */
-  'ðï¸ Model Logo â Canto inferior direito':'ðï¸ Model Logo â Bottom right corner',
-  'ðï¸ Model Logo â Canto superior esquerdo':'ðï¸ Model Logo â Top left corner',
-  'Model Logo â Canto inferior direito':'Model Logo â Bottom right corner',
-  'Model Logo â Canto superior esquerdo':'Model Logo â Top left corner',
-  'Brand Logo â Canto superior esquerdo':'Brand Logo â Top left corner',
-  'Brand Logo â Canto inferior direito':'Brand Logo â Bottom right corner',
-  'â Brand Logo â Canto superior esquerdo':'â Brand Logo â top-left corner',
-  'â Model Logo â Canto inferior direito':'â Model Logo â bottom-right corner'
+  'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Canto inferior direito':'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Bottom right corner',
+  'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Canto superior esquerdo':'Ã°ÂÂÂÃ¯Â¸Â Model Logo Ã¢ÂÂ Top left corner',
+  'Model Logo Ã¢ÂÂ Canto inferior direito':'Model Logo Ã¢ÂÂ Bottom right corner',
+  'Model Logo Ã¢ÂÂ Canto superior esquerdo':'Model Logo Ã¢ÂÂ Top left corner',
+  'Brand Logo Ã¢ÂÂ Canto superior esquerdo':'Brand Logo Ã¢ÂÂ Top left corner',
+  'Brand Logo Ã¢ÂÂ Canto inferior direito':'Brand Logo Ã¢ÂÂ Bottom right corner',
+  'Ã¢ÂÂ Brand Logo Ã¢ÂÂ Canto superior esquerdo':'Ã¢ÂÂ Brand Logo Ã¢ÂÂ top-left corner',
+  'Ã¢ÂÂ Model Logo Ã¢ÂÂ Canto inferior direito':'Ã¢ÂÂ Model Logo Ã¢ÂÂ bottom-right corner'
 };
 
 /* Combined substring map for compound strings */
@@ -2002,7 +2002,7 @@ var _SUBSTR9={
   'Moldura Fibra de Carbono':'Carbon Fiber Frame',
   'Fundo Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl) Background',
   'Fundo Fibra de Carbono':'Carbon Fiber Background',
-  'Fundo AcrÃ­lico UV':'UV Acrylic Background',
+  'Fundo AcrÃÂ­lico UV':'UV Acrylic Background',
   'Logo da Marca':'Brand Logo',
   'Logo do Modelo':'Model Logo',
   'canto sup. esq.':'top-left corner',
@@ -2052,10 +2052,10 @@ function _substrApply9(subMap){
   }catch(e){}
 }
 
-/* ââ FLAG ICON FIX ââ
-   Language dropdown has .fp-lang-opt items for PortuguÃªs/English/EspaÃ±ol/FranÃ§ais.
+/* Ã¢ÂÂÃ¢ÂÂ FLAG ICON FIX Ã¢ÂÂÃ¢ÂÂ
+   Language dropdown has .fp-lang-opt items for PortuguÃÂªs/English/EspaÃÂ±ol/FranÃÂ§ais.
    Clone the .fp-flag SVG from the matching option into the button's flag slot. */
-var _p9_langNames={pt:'PortuguÃªs',en:'English',es:'EspaÃ±ol',fr:'FranÃ§ais'};
+var _p9_langNames={pt:'PortuguÃÂªs',en:'English',es:'EspaÃÂ±ol',fr:'FranÃÂ§ais'};
 
 function _updateFlag9(lang){
   try{
@@ -2095,14 +2095,14 @@ function _startOb9(){
   _ob9.observe(document.body,{childList:true,subtree:true});
 }
 
-/* ââ INTERCEPT FP_traduzTudo ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INTERCEPT FP_traduzTudo Ã¢ÂÂÃ¢ÂÂ */
 window.FP_traduzTudo=function(lang){
   _lang9=lang;
   _p9.call(this,lang);           /* run full upstream chain (patches 1-8) */
   if(lang!=='pt'){
-    /* For any non-PT language: ensure PTâEN translation is applied.
+    /* For any non-PT language: ensure PTÃ¢ÂÂEN translation is applied.
        Patches 4-7 incorrectly run walkApply(PTn) for non-EN/non-PT langs
-       (which maps ENâPT, a no-op on PT content). We apply the EN maps here
+       (which maps ENÃ¢ÂÂPT, a no-op on PT content). We apply the EN maps here
        to guarantee dynamic content (LEGO card, wizard labels) gets translated. */
     _walkApply9(_EN9);
     _substrApply9(_SUBSTR9);
@@ -2116,7 +2116,7 @@ window.FP_traduzTudo=function(lang){
   _startOb9();
 };
 
-/* ââ INITIAL LOAD ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INITIAL LOAD Ã¢ÂÂÃ¢ÂÂ */
 /* Apply on first load in case lang is already non-PT in localStorage */
 (function(){
   function _p9Init(){
@@ -2135,8 +2135,8 @@ window.FP_traduzTudo=function(lang){
 ;(function(){
 'use strict';
 
-/* PATCH 10 â Fix remaining LEGO card PT fragment.
-   "Se escolher essa opÃ§Ã£o vocÃª terÃ¡" appears as part of a single
+/* PATCH 10 Ã¢ÂÂ Fix remaining LEGO card PT fragment.
+   "Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡" appears as part of a single
    concatenated text node, so _walkApply9 (exact-match) never fires.
    Adding it to a new SUBSTR pass fixes the partial translation. */
 
@@ -2147,10 +2147,10 @@ var _tmr10=null;
 var _ob10=null;
 
 var _SUBSTR10={
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡':"By choosing this option, you'll have",
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡':"By choosing this option, you'll have",
   'Escolher quadros para sua miniatura(s);':'Choose frames for your miniature(s);',
-  'Escolher quadros prontos que jÃ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
+  'Escolher quadros prontos que jÃÂ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
   'dois caminhos:':'two paths:'
 };
 
@@ -2209,7 +2209,7 @@ window.FP_traduzTudo=function(lang){
 ;(function(){
 'use strict';
 
-/* PATCH 11 â Retry pump for React re-render timing.
+/* PATCH 11 Ã¢ÂÂ Retry pump for React re-render timing.
    Root cause: React re-renders components AFTER FP_traduzTudo(lang)
    returns, resetting text nodes back to PT. Patches 9-10 run once
    and the MutationObserver (childList only) may miss direct text-node
@@ -2217,7 +2217,7 @@ window.FP_traduzTudo=function(lang){
    with a per-language guard so stale retries are cancelled on lang change.
 
    Covers confirmed-failing nodes (verified in-browser):
-   - "Se escolher essa opÃ§Ã£o voce tera " (LEGO card, concat node)
+   - "Se escolher essa opÃÂ§ÃÂ£o voce tera " (LEGO card, concat node)
    - ". Assim, na proxima etapa, voce podera comparar..." (viz note)
    - Remaining LEGO-path fragments and prop/step sentences. */
 
@@ -2227,20 +2227,20 @@ var _lang11='pt';
 var _tmrs11=[];
 
 var _RETRY11={
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
-  'Se escolher essa opÃ§Ã£o vocÃª terÃ¡':"By choosing this option, you'll have",
-  '. Assim, na prÃ³xima etapa, vocÃª poderÃ¡ comparar os diferentes tamanhos disponÃ­veis e escolher com mais seguranÃ§a o modelo que melhor valoriza e acomoda a sua miniatura.':"In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
-  'Nesta etapa, o objetivo principal Ã© demonstrar a':"At this stage, the main goal is to show the vehicleâs",
-  'proporÃ§Ã£o do veÃ­culo em relaÃ§Ã£o ao quadro':'scale relative to the frame',
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ dois caminhos:':"By choosing this option, you'll have two paths:",
+  'Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡':"By choosing this option, you'll have",
+  '. Assim, na prÃÂ³xima etapa, vocÃÂª poderÃÂ¡ comparar os diferentes tamanhos disponÃÂ­veis e escolher com mais seguranÃÂ§a o modelo que melhor valoriza e acomoda a sua miniatura.':"In the next step, you'll be able to compare the available sizes and confidently choose the option that best showcases and fits your miniature.",
+  'Nesta etapa, o objetivo principal ÃÂ© demonstrar a':"At this stage, the main goal is to show the vehicleÃ¢ÂÂs",
+  'proporÃÂ§ÃÂ£o do veÃÂ­culo em relaÃÂ§ÃÂ£o ao quadro':'scale relative to the frame',
   'Escolher quadros para sua miniatura(s);':'Choose frames for your miniature(s);',
-  'Escolher quadros prontos que jÃ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
+  'Escolher quadros prontos que jÃÂ¡ contenham miniaturas inclusas.':'Choose ready-made frames that already include miniatures.',
   'dois caminhos:':'two paths:',
   'dezenas de modelos de quadros':'dozens of frame models',
   'para fixar sua miniatura de Lego.':'to mount your Lego miniature.',
   'para Lego.':'frames for Lego.',
-  'Clique no botÃ£o':'Click the button',
-  ', abaixo e dÃª continuidade na experiÃªncia':', below and continue the experience',
-  'ObservaÃ§Ã£o:':'Note:'
+  'Clique no botÃÂ£o':'Click the button',
+  ', abaixo e dÃÂª continuidade na experiÃÂªncia':', below and continue the experience',
+  'ObservaÃÂ§ÃÂ£o:':'Note:'
 };
 
 function _substrApply11(subMap){
@@ -2297,45 +2297,45 @@ window.FP_traduzTudo=function(lang){
 ;(function(){
 'use strict';
 
-/* PATCH 12 â sel* intercept + missing display-name translations.
+/* PATCH 12 Ã¢ÂÂ sel* intercept + missing display-name translations.
    Three confirmed issues (EN mode):
-   1. Order summary BACKGROUND stays PT â selFundo stores PT 3rd arg
-   2. Preview "Textura Rexy" stays PT â LEGO_FUNDOS_DB nome field
-   3. Cart "Retirar na fabrica" stays PT â _fpFreteRender injects PT HTML
+   1. Order summary BACKGROUND stays PT Ã¢ÂÂ selFundo stores PT 3rd arg
+   2. Preview "Textura Rexy" stays PT Ã¢ÂÂ LEGO_FUNDOS_DB nome field
+   3. Cart "Retirar na fabrica" stays PT Ã¢ÂÂ _fpFreteRender injects PT HTML
    Fix: intercept selFundo/selMoldura/selDisp at source + substr observer */
 
 var _lang12=(localStorage.getItem('fp_lang')||'pt');
 
 var _SELMAP12={
-  'AcrÃ­lico Brilho com ImpressÃ£o UV':'Glossy Acrylic â UV',
+  'AcrÃÂ­lico Brilho com ImpressÃÂ£o UV':'Glossy Acrylic Ã¢ÂÂ UV',
   'Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl)',
   'Fosco':'Matte',
   'Fibra de Carbono':'Carbon Fiber',
   'Laca Preto':'Black Lacquer',
-  'Die-cast â disponÃ­vel no mercado':'Die-cast â available on market',
+  'Die-cast Ã¢ÂÂ disponÃÂ­vel no mercado':'Die-cast Ã¢ÂÂ available on market',
   'A verificar pela equipe Funparts':'To be verified by Funparts team',
-  'ImpressÃ£o 3D + Pintura Automotiva':'3D Printing + Automotive Paint'
+  'ImpressÃÂ£o 3D + Pintura Automotiva':'3D Printing + Automotive Paint'
 };
 
 var _SUBSTR12={
-  'AcrÃ­lico Brilho com ImpressÃ£o UV':'Glossy Acrylic â UV',
+  'AcrÃÂ­lico Brilho com ImpressÃÂ£o UV':'Glossy Acrylic Ã¢ÂÂ UV',
   'Fosco':'Matte',
   'Textura Rexy':'Texture Rexy',
   'TEXTURA REXY':'TEXTURE REXY',
-  'DegrÃª Linear':'Linear Gradient',
-  'DegrÃª':'Gradient',
+  'DegrÃÂª Linear':'Linear Gradient',
+  'DegrÃÂª':'Gradient',
   'Abstrato':'Abstract',
   'Setas':'Arrows',
   'Listra Central':'Center Stripe',
   'Listras':'Stripes',
-  'Retirar na fÃ¡brica':'Factory pickup',
-  'Retirar na FÃ¡brica':'Factory pickup',
-  'RETIRAR NA FÃBRICA':'FACTORY PICKUP',
+  'Retirar na fÃÂ¡brica':'Factory pickup',
+  'Retirar na FÃÂ¡brica':'Factory pickup',
+  'RETIRAR NA FÃÂBRICA':'FACTORY PICKUP',
   'Seu carrinho':'Your cart',
   'Fechar pedido':'Complete order',
-  'Die-cast â disponÃ­vel no mercado':'Die-cast â available on market',
+  'Die-cast Ã¢ÂÂ disponÃÂ­vel no mercado':'Die-cast Ã¢ÂÂ available on market',
   'A verificar pela equipe Funparts':'To be verified by Funparts team',
-  'ImpressÃ£o 3D + Pintura Automotiva':'3D Printing + Automotive Paint'
+  'ImpressÃÂ£o 3D + Pintura Automotiva':'3D Printing + Automotive Paint'
 };
 
 function _substrApply12(subMap){
@@ -2416,50 +2416,50 @@ function _startOb12(){
 ;(function(){
 'use strict';
 
-/* PATCH 13 â LED field, FINALIZAR PEDIDO button, shipping subtitle & GrÃ¡tis.
+/* PATCH 13 Ã¢ÂÂ LED field, FINALIZAR PEDIDO button, shipping subtitle & GrÃÂ¡tis.
    Four confirmed PT strings in EN mode:
-   1. Order summary LED field: "Com iluminaÃ§Ã£o LED" stays PT
-      â Fix: intercept selLED (if present) + substr map
+   1. Order summary LED field: "Com iluminaÃÂ§ÃÂ£o LED" stays PT
+      Ã¢ÂÂ Fix: intercept selLED (if present) + substr map
    2. Wizard step 8 bottom button: "FINALIZAR PEDIDO" stays PT
-      â Root cause: existing _EN9 maps 'Finalizar pedido' but not the ALL-CAPS variant
-      â Fix: add uppercase variant to substr map
+      Ã¢ÂÂ Root cause: existing _EN9 maps 'Finalizar pedido' but not the ALL-CAPS variant
+      Ã¢ÂÂ Fix: add uppercase variant to substr map
    3. Shipping subtitle: "Combinar retirada" stays PT under FACTORY PICKUP
-      â Fix: substr map + MutationObserver already running from patch12
-   4. Shipping cost: "GrÃ¡tis" stays PT
-      â Fix: substr map */
+      Ã¢ÂÂ Fix: substr map + MutationObserver already running from patch12
+   4. Shipping cost: "GrÃÂ¡tis" stays PT
+      Ã¢ÂÂ Fix: substr map */
 
 var _lang13 = (localStorage.getItem('fp_lang') || 'pt');
 
-/* ââ MAP 1: sel* function 3rd-argument names ââ */
+/* Ã¢ÂÂÃ¢ÂÂ MAP 1: sel* function 3rd-argument names Ã¢ÂÂÃ¢ÂÂ */
 var _SELMAP13 = {
   /* selLED / selIluminacao */
-  'Com iluminaÃ§Ã£o LED':'With LED lighting',
-  'Sem iluminaÃ§Ã£o':'Without lighting',
-  'Sem IluminaÃ§Ã£o':'Without lighting',
-  'SEM ILUMINAÃÃO':'WITHOUT LIGHTING',
-  'Com IluminaÃ§Ã£o LED':'With LED lighting',
-  'COM ILUMINAÃÃO LED':'WITH LED LIGHTING'
+  'Com iluminaÃÂ§ÃÂ£o LED':'With LED lighting',
+  'Sem iluminaÃÂ§ÃÂ£o':'Without lighting',
+  'Sem IluminaÃÂ§ÃÂ£o':'Without lighting',
+  'SEM ILUMINAÃÂÃÂO':'WITHOUT LIGHTING',
+  'Com IluminaÃÂ§ÃÂ£o LED':'With LED lighting',
+  'COM ILUMINAÃÂÃÂO LED':'WITH LED LIGHTING'
 };
 
-/* ââ MAP 2: DOM text-node substr replacements ââ */
+/* Ã¢ÂÂÃ¢ÂÂ MAP 2: DOM text-node substr replacements Ã¢ÂÂÃ¢ÂÂ */
 var _SUBSTR13 = {
   /* LED / lighting */
-  'Com iluminaÃ§Ã£o LED':'With LED lighting',
-  'Com IluminaÃ§Ã£o LED':'With LED lighting',
-  'COM ILUMINAÃÃO LED':'WITH LED LIGHTING',
-  'Sem iluminaÃ§Ã£o':'Without lighting',
-  'Sem IluminaÃ§Ã£o':'Without lighting',
-  'SEM ILUMINAÃÃO':'WITHOUT LIGHTING',
-  /* Finalizar pedido â all case variants */
+  'Com iluminaÃÂ§ÃÂ£o LED':'With LED lighting',
+  'Com IluminaÃÂ§ÃÂ£o LED':'With LED lighting',
+  'COM ILUMINAÃÂÃÂO LED':'WITH LED LIGHTING',
+  'Sem iluminaÃÂ§ÃÂ£o':'Without lighting',
+  'Sem IluminaÃÂ§ÃÂ£o':'Without lighting',
+  'SEM ILUMINAÃÂÃÂO':'WITHOUT LIGHTING',
+  /* Finalizar pedido Ã¢ÂÂ all case variants */
   'FINALIZAR PEDIDO':'COMPLETE ORDER',
   'Finalizar Pedido':'Complete Order',
   /* Shipping subtitle */
   'Combinar retirada':'Schedule pickup',
   'COMBINAR RETIRADA':'SCHEDULE PICKUP',
   /* Shipping cost */
-  'GrÃ¡tis':'Free',
-  'GRÃTIS':'FREE',
-  'grÃ¡tis':'free'
+  'GrÃÂ¡tis':'Free',
+  'GRÃÂTIS':'FREE',
+  'grÃÂ¡tis':'free'
 };
 
 function _substrApply13(subMap){
@@ -2481,7 +2481,7 @@ function _substrApply13(subMap){
   }catch(e){}
 }
 
-/* ââ INTERCEPT sel* FUNCTIONS ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INTERCEPT sel* FUNCTIONS Ã¢ÂÂÃ¢ÂÂ */
 function _patchSelFn13(fnName){
   if(typeof window[fnName]!=='function')return;
   var orig=window[fnName];
@@ -2494,10 +2494,10 @@ function _patchSelFn13(fnName){
 }
 
 function _applySelPatches13(){
-  ['selLED','selIluminacao','selIluminaÃ§Ã£o'].forEach(_patchSelFn13);
+  ['selLED','selIluminacao','selIluminaÃÂ§ÃÂ£o'].forEach(_patchSelFn13);
 }
 
-/* ââ INTERCEPT FP_traduzTudo ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INTERCEPT FP_traduzTudo Ã¢ÂÂÃ¢ÂÂ */
 if(typeof window.FP_traduzTudo==='function'){
   var _p13=window.FP_traduzTudo;
   window.FP_traduzTudo=function(lang){
@@ -2514,7 +2514,7 @@ if(typeof window.FP_traduzTudo==='function'){
   };
 }
 
-/* ââ PERSISTENT MUTATION OBSERVER ââ */
+/* Ã¢ÂÂÃ¢ÂÂ PERSISTENT MUTATION OBSERVER Ã¢ÂÂÃ¢ÂÂ */
 var _ob13=null;
 var _tmr13=null;
 function _startOb13(){
@@ -2531,7 +2531,7 @@ function _startOb13(){
   _ob13.observe(document.body,{childList:true,subtree:true});
 }
 
-/* ââ INITIAL LOAD ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INITIAL LOAD Ã¢ÂÂÃ¢ÂÂ */
 (function(){
   _applySelPatches13();
   if(_lang13!=='pt'){
@@ -2547,7 +2547,7 @@ function _startOb13(){
 ;(function(){
 'use strict';
 
-/* PATCH 14 â ESCOLHA O FRETE, CONTINUAR, FINALIZAR PEDIDO.
+/* PATCH 14 Ã¢ÂÂ ESCOLHA O FRETE, CONTINUAR, FINALIZAR PEDIDO.
    Three confirmed PT strings in EN mode:
    1. Shipping modal header: "ESCOLHA O FRETE"
    2. Shipping modal button: "CONTINUAR"
@@ -2587,7 +2587,7 @@ function _substrApply14(subMap){
   }catch(e){}
 }
 
-/* ââ INTERCEPT FP_traduzTudo ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INTERCEPT FP_traduzTudo Ã¢ÂÂÃ¢ÂÂ */
 if(typeof window.FP_traduzTudo==='function'){
   var _p14=window.FP_traduzTudo;
   window.FP_traduzTudo=function(lang){
@@ -2595,7 +2595,7 @@ if(typeof window.FP_traduzTudo==='function'){
     _p14.call(this,lang);
     if(lang!=='pt'){
       var cl=lang;
-      /* Aggressive retry schedule â React re-renders buttons late */
+      /* Aggressive retry schedule Ã¢ÂÂ React re-renders buttons late */
       [50,150,300,600,1000,1800,3000].forEach(function(ms){
         setTimeout(function(){if(_lang14===cl)_substrApply14(_SUBSTR14);},ms);
       });
@@ -2603,7 +2603,7 @@ if(typeof window.FP_traduzTudo==='function'){
   };
 }
 
-/* ââ PERSISTENT MUTATION OBSERVER â 40ms debounce (tighter window) ââ */
+/* Ã¢ÂÂÃ¢ÂÂ PERSISTENT MUTATION OBSERVER Ã¢ÂÂ 40ms debounce (tighter window) Ã¢ÂÂÃ¢ÂÂ */
 var _ob14=null;
 var _tmr14=null;
 function _startOb14(){
@@ -2617,7 +2617,7 @@ function _startOb14(){
   _ob14.observe(document.body,{childList:true,subtree:true});
 }
 
-/* ââ INITIAL LOAD ââ */
+/* Ã¢ÂÂÃ¢ÂÂ INITIAL LOAD Ã¢ÂÂÃ¢ÂÂ */
 (function(){
   if(_lang14!=='pt'){
     _substrApply14(_SUBSTR14);
@@ -2631,13 +2631,13 @@ function _startOb14(){
 })();
 
 
-/* ━━ FIX: moldura 49×49cm — aspect-ratio quadrado ━━━━━━━━━━━━━━━━━━━━━━
-   Produtos LEGO com dim:'49×49cm' recebem classe .dim4949, mas
+/* ââ FIX: moldura 49Ã49cm â aspect-ratio quadrado ââââââââââââââââââââââ
+   Produtos LEGO com dim:'49Ã49cm' recebem classe .dim4949, mas
    app_1.js aplica inline style aspect-ratio:53/83 (portrait).
    Patch: (1) CSS !important vence inline style; (2) corrige inline
-   style via JS imediato + MutationObserver para mudanças dinâmicas.  */
+   style via JS imediato + MutationObserver para mudanÃ§as dinÃ¢micas.  */
 (function(){
-  // 1. Injetar regra CSS com !important — tem precedência sobre inline style
+  // 1. Injetar regra CSS com !important â tem precedÃªncia sobre inline style
   var _st49 = document.createElement('style');
   _st49.id = 'fp-dim4949-fix';
   _st49.textContent =
@@ -2651,7 +2651,7 @@ function _startOb14(){
       if(el.style.aspectRatio && el.style.aspectRatio.replace(/\s/g,'') !== '1/1'){
         el.style.aspectRatio = '1/1';
       }
-      // Corrigir também filhos com inline aspect-ratio errado
+      // Corrigir tambÃ©m filhos com inline aspect-ratio errado
       el.querySelectorAll('[style]').forEach(function(child){
         if(child.style.aspectRatio && child.style.aspectRatio.replace(/\s/g,'') !== '1/1'){
           child.style.aspectRatio = '1/1';
@@ -2660,7 +2660,7 @@ function _startOb14(){
     });
   }
 
-  // 3. Patch selFrameSize — roda correção logo após a função original
+  // 3. Patch selFrameSize â roda correÃ§Ã£o logo apÃ³s a funÃ§Ã£o original
   if(typeof window.selFrameSize === 'function'){
     var _origSFS49 = window.selFrameSize;
     window.selFrameSize = function(el, dim){
@@ -2670,13 +2670,13 @@ function _startOb14(){
     };
   }
 
-  // 4. Rodar imediatamente e em delays pós-renderização
+  // 4. Rodar imediatamente e em delays pÃ³s-renderizaÃ§Ã£o
   _fix49();
   [100, 300, 800, 1500, 3000].forEach(function(ms){
     setTimeout(_fix49, ms);
   });
 
-  // 5. MutationObserver para mudanças dinâmicas (ex: troca de produto)
+  // 5. MutationObserver para mudanÃ§as dinÃ¢micas (ex: troca de produto)
   var _ob49, _tmr49;
   function _start49(){
     if(_ob49) return;
@@ -2696,4 +2696,88 @@ function _startOb14(){
   }
   if(document.body) _start49();
   else document.addEventListener('DOMContentLoaded', _start49);
+})();
+
+
+/* ━━ FIX v2: moldura 49×49cm — corrige #legoDetQuadro diretamente ━━━━━
+   O elemento #legoDetQuadro recebe aspect-ratio:53/83 por inline style
+   mesmo quando o produto é 49×49cm. Este patch corrige o inline style
+   diretamente via MutationObserver, sem depender de classes CSS.      */
+(function(){
+  var MODELOS_49 = [
+    'McLaren GTR',
+    'McLaren MP4/4 Senna 49x49cm',
+    'Porsche 911 Targa 1970'
+  ];
+
+  function is49x49(){
+    try {
+      var m = (typeof S !== 'undefined' && S.legoModel) ? S.legoModel : '';
+      return MODELOS_49.some(function(n){ return m.indexOf(n) !== -1 || n.indexOf(m) !== -1; });
+    } catch(e){ return false; }
+  }
+
+  var _fixing49v2 = false;
+  function fixDetQuadro(){
+    if(_fixing49v2) return;
+    if(!is49x49()) return;
+    var el = document.getElementById('legoDetQuadro');
+    if(!el) return;
+    var ar = el.style.aspectRatio.replace(/\s/g,'');
+    if(ar === '1/1') return; // já correto
+    _fixing49v2 = true;
+    el.style.aspectRatio = '1/1';
+    _fixing49v2 = false;
+  }
+
+  // Rodar imediatamente e após cada renderização
+  fixDetQuadro();
+  [100, 300, 600, 1200, 2500].forEach(function(ms){ setTimeout(fixDetQuadro, ms); });
+
+  // Patch goStep — roda correção sempre que muda de etapa
+  var _origGS49 = window.goStep;
+  if(typeof _origGS49 === 'function'){
+    window.goStep = function(n){
+      var r = _origGS49.apply(this, arguments);
+      setTimeout(fixDetQuadro, 50);
+      setTimeout(fixDetQuadro, 250);
+      return r;
+    };
+  }
+
+  // Patch selLegoModel — roda correção quando muda de modelo
+  var _origSLM49 = window.selLegoModel;
+  if(typeof _origSLM49 === 'function'){
+    window.selLegoModel = function(){
+      var r = _origSLM49.apply(this, arguments);
+      setTimeout(fixDetQuadro, 50);
+      setTimeout(fixDetQuadro, 300);
+      return r;
+    };
+  }
+
+  // MutationObserver: corrige quando o style de #legoDetQuadro muda
+  var _ob49v2;
+  function startObs49v2(){
+    var el = document.getElementById('legoDetQuadro');
+    var target = el || document.body;
+    if(_ob49v2){ _ob49v2.disconnect(); }
+    _ob49v2 = new MutationObserver(function(ms){
+      var relevant = ms.some(function(m){
+        return (m.type==='attributes' && m.attributeName==='style') ||
+               (m.type==='childList' && m.addedNodes.length > 0);
+      });
+      if(!relevant) return;
+      clearTimeout(window._tmr49v2);
+      window._tmr49v2 = setTimeout(fixDetQuadro, 30);
+    });
+    _ob49v2.observe(target, {
+      attributes: true, attributeFilter: ['style'],
+      childList: true, subtree: true
+    });
+  }
+  if(document.body) startObs49v2();
+  else document.addEventListener('DOMContentLoaded', startObs49v2);
+
+  window._fixDetQuadro49v2 = fixDetQuadro;
 })();
