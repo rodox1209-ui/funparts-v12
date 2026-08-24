@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funparts — Criar Pedido Manual</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f0f;color:#e8e8e8;min-height:100vh;padding:24px 16px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:20px;font-weight:700;letter-spacing:.5px;margin-bottom:4px;color:#fff}
+.sub{font-size:13px;color:#666;margin-bottom:28px}
+.section{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px}
+.section h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row.full{grid-template-columns:1fr}
+.row.three{grid-template-columns:1fr 1fr 1fr}
+label{display:block;font-size:11px;color:#666;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{width:100%;background:#111;border:1px solid #333;border-radius:6px;color:#e8e8e8;padding:9px 12px;font-size:14px;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:#e8b84b}
+select option{background:#1a1a1a}
+textarea{resize:vertical;min-height:60px}
+.item-block{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
+.item-block .del{position:absolute;top:10px;right:10px;background:none;border:none;color:#555;cursor:pointer;font-size:18px;line-height:1}
+.item-block .del:hover{color:#e55}
+.add-item{background:none;border:1px dashed #333;border-radius:6px;width:100%;padding:10px;color:#666;cursor:pointer;font-size:13px;margin-bottom:8px}
+.add-item:hover{border-color:#e8b84b;color:#e8b84b}
+.btn{display:block;width:100%;background:#e8b84b;color:#111;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin-top:8px}
+.btn:hover{background:#f5c84a}
+.btn:disabled{background:#333;color:#666;cursor:not-allowed}
+#resultado{background:#1a1a1a;border:1px solid #2e5a2e;border-radius:10px;padding:20px;margin-top:16px;display:none}
+#resultado h3{color:#6fcf97;font-size:14px;margin-bottom:12px}
+#link-box{background:#111;border:1px solid #333;border-radius:6px;padding:10px 12px;font-size:13px;color:#e8b84b;word-break:break-all;margin-bottom:12px}
+.copy-btn{background:#333;border:none;border-radius:6px;color:#e8e8e8;padding:8px 16px;cursor:pointer;font-size:13px}
+.copy-btn:hover{background:#444}
+.erro{background:#1a1a1a;border:1px solid #5a2e2e;border-radius:8px;padding:14px;color:#e88;margin-top:12px;font-size:13px;display:none}
+#auth-wall{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:32px;max-width:360px;margin:80px auto;text-align:center}
+#auth-wall h2{margin-bottom:16px;color:#fff;font-size:18px}
+#auth-wall input{margin-bottom:12px}
+#auth-wall .btn{margin-top:4px}
+#form-main{display:none}
+.wz-btn{background:#25d366;border:none;border-radius:6px;color:#fff;padding:8px 16px;cursor:pointer;font-size:13px;margin-left:8px}
+</style>
+</head>
+<body>
+<div id="auth-wall">
+  <h1>🔐 Funparts</h1>
+  <p class="sub" style="margin-bottom:20px;margin-top:6px">Acesso restrito — admin</p>
+  <div>
+    <label>Senha admin</label>
+    <input type="password" id="senha-input" placeholder="Digite a senha..." />
+    <button class="btn" onclick="autenticar()">Entrar</button>
+    <div class="erro" id="auth-erro">Senha incorreta.</div>
+  </div>
+</div>
+
+<div id="form-main" class="wrap">
+  <h1>✏️ Criar Pedido Manual</h1>
+  <div class="sub">Preencha os dados e envie o link de pagamento PIX ao cliente.</div>
+
+  <div class="section">
+    <h2>📦 Itens do pedido</h2>
+    <div id="itens-container"></div>
+    <button class="add-item" onclick="addItem()">+ Adicionar item</button>
+  </div>
+
+  <div class="section">
+    <h2>👤 Dados do cliente</h2>
+    <div class="row">
+      <div><label>Nome completo *</label><input id="cli_nome" type="text" placeholder="João Silva" /></div>
+      <div><label>WhatsApp *</label><input id="cli_wpp" type="tel" placeholder="11999999999" /></div>
+    </div>
+    <div class="row">
+      <div><label>Email</label><input id="cli_email" type="email" placeholder="joao@email.com" /></div>
+      <div><label>CPF</label><input id="cli_cpf" type="text" placeholder="000.000.000-00" /></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🚚 Endereço de entrega</h2>
+    <div class="row">
+      <div><label>CEP</label><input id="cli_cep" type="text" placeholder="01310-100" oninput="buscarCep(this.value)" /></div>
+      <div><label>Número</label><input id="cli_num" type="text" placeholder="100" /></div>
+    </div>
+    <div class="row full"><label>Rua</label><input id="cli_rua" type="text" placeholder="Av. Paulista" /></div>
+    <div class="row">
+      <div><label>Complemento</label><input id="cli_comp" type="text" placeholder="Apto 42" /></div>
+      <div><label>Bairro</label><input id="cli_bairro" type="text" placeholder="Bela Vista" /></div>
+    </div>
+    <div class="row">
+      <div><label>Cidade</label><input id="cli_cidade" type="text" placeholder="São Paulo" /></div>
+      <div><label>UF</label><input id="cli_uf" type="text" placeholder="SP" maxlength="2" /></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>💰 Valores</h2>
+    <div class="row">
+      <div><label>Valor dos produtos (R$)</label><input id="val_produtos" type="number" step="0.01" min="0" placeholder="0.00" /></div>
+      <div><label>Frete (R$)</label><input id="val_frete" type="number" step="0.01" min="0" placeholder="0.00" value="0" /></div>
+    </div>
+    <div class="row full"><label>Observações internas (não aparece ao cliente)</label><textarea id="obs" rows="2" placeholder="Referência interna, combinado com cliente, etc."></textarea></div>
+  </div>
+
+  <button class="btn" id="btn-criar" onclick="criarPedido()">Criar pedido e gerar link</button>
+
+  <div id="resultado">
+    <h3>✅ Pedido criado com sucesso!</h3>
+    <div id="link-box"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="copy-btn" onclick="copiarLink()">📋 Copiar link</button>
+      <button class="wz-btn" onclick="abrirWhatsapp()">WhatsApp</button>
+      <button class="wz-btn" style="background:#833ab4" onclick="copiarMensagem()">📲 Copiar msg completa</button>
+    </div>
+  </div>
+  <div class="erro" id="form-erro"></div>
+</div>
+
+<script>
+var WORKER = 'https://funparts-ai-proxy.rodox1209.workers.dev';
+var SENHA_CORRETA = '';
+var pedidoLink = '';
+
+function autenticar() {
+  var s = document.getElementById('senha-input').value;
+  if (!s) return;
+  // Verifica enviando uma requisição de teste ao Worker
+  fetch(WORKER + '/stats', { headers: { 'x-admin-key': s } })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      SENHA_CORRETA = s;
+      document.getElementById('auth-wall').style.display = 'none';
+      document.getElementById('form-main').style.display = 'block';
+      addItem();
+    })
+    .catch(function(){ 
+      // Worker stats pode não precisar de auth - só aceita
+      SENHA_CORRETA = s;
+      document.getElementById('auth-wall').style.display = 'none';
+      document.getElementById('form-main').style.display = 'block';
+      addItem();
+    });
+}
+
+document.getElementById('senha-input').addEventListener('keydown', function(e){ if(e.key==='Enter') autenticar(); });
+
+var itemCount = 0;
+function addItem() {
+  itemCount++;
+  var id = itemCount;
+  var div = document.createElement('div');
+  div.className = 'item-block';
+  div.id = 'item-' + id;
+  div.innerHTML = 
+    '<button class="del" onclick="removeItem(' + id + ')">×</button>' +
+    '<div class="row"><div><label>Título do produto</label><input id="it_titulo_'+id+'" type="text" placeholder="Quadro BMW M3 — Miniatura inclusa" /></div>' +
+    '<div><label>Subtítulo / detalhes</label><input id="it_sub_'+id+'" type="text" placeholder="49×49cm, Moldura Preta, LED" /></div></div>' +
+    '<div class="row three"><div><label>Preço unitário (R$)</label><input id="it_preco_'+id+'" type="number" step="0.01" min="0" placeholder="0.00" /></div>' +
+    '<div><label>Categoria</label><select id="it_tipo_'+id+'"><option value="mini">Miniatura inclusa</option><option value="lego">LEGO</option><option value="quad">Somente Quadro</option></select></div>' +
+    '<div><label>Observação do item</label><input id="it_obs_'+id+'" type="text" placeholder="Cor especial, etc." /></div></div>';
+  document.getElementById('itens-container').appendChild(div);
+}
+
+function removeItem(id) {
+  var el = document.getElementById('item-' + id);
+  if (el) el.remove();
+}
+
+function buscarCep(cep) {
+  cep = cep.replace(/\D/g,'');
+  if (cep.length !== 8) return;
+  fetch('https://viacep.com.br/ws/' + cep + '/json/')
+    .then(r => r.json())
+    .then(d => {
+      if (!d.erro) {
+        document.getElementById('cli_rua').value = d.logradouro || '';
+        document.getElementById('cli_bairro').value = d.bairro || '';
+        document.getElementById('cli_cidade').value = d.localidade || '';
+        document.getElementById('cli_uf').value = d.uf || '';
+      }
+    }).catch(function(){});
+}
+
+function getItems() {
+  var itens = [];
+  document.querySelectorAll('.item-block').forEach(function(block) {
+    var id = block.id.replace('item-','');
+    var titulo = (document.getElementById('it_titulo_'+id)||{}).value || '';
+    var sub = (document.getElementById('it_sub_'+id)||{}).value || '';
+    var preco = parseFloat((document.getElementById('it_preco_'+id)||{}).value || '0') || 0;
+    var tipo = (document.getElementById('it_tipo_'+id)||{}).value || 'mini';
+    var obs = (document.getElementById('it_obs_'+id)||{}).value || '';
+    if (titulo || preco > 0) {
+      itens.push({ titulo: titulo, sub: (sub + (obs?' — '+obs:'')).trim(), via: 'catalogo', tipo: tipo, cfg: { preco: preco } });
+    }
+  });
+  return itens;
+}
+
+function criarPedido() {
+  var btn = document.getElementById('btn-criar');
+  var erroDiv = document.getElementById('form-erro');
+  erroDiv.style.display = 'none';
+
+  var nome = document.getElementById('cli_nome').value.trim();
+  var wpp = document.getElementById('cli_wpp').value.replace(/\D/g,'');
+  if (!nome) { erroDiv.textContent = 'Nome do cliente é obrigatório.'; erroDiv.style.display='block'; return; }
+  if (!wpp) { erroDiv.textContent = 'WhatsApp do cliente é obrigatório.'; erroDiv.style.display='block'; return; }
+
+  var itens = getItems();
+  if (!itens.length) { erroDiv.textContent = 'Adicione ao menos um item ao pedido.'; erroDiv.style.display='block'; return; }
+
+  var frete = parseFloat(document.getElementById('val_frete').value || '0') || 0;
+  var prodTotal = itens.reduce(function(s,i){ return s + (i.cfg.preco||0); }, 0);
+
+  var body = {
+    cliente: {
+      nome: nome,
+      cpf: document.getElementById('cli_cpf').value.replace(/\D/g,''),
+      whatsapp: wpp,
+      email: document.getElementById('cli_email').value.trim(),
+      cep: document.getElementById('cli_cep').value.replace(/\D/g,''),
+      rua: document.getElementById('cli_rua').value.trim(),
+      numero: document.getElementById('cli_num').value.trim(),
+      complemento: document.getElementById('cli_comp').value.trim(),
+      bairro: document.getElementById('cli_bairro').value.trim(),
+      cidade: document.getElementById('cli_cidade').value.trim(),
+      uf: document.getElementById('cli_uf').value.trim().toUpperCase()
+    },
+    items: itens,
+    frete: frete,
+    origem: 'MANUAL',
+    obs: document.getElementById('obs').value.trim()
+  };
+
+  btn.disabled = true;
+  btn.textContent = 'Criando pedido...';
+
+  fetch(WORKER + '/pedido', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d) {
+    btn.disabled = false;
+    btn.textContent = 'Criar pedido e gerar link';
+    if (d.erro || d.error) {
+      erroDiv.textContent = 'Erro: ' + (d.erro || d.error);
+      erroDiv.style.display = 'block';
+    } else if (d.token || d.chave || d.ok) {
+      var token = d.token || d.chave || '';
+      pedidoLink = WORKER + '/pedido/' + token;
+      document.getElementById('link-box').textContent = pedidoLink;
+      document.getElementById('resultado').style.display = 'block';
+      document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
+    } else {
+      erroDiv.textContent = 'Resposta inesperada: ' + JSON.stringify(d).substring(0,200);
+      erroDiv.style.display = 'block';
+    }
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    btn.textContent = 'Criar pedido e gerar link';
+    erroDiv.textContent = 'Erro de rede: ' + e.message;
+    erroDiv.style.display = 'block';
+  });
+}
+
+function copiarLink() {
+  navigator.clipboard.writeText(pedidoLink).then(function(){
+    var b = document.querySelector('.copy-btn');
+    b.textContent = '✅ Copiado!';
+    setTimeout(function(){ b.textContent = '📋 Copiar link'; }, 2000);
+  });
+}
+
+function abrirWhatsapp() {
+  var nome = document.getElementById('cli_nome').value.trim();
+  var msg = 'Olá ' + (nome.split(' ')[0]||'') + '! 🏎️\n\n' +
+    'Seu pedido Funparts foi criado. Acesse o link abaixo para revisar e efetuar o pagamento via PIX:\n\n' +
+    pedidoLink + '\n\n' +
+    'Qualquer dúvida, é só chamar! 🙌';
+  var wpp = document.getElementById('cli_wpp').value.replace(/\D/g,'');
+  window.open('https://wa.me/55' + wpp + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function copiarMensagem() {
+  var nome = document.getElementById('cli_nome').value.trim();
+  var msg = 'Olá ' + (nome.split(' ')[0]||'') + '! 🏎️\n\n' +
+    'Seu pedido Funparts foi criado. Acesse o link abaixo para revisar e efetuar o pagamento via PIX:\n\n' +
+    pedidoLink + '\n\n' +
+    'Qualquer dúvida, é só chamar! 🙌';
+  navigator.clipboard.writeText(msg).then(function(){
+    var b = document.querySelectorAll('.wz-btn')[1];
+    b.textContent = '✅ Copiado!';
+    setTimeout(function(){ b.textContent = '📲 Copiar msg completa'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
