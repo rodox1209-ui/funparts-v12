@@ -3,299 +3,590 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funparts — Criar Pedido Manual</title>
+<title>Criar Pedido Manual — Funparts Admin</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f0f0f;color:#e8e8e8;min-height:100vh;padding:24px 16px}
-.wrap{max-width:720px;margin:0 auto}
-h1{font-size:20px;font-weight:700;letter-spacing:.5px;margin-bottom:4px;color:#fff}
-.sub{font-size:13px;color:#666;margin-bottom:28px}
-.section{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:20px;margin-bottom:16px}
-.section h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:14px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.row.full{grid-template-columns:1fr}
-.row.three{grid-template-columns:1fr 1fr 1fr}
-label{display:block;font-size:11px;color:#666;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-input,select,textarea{width:100%;background:#111;border:1px solid #333;border-radius:6px;color:#e8e8e8;padding:9px 12px;font-size:14px;outline:none;transition:border .2s}
-input:focus,select:focus,textarea:focus{border-color:#e8b84b}
-select option{background:#1a1a1a}
-textarea{resize:vertical;min-height:60px}
-.item-block{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:14px;margin-bottom:10px;position:relative}
-.item-block .del{position:absolute;top:10px;right:10px;background:none;border:none;color:#555;cursor:pointer;font-size:18px;line-height:1}
-.item-block .del:hover{color:#e55}
-.add-item{background:none;border:1px dashed #333;border-radius:6px;width:100%;padding:10px;color:#666;cursor:pointer;font-size:13px;margin-bottom:8px}
-.add-item:hover{border-color:#e8b84b;color:#e8b84b}
-.btn{display:block;width:100%;background:#e8b84b;color:#111;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin-top:8px}
-.btn:hover{background:#f5c84a}
-.btn:disabled{background:#333;color:#666;cursor:not-allowed}
-#resultado{background:#1a1a1a;border:1px solid #2e5a2e;border-radius:10px;padding:20px;margin-top:16px;display:none}
-#resultado h3{color:#6fcf97;font-size:14px;margin-bottom:12px}
-#link-box{background:#111;border:1px solid #333;border-radius:6px;padding:10px 12px;font-size:13px;color:#e8b84b;word-break:break-all;margin-bottom:12px}
-.copy-btn{background:#333;border:none;border-radius:6px;color:#e8e8e8;padding:8px 16px;cursor:pointer;font-size:13px}
-.copy-btn:hover{background:#444}
-.erro{background:#1a1a1a;border:1px solid #5a2e2e;border-radius:8px;padding:14px;color:#e88;margin-top:12px;font-size:13px;display:none}
-#auth-wall{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:32px;max-width:360px;margin:80px auto;text-align:center}
-#auth-wall h2{margin-bottom:16px;color:#fff;font-size:18px}
-#auth-wall input{margin-bottom:12px}
-#auth-wall .btn{margin-top:4px}
-#form-main{display:none}
-.wz-btn{background:#25d366;border:none;border-radius:6px;color:#fff;padding:8px 16px;cursor:pointer;font-size:13px;margin-left:8px}
+body{background:#0a0a0a;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:0}
+
+/* AUTH SCREEN */
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.auth-box{background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:40px 32px;width:100%;max-width:380px;text-align:center}
+.auth-logo{font-size:13px;letter-spacing:3px;color:#e8b84b;text-transform:uppercase;margin-bottom:8px}
+.auth-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}
+.auth-sub{font-size:13px;color:#666;margin-bottom:28px}
+.auth-input{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px;font-size:15px;color:#fff;outline:none;margin-bottom:16px;transition:border .2s}
+.auth-input:focus{border-color:#e8b84b}
+.auth-btn{width:100%;background:#e8b84b;color:#111;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:opacity .2s}
+.auth-btn:hover{opacity:.88}
+.auth-btn:disabled{opacity:.4;cursor:not-allowed}
+.auth-error{color:#ff6b6b;font-size:13px;margin-top:10px;min-height:18px}
+
+/* MAIN APP */
+#app{display:none}
+.topbar{background:#111;border-bottom:1px solid #1e1e1e;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-brand{font-size:11px;letter-spacing:3px;color:#e8b84b;text-transform:uppercase;font-weight:700}
+.topbar-title{font-size:14px;color:#aaa}
+.topbar-logout{background:transparent;border:1px solid #333;color:#777;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+.topbar-logout:hover{border-color:#555;color:#bbb}
+
+.container{max-width:820px;margin:0 auto;padding:28px 20px 60px}
+
+.section{background:#111;border:1px solid #1e1e1e;border-radius:14px;margin-bottom:20px;overflow:hidden}
+.section-header{padding:16px 20px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:10px}
+.section-icon{width:28px;height:28px;background:#1a1a1a;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.section-label{font-size:13px;font-weight:600;color:#ccc;letter-spacing:.3px}
+.section-body{padding:20px}
+
+.form-row{display:grid;gap:14px;margin-bottom:14px}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.form-row-1{grid-template-columns:1fr}
+@media(max-width:600px){.form-row-2,.form-row-3{grid-template-columns:1fr}}
+
+.field label{display:block;font-size:11px;color:#666;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px 13px;font-size:14px;color:#e0e0e0;outline:none;transition:border .2s;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#e8b84b}
+.field input::placeholder{color:#444}
+.field textarea{resize:vertical;min-height:72px}
+.field select option{background:#111}
+
+/* ITEMS */
+#items-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.item-block{background:#0d0d0d;border:1px solid #222;border-radius:10px;padding:16px;position:relative}
+.item-remove{position:absolute;top:12px;right:12px;background:transparent;border:none;color:#555;cursor:pointer;font-size:18px;line-height:1;padding:0;transition:color .2s}
+.item-remove:hover{color:#ff6b6b}
+.item-num{font-size:10px;letter-spacing:1px;color:#555;text-transform:uppercase;margin-bottom:12px}
+
+.btn-add-item{width:100%;background:transparent;border:1px dashed #2a2a2a;border-radius:8px;color:#666;padding:11px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-add-item:hover{border-color:#e8b84b;color:#e8b84b}
+
+/* TOTAL BAR */
+.total-bar{background:#0d1a0d;border:1px solid #2a3a2a;border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.total-label{font-size:13px;color:#aaa}
+.total-value{font-size:24px;font-weight:700;color:#6fcf97}
+
+/* SUBMIT */
+.btn-submit{width:100%;background:#e8b84b;color:#111;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:opacity .2s;margin-top:20px}
+.btn-submit:hover{opacity:.88}
+.btn-submit:disabled{opacity:.35;cursor:not-allowed}
+
+/* RESULT */
+#result-section{display:none;background:#0d1f0d;border:1px solid #2e5a2e;border-radius:14px;padding:28px;margin-top:24px}
+.result-title{font-size:16px;font-weight:700;color:#6fcf97;margin-bottom:4px}
+.result-codigo{font-size:28px;font-weight:700;color:#fff;margin-bottom:20px;letter-spacing:2px}
+.result-link{font-family:monospace;font-size:13px;color:#e8b84b;word-break:break-all;background:#111;padding:10px 14px;border-radius:8px;margin-bottom:16px}
+.result-btns{display:flex;flex-direction:column;gap:10px}
+.btn-wpp{background:#25d366;color:#fff;border:none;border-radius:9px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-copy{background:#1a1a1a;border:1px solid #333;color:#ccc;border-radius:9px;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-copy:hover{border-color:#e8b84b;color:#e8b84b}
+.btn-new{background:transparent;border:1px solid #2e5a2e;color:#6fcf97;border-radius:9px;padding:11px 20px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;width:100%;transition:all .2s}
+.btn-new:hover{background:#0a2a0a}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(17,17,17,.3);border-top-color:#111;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.cep-loading{font-size:11px;color:#e8b84b;margin-top:4px;height:14px}
+
+.error-msg{background:#1f0d0d;border:1px solid #5a2e2e;border-radius:8px;padding:12px 16px;color:#ff8a8a;font-size:13px;margin-top:16px;display:none}
 </style>
 </head>
 <body>
-<div id="auth-wall">
-  <h1>🔐 Funparts</h1>
-  <p class="sub" style="margin-bottom:20px;margin-top:6px">Acesso restrito — admin</p>
-  <div>
-    <label>Senha admin</label>
-    <input type="password" id="senha-input" placeholder="Digite a senha..." />
-    <button class="btn" onclick="autenticar()">Entrar</button>
-    <div class="erro" id="auth-erro">Senha incorreta.</div>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">Funparts</div>
+    <div class="auth-title">Painel Admin</div>
+    <div class="auth-sub">Criar Pedido Manual</div>
+    <input id="auth-pass" class="auth-input" type="password" placeholder="Senha do painel" autocomplete="current-password">
+    <button class="auth-btn" id="auth-btn" onclick="doAuth()">Entrar</button>
+    <div class="auth-error" id="auth-error"></div>
   </div>
 </div>
 
-<div id="form-main" class="wrap">
-  <h1>✏️ Criar Pedido Manual</h1>
-  <div class="sub">Preencha os dados e envie o link de pagamento PIX ao cliente.</div>
-
-  <div class="section">
-    <h2>📦 Itens do pedido</h2>
-    <div id="itens-container"></div>
-    <button class="add-item" onclick="addItem()">+ Adicionar item</button>
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">Funparts</div>
+    <div class="topbar-title">Criar Pedido Manual</div>
+    <button class="topbar-logout" onclick="doLogout()">Sair</button>
   </div>
 
-  <div class="section">
-    <h2>👤 Dados do cliente</h2>
-    <div class="row">
-      <div><label>Nome completo *</label><input id="cli_nome" type="text" placeholder="João Silva" /></div>
-      <div><label>WhatsApp *</label><input id="cli_wpp" type="tel" placeholder="11999999999" /></div>
-    </div>
-    <div class="row">
-      <div><label>Email</label><input id="cli_email" type="email" placeholder="joao@email.com" /></div>
-      <div><label>CPF</label><input id="cli_cpf" type="text" placeholder="000.000.000-00" /></div>
-    </div>
-  </div>
+  <div class="container">
 
-  <div class="section">
-    <h2>🚚 Endereço de entrega</h2>
-    <div class="row">
-      <div><label>CEP</label><input id="cli_cep" type="text" placeholder="01310-100" oninput="buscarCep(this.value)" /></div>
-      <div><label>Número</label><input id="cli_num" type="text" placeholder="100" /></div>
+    <!-- CLIENTE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">👤</div>
+        <div class="section-label">Dados do Cliente</div>
+      </div>
+      <div class="section-body">
+        <div class="form-row form-row-2">
+          <div class="field">
+            <label>Nome completo *</label>
+            <input id="cli-nome" type="text" placeholder="Nome do cliente">
+          </div>
+          <div class="field">
+            <label>WhatsApp *</label>
+            <input id="cli-wpp" type="text" placeholder="11999998888" maxlength="15">
+          </div>
+        </div>
+        <div class="form-row form-row-2">
+          <div class="field">
+            <label>E-mail</label>
+            <input id="cli-email" type="email" placeholder="email@exemplo.com">
+          </div>
+          <div class="field">
+            <label>CPF</label>
+            <input id="cli-cpf" type="text" placeholder="000.000.000-00" maxlength="14">
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="row full"><label>Rua</label><input id="cli_rua" type="text" placeholder="Av. Paulista" /></div>
-    <div class="row">
-      <div><label>Complemento</label><input id="cli_comp" type="text" placeholder="Apto 42" /></div>
-      <div><label>Bairro</label><input id="cli_bairro" type="text" placeholder="Bela Vista" /></div>
-    </div>
-    <div class="row">
-      <div><label>Cidade</label><input id="cli_cidade" type="text" placeholder="São Paulo" /></div>
-      <div><label>UF</label><input id="cli_uf" type="text" placeholder="SP" maxlength="2" /></div>
-    </div>
-  </div>
 
-  <div class="section">
-    <h2>💰 Valores</h2>
-    <div class="row">
-      <div><label>Valor dos produtos (R$)</label><input id="val_produtos" type="number" step="0.01" min="0" placeholder="0.00" /></div>
-      <div><label>Frete (R$)</label><input id="val_frete" type="number" step="0.01" min="0" placeholder="0.00" value="0" /></div>
+    <!-- ENTREGA -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📦</div>
+        <div class="section-label">Endereço de Entrega</div>
+      </div>
+      <div class="section-body">
+        <div class="form-row form-row-2">
+          <div class="field">
+            <label>CEP</label>
+            <input id="cli-cep" type="text" placeholder="00000-000" maxlength="9" oninput="maskCep(this)" onblur="fetchCep()">
+            <div class="cep-loading" id="cep-status"></div>
+          </div>
+          <div class="field">
+            <label>Número</label>
+            <input id="cli-numero" type="text" placeholder="123">
+          </div>
+        </div>
+        <div class="form-row form-row-1">
+          <div class="field">
+            <label>Rua / Logradouro</label>
+            <input id="cli-rua" type="text" placeholder="Rua das Flores">
+          </div>
+        </div>
+        <div class="form-row form-row-3">
+          <div class="field">
+            <label>Complemento</label>
+            <input id="cli-comp" type="text" placeholder="Apto, Bloco…">
+          </div>
+          <div class="field">
+            <label>Bairro</label>
+            <input id="cli-bairro" type="text" placeholder="Centro">
+          </div>
+          <div class="field">
+            <label>Cidade / UF</label>
+            <input id="cli-cidade" type="text" placeholder="São Paulo / SP">
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="row full"><label>Observações internas (não aparece ao cliente)</label><textarea id="obs" rows="2" placeholder="Referência interna, combinado com cliente, etc."></textarea></div>
-  </div>
 
-  <button class="btn" id="btn-criar" onclick="criarPedido()">Criar pedido e gerar link</button>
-
-  <div id="resultado">
-    <h3>✅ Pedido criado com sucesso!</h3>
-    <div id="link-box"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="copy-btn" onclick="copiarLink()">📋 Copiar link</button>
-      <button class="wz-btn" onclick="abrirWhatsapp()">WhatsApp</button>
-      <button class="wz-btn" style="background:#833ab4" onclick="copiarMensagem()">📲 Copiar msg completa</button>
+    <!-- ITENS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🏎️</div>
+        <div class="section-label">Itens do Pedido</div>
+      </div>
+      <div class="section-body">
+        <div id="items-list"></div>
+        <button class="btn-add-item" onclick="addItem()">+ Adicionar Item</button>
+      </div>
     </div>
-  </div>
-  <div class="erro" id="form-erro"></div>
-</div>
+
+    <!-- TOTAIS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">💰</div>
+        <div class="section-label">Valores</div>
+      </div>
+      <div class="section-body">
+        <div class="form-row form-row-2">
+          <div class="field">
+            <label>Frete (R$)</label>
+            <input id="val-frete" type="number" min="0" step="0.01" placeholder="0,00" oninput="updateTotal()">
+          </div>
+          <div class="field">
+            <label>Desconto (R$)</label>
+            <input id="val-desconto" type="number" min="0" step="0.01" placeholder="0,00" oninput="updateTotal()">
+          </div>
+        </div>
+        <div class="total-bar">
+          <div class="total-label">Total do Pedido</div>
+          <div class="total-value" id="total-display">R$ 0,00</div>
+        </div>
+        <div class="form-row form-row-1" style="margin-top:14px">
+          <div class="field">
+            <label>Observações</label>
+            <textarea id="obs" placeholder="Notas internas, instruções especiais…"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="form-error"></div>
+
+    <button class="btn-submit" id="btn-submit" onclick="criarPedido()">
+      Criar Pedido e Gerar Link
+    </button>
+
+    <!-- RESULTADO -->
+    <div id="result-section">
+      <div class="result-title">✅ Pedido criado com sucesso!</div>
+      <div class="result-codigo" id="res-codigo">FP-XXXX</div>
+      <div class="result-link" id="res-link"></div>
+      <div class="result-btns">
+        <a id="btn-wpp" class="btn-wpp" target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.02 22l4.978-1.382A9.945 9.945 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 01-4.073-1.123l-.292-.174-3.016.838.838-3.068-.19-.299A7.963 7.963 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/></svg>
+          Enviar via WhatsApp
+        </a>
+        <button class="btn-copy" onclick="copyLink()">📋 Copiar Link do Pedido</button>
+        <button class="btn-copy" onclick="copyMsg()">💬 Copiar Mensagem Completa</button>
+        <button class="btn-new" onclick="novoPedido()">+ Criar Novo Pedido</button>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /app -->
 
 <script>
-var WORKER = 'https://funparts-ai-proxy.rodox1209.workers.dev';
-var SENHA_CORRETA = '';
-var pedidoLink = '';
+const WORKER = 'https://funparts-ai-proxy.rodox1209.workers.dev';
+let _adminKey = '';
+let _useFallback = false;
+let _itemCount = 0;
+let _lastResult = null;
 
-function autenticar() {
-  var s = document.getElementById('senha-input').value;
-  if (!s) return;
-  // Verifica enviando uma requisição de teste ao Worker
-  fetch(WORKER + '/stats', { headers: { 'x-admin-key': s } })
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      SENHA_CORRETA = s;
-      document.getElementById('auth-wall').style.display = 'none';
-      document.getElementById('form-main').style.display = 'block';
-      addItem();
-    })
-    .catch(function(){ 
-      // Worker stats pode não precisar de auth - só aceita
-      SENHA_CORRETA = s;
-      document.getElementById('auth-wall').style.display = 'none';
-      document.getElementById('form-main').style.display = 'block';
-      addItem();
+// ─────────────────── AUTH ───────────────────
+document.getElementById('auth-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAuth();
+});
+
+async function doAuth() {
+  const pass = document.getElementById('auth-pass').value.trim();
+  const errEl = document.getElementById('auth-error');
+  const btn = document.getElementById('auth-btn');
+  if (!pass) { errEl.textContent = 'Digite a senha.'; return; }
+  errEl.textContent = '';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Verificando…';
+
+  try {
+    // Test against /pedido-manual — 401 = wrong, 400/other = correct password
+    const r = await fetch(WORKER + '/pedido-manual', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': pass },
+      body: JSON.stringify({})
     });
+    if (r.status === 401) {
+      errEl.textContent = 'Senha incorreta.';
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+      return;
+    }
+    if (r.status === 404) {
+      // Worker not deployed yet — fallback mode using /pedido
+      _useFallback = true;
+    }
+    // 400 or any non-401 = password is correct
+    _adminKey = pass;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    addItem(); // start with one item
+  } catch (e) {
+    errEl.textContent = 'Erro de conexão: ' + e.message;
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
 }
 
-document.getElementById('senha-input').addEventListener('keydown', function(e){ if(e.key==='Enter') autenticar(); });
+function doLogout() {
+  _adminKey = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('auth-pass').value = '';
+  document.getElementById('auth-error').textContent = '';
+}
 
-var itemCount = 0;
+// ─────────────────── ITEMS ───────────────────
 function addItem() {
-  itemCount++;
-  var id = itemCount;
-  var div = document.createElement('div');
+  _itemCount++;
+  const n = _itemCount;
+  const list = document.getElementById('items-list');
+  const div = document.createElement('div');
   div.className = 'item-block';
-  div.id = 'item-' + id;
-  div.innerHTML = 
-    '<button class="del" onclick="removeItem(' + id + ')">×</button>' +
-    '<div class="row"><div><label>Título do produto</label><input id="it_titulo_'+id+'" type="text" placeholder="Quadro BMW M3 — Miniatura inclusa" /></div>' +
-    '<div><label>Subtítulo / detalhes</label><input id="it_sub_'+id+'" type="text" placeholder="49×49cm, Moldura Preta, LED" /></div></div>' +
-    '<div class="row three"><div><label>Preço unitário (R$)</label><input id="it_preco_'+id+'" type="number" step="0.01" min="0" placeholder="0.00" /></div>' +
-    '<div><label>Categoria</label><select id="it_tipo_'+id+'"><option value="mini">Miniatura inclusa</option><option value="lego">LEGO</option><option value="quad">Somente Quadro</option></select></div>' +
-    '<div><label>Observação do item</label><input id="it_obs_'+id+'" type="text" placeholder="Cor especial, etc." /></div></div>';
-  document.getElementById('itens-container').appendChild(div);
+  div.id = 'item-' + n;
+  div.innerHTML = `
+    <div class="item-num">Item #${n}</div>
+    <button class="item-remove" onclick="removeItem(${n})" title="Remover">×</button>
+    <div class="form-row form-row-2" style="margin-bottom:10px">
+      <div class="field">
+        <label>Título *</label>
+        <input type="text" id="it${n}-titulo" placeholder="Ex: Quadro Ferrari SF-23" oninput="updateTotal()">
+      </div>
+      <div class="field">
+        <label>Subtítulo</label>
+        <input type="text" id="it${n}-sub" placeholder="Ex: Charles Leclerc #16">
+      </div>
+    </div>
+    <div class="form-row form-row-3">
+      <div class="field">
+        <label>Preço (R$) *</label>
+        <input type="number" id="it${n}-preco" min="0" step="0.01" placeholder="0,00" oninput="updateTotal()">
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <select id="it${n}-tipo">
+          <option value="quadro">Quadro</option>
+          <option value="display">Display</option>
+          <option value="redoma">Redoma</option>
+          <option value="miniatura">Miniatura</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Qtd</label>
+        <input type="number" id="it${n}-qtd" min="1" value="1" oninput="updateTotal()">
+      </div>
+    </div>
+    <div class="form-row form-row-1" style="margin-top:0">
+      <div class="field">
+        <label>Notas do item</label>
+        <input type="text" id="it${n}-obs" placeholder="Cor, personalização, detalhes…">
+      </div>
+    </div>`;
+  list.appendChild(div);
+  updateTotal();
 }
 
-function removeItem(id) {
-  var el = document.getElementById('item-' + id);
+function removeItem(n) {
+  const el = document.getElementById('item-' + n);
   if (el) el.remove();
-}
-
-function buscarCep(cep) {
-  cep = cep.replace(/\D/g,'');
-  if (cep.length !== 8) return;
-  fetch('https://viacep.com.br/ws/' + cep + '/json/')
-    .then(r => r.json())
-    .then(d => {
-      if (!d.erro) {
-        document.getElementById('cli_rua').value = d.logradouro || '';
-        document.getElementById('cli_bairro').value = d.bairro || '';
-        document.getElementById('cli_cidade').value = d.localidade || '';
-        document.getElementById('cli_uf').value = d.uf || '';
-      }
-    }).catch(function(){});
+  updateTotal();
 }
 
 function getItems() {
-  var itens = [];
-  document.querySelectorAll('.item-block').forEach(function(block) {
-    var id = block.id.replace('item-','');
-    var titulo = (document.getElementById('it_titulo_'+id)||{}).value || '';
-    var sub = (document.getElementById('it_sub_'+id)||{}).value || '';
-    var preco = parseFloat((document.getElementById('it_preco_'+id)||{}).value || '0') || 0;
-    var tipo = (document.getElementById('it_tipo_'+id)||{}).value || 'mini';
-    var obs = (document.getElementById('it_obs_'+id)||{}).value || '';
-    if (titulo || preco > 0) {
-      itens.push({ titulo: titulo, sub: (sub + (obs?' — '+obs:'')).trim(), via: 'catalogo', tipo: tipo, cfg: { preco: preco } });
+  const items = [];
+  const blocks = document.querySelectorAll('.item-block');
+  blocks.forEach(block => {
+    const id = block.id.replace('item-', '');
+    const titulo = (document.getElementById('it' + id + '-titulo') || {}).value || '';
+    const sub = (document.getElementById('it' + id + '-sub') || {}).value || '';
+    const precoRaw = parseFloat((document.getElementById('it' + id + '-preco') || {}).value || '0') || 0;
+    const tipo = (document.getElementById('it' + id + '-tipo') || {}).value || 'quadro';
+    const qtd = parseInt((document.getElementById('it' + id + '-qtd') || {}).value || '1') || 1;
+    const obs = (document.getElementById('it' + id + '-obs') || {}).value || '';
+    if (titulo || precoRaw > 0) {
+      items.push({ titulo, sub, tipo, preco: precoRaw, qtd, obs, via: 'catalogo', cfg: { preco: precoRaw } });
     }
   });
-  return itens;
+  return items;
 }
 
-function criarPedido() {
-  var btn = document.getElementById('btn-criar');
-  var erroDiv = document.getElementById('form-erro');
-  erroDiv.style.display = 'none';
+function updateTotal() {
+  const items = getItems();
+  let sub = 0;
+  items.forEach(it => sub += (it.preco || 0) * (it.qtd || 1));
+  const frete = parseFloat(document.getElementById('val-frete').value || '0') || 0;
+  const desc = parseFloat(document.getElementById('val-desconto').value || '0') || 0;
+  const total = Math.max(0, sub + frete - desc);
+  document.getElementById('total-display').textContent = 'R$ ' + total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return total;
+}
 
-  var nome = document.getElementById('cli_nome').value.trim();
-  var wpp = document.getElementById('cli_wpp').value.replace(/\D/g,'');
-  if (!nome) { erroDiv.textContent = 'Nome do cliente é obrigatório.'; erroDiv.style.display='block'; return; }
-  if (!wpp) { erroDiv.textContent = 'WhatsApp do cliente é obrigatório.'; erroDiv.style.display='block'; return; }
+// ─────────────────── CEP ───────────────────
+function maskCep(input) {
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
+  input.value = v;
+}
 
-  var itens = getItems();
-  if (!itens.length) { erroDiv.textContent = 'Adicione ao menos um item ao pedido.'; erroDiv.style.display='block'; return; }
+async function fetchCep() {
+  const raw = document.getElementById('cli-cep').value.replace(/\D/g, '');
+  const st = document.getElementById('cep-status');
+  if (raw.length !== 8) return;
+  st.textContent = 'Buscando…';
+  try {
+    const r = await fetch('https://viacep.com.br/ws/' + raw + '/json/');
+    const d = await r.json();
+    if (d.erro) { st.textContent = 'CEP não encontrado'; return; }
+    document.getElementById('cli-rua').value = d.logradouro || '';
+    document.getElementById('cli-bairro').value = d.bairro || '';
+    document.getElementById('cli-cidade').value = (d.localidade || '') + (d.uf ? ' / ' + d.uf : '');
+    st.textContent = '';
+    document.getElementById('cli-numero').focus();
+  } catch(e) {
+    st.textContent = 'Erro ao buscar CEP';
+  }
+}
 
-  var frete = parseFloat(document.getElementById('val_frete').value || '0') || 0;
-  var prodTotal = itens.reduce(function(s,i){ return s + (i.cfg.preco||0); }, 0);
+// ─────────────────── SUBMIT ───────────────────
+async function criarPedido() {
+  const errEl = document.getElementById('form-error');
+  errEl.style.display = 'none';
 
-  var body = {
-    cliente: {
-      nome: nome,
-      cpf: document.getElementById('cli_cpf').value.replace(/\D/g,''),
-      whatsapp: wpp,
-      email: document.getElementById('cli_email').value.trim(),
-      cep: document.getElementById('cli_cep').value.replace(/\D/g,''),
-      rua: document.getElementById('cli_rua').value.trim(),
-      numero: document.getElementById('cli_num').value.trim(),
-      complemento: document.getElementById('cli_comp').value.trim(),
-      bairro: document.getElementById('cli_bairro').value.trim(),
-      cidade: document.getElementById('cli_cidade').value.trim(),
-      uf: document.getElementById('cli_uf').value.trim().toUpperCase()
-    },
-    items: itens,
-    frete: frete,
-    origem: 'MANUAL',
-    obs: document.getElementById('obs').value.trim()
+  const nome = document.getElementById('cli-nome').value.trim();
+  const wpp = document.getElementById('cli-wpp').value.replace(/\D/g, '');
+  if (!nome) { showError('Nome do cliente é obrigatório.'); return; }
+  if (!wpp) { showError('WhatsApp do cliente é obrigatório.'); return; }
+
+  const items = getItems();
+  if (items.length === 0) { showError('Adicione ao menos um item ao pedido.'); return; }
+  const hasTitle = items.every(it => it.titulo);
+  if (!hasTitle) { showError('Todos os itens precisam ter título.'); return; }
+
+  const total = updateTotal();
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Criando pedido…';
+
+  const cidadeRaw = document.getElementById('cli-cidade').value;
+  const [cidade, uf] = cidadeRaw.includes('/') ? cidadeRaw.split('/').map(s => s.trim()) : [cidadeRaw, ''];
+
+  const payload = {
+    customer_name: nome,
+    customer_phone: wpp,
+    customer_email: document.getElementById('cli-email').value.trim(),
+    customer_cpf: document.getElementById('cli-cpf').value.trim(),
+    shipping_cep: document.getElementById('cli-cep').value.trim(),
+    shipping_street: document.getElementById('cli-rua').value.trim(),
+    shipping_number: document.getElementById('cli-numero').value.trim(),
+    shipping_complement: document.getElementById('cli-comp').value.trim(),
+    shipping_bairro: document.getElementById('cli-bairro').value.trim(),
+    shipping_city: cidade,
+    shipping_state: uf,
+    total_value: total,
+    obs: document.getElementById('obs').value.trim(),
+    items
   };
 
-  btn.disabled = true;
-  btn.textContent = 'Criando pedido...';
-
-  fetch(WORKER + '/pedido', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(d) {
-    btn.disabled = false;
-    btn.textContent = 'Criar pedido e gerar link';
-    if (d.erro || d.error) {
-      erroDiv.textContent = 'Erro: ' + (d.erro || d.error);
-      erroDiv.style.display = 'block';
-    } else if (d.token || d.chave || d.ok) {
-      var token = d.token || d.chave || '';
-      pedidoLink = WORKER + '/pedido/' + token;
-      document.getElementById('link-box').textContent = pedidoLink;
-      document.getElementById('resultado').style.display = 'block';
-      document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
-    } else {
-      erroDiv.textContent = 'Resposta inesperada: ' + JSON.stringify(d).substring(0,200);
-      erroDiv.style.display = 'block';
+  try {
+    let data;
+    if (!_useFallback) {
+      const r = await fetch(WORKER + '/pedido-manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': _adminKey },
+        body: JSON.stringify(payload)
+      });
+      if (r.status === 404) {
+        _useFallback = true;
+      } else {
+        data = await r.json();
+        if (!r.ok) throw new Error(data.erro || data.error || 'Erro ao criar pedido');
+      }
     }
-  })
-  .catch(function(e) {
+
+    if (_useFallback) {
+      // Fallback: use existing /pedido endpoint
+      const pedidoPayload = {
+        via: 'manual',
+        customer_name: nome,
+        customer_phone: wpp,
+        customer_email: payload.customer_email,
+        customer_cpf: payload.customer_cpf,
+        shipping_cep: payload.shipping_cep,
+        shipping_street: payload.shipping_street,
+        shipping_number: payload.shipping_number,
+        shipping_complement: payload.shipping_complement,
+        shipping_bairro: payload.shipping_bairro,
+        shipping_city: payload.shipping_city,
+        shipping_state: payload.shipping_state,
+        total_value: total,
+        obs: payload.obs,
+        items: items.map(it => ({ ...it, via: 'catalogo', cfg: { preco: it.preco } }))
+      };
+      const r2 = await fetch(WORKER + '/pedido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': _adminKey },
+        body: JSON.stringify(pedidoPayload)
+      });
+      data = await r2.json();
+      if (!r2.ok) throw new Error(data.error || data.erro || 'Erro ao criar pedido (fallback)');
+    }
+
+    _lastResult = { ...data, nome, wpp, total, items };
+    showResult(data, nome, wpp, total, items);
+  } catch(e) {
+    showError('Erro: ' + e.message);
+  } finally {
     btn.disabled = false;
-    btn.textContent = 'Criar pedido e gerar link';
-    erroDiv.textContent = 'Erro de rede: ' + e.message;
-    erroDiv.style.display = 'block';
+    btn.textContent = 'Criar Pedido e Gerar Link';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('form-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function showResult(data, nome, wpp, total, items) {
+  const baseUrl = 'https://funparts-ai-proxy.rodox1209.workers.dev';
+  const token = data.token || data.uuid || data.d1_token || '';
+  const codigo = data.codigo || data.external_id || 'FP-???';
+  const link = token ? (baseUrl + '/pedido/' + token) : (data.link || '');
+
+  document.getElementById('res-codigo').textContent = codigo;
+  document.getElementById('res-link').textContent = link;
+
+  const itemsText = items.map((it, i) =>
+    `${i + 1}. ${it.titulo}${it.sub ? ' — ' + it.sub : ''}: R$ ${(it.preco * (it.qtd || 1)).toFixed(2).replace('.', ',')}`
+  ).join('\n');
+
+  const msg = encodeURIComponent(
+    `Olá ${nome}! 👋\n\nSeu pedido Funparts foi criado com sucesso!\n\n` +
+    `📋 *Código:* ${codigo}\n\n` +
+    `🛒 *Itens:*\n${itemsText}\n\n` +
+    `💰 *Total: R$ ${total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}*\n\n` +
+    `Para confirmar e pagar seu pedido, acesse o link abaixo:\n${link}\n\n` +
+    `Dúvidas? Estamos à disposição! 🏎️`
+  );
+
+  const wppNum = wpp.replace(/\D/g, '');
+  document.getElementById('btn-wpp').href = `https://wa.me/55${wppNum}?text=${msg}`;
+
+  document.getElementById('result-section').style.display = 'block';
+  document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // store for copy functions
+  window._resultLink = link;
+  window._resultMsg = decodeURIComponent(msg);
+}
+
+function copyLink() {
+  if (!window._resultLink) return;
+  navigator.clipboard.writeText(window._resultLink).then(() => {
+    const btn = event.target;
+    btn.textContent = '✅ Link copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar Link do Pedido', 2000);
   });
 }
 
-function copiarLink() {
-  navigator.clipboard.writeText(pedidoLink).then(function(){
-    var b = document.querySelector('.copy-btn');
-    b.textContent = '✅ Copiado!';
-    setTimeout(function(){ b.textContent = '📋 Copiar link'; }, 2000);
+function copyMsg() {
+  if (!window._resultMsg) return;
+  navigator.clipboard.writeText(window._resultMsg).then(() => {
+    const btn = event.target;
+    btn.textContent = '✅ Mensagem copiada!';
+    setTimeout(() => btn.textContent = '💬 Copiar Mensagem Completa', 2000);
   });
 }
 
-function abrirWhatsapp() {
-  var nome = document.getElementById('cli_nome').value.trim();
-  var msg = 'Olá ' + (nome.split(' ')[0]||'') + '! 🏎️\n\n' +
-    'Seu pedido Funparts foi criado. Acesse o link abaixo para revisar e efetuar o pagamento via PIX:\n\n' +
-    pedidoLink + '\n\n' +
-    'Qualquer dúvida, é só chamar! 🙌';
-  var wpp = document.getElementById('cli_wpp').value.replace(/\D/g,'');
-  window.open('https://wa.me/55' + wpp + '?text=' + encodeURIComponent(msg), '_blank');
-}
-
-function copiarMensagem() {
-  var nome = document.getElementById('cli_nome').value.trim();
-  var msg = 'Olá ' + (nome.split(' ')[0]||'') + '! 🏎️\n\n' +
-    'Seu pedido Funparts foi criado. Acesse o link abaixo para revisar e efetuar o pagamento via PIX:\n\n' +
-    pedidoLink + '\n\n' +
-    'Qualquer dúvida, é só chamar! 🙌';
-  navigator.clipboard.writeText(msg).then(function(){
-    var b = document.querySelectorAll('.wz-btn')[1];
-    b.textContent = '✅ Copiado!';
-    setTimeout(function(){ b.textContent = '📲 Copiar msg completa'; }, 2000);
+function novoPedido() {
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('form-error').style.display = 'none';
+  // Reset form fields
+  ['cli-nome','cli-wpp','cli-email','cli-cpf','cli-cep','cli-rua','cli-numero','cli-comp','cli-bairro','cli-cidade','val-frete','val-desconto','obs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
+  document.getElementById('items-list').innerHTML = '';
+  _itemCount = 0;
+  addItem();
+  updateTotal();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 </body>
