@@ -1216,7 +1216,6 @@ var EXTRA_EN={
   'PadrÃÂ£o':'Standard',
   'NÃÂºmero de corrida na carroceria':'Race number on the bodywork',
   'Ã¢ÂÂ± 7Ã¢ÂÂ12 dias ÃÂºteis':'Ã¢ÂÂ± 7Ã¢ÂÂ12 business days',
-  'Super HerÃÂ³is':'Super Heroes'
 };
 var EXTRA_PT={};
 Object.keys(EXTRA_EN).forEach(function(k){EXTRA_PT[EXTRA_EN[k]]=k;});
@@ -1296,7 +1295,6 @@ var ALL_EN={
   'Padr\u00E3o':'Standard',
   'N\u00FAmero de corrida na carroceria':'Race number on the bodywork',
   '\u23F1 7\u201312 dias \u00FAteis':'\u23F1 7\u201312 business days',
-  'Super Her\u00F3is':'Super Heroes'
 };
 
 var ALL_PT={};
@@ -1453,7 +1451,6 @@ var EN4={
   'PadrÃÂ£o':'Standard',
   'NÃÂºmero de corrida na carroceria':'Race number on the bodywork',
   'Ã¢ÂÂ± 7Ã¢ÂÂ12 dias ÃÂºteis':'Ã¢ÂÂ± 7Ã¢ÂÂ12 business days',
-  'Super HerÃÂ³is':'Super Heroes',
   /* Ã¢ÂÂÃ¢ÂÂ NEW entries for dynamically rendered wizard content Ã¢ÂÂÃ¢ÂÂ */
   'Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl)',
   'Fibra de Carbono':'Carbon Fiber',
@@ -1932,7 +1929,6 @@ var _EN9={
   'PadrÃÂ£o':'Standard',
   'NÃÂºmero de corrida na carroceria':'Race number on the bodywork',
   'Ã¢ÂÂ± 7Ã¢ÂÂ12 dias ÃÂºteis':'Ã¢ÂÂ± 7Ã¢ÂÂ12 business days',
-  'Super HerÃÂ³is':'Super Heroes',
   'Fibra de Carbono (Vinil)':'Carbon Fiber (Vinyl)',
   'Fibra de Carbono':'Carbon Fiber',
   'Envio prÃÂ³prio':'Self-provided',

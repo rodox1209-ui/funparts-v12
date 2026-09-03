@@ -71,12 +71,6 @@ const LEGO_CATALOG = {
     {name:'BMW 1000RR',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
     {name:'BMW GS 1250',dim:'49ÃÂ49cm',scale:'1:13',f1:false},
   ],
-  'Super HerÃÂ³is': [
-    {name:'BatmÃÂ³vel',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
-    {name:'Tumbler Batman',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
-    {name:'Ecto-01 Ghostbusters',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
-    {name:'X-Wing Star Wars',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
-  ],
   'Filmes': [
     {name:'DeLorean Ã¢ÂÂ De Volta para o Futuro',dim:'49ÃÂ49cm',scale:'1:13',f1:false},
     {name:'Ecto-01 Ghostbusters',dim:'53ÃÂ83cm',scale:'1:8',f1:false},
