@@ -1317,6 +1317,53 @@
   else iniciar();
 })();
 </script>
+<script>
+/* ============ CADA ETAPA COMECA NO TOPO DO SITE ============
+   Ao avancar ou voltar uma etapa, a pagina volta para o topo, onde ficam o
+   cabecalho, as abas com o passo atual e o preview do quadro. Antes disso a
+   tela continuava na altura em que o cliente estava, e a etapa nova abria
+   pelo meio.
+
+   So rola a pagina quando a etapa realmente mudou: se o avanco for barrado
+   (por exemplo, sem marca escolhida na etapa 2), nada acontece.
+   Vale para o botao do celular, o do desktop, o "voltar" e as abas do topo,
+   porque todos passam pelo mesmo goStep.
+   Se qualquer elemento faltar, sai sem fazer nada (nunca quebra a pagina). */
+(function(){
+  function ativa(){
+    var s=document.querySelectorAll('.cfg-sec');
+    for(var i=0;i<s.length;i++)if(s[i].classList.contains('active'))return i;
+    return -1;
+  }
+  function aoTopo(){
+    try{window.scrollTo(0,0);}catch(e){}
+    try{if(document.documentElement)document.documentElement.scrollTop=0;}catch(e){}
+    try{if(document.body)document.body.scrollTop=0;}catch(e){}
+    try{
+      var p=document.getElementById('cfgPanel');
+      if(p)p.scrollTop=0;
+    }catch(e){}
+  }
+  function iniciar(){
+    if(typeof window.goStep!=='function')return;
+    var oGo=window.goStep;
+    window.goStep=function(){
+      var antes=ativa();
+      var r=oGo.apply(this,arguments);
+      try{
+        if(ativa()!==antes){
+          aoTopo();
+          setTimeout(aoTopo,0);   /* de novo depois que o layout assenta */
+        }
+      }catch(e){}
+      return r;
+    };
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',iniciar);
+  else iniciar();
+})();
+</script>
 <style>
 .cart-acts{display:flex;align-items:center;gap:13px;}
 .cart-ed{background:none;border:none;color:#e07b00;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
