@@ -4194,20 +4194,32 @@ function _rascEnvia(){
 // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ FUNPARTS PATCH v1: nova etapa de frete + RETIRAR NA FÃÂBRICA Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 ;(function(){
   var _step=1;
-  var RETIRADA='RETIRAR NA FÃÂBRICA';
+  var RETIRADA='RETIRAR NA F\u00C1BRICA';
 
+  /* marca a opcao pelo atributo data-retirada. Antes comparava o texto da
+     tela com a constante do codigo, e os dois nunca batiam: a tela mostra
+     "RETIRAR NA FABRICA" corrigido e a constante estava corrompida. Por isso
+     o clique funcionava mas a bolinha nunca acendia. */
+  function _marcaRetirada(ligado){
+    var achou=false;
+    document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(el){
+      var eh=el.getAttribute('data-retirada')==='1';
+      if(!eh){
+        var n=el.querySelector('.fp-frete-nome');
+        eh=!!(n&&n.textContent===RETIRADA);        /* reserva */
+      }
+      if(eh){ achou=true; el.classList.toggle('on',!!ligado); }
+      else if(ligado){ el.classList.remove('on'); }
+    });
+    return achou;
+  }
   window._selRetirada=function(){
     window._freteEscolhido={label:RETIRADA,price:0,carrier:null,currency:'BRL'};
     if(typeof _fpFreteAtualizaTot==='function')_fpFreteAtualizaTot();
-    document.querySelectorAll('#fpFreteOpts').forEach(function(c){
-      c.querySelectorAll('.fp-frete-opt').forEach(function(el){
-        var n=el.querySelector('.fp-frete-nome');
-        el.classList.toggle('on',!!(n&&n.textContent===RETIRADA));
-      });
-    });
+    _marcaRetirada(true);
   };
 
-  var RETIRADA_HTML='<div class="fp-frete-opt" onclick="_selRetirada()">'
+  var RETIRADA_HTML='<div class="fp-frete-opt" data-retirada="1" onclick="_selRetirada()">'
     +'<div class="fp-frete-radio"></div>'
     +'<div class="fp-frete-info"><div class="fp-frete-nome">'+RETIRADA+'</div>'
     +'<div class="fp-frete-prazo">Combinar retirada</div>'
@@ -4216,16 +4228,32 @@ function _rascEnvia(){
 
   function _ensureRetirada(){
     document.querySelectorAll('#fpFreteOpts').forEach(function(el){
-      if(el.innerHTML.indexOf(RETIRADA)===-1)el.innerHTML+=RETIRADA_HTML;
+      if(!el.querySelector('[data-retirada="1"]'))el.innerHTML+=RETIRADA_HTML;
     });
   }
 
   function _updateRetiradaState(){
     var sel=!!(window._freteEscolhido&&window._freteEscolhido.label===RETIRADA);
-    document.querySelectorAll('#fpFreteOpts .fp-frete-opt').forEach(function(el){
-      var n=el.querySelector('.fp-frete-nome');
-      if(n&&n.textContent===RETIRADA)el.classList.toggle('on',sel);
-    });
+    if(sel)_marcaRetirada(true);
+  }
+
+  /* nao deixa passar da escolha do frete sem uma opcao de entrega marcada.
+     So barra quando ha opcao para escolher: se a lista estiver vazia por
+     algum motivo, o cliente nunca fica preso. */
+  function _faltaFrete(){
+    if(window._freteEscolhido)return false;
+    var cx=document.querySelector('#cartFoot #fpFreteOpts')||
+           document.getElementById('fpFreteOpts');
+    if(!cx)return false;
+    var n=cx.querySelectorAll('.fp-frete-opt').length;
+    if(!n)return false;
+    try{
+      cx.scrollIntoView({behavior:'smooth',block:'center'});
+      cx.style.transition='box-shadow .25s';
+      cx.style.boxShadow='0 0 0 2px rgba(224,123,0,.75)';
+      setTimeout(function(){cx.style.boxShadow='';},1200);
+    }catch(e){}
+    return true;
   }
 
   var _origRender=window._fpFreteRender;
@@ -4271,6 +4299,7 @@ function _rascEnvia(){
       _fpFreteCalc();
       _ensureRetirada();
     }else{
+      if(n===2&&_step===1.5&&_faltaFrete())return;   /* falta escolher a entrega */
       if(n!==2){
         var f1r=document.getElementById('cartFoot');
         var bGr=f1r?f1r.querySelector('.btn-cart-go'):null;
