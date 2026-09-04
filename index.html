@@ -977,7 +977,8 @@
    Le a lista de fotos em <WORKER>/carrossel. Se o endpoint ainda nao
    existir, segue com as fotos que estao no HTML. Nunca quebra a pagina. */
 (function(){
-  var CAR='https://funparts-ai-proxy.rodox1209.workers.dev/carrossel';
+  var BASE='https://funparts-ai-proxy.rodox1209.workers.dev';
+  var CAR=BASE+'/catalogo';
   var TROCA=5000;
   function iniciar(){
     var car=document.getElementById('fpCar'),track=document.getElementById('fpTrack');
@@ -1046,8 +1047,17 @@
         if(!r.ok)throw 0;
         return r.json();
       }).then(function(js){
-        var fotos=(js&&js.fotos)||js;
-        if(!fotos||!fotos.length)return;
+        var inf=(js&&js.infos)||{};
+        var ks=[];
+        for(var kk in inf){ if(/^carrossel_\d+$/.test(kk)) ks.push(kk); }
+        ks.sort(function(a,b){return (+a.split('_')[1])-(+b.split('_')[1]);});
+        var fotos=[];
+        for(var q=0;q<ks.length;q++){
+          var it=inf[ks[q]]||{};
+          if(!it.img)continue;
+          fotos.push({url:BASE+'/img/'+encodeURIComponent(it.img),legenda:it.texto||''});
+        }
+        if(!fotos.length)return;
         var html='';
         for(var k=0;k<fotos.length;k++){
           var f=fotos[k];
