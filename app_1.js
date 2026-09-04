@@ -1393,6 +1393,45 @@ async function triggerDetTopView(){
   }
 }
 
+/* No celular, um quadro quadrado ou deitado tem que ser mandado pela LARGURA.
+   Com height:100%;width:auto;max-width:100% a largura calculada estoura a
+   coluna, o max-width corta so a largura e o quadro fica alto e estreito.
+   No desktop a coluna e larga e o corte nunca acontece -- por isso la sempre
+   esteve certo, e nada muda no desktop. */
+function _fpQuadroMobile(el,ratio){
+  if(!el)return;
+  var l=0,a=0;
+  if(ratio){
+    var pp=String(ratio).split('/');
+    l=parseFloat(String(pp[0]).replace(',','.'));
+    a=parseFloat(String(pp[1]).replace(',','.'));
+  }
+  var naoEhRetrato=(l>0&&a>0&&l>=a);
+  var celular=false;
+  try{celular=window.innerWidth<=720;}catch(e){}
+  if(celular&&naoEhRetrato){
+    el.style.width='100%';
+    el.style.height='auto';
+  }else{
+    el.style.width='auto';      /* volta ao padrao que vem do HTML */
+    el.style.height='100%';
+  }
+}
+/* refaz o ajuste quando o celular gira ou a janela muda de tamanho */
+(function(){
+  var _t=null;
+  try{
+    window.addEventListener('resize',function(){
+      clearTimeout(_t);
+      _t=setTimeout(function(){
+        try{
+          var q=document.getElementById('legoDetQuadro');
+          if(q)_fpQuadroMobile(q,q.style.aspectRatio||'');
+        }catch(e){}
+      },140);
+    });
+  }catch(e){}
+})();
 function _legoLegacyRatio(dim){
   // Compute CSS aspect-ratio from LEGO dim strings like "53ÃÂ83cm"
   if(!dim) return '';
@@ -1447,6 +1486,7 @@ function updateDetPreview(){
     if(ldq&&S.legoDim){
       var _lr=_legoLegacyRatio(S.legoDim);
       if(_lr){ldq.style.aspectRatio=_lr;}
+      _fpQuadroMobile(ldq,_lr||ldq.style.aspectRatio||'');
       ldq.classList.toggle('lego-53x83',/^53\s*[ÃÂx]\s*83/.test(S.legoDim));
     }
     // Scale reference image (lazy-load from wallModal)
