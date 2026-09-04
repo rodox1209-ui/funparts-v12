@@ -1079,42 +1079,70 @@
 })();
 </script>
 <script>
-/* ============ ETAPA 2: MARCA ESCOLHIDA EM CIMA, GRADE EMBAIXO ============
+/* ============ ETAPA 2: OS MODELOS ABREM NO MEIO DAS MARCAS ============
    Ao abrir a etapa nenhuma marca vem escolhida: aparece so a grade das 15.
-   Ao escolher uma, a etapa vira:
-       MARCA ESCOLHIDA -> faixa com o logo da marca
-       MODELO          -> os modelos daquela marca
-       MARCA/CATEGORIA -> a grade completa, para trocar quando quiser
-   A grade nunca some: ela desce para baixo dos modelos.
-   Enquanto nao houver marca escolhida, o botao de avancar nao passa da etapa.
+   Ao tocar numa marca, o bloco MODELO abre logo abaixo da linha daquela
+   marca, dentro da propria grade -- no lugar onde o dedo esta, sem jogar a
+   pagina para o topo. As marcas seguintes continuam logo abaixo dos modelos.
+   Enquanto nao houver marca escolhida, o avanco de etapa fica travado.
 
-   Nao cria, nao apaga e nao redesenha nenhum item da grade -- so muda de lugar
-   e liga/desliga. Os modelos continuam vindo do banco (D1) pelo /catalogo.
-   Se qualquer elemento faltar, sai sem fazer nada (nunca quebra a pagina). */
+   Nao cria, nao apaga e nao redesenha nenhum item da grade -- so muda de
+   lugar e liga/desliga. Os modelos continuam vindo do banco (D1) pelo
+   /catalogo. Se qualquer elemento faltar, sai sem fazer nada. */
 (function(){
-  var GRID=null,LISTA=null,BLOCO=null,FAIXA=null,ROTULO=null,SECAO=null;
+  var GRID=null,LISTA=null,BLOCO=null,SECAO=null;
   function escolhida(){ return GRID?GRID.querySelector('.bcard.sel'):null; }
+  /* quantas colunas a grade tem agora (2 no celular, 4 no desktop) */
+  function colunas(){
+    try{
+      var g=(getComputedStyle(GRID).gridTemplateColumns||'').trim();
+      var m=/repeat\(\s*(\d+)/.exec(g);
+      if(m)return +m[1];
+      var n=g.split(/\s+/).filter(function(x){return !!x;}).length;
+      return n>0?n:1;
+    }catch(e){return 1;}
+  }
+  /* ultima marca da mesma linha visual da marca escolhida */
+  function fimDaLinha(cards,sel){
+    if(GRID.offsetParent){          /* visivel: mede na tela, sempre exato */
+      var t=sel.offsetTop,ult=sel;
+      for(var k=0;k<cards.length;k++){
+        if(Math.abs(cards[k].offsetTop-t)<4)ult=cards[k];
+      }
+      return ult;
+    }
+    var c=colunas();                /* escondido: usa as colunas do CSS */
+    var i=cards.indexOf(sel);
+    return cards[Math.min(cards.length-1,(Math.floor(i/c)+1)*c-1)];
+  }
   function pinta(){
     var sel=escolhida();
-    if(!sel){
-      ROTULO.classList.remove('on');
-      FAIXA.classList.remove('on');
-      BLOCO.classList.remove('on');
-      return;
-    }
-    var nm=sel.querySelector('.bnm'), img=sel.querySelector('img');
-    var ico=FAIXA.querySelector('.fp-marca-ico');
-    ico.innerHTML='';
-    if(img){
-      var c=document.createElement('img');
-      c.src=img.getAttribute('src')||'';
-      c.alt='';
-      ico.appendChild(c);
-    }
-    FAIXA.querySelector('.fp-marca-nm').textContent=nm?nm.textContent:'';
-    ROTULO.classList.add('on');
-    FAIXA.classList.add('on');
+    if(!sel){ BLOCO.classList.remove('on'); return; }
     BLOCO.classList.add('on');
+    var cards=[].slice.call(GRID.querySelectorAll('.bcard'));
+    if(cards.indexOf(sel)<0)return;
+    var ancora=fimDaLinha(cards,sel);
+    if(ancora&&ancora.nextSibling!==BLOCO)GRID.insertBefore(BLOCO,ancora.nextSibling);
+  }
+  /* quem rola a tela: a coluna do configurador ou a propria janela */
+  function rolador(){
+    var n=GRID.parentNode;
+    while(n&&n!==document.body&&n!==document.documentElement){
+      try{
+        var st=getComputedStyle(n);
+        if(/(auto|scroll)/.test(st.overflowY)&&n.scrollHeight>n.clientHeight+4)return n;
+      }catch(e){}
+      n=n.parentNode;
+    }
+    return null;
+  }
+  /* mantem a marca tocada exatamente no mesmo ponto da tela */
+  function seguraNoLugar(card,antes){
+    if(antes===null||!card)return;
+    var d=card.getBoundingClientRect().top-antes;
+    if(Math.abs(d)<1)return;
+    var c=rolador();
+    if(c)c.scrollTop+=d; else window.scrollBy(0,d);
   }
   /* pisca a grade quando tentam avancar sem escolher */
   function cobra(){
@@ -1126,7 +1154,7 @@
   function precisaEscolher(n){
     if(n<=1)return false;
     if(typeof S==='undefined'||S.tipo!=='lego')return false;
-    if(!SECAO||!SECAO.offsetParent)return false;      /* secao LEGO nao esta na tela */
+    if(!SECAO||!SECAO.offsetParent)return false;      /* secao LEGO fora da tela */
     var atual=document.getElementById('step-1');
     if(!atual||!atual.classList.contains('active'))return false;
     return !escolhida();
@@ -1136,33 +1164,20 @@
     LISTA=document.getElementById('legoModels');
     SECAO=document.getElementById('legoSection');
     BLOCO=LISTA?LISTA.parentNode:null;
-    if(!GRID||!BLOCO||document.getElementById('fpMarca'))return;
+    if(!GRID||!BLOCO||BLOCO===GRID||GRID.contains(BLOCO))return;
     LISTA.style.maxHeight='none';
     LISTA.style.overflowY='visible';
     BLOCO.classList.add('fp-esc');
-    ROTULO=document.createElement('div');
-    ROTULO.className='sec-sub fp-esc';
-    ROTULO.id='fpMarcaLbl';
-    ROTULO.style.marginBottom='8px';
-    ROTULO.textContent='Marca escolhida';
-    FAIXA=document.createElement('div');
-    FAIXA.id='fpMarca';
-    FAIXA.className='fp-marca';
-    FAIXA.innerHTML='<span class="fp-marca-ico"></span><span class="fp-marca-nm"></span>';
-    /* ordem final: MARCA ESCOLHIDA, faixa, MODELO, MARCA/CATEGORIA, grade */
-    var antes=GRID.previousElementSibling||GRID;     /* rotulo "Marca / Categoria" */
-    var pai=GRID.parentNode;
-    pai.insertBefore(ROTULO,antes);
-    pai.insertBefore(FAIXA,antes);
-    pai.insertBefore(BLOCO,antes);
     /* ao abrir, nenhuma marca escolhida */
     [].forEach.call(GRID.querySelectorAll('.bcard'),function(c){c.classList.remove('sel');});
     pinta();
     if(typeof window.selLegoBrand==='function'){
       var oSel=window.selLegoBrand;
-      window.selLegoBrand=function(){
+      window.selLegoBrand=function(card){
+        var antes=null;
+        try{ if(card&&card.getBoundingClientRect)antes=card.getBoundingClientRect().top; }catch(e){}
         var r=oSel.apply(this,arguments);
-        try{pinta();}catch(e){}
+        try{ pinta(); seguraNoLugar(card,antes); }catch(e){}
         return r;
       };
     }
@@ -1188,6 +1203,10 @@
         return oGo.apply(this,arguments);
       };
     }
+    var t=null;
+    window.addEventListener('resize',function(){
+      clearTimeout(t);t=setTimeout(function(){try{pinta();}catch(e){}},120);
+    });
   }
   if(document.readyState==='loading')
     document.addEventListener('DOMContentLoaded',iniciar);
@@ -1273,20 +1292,9 @@
         color:rgba(255,255,255,.6);pointer-events:none;padding:0 14px;}
 @media(max-width:680px){.fp-cap{font-size:8.5px;bottom:23px;}}
 @media(prefers-reduced-motion:reduce){.fp-track{transition:none;}}
-/* ============ ETAPA 2: FAIXA DA MARCA ESCOLHIDA ============ */
-.fp-marca{display:none;align-items:center;gap:10px;
-          width:100%;box-sizing:border-box;min-height:52px;padding:10px 12px;
-          border:1px solid var(--orange);border-radius:5px;
-          background:rgba(58,156,200,.06);text-align:left;font-family:inherit;}
-.fp-marca.on{display:flex;}
-.fp-marca-ico{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;
-              justify-content:center;}
-.fp-marca-ico img{max-width:100%;max-height:100%;object-fit:contain;}
-.fp-marca-nm{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
-             letter-spacing:1px;text-transform:uppercase;color:var(--orange);
-             overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* ============ ETAPA 2: MODELOS ABREM DENTRO DA GRADE ============ */
 .fp-esc{display:none;}
-.fp-esc.on{display:block;}
+.fp-esc.on{display:block;grid-column:1 / -1;}
 .fp-pisca{box-shadow:0 0 0 2px rgba(224,123,0,.75);border-radius:6px;
           transition:box-shadow .25s;}
 </style>
