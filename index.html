@@ -28,8 +28,8 @@
 .novaPersona-btn{display:inline-flex;align-items:center;gap:7px;margin-left:16px;background:linear-gradient(135deg,#1c1c1c,#121212);border:1px solid #e07b00;color:#fff;font-family:inherit;font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:8px 15px;border-radius:999px;cursor:pointer;box-shadow:0 2px 9px rgba(0,0,0,.45);transition:background .15s,box-shadow .15s,transform .12s;white-space:nowrap;}
 .novaPersona-btn:hover{background:#e07b00;border-color:#e07b00;box-shadow:0 4px 16px rgba(224,123,0,.45);transform:translateY(-1px);}
 .novaPersona-btn:active{transform:translateY(0);}
-.novaPersona-btn svg{width:13px;height:13px;flex-shrink:0;}
-@media(max-width:680px){.novaPersona-btn span{display:none;}.novaPersona-btn{padding:8px;margin-left:9px;}}
+.novaPersona-btn svg{width:13px;height:13px;flex-shrink:0;}.novaPersona-btn .np-curto{display:none;}
+@media(max-width:680px){header .sub{display:none;}.novaPersona-btn .np-full{display:none;}.novaPersona-btn .np-curto{display:inline;}.novaPersona-btn{padding:8px 13px;margin-left:9px;margin-right:auto;font-size:9.8px;letter-spacing:.4px;}}
 </style>
 <header>
   <div class="logo-img-wrap">
@@ -37,7 +37,7 @@
   </div>
   <button class="novaPersona-btn" onclick="iniciarNovaPersonalizacao()" title="ComeÃÂ§ar uma personalizaÃÂ§ÃÂ£o do zero (mantÃÂ©m o carrinho)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-    <span>Iniciar nova personalizaÃÂ§ÃÂ£o</span>
+    <span class="np-full">Iniciar nova personalizaÃÂ§ÃÂ£o</span><span class="np-curto">Nova personalizaÃÂ§ÃÂ£o</span>
   </button>
   <div class="sub" id="headerSub">Visualizador ÃÂ· Ferrari SF24 F1 LEGO</div>
   <button class="cart-btn" id="cartBtn" onclick="abrirCarrinho()" aria-label="Abrir carrinho">
