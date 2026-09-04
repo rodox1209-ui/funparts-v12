@@ -1213,6 +1213,110 @@
   else iniciar();
 })();
 </script>
+<script>
+/* ====== QUADRO INCLUSO MINIATURA: MODELOS ABREM NO MEIO DAS MARCAS ======
+   Mesmo comportamento da etapa 2 do LEGO, agora na tela de quadros que ja
+   vem com a miniatura: ao tocar numa marca, a lista de modelos abre logo
+   abaixo da linha daquela marca, dentro da propria grade, e as marcas
+   seguintes continuam abaixo. A pagina nao sobe para o topo.
+
+   Aqui a grade de marcas e' redesenhada pelo proprio site (renderInclusoBrands)
+   sempre que o catalogo do banco chega. Por isso o bloco de modelos e' tirado
+   da grade antes de cada redesenho e recolocado no clique seguinte -- assim o
+   redesenho nunca apaga o bloco.
+   Se qualquer elemento faltar, sai sem fazer nada (nunca quebra a pagina). */
+(function(){
+  var GRID=null,WRAP=null,PAI=null,DEPOIS=null;
+  function colunas(){
+    try{
+      var g=(getComputedStyle(GRID).gridTemplateColumns||'').trim();
+      var m=/repeat\(\s*(\d+)/.exec(g);
+      if(m)return +m[1];
+      var n=g.split(/\s+/).filter(function(x){return !!x;}).length;
+      return n>0?n:1;
+    }catch(e){return 1;}
+  }
+  function fimDaLinha(cards,sel){
+    if(GRID.offsetParent){
+      var t=sel.offsetTop,ult=sel;
+      for(var k=0;k<cards.length;k++){
+        if(Math.abs(cards[k].offsetTop-t)<4)ult=cards[k];
+      }
+      return ult;
+    }
+    var c=colunas();
+    var i=cards.indexOf(sel);
+    return cards[Math.min(cards.length-1,(Math.floor(i/c)+1)*c-1)];
+  }
+  function rolador(){
+    var n=GRID.parentNode;
+    while(n&&n!==document.body&&n!==document.documentElement){
+      try{
+        var st=getComputedStyle(n);
+        if(/(auto|scroll)/.test(st.overflowY)&&n.scrollHeight>n.clientHeight+4)return n;
+      }catch(e){}
+      n=n.parentNode;
+    }
+    return null;
+  }
+  function seguraNoLugar(card,antes){
+    if(antes===null||!card)return;
+    var d=card.getBoundingClientRect().top-antes;
+    if(Math.abs(d)<1)return;
+    var c=rolador();
+    if(c)c.scrollTop+=d; else window.scrollBy(0,d);
+  }
+  function foraDaGrade(){
+    if(WRAP&&PAI&&WRAP.parentNode!==PAI)PAI.insertBefore(WRAP,DEPOIS);
+  }
+  function posiciona(){
+    if(!GRID||!WRAP)return;
+    var sel=GRID.querySelector('.bcard.sel');
+    if(!sel){foraDaGrade();return;}
+    var cards=[].slice.call(GRID.querySelectorAll('.bcard'));
+    if(cards.indexOf(sel)<0){foraDaGrade();return;}
+    WRAP.style.gridColumn='1 / -1';
+    var a=fimDaLinha(cards,sel);
+    if(a&&a.nextSibling!==WRAP)GRID.insertBefore(WRAP,a.nextSibling);
+  }
+  function iniciar(){
+    GRID=document.getElementById('inclusoBrands');
+    WRAP=document.getElementById('inclusoModelsWrap');
+    if(!GRID||!WRAP||GRID.contains(WRAP))return;
+    PAI=WRAP.parentNode;
+    DEPOIS=WRAP.nextSibling;
+    var lst=document.getElementById('inclusoModels');
+    if(lst){lst.style.maxHeight='none';lst.style.overflowY='visible';}
+    if(typeof window.renderInclusoBrands==='function'){
+      var oRen=window.renderInclusoBrands;
+      window.renderInclusoBrands=function(){
+        foraDaGrade();                 /* tira o bloco antes do redesenho */
+        return oRen.apply(this,arguments);
+      };
+    }
+    if(typeof window.selInclusoBrand==='function'){
+      var oSel=window.selInclusoBrand;
+      window.selInclusoBrand=function(b){
+        var card=null,antes=null;
+        try{
+          card=GRID.querySelector('.bcard[data-ib="'+String(b).replace(/"/g,'\\"')+'"]');
+          if(card)antes=card.getBoundingClientRect().top;
+        }catch(e){}
+        var r=oSel.apply(this,arguments);
+        try{ posiciona(); seguraNoLugar(card,antes); }catch(e){}
+        return r;
+      };
+    }
+    var t=null;
+    window.addEventListener('resize',function(){
+      clearTimeout(t);t=setTimeout(function(){try{posiciona();}catch(e){}},120);
+    });
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',iniciar);
+  else iniciar();
+})();
+</script>
 <style>
 .cart-acts{display:flex;align-items:center;gap:13px;}
 .cart-ed{background:none;border:none;color:#e07b00;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
