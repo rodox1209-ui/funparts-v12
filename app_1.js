@@ -3262,6 +3262,12 @@ function _mobUpdateNav(){
     else{btn.style.display='';btn.textContent=(labels[_mobStep]||'PrÃÂ³ximo')+' Ã¢ÂÂ';}
   }
   if(bck){bck.style.display=_mobStep>0?'':'none';}
+  var bs=document.getElementById('mobBarStep');
+  if(bs){
+    var _tot=secs-1-(isLego?0:1);              // mini pula uma etapa
+    var _at=_mobStep+1-((!isLego&&_mobStep>2)?1:0);
+    bs.textContent=(_mobStep>=secs-1)?'Resumo':('Passo '+_at+' de '+_tot);
+  }
 }
 
 // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
