@@ -181,7 +181,27 @@
 
   <div class="pv-panel">
     <div id="heroImg" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:10px 40px;box-sizing:border-box;">
-      <img src="images/img_002.webp" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;" alt="Funparts Quadros">
+      <!-- ===================== CARROSSEL DA ETAPA 1 =====================
+           PARA TROCAR AS FOTOS: edite so as linhas com a classe fp-slide abaixo.
+             . tirar uma foto  -> apague a linha inteira dela
+             . incluir uma     -> suba a imagem em images/ e copie uma linha,
+                                  trocando o nome do arquivo e a legenda
+           As bolinhas se ajustam sozinhas a quantidade de fotos.
+           Quando o painel de fotos ficar pronto no Worker, esta lista vira
+           apenas a reserva: o carrossel passa a obedecer o painel sozinho.
+           ================================================================ -->
+      <div class="fp-car" id="fpCar">
+        <div class="fp-track" id="fpTrack">
+        <div class="fp-slide"><img src="images/img_002.webp" alt="Linha completa de quadros" loading="lazy" draggable="false"></div>
+        <div class="fp-slide"><img src="images/produto_2.jpg" alt="Montado na parede" loading="lazy" draggable="false"></div>
+        <div class="fp-slide"><img src="images/produto_4.jpg" alt="Acabamento e profundidade" loading="lazy" draggable="false"></div>
+        <div class="fp-slide"><img src="images/img_088.jpg" alt="Escala real do quadro" loading="lazy" draggable="false"></div>
+        <div class="fp-slide"><img src="images/produto_1.jpg" alt="Red Bull RB19" loading="lazy" draggable="false"></div>
+        <div class="fp-slide"><img src="images/produto_3.jpg" alt="Detalhe do alto-relevo" loading="lazy" draggable="false"></div>
+        </div>
+        <div class="fp-cap" id="fpCap"></div>
+        <div class="fp-dots" id="fpDots"></div>
+      </div>
     </div>
 
     <div id="legoHeroImg" style="width:100%;height:100%;display:none;position:relative;align-items:center;justify-content:center;padding:40px;box-sizing:border-box;">
@@ -952,6 +972,102 @@
 </div>
 <script src="app_2.js"></script>
 <script src="fp_addons.js?v=16"></script>
+<script>
+/* ===================== CARROSSEL DA ETAPA 1 =====================
+   Le a lista de fotos em <WORKER>/carrossel. Se o endpoint ainda nao
+   existir, segue com as fotos que estao no HTML. Nunca quebra a pagina. */
+(function(){
+  var CAR='https://funparts-ai-proxy.rodox1209.workers.dev/carrossel';
+  var TROCA=5000;
+  function iniciar(){
+    var car=document.getElementById('fpCar'),track=document.getElementById('fpTrack');
+    if(!car||!track)return;
+    var dotsC=document.getElementById('fpDots'),capEl=document.getElementById('fpCap');
+    var i=0,timer=null,n=0;
+    var reduz=false;
+    try{reduz=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+
+    function legendas(){
+      return [].map.call(track.children,function(s){
+        var im=s.querySelector('img');return im?(im.getAttribute('alt')||''):'';});
+    }
+    function montaDots(){
+      n=track.children.length;
+      dotsC.innerHTML='';
+      if(n<2){dotsC.style.display='none';if(capEl)capEl.style.display='none';return;}
+      dotsC.style.display='';
+      for(var k=0;k<n;k++){
+        var b=document.createElement('button');
+        b.className='fp-dot'+(k===0?' on':'');
+        b.type='button';
+        b.setAttribute('aria-label','Foto '+(k+1));
+        b.setAttribute('data-i',k);
+        b.onclick=function(e){ir(+e.currentTarget.getAttribute('data-i'));reinicia();};
+        dotsC.appendChild(b);
+      }
+    }
+    function ir(k){
+      if(!n)return;
+      i=((k%n)+n)%n;
+      track.style.transform='translateX('+(-i*100)+'%)';
+      var ds=dotsC.children;
+      for(var j=0;j<ds.length;j++)ds[j].className='fp-dot'+(j===i?' on':'');
+      if(capEl)capEl.textContent=legendas()[i]||'';
+    }
+    function para(){if(timer){clearInterval(timer);timer=null;}}
+    function anda(){if(!timer&&!reduz&&n>1)timer=setInterval(function(){ir(i+1);},TROCA);}
+    function reinicia(){para();anda();}
+
+    var x0=null,dx=0,arr=false;
+    function ini(x){x0=x;dx=0;arr=true;para();track.className='fp-track fp-drag';}
+    function mov(x){if(!arr)return;dx=x-x0;
+      track.style.transform='translateX(calc('+(-i*100)+'% + '+dx+'px))';}
+    function fim(){if(!arr)return;arr=false;track.className='fp-track';
+      var lim=car.clientWidth*0.18;
+      if(dx<-lim)ir(i+1);else if(dx>lim)ir(i-1);else ir(i);anda();}
+    car.addEventListener('touchstart',function(e){ini(e.touches[0].clientX);},{passive:true});
+    car.addEventListener('touchmove',function(e){mov(e.touches[0].clientX);},{passive:true});
+    car.addEventListener('touchend',fim);
+    car.addEventListener('mousedown',function(e){e.preventDefault();ini(e.clientX);});
+    window.addEventListener('mousemove',function(e){mov(e.clientX);});
+    window.addEventListener('mouseup',fim);
+    car.addEventListener('mouseenter',para);
+    car.addEventListener('mouseleave',anda);
+    document.addEventListener('visibilitychange',function(){document.hidden?para():anda();});
+
+    montaDots();ir(0);anda();
+
+    // se o painel ja tiver fotos, elas substituem as de reserva
+    try{
+      var ctl=new AbortController();
+      var t=setTimeout(function(){ctl.abort();},4000);
+      fetch(CAR,{cache:'no-store',signal:ctl.signal}).then(function(r){
+        clearTimeout(t);
+        if(!r.ok)throw 0;
+        return r.json();
+      }).then(function(js){
+        var fotos=(js&&js.fotos)||js;
+        if(!fotos||!fotos.length)return;
+        var html='';
+        for(var k=0;k<fotos.length;k++){
+          var f=fotos[k];
+          var src=(typeof f==='string')?f:(f.url||f.src||'');
+          var leg=(typeof f==='string')?'':(f.legenda||f.alt||'');
+          if(!src)continue;
+          html+='<div class="fp-slide"><img src="'+src+'" alt="'+leg+
+                '" loading="lazy" draggable="false"></div>';
+        }
+        if(!html)return;
+        track.innerHTML=html;
+        para();montaDots();ir(0);anda();
+      }).catch(function(){/* endpoint ainda nao existe: segue com as de reserva */});
+    }catch(e){}
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',iniciar);
+  else iniciar();
+})();
+</script>
 <style>
 .cart-acts{display:flex;align-items:center;gap:13px;}
 .cart-ed{background:none;border:none;color:#e07b00;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
@@ -1011,6 +1127,26 @@
 .fp-cup-val{font-size:13px;color:#fff;font-weight:700;white-space:nowrap;}
 .fp-cup-rm{background:transparent;border:none;color:#9a9a9a;font-family:inherit;font-size:11px;cursor:pointer;text-decoration:underline;padding:0;}
 .fp-cup-rm:hover{color:#e2837a;}
+/* ===================== CARROSSEL DA ETAPA 1 ===================== */
+.fp-car{position:relative;width:100%;max-width:760px;margin:0 auto;overflow:hidden;
+        border-radius:8px;touch-action:pan-y;user-select:none;}
+.fp-track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.fp-track.fp-drag{transition:none;}
+.fp-slide{flex:0 0 100%;display:flex;align-items:center;justify-content:center;
+          aspect-ratio:6/5;}
+.fp-slide img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;
+              pointer-events:none;-webkit-user-drag:none;}
+.fp-dots{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;
+         gap:7px;z-index:3;}
+.fp-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.34);
+        border:none;padding:0;cursor:pointer;transition:width .25s,background .25s;
+        -webkit-tap-highlight-color:transparent;}
+.fp-dot.on{width:20px;border-radius:4px;background:#e07b00;}
+.fp-cap{position:absolute;left:0;right:0;bottom:25px;text-align:center;z-index:3;
+        font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;
+        color:rgba(255,255,255,.6);pointer-events:none;padding:0 14px;}
+@media(max-width:680px){.fp-cap{font-size:8.5px;bottom:23px;}}
+@media(prefers-reduced-motion:reduce){.fp-track{transition:none;}}
 </style>
 
 
