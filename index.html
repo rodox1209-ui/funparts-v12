@@ -1078,6 +1078,88 @@
   else iniciar();
 })();
 </script>
+<script>
+/* ============ ETAPA 2: A GRADE DE MARCAS RECOLHE ============
+   Ao escolher a marca, a grade das 15 marcas some e vira uma faixa com a
+   marca escolhida. Os modelos daquela marca ficam logo abaixo, na mesma tela.
+   Tocar na faixa abre a grade de novo para trocar de marca.
+
+   So esconde e mostra: nao move, nao cria e nao apaga nenhum item da grade.
+   Os modelos continuam vindo do banco (D1) pelo /catalogo, como antes.
+   Se qualquer elemento faltar, sai sem fazer nada (nunca quebra a pagina). */
+(function(){
+  var GRID=null,LISTA=null,FAIXA=null,ABERTA=false;
+  function marcaSel(){ return GRID?GRID.querySelector('.bcard.sel'):null; }
+  function pintaFaixa(){
+    var sel=marcaSel(); if(!sel)return false;
+    var nm=sel.querySelector('.bnm'), img=sel.querySelector('img');
+    var ico=FAIXA.querySelector('.fp-marca-ico');
+    ico.innerHTML='';
+    if(img){
+      var c=document.createElement('img');
+      c.src=img.getAttribute('src')||'';
+      c.alt='';
+      ico.appendChild(c);
+    }
+    FAIXA.querySelector('.fp-marca-nm').textContent=nm?nm.textContent:'';
+    return true;
+  }
+  function abre(){
+    ABERTA=true;
+    GRID.style.display='';
+    FAIXA.classList.remove('on');
+    FAIXA.setAttribute('aria-expanded','true');
+  }
+  function fecha(){
+    if(!pintaFaixa())return;
+    ABERTA=false;
+    GRID.style.display='none';
+    FAIXA.classList.add('on');
+    FAIXA.setAttribute('aria-expanded','false');
+  }
+  function sincroniza(){ if(!ABERTA)fecha(); else pintaFaixa(); }
+  function iniciar(){
+    GRID=document.getElementById('legoBrands');
+    LISTA=document.getElementById('legoModels');
+    if(!GRID||!LISTA||document.getElementById('fpMarca'))return;
+    LISTA.style.maxHeight='none';
+    LISTA.style.overflowY='visible';
+    FAIXA=document.createElement('button');
+    FAIXA.type='button';
+    FAIXA.id='fpMarca';
+    FAIXA.className='fp-marca';
+    FAIXA.setAttribute('aria-label','Trocar marca');
+    FAIXA.innerHTML='<span class="fp-marca-esq">'+
+      '<span class="fp-marca-ico"></span><span class="fp-marca-nm"></span></span>'+
+      '<span class="fp-marca-tr"><span>Trocar marca</span>'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" '+
+      'stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9">'+
+      '</polyline></svg></span>';
+    FAIXA.onclick=abre;
+    GRID.parentNode.insertBefore(FAIXA,GRID);
+    if(typeof window.selLegoBrand==='function'){
+      var oSel=window.selLegoBrand;
+      window.selLegoBrand=function(){
+        var r=oSel.apply(this,arguments);
+        try{fecha();}catch(e){}
+        return r;
+      };
+    }
+    if(typeof window.renderLegoModels==='function'){
+      var oRen=window.renderLegoModels;
+      window.renderLegoModels=function(){
+        var r=oRen.apply(this,arguments);
+        setTimeout(function(){try{sincroniza();}catch(e){}},0);
+        return r;
+      };
+    }
+    fecha();
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',iniciar);
+  else iniciar();
+})();
+</script>
 <style>
 .cart-acts{display:flex;align-items:center;gap:13px;}
 .cart-ed{background:none;border:none;color:#e07b00;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
@@ -1157,6 +1239,26 @@
         color:rgba(255,255,255,.6);pointer-events:none;padding:0 14px;}
 @media(max-width:680px){.fp-cap{font-size:8.5px;bottom:23px;}}
 @media(prefers-reduced-motion:reduce){.fp-track{transition:none;}}
+/* ============ ETAPA 2: FAIXA DA MARCA ESCOLHIDA ============ */
+.fp-marca{display:none;align-items:center;justify-content:space-between;gap:12px;
+          width:100%;box-sizing:border-box;min-height:52px;padding:10px 12px;
+          border:1px solid var(--orange);border-radius:5px;
+          background:rgba(58,156,200,.06);cursor:pointer;text-align:left;
+          font-family:inherit;-webkit-tap-highlight-color:transparent;
+          transition:background .2s;}
+.fp-marca.on{display:flex;}
+.fp-marca:hover{background:rgba(58,156,200,.11);}
+.fp-marca-esq{display:flex;align-items:center;gap:10px;min-width:0;}
+.fp-marca-ico{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;
+              justify-content:center;}
+.fp-marca-ico img{max-width:100%;max-height:100%;object-fit:contain;}
+.fp-marca-nm{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;
+             letter-spacing:1px;text-transform:uppercase;color:var(--orange);
+             overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fp-marca-tr{flex:0 0 auto;display:flex;align-items:center;gap:5px;
+             font-family:inherit;font-size:10px;letter-spacing:1.2px;
+             text-transform:uppercase;color:var(--t3,#8a8a92);}
+.fp-marca-tr svg{width:11px;height:11px;}
 </style>
 
 
