@@ -3836,3 +3836,25 @@ function _startOb14(){
     });
   };
 })();
+
+
+/* ============ "FALTA PREENCHER: ..." ============
+   A mensagem de campo obrigatorio dizia so "Confira os campos destacados".
+   Como o campo Pais comeca em branco e fica abaixo da dobra, dava a impressao
+   de que o botao de fechar pedido nao funcionava. Aqui ela ganha os nomes dos
+   campos, nos quatro idiomas. */
+(function(){
+  var T={
+    pt:{ falta:'Falta preencher: ', geral:'Confira os campos destacados antes de continuar.' },
+    en:{ falta:'Please fill in: ',  geral:'Check the highlighted fields before continuing.' },
+    es:{ falta:'Falta completar: ', geral:'Revisa los campos marcados antes de continuar.' },
+    fr:{ falta:'\u00c0 remplir : ',    geral:'V\u00e9rifiez les champs en rouge avant de continuer.' }
+  };
+  window._fpAvisoCampos=function(nomes){
+    var l='pt';
+    try{ l=(window.FP&&FP.lang)||'pt'; }catch(e){}
+    var t=T[l]||T.pt;
+    if(!nomes||!nomes.length)return t.geral;
+    return t.falta+nomes.join(', ');
+  };
+})();

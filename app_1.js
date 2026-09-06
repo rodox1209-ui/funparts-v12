@@ -3577,7 +3577,21 @@ function fecharPedidoWpp(){
   var aviso=document.getElementById('frmAviso');
   var btn=document.getElementById('btnFecharPedido');
   if(!_frmValidaTudo(true)){
-    if(aviso)aviso.textContent='Confira os campos destacados antes de continuar.';
+    /* Dizer QUAIS campos faltam. O campo Pais comeca em branco de proposito e
+       fica abaixo da dobra: com a mensagem generica, o cliente clicava em
+       fechar e parecia que o botao nao funcionava. */
+    var _faltando=FRM_CAMPOS.map(function(c){return document.getElementById(c.id);})
+      .filter(function(e){return e&&e.classList.contains('erro');})
+      .map(function(e){
+        var g=(e.closest?e.closest('.frm-g'):null);
+        var l=g?g.querySelector('label'):null;
+        return String((l&&l.textContent)||e.id).replace(/\s+/g,' ').trim();
+      }).filter(Boolean);
+    if(aviso){
+      if(typeof window._fpAvisoCampos==='function')aviso.textContent=window._fpAvisoCampos(_faltando);
+      else aviso.textContent=_faltando.length?('Falta preencher: '+_faltando.join(', '))
+                                             :'Confira os campos destacados antes de continuar.';
+    }
     var ruim=FRM_CAMPOS.map(function(c){return document.getElementById(c.id);})
                        .filter(function(e){return e&&e.classList.contains('erro');})[0];
     if(ruim){ ruim.focus(); ruim.scrollIntoView({behavior:'smooth',block:'center'}); }
@@ -3863,8 +3877,12 @@ function _fpFreteRender(options,carrier,currency){
   _fpFreteAtualizaTot();
 }
 function _fpFreteCalc(){
-  var cep=_so(_frmVal('fCep'));
-  if(cep.length!==8)return;
+  /* Este calculo nasceu so para o Brasil: exigia 8 digitos e nao dizia ao
+     servidor de que regiao era o pedido. Sem regiao, o servidor responde como
+     Brasil -- e o cliente europeu via PAC e SEDEX com simbolo de euro. */
+  var _fpReg=(window.FP&&FP.region)||'BR', _fpBRc=(_fpReg==='BR');
+  var cep=_fpBRc?_so(_frmVal('fCep')):String(_frmVal('fCep')||'').trim();
+  if(_fpBRc?(cep.length!==8):(cep.length<3))return;
   if(cep===_freteCepCalcado&&_freteEscolhido)return;
   if(_freteCalcEmCurso)return;
   _freteCepCalcado=cep; _freteCalcEmCurso=true; _freteEscolhido=null;
@@ -3880,7 +3898,9 @@ function _fpFreteCalc(){
   });
   fetch(API_FUNPARTS+'/frete',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({postal_code:cep,items:items})
+    body:JSON.stringify({postal_code:cep,items:items,region:_fpReg,
+      country:_fpBRc?'BR':((((document.getElementById('fPais')||{}).value)||'').trim()
+        ||(window.FP&&FP.geoCountry)||'BE')})
   })
   .then(function(r){return r.json();})
   .then(function(d){
