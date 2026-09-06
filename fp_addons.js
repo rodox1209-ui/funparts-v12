@@ -247,7 +247,7 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
 (function(){
   var CFG={
     BR:{lang:'pt',currency:'BRL',symbol:'R$',frete:'superfrete',gateway:'pagarme',flag:'ÃÂ°ÃÂÃÂÃÂ§ÃÂ°ÃÂÃÂÃÂ·',reg:{pt:'Brasil',en:'Brazil'},prices:{lego_base_carbono:689,lego_base_fosco:589,mini_base_P:1990,mini_base_M:2490,mini_base_G:2990,opt_moldura_fibra:75,opt_led_rgb_sem:489,opt_led_rgb_com:589,opt_led_warm_sem:389,opt_led_warm_com:489,opt_relevo_bandeira:90,opt_relevo_piloto:90}},
-    EU:{lang:'en',currency:'EUR',symbol:'ÃÂ¢ÃÂÃÂ¬',frete:'sendcloud',gateway:'stripe',flag:'ÃÂ°ÃÂÃÂÃÂªÃÂ°ÃÂÃÂÃÂº',reg:{pt:'Europa',en:'Europe'},prices:{lego_base_carbono:119,lego_base_fosco:102,mini_base_P:343,mini_base_M:429,mini_base_G:515,opt_moldura_fibra:13,opt_led_rgb_sem:84,opt_led_rgb_com:102,opt_led_warm_sem:67,opt_led_warm_com:84,opt_relevo_bandeira:16,opt_relevo_piloto:16}},
+    EU:{lang:'en',currency:'EUR',symbol:'\u20ac',frete:'sendcloud',gateway:'stripe',flag:'ÃÂ°ÃÂÃÂÃÂªÃÂ°ÃÂÃÂÃÂº',reg:{pt:'Europa',en:'Europe'},prices:{lego_base_carbono:119,lego_base_fosco:102,mini_base_P:343,mini_base_M:429,mini_base_G:515,opt_moldura_fibra:13,opt_led_rgb_sem:84,opt_led_rgb_com:102,opt_led_warm_sem:67,opt_led_warm_com:84,opt_relevo_bandeira:16,opt_relevo_piloto:16}},
     US:{lang:'en',currency:'USD',symbol:'$',frete:'sendcloud',gateway:'stripe',flag:'ÃÂ°ÃÂÃÂÃÂºÃÂ°ÃÂÃÂÃÂ¸',reg:{pt:'EUA',en:'USA'},prices:{lego_base_carbono:130,lego_base_fosco:111,mini_base_P:375,mini_base_M:470,mini_base_G:564,opt_moldura_fibra:14,opt_led_rgb_sem:92,opt_led_rgb_com:111,opt_led_warm_sem:73,opt_led_warm_com:92,opt_relevo_bandeira:17,opt_relevo_piloto:17}}
   };
   var EUcc=['PT','ES','FR','DE','IT','BE','NL','LU','IE','AT','FI','GR','CY','MT','EE','LV','LT','SK','SI','HR','PL','CZ','HU','RO','BG','DK','SE','GB','CH','NO','IS'];
@@ -3343,4 +3343,166 @@ function _startOb14(){
   if(document.readyState==='loading')
     document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,160);});
   else setTimeout(liga,160);
+})();
+
+
+/* ============ CHECKOUT EUROPEU: ENTREGA ============
+   Tres coisas, todas so para regiao diferente de Brasil. No Brasil nada muda.
+
+   1. DESTRAVA O "CONTINUAR" - NO BRASIL TAMBEM.  A trava que impede fechar
+      pedido sem entrega escolhida (posta no conserto do frete, 04/09) olha
+      window._freteEscolhido. Mas quem preenche essa variavel e' o painel
+      antigo do app_1.js, que so calcula quando o campo CEP do FORMULARIO ja
+      esta preenchido - e esse formulario so aparece DEPOIS da tela do frete.
+      Na pratica quem calcula e' o painel do fp_addons.js (o do botao
+      "Calcular"), e ele guarda a escolha em FP.frete. Resultado, medido nos
+      dois lados: o cliente escolhe a transportadora, ve o "Total com frete"
+      na tela, clica em Continuar e nada acontece. So passava quem clicasse em
+      "Retirar na fabrica". Vale para Brasil e Europa.
+      Aqui, na hora de avancar, a escolha e' emprestada para a variavel que a
+      trava espera e devolvida logo depois - assim nada mais no site enxerga
+      essa variavel preenchida (o texto do WhatsApp, por exemplo, continua
+      saindo do FP.frete, com o simbolo certo). A trava continua barrando quem
+      nao escolheu nada.
+
+   2. RETIRADA.  Fora do Brasil, "RETIRAR NA FABRICA" (Barueri) e' substituida
+      pela retirada em Braine-l'Alleud. Mesma linha, mesmo lugar na lista.
+
+   3. LIMPA A LISTA.  A Sendcloud devolve tudo que existe na rota, inclusive
+      carta sem selo por EUR 0,00 e servicos B2B, que so entregam em endereco
+      comercial. Um quadro de 53x83 vai numa caixa de 6 kg e 92 cm: nenhum dos
+      dois entrega isso na casa do cliente. Ficam de fora, na Europa. */
+(function(){
+  var RETIRADA_EU={
+    endereco:"Place Abb\u00e9 Renard, 5 \u2014 1420 Braine-l\u2019Alleud",
+    nome:{pt:"RETIRAR EM BRAINE-L\u2019ALLEUD",en:"PICK UP IN BRAINE-L\u2019ALLEUD",
+          es:"RECOGER EN BRAINE-L\u2019ALLEUD",fr:"RETRAIT \u00c0 BRAINE-L\u2019ALLEUD"},
+    gratis:{pt:"Gr\u00e1tis",en:"Free",es:"Gratis",fr:"Gratuit"}
+  };
+  function reg(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
+  function lang(){ try{ return (window.FP&&FP.lang)||'pt'; }catch(e){ return 'pt'; } }
+  function fora(){ return reg()!=='BR'; }
+  function simbolo(){
+    try{ if(window.CFG&&CFG[reg()]&&CFG[reg()].symbol)return CFG[reg()].symbol; }catch(e){}
+    return '\u20ac';
+  }
+
+  /* ---------- 1. destrava o avanco (Brasil E Europa) ---------- */
+  (function(){
+    if(typeof window.carrinhoPasso!=='function')return;
+    var oPasso=window.carrinhoPasso;
+    window.carrinhoPasso=function(){
+      var emprestado=false;
+      try{
+        if(window.FP&&FP.frete&&FP.frete.price!=null&&!window._freteEscolhido){
+          window._freteEscolhido={__eu:true,label:FP.frete.label,price:FP.frete.price,
+                                  carrier:FP.frete.carrier||'',currency:FP.frete.currency||simbolo()};
+          emprestado=true;
+        }
+      }catch(e){}
+      try{ return oPasso.apply(this,arguments); }
+      finally{
+        try{ if(emprestado&&window._freteEscolhido&&window._freteEscolhido.__eu)
+               window._freteEscolhido=null; }catch(e){}
+      }
+    };
+  })();
+
+  /* ---------- 2. limpa a lista que vem da Sendcloud ---------- */
+  (function(){
+    if(typeof window.fetch!=='function')return;
+    var oFetch=window.fetch;
+    function serve(o){
+      if(!o)return false;
+      var p=Number(o.price);
+      if(!(p>0))return false;                          /* ninguem entrega quadro de graca */
+      var n=String(o.label||'');
+      if(/(^|[^a-z])b2b([^a-z]|$)/i.test(n))return false;   /* so endereco comercial */
+      return true;
+    }
+    window.fetch=function(entrada,init){
+      var u='';
+      try{ u=(typeof entrada==='string')?entrada:((entrada&&entrada.url)||''); }catch(e){}
+      var r=oFetch.apply(this,arguments);
+      if(u.indexOf('/frete')<0||!fora())return r;
+      return r.then(function(resp){
+        try{
+          var clone=resp.clone();
+          return clone.json().then(function(d){
+            if(!d||!d.ok||!Array.isArray(d.options))return resp;
+            var limpo=d.options.filter(serve);
+            if(limpo.length===d.options.length)return resp;
+            if(!limpo.length)limpo=d.options;          /* nunca deixar sem opcao nenhuma */
+            d.options=limpo;
+            return new Response(JSON.stringify(d),
+              {status:resp.status,statusText:resp.statusText,headers:resp.headers});
+          }).catch(function(){ return resp; });
+        }catch(e){ return resp; }
+      });
+    };
+  })();
+
+  /* ---------- 3. retirada: Barueri vira Braine-l'Alleud ---------- */
+  (function(){
+    function escolhe(linha){
+      try{
+        window.FP.frete={price:0,label:RETIRADA_EU.nome[lang()]||RETIRADA_EU.nome.en,
+                         carrier:'retirada',currency:simbolo(),region:reg()};
+      }catch(e){}
+      try{
+        document.querySelectorAll('#fpFreteOpts .fp-frete-opt')
+          .forEach(function(x){ x.classList.remove('on'); });
+        linha.classList.add('on');
+      }catch(e){}
+      /* mesma linha de total que o painel europeu ja mostra */
+      try{
+        var sub=(typeof _cartTotal==='function')?_cartTotal():0;
+        var v=Number(sub||0).toLocaleString(
+          ({pt:'pt-BR',en:'en-US',es:'es-ES',fr:'fr-FR'})[lang()]||'pt-BR',
+          {minimumFractionDigits:2,maximumFractionDigits:2});
+        var velho=document.getElementById('fpFreteTot'); if(velho)velho.remove();
+        var d=document.createElement('div');
+        d.className='fp-frete-tot'; d.id='fpFreteTot';
+        var rot=(window.FP&&FP.t)?FP.t('frete.totalShip'):'Total';
+        d.innerHTML='<span>'+rot+'</span><span>'+simbolo()+' '+v+'</span>';
+        var cx=document.getElementById('fpFreteOpts'); if(cx)cx.appendChild(d);
+      }catch(e){}
+    }
+    function ajusta(){
+      if(!fora())return;
+      var linhas=document.querySelectorAll('#fpFreteOpts [data-retirada="1"]');
+      for(var i=0;i<linhas.length;i++){
+        var l=linhas[i];
+        if(l.getAttribute('data-eu')==='1'&&l.getAttribute('data-lg')===lang())continue;
+        l.setAttribute('data-eu','1');
+        l.setAttribute('data-lg',lang());
+        l.removeAttribute('onclick');
+        l.onclick=null;
+        l.innerHTML='<div class="fp-frete-radio"></div>'
+          +'<div class="fp-frete-info">'
+          +'<div class="fp-frete-nome">'+(RETIRADA_EU.nome[lang()]||RETIRADA_EU.nome.en)+'</div>'
+          +'<div class="fp-frete-prazo">'+RETIRADA_EU.endereco+'</div>'
+          +'</div>'
+          +'<div class="fp-frete-preco">'+(RETIRADA_EU.gratis[lang()]||RETIRADA_EU.gratis.en)+'</div>';
+        (function(el){ el.addEventListener('click',function(){ escolhe(el); }); })(l);
+      }
+    }
+    var t=null;
+    function agenda(){ clearTimeout(t); t=setTimeout(function(){ try{ajusta();}catch(e){} },60); }
+    function liga(){
+      agenda();
+      try{ new MutationObserver(agenda).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+      try{
+        if(window.FP&&typeof FP.setLang==='function'){
+          var o=FP.setLang; FP.setLang=function(){ var r=o.apply(this,arguments); agenda(); return r; };
+        }
+        if(window.FP&&typeof FP.setRegion==='function'){
+          var o2=FP.setRegion; FP.setRegion=function(){ var r=o2.apply(this,arguments); agenda(); return r; };
+        }
+      }catch(e){}
+    }
+    if(document.readyState==='loading')
+      document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,200);});
+    else setTimeout(liga,200);
+  })();
 })();
