@@ -3858,3 +3858,47 @@ function _startOb14(){
     return t.falta+nomes.join(', ');
   };
 })();
+
+
+/* ============ LISTA DE ENTREGA COM ROLAGEM PROPRIA ============
+   A Sendcloud devolve 7 opcoes para a Belgica. O rodape do carrinho nao rola
+   de proposito (para o botao ficar sempre no lugar), entao a lista longa
+   empurrava o "Continuar" para fora da tela.
+
+   Aqui a lista ganha altura maxima e rolagem propria. Nenhuma opcao some.
+   So age quando ha MAIS DE 4 opcoes: com 2 ou 3, como no Brasil, nada muda. */
+(function(){
+  var MAX_ALTURA=186;          /* cabem ~3 opcoes e meia: da para ver que rola */
+  var MINIMO=5;                /* de 5 opcoes para cima */
+
+  function ajusta(){
+    var caixas=document.querySelectorAll('#fpFreteOpts');
+    for(var i=0;i<caixas.length;i++){
+      var cx=caixas[i];
+      var n=cx.querySelectorAll('.fp-frete-opt').length;
+      if(n>=MINIMO){
+        if(cx.style.maxHeight!==MAX_ALTURA+'px'){
+          cx.style.maxHeight=MAX_ALTURA+'px';
+          cx.style.overflowY='auto';
+          cx.style.paddingRight='4px';
+          try{ cx.style.scrollbarWidth='thin'; }catch(e){}
+        }
+      }else if(cx.style.maxHeight){
+        cx.style.maxHeight='';
+        cx.style.overflowY='';
+        cx.style.paddingRight='';
+      }
+    }
+  }
+
+  var t=null;
+  function agenda(){ clearTimeout(t); t=setTimeout(function(){ try{ajusta();}catch(e){} },90); }
+  function liga(){
+    agenda();
+    try{ new MutationObserver(agenda).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+    try{ window.addEventListener('resize',agenda); }catch(e){}
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,260);});
+  else setTimeout(liga,260);
+})();
