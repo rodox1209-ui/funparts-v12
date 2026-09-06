@@ -3902,3 +3902,67 @@ function _startOb14(){
     document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,260);});
   else setTimeout(liga,260);
 })();
+
+
+/* ============ O TOTAL DA EUROPA ESTAVA EM REAL ============
+   Duas correcoes pequenas em cima do total do fechamento:
+
+   1) escolher a retirada, ou trocar de transportadora, nem sempre refazia o
+      total -- a linha da retirada europeia e a lista do painel novo nao
+      chamam o calculo do total. Aqui qualquer clique numa opcao de entrega
+      manda refazer. So fora do Brasil: la o painel antigo ja faz isso.
+
+   2) o prazo da lista sai escrito em portugues ("1 dia util") mesmo com o
+      site em ingles, frances ou espanhol, porque vem do painel antigo. Aqui
+      ele e reescrito no idioma da pagina, sem mexer no resto da linha. */
+(function(){
+  function reg(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
+  function lang(){ try{ return (window.FP&&FP.lang)||'pt'; }catch(e){ return 'pt'; } }
+
+  var PRAZO={
+    pt:{um:'1 dia \u00fatil',        n:' dias \u00fateis'},
+    en:{um:'1 business day',      n:' business days'},
+    es:{um:'1 d\u00eda h\u00e1bil',     n:' d\u00edas h\u00e1biles'},
+    fr:{um:'1 jour ouvr\u00e9',      n:' jours ouvr\u00e9s'}
+  };
+
+  function traduzPrazos(){
+    if(reg()==='BR')return;
+    var t=PRAZO[lang()]||PRAZO.en;
+    var els=document.querySelectorAll('#fpFreteOpts .fp-frete-prazo');
+    for(var i=0;i<els.length;i++){
+      var el=els[i], s=String(el.textContent||'').trim();
+      var m=s.match(/^(\d+)\s*dias?\b/i);      /* so o que veio em portugues */
+      if(!m)continue;
+      var n=parseInt(m[1],10);
+      el.textContent=(n===1)?t.um:(n+t.n);
+    }
+  }
+
+  function refazTotal(){
+    if(reg()==='BR')return;
+    try{ if(typeof window._fpFreteAtualizaTot==='function')window._fpFreteAtualizaTot(); }catch(e){}
+  }
+
+  function passada(){ traduzPrazos(); refazTotal(); }
+
+  /* qualquer clique numa opcao de entrega */
+  document.addEventListener('click',function(e){
+    var alvo=null;
+    try{ alvo=(e.target&&e.target.closest)?e.target.closest('.fp-frete-opt'):null; }catch(err){}
+    if(!alvo)return;
+    setTimeout(passada,0); setTimeout(passada,200);
+  },true);
+
+  /* e sempre que a lista for redesenhada */
+  function envolve(){
+    try{
+      if(typeof window._fpFreteRender!=='function'||window._fpFreteRender.__fpTot)return;
+      var o=window._fpFreteRender;
+      var f=function(){ var r=o.apply(this,arguments); try{ passada(); }catch(err){} return r; };
+      f.__fpTot=1; window._fpFreteRender=f;
+    }catch(err){}
+  }
+  setTimeout(envolve,300); setTimeout(envolve,1200); setTimeout(envolve,2500);
+  setTimeout(passada,1500);
+})();

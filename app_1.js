@@ -3823,12 +3823,39 @@ var _freteCarrierAtual='superfrete';
 var _freteCurrencyAtual='R$';
 var _freteCalcEmCurso=false;
 var _freteCepCalcado='';
+/* A moeda da regiao, num lugar so. */
+function _fpMoedaRegiao(){
+  var r=(window.FP&&FP.region)||'BR';
+  return (r==='EU')?'\u20ac':((r==='US')?'$':'R$');
+}
+/* Esta funcao nasceu so para o Brasil e escrevia 'R$' fixo. Na Europa ela
+   pintava o TOTAL do pedido em real, com os fretes em euro logo acima --
+   e era ela que rodava quando a lista de entrega terminava de carregar,
+   por isso o real aparecia so 'as vezes'. O Brasil continua identico:
+   mesmo simbolo, mesmo formato, mesmas duas casas. */
 function _fpFreteBrl(v){
-  return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var _r=(window.FP&&FP.region)||'BR', _n=Number(v||0);
+  if(_r==='EU')return '\u20ac'+_n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(_r==='US')return '$ '+_n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return 'R$ '+_n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function _fpFreteAtualizaTot(){
   var base=_cartTotal();
-  var fv=(_freteEscolhido&&_freteCurrencyAtual==='R$')?Number(_freteEscolhido.price||0):0;
+  var _rg=(window.FP&&FP.region)||'BR', fv=0;
+  if(_rg==='BR'){
+    /* caminho brasileiro, palavra por palavra como sempre foi */
+    fv=(_freteEscolhido&&_freteCurrencyAtual==='R$')?Number(_freteEscolhido.price||0):0;
+  }else{
+    /* Fora do Brasil o frete ficava de fora do total da tela, mas o
+       servidor cobra mercadoria + frete. Aqui o valor vem do MESMO lugar
+       que vai no pedido, para a tela e a cobranca nunca discordarem. */
+    var _f=_freteEscolhido;
+    try{ if(window.FP&&FP.frete&&FP.frete.price!=null)_f=FP.frete; }catch(e){}
+    var _m=_fpMoedaRegiao();
+    var _c=_f?String(_f.currency||''):'';
+    if(!_c)_c=_freteCurrencyAtual;
+    fv=(_f&&_c===_m)?Number(_f.price||0):0;
+  }
   var t2=document.getElementById('cartTotal2');
   if(t2)t2.textContent=_fpFreteBrl(base+fv);
 }
