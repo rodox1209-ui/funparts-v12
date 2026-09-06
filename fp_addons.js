@@ -833,7 +833,8 @@ window._priceFix={ran:true};
       } else if(CFG[reg]&&CFG[reg].prices){
         // Salvar original apenas uma vez
         if(window._origCAT_PRECOS===undefined) window._origCAT_PRECOS=window.CAT_PRECOS;
-        window.CAT_PRECOS=CFG[reg].prices;
+        window.CAT_PRECOS=(window.__fpPrecosEur&&Object.keys(window.__fpPrecosEur).length)
+          ? window.__fpPrecosEur : CFG[reg].prices;
       }
       // Recalcular preÃÂ§o exibido e corrigir sÃÂ­mbolo
       setTimeout(function(){
@@ -3505,4 +3506,152 @@ function _startOb14(){
       document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,200);});
     else setTimeout(liga,200);
   })();
+})();
+
+
+/* ============ PRECO EM EURO VEM DO BANCO ============
+   Ver o comentario do commit. Resumo: o site passa a usar os precos em euro
+   definidos no painel, os mesmos que o servidor usa para cobrar. Sem preco em
+   euro, o item nao e' vendido na Europa - some da lista ou desliga o botao. */
+(function(){
+  var BRUTO=null;              /* catalogo como veio do banco, intacto */
+  var FALTA=[];                /* chaves sem preco em euro */
+
+  function reg(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
+  /* so a Europa: a regiao EUA nunca foi aberta e nao tem preco em dolar no
+     banco - mexer nela agora seria inventar numero. */
+  function euro(){ return reg()==='EU'; }
+  function lang(){ try{ return (window.FP&&FP.lang)||'pt'; }catch(e){ return 'pt'; } }
+
+  var AVISO={
+    pt:'Este item ainda nao tem preco em euro definido.',
+    en:'This item has no price in euro yet.',
+    es:'Este articulo aun no tiene precio en euros.',
+    fr:'Cet article n\u2019a pas encore de prix en euros.'
+  };
+
+  /* Troca a tabela de precos e a lista de produtos pela versao em euro.
+     Nao inventa nenhum numero: o que nao tem euro fica de fora. */
+  function converte(c){
+    if(!c||!euro())return c;
+    var out;
+    try{ out=JSON.parse(JSON.stringify(c)); }catch(e){ return c; }
+    var pe=c.precos_eur||{}, pr=c.precos||{};
+    out.precos={};
+    FALTA=[];
+    Object.keys(pr).forEach(function(k){
+      if(pe[k]!=null)out.precos[k]=pe[k];
+      else FALTA.push(k);
+    });
+    if(out.mini){
+      Object.keys(out.mini).forEach(function(m){
+        var itens=((out.mini[m]||{}).itens)||[];
+        var vivos=itens.filter(function(p){ return p&&p.p_eur!=null; });
+        vivos.forEach(function(p){ p.p=p.p_eur; });
+        if(vivos.length)out.mini[m].itens=vivos;
+        else delete out.mini[m];
+      });
+    }
+    return out;
+  }
+
+  /* Quando falta preco em euro de alguma base ou opcional, o configurador nao
+     pode mostrar valor: o numero sairia da reserva escrita no codigo, que esta
+     em real. Melhor desligar a compra e dizer o porque. */
+  function trava(){
+    var ligar=!(euro()&&FALTA.length);
+    ['btnAddCart','btnAddCartInc'].forEach(function(id){
+      var b=document.getElementById(id);
+      if(!b)return;
+      b.disabled=!ligar;
+      b.style.opacity=ligar?'':'0.45';
+      b.style.pointerEvents=ligar?'':'none';
+    });
+    var msg=document.getElementById('fpSemEuro');
+    if(!ligar){
+      if(!msg){
+        msg=document.createElement('div');
+        msg.id='fpSemEuro';
+        msg.style.cssText='margin:10px 0;padding:9px 11px;border:1px solid #6a4a12;'
+          +'background:#241a06;color:#e8c37a;border-radius:8px;font-size:12.5px;line-height:1.5';
+        var alvo=document.getElementById('btnAddCart');
+        if(alvo&&alvo.parentNode)alvo.parentNode.insertBefore(msg,alvo);
+      }
+      msg.textContent=AVISO[lang()]||AVISO.en;
+      ['pvPrice','mobBarPrice','deskBarPrice'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(el)el.textContent='\u2014';
+      });
+    }else if(msg){ msg.remove(); }
+  }
+
+  function reaplica(){
+    if(!BRUTO||typeof window._aplicaCatalogoBanco!=='function')return;
+    var out=converte(BRUTO);
+    if(euro())alinhaCFG(out.precos); else alinhaCFG(null);
+    try{ window._aplicaCatalogoBanco(out); }catch(e){}
+    try{ if(typeof calcPrice==='function')calcPrice(); }catch(e){}
+    setTimeout(trava,60);
+  }
+
+  /* Um bloco antigo faz  CAT_PRECOS = CFG[regiao].prices  a cada mudanca na
+     pagina. Essa tabela esta escrita dentro do arquivo e cobre so os quadros
+     LEGO. Em vez de brigar com ele, os numeros DELE sao trocados pelos do
+     banco: seja quem for que escreva CAT_PRECOS, o valor sai certo. */
+  function alinhaCFG(precosEur){
+    try{
+      /* CFG vive dentro de um bloco fechado e nao da para alcancar daqui.
+         Entao a tabela do banco e' publicada aqui, e o bloco antigo (alterado
+         no mesmo commit) passa a preferi-la a tabela escrita no arquivo. */
+      if(precosEur&&Object.keys(precosEur).length)window.__fpPrecosEur=precosEur;
+      else window.__fpPrecosEur=null;
+      if(window.__fpPrecosEur&&euro())window.CAT_PRECOS=window.__fpPrecosEur;
+    }catch(e){}
+  }
+
+  /* A resposta do banco e' interceptada no proprio fetch: e' cedo o bastante
+     para pegar a primeira carga, que acontece antes deste bloco ligar. */
+  (function(){
+    if(typeof window.fetch!=='function')return;
+    var oFetch=window.fetch;
+    window.fetch=function(entrada,init){
+      var u='';
+      try{ u=(typeof entrada==='string')?entrada:((entrada&&entrada.url)||''); }catch(e){}
+      var r=oFetch.apply(this,arguments);
+      if(u.indexOf('/catalogo')<0)return r;
+      return r.then(function(resp){
+        try{
+          return resp.clone().json().then(function(c){
+            if(!c||(!c.precos&&!c.mini))return resp;
+            BRUTO=c;
+            var out=converte(c);
+            if(euro())alinhaCFG(out.precos);
+            setTimeout(trava,120);
+            if(out===c)return resp;
+            return new Response(JSON.stringify(out),
+              {status:resp.status,statusText:resp.statusText,headers:resp.headers});
+          }).catch(function(){ return resp; });
+        }catch(e){ return resp; }
+      });
+    };
+  })();
+
+  function liga(){
+    try{
+      if(window.FP&&typeof FP.setRegion==='function'){
+        var o=FP.setRegion;
+        FP.setRegion=function(){ var r=o.apply(this,arguments); setTimeout(reaplica,40); return r; };
+      }
+      if(window.FP&&typeof FP.setLang==='function'){
+        var o2=FP.setLang;
+        FP.setLang=function(){ var r=o2.apply(this,arguments); setTimeout(trava,60); return r; };
+      }
+    }catch(e){}
+    try{ if(typeof calcPrice==='function'){ var oc=calcPrice;
+      window.calcPrice=function(){ var r=oc.apply(this,arguments); try{trava();}catch(e){} return r; }; } }catch(e){}
+    setTimeout(trava,400);
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,200);});
+  else setTimeout(liga,200);
 })();
