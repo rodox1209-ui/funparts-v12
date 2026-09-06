@@ -3606,10 +3606,7 @@ function fecharPedidoWpp(){
     return 'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n*ITENS*\n'+itens+
            (_freteEscolhido?'\n*Frete ('+_freteEscolhido.label+'):* '+_fpFreteBrl(_frv):'')+
            '\n\n*TOTAL:* '+_fpFreteBrl(_tot)+'\n\n*MEUS DADOS*\n'+
-           'Nome: '+c.nome+'\nCPF: '+_mascCpf(c.cpf)+'\nWhatsApp: '+_mascTel(c.whatsapp)+
-           '\nE-mail: '+c.email+'\nEndere\u00e7o: '+c.rua+', '+c.numero+
-           (c.complemento?' - '+c.complemento:'')+'\n'+c.bairro+' - '+c.cidade+'/'+c.uf+
-           '\nCEP: '+_mascCep(c.cep);
+           _fpDadosTexto(c);
   }
 
   var corpo={
@@ -3763,6 +3760,12 @@ function _frmVal(id){ var e=document.getElementById(id); return e?e.value:''; }
 
 function _frmValidaCampo(c,mostrar){
   var el=document.getElementById(c.id); if(!el)return true;
+  /* campo desligado para a regiao atual (ex.: CPF fora do Brasil) nao e cobrado */
+  if(el.getAttribute('data-off')==='1'){
+    el.classList.remove('erro');el.classList.remove('ok');
+    var e0=c.err&&document.getElementById(c.err); if(e0)e0.textContent='';
+    return true;
+  }
   var v=el.value||'';
   var vazio=!v.trim();
   var ok, msg='';
@@ -3917,7 +3920,11 @@ function _buscaCep(){
 var _frmLigado=false;
 function _frmLiga(){
   if(_frmLigado)return; _frmLigado=true;
-  var masc={ fCpf:_mascCpf, fCep:_mascCep, fZap:_mascTel };
+  /* as mascaras 000.000.000-00 e 00000-000 sao brasileiras: fora do Brasil, nenhuma */
+  var mascBR={ fCpf:_mascCpf, fCep:_mascCep, fZap:_mascTel };
+  var masc=new Proxy({},{get:function(_,k){
+    return (typeof _fpBR==='function'&&!_fpBR())?undefined:mascBR[k];
+  }});
   FRM_CAMPOS.forEach(function(c){
     var el=document.getElementById(c.id); if(!el)return;
     el.addEventListener('input',function(){
@@ -3939,7 +3946,10 @@ function _frmLiga(){
     });
   });
   var cep=document.getElementById('fCep');
-  if(cep)cep.addEventListener('input',function(){ if(_so(cep.value).length===8){ _buscaCep(); _fpFreteCalc(); } });
+  if(cep)cep.addEventListener('input',function(){
+    if(typeof _fpBR==='function'&&!_fpBR())return;   /* busca de CEP e' so do Brasil */
+    if(_so(cep.value).length===8){ _buscaCep(); _fpFreteCalc(); }
+  });
 }
 
 // Ã¢ÂÂÃ¢ÂÂ guarda os dados para o cliente nao redigitar Ã¢ÂÂÃ¢ÂÂ
@@ -3966,7 +3976,8 @@ function dadosCliente(){
     cep:_so(_frmVal('fCep')), rua:_frmVal('fRua').trim(),
     numero:_frmVal('fNum').trim(), complemento:_frmVal('fCompl').trim(),
     bairro:_frmVal('fBairro').trim(), cidade:_frmVal('fCidade').trim(),
-    uf:_frmVal('fUf').trim().toUpperCase()
+    uf:_frmVal('fUf').trim().toUpperCase(),
+    pais:_frmVal('fPais').trim()
   };
 }
 
@@ -4356,4 +4367,282 @@ function _rascEnvia(){
       }
     }
   };
+})();
+
+
+/* ===================== CHECKOUT POR REGIAO =====================
+   O formulario de dados do pedido era fixo em campos brasileiros: CPF com
+   digito verificador obrigatorio, CEP de 8 digitos com busca de endereco,
+   Bairro e UF de 2 letras. Um cliente europeu nao tinha o que preencher em
+   quatro dos onze campos -- e nao conseguia concluir o pedido de jeito nenhum,
+   mesmo com a etapa de frete ja funcionando em euro pela SendCloud.
+
+   Agora:
+   . No BRASIL nada muda. Mesmos campos, mesmas regras, mesmas mascaras e o
+     mesmo texto de pedido no WhatsApp, letra por letra.
+   . FORA do Brasil: CPF, Bairro e UF saem da tela e da validacao; o CEP vira
+     "codigo postal" sem formato fixo e sem busca; o telefone aceita formato
+     internacional; e entra o campo Pais, com a mesma lista de paises que a
+     etapa de frete ja usa.
+   Os rotulos novos ja nascem traduzidos nos quatro idiomas.
+   Se algum elemento faltar, sai sem fazer nada (nunca quebra a pagina). */
+(function(){
+  function regiao(){
+    try{ if(window.FP&&FP.region)return FP.region; }catch(e){}
+    try{ var r=localStorage.getItem('fp_region'); if(r)return r; }catch(e){}
+    return 'BR';
+  }
+  window._fpBR=function(){ return regiao()==='BR'; };
+
+  function idioma(){
+    try{ if(window.FP&&FP.lang)return FP.lang; }catch(e){}
+    try{ return localStorage.getItem('fp_lang')||'pt'; }catch(e){}
+    return 'pt';
+  }
+  var TXT={
+    pt:{cep:'C\u00f3digo postal',zap:'Telefone',pais:'Pa\u00eds',end:'Endere\u00e7o',
+        num:'N\u00famero',phCep:'0000 AB',phZap:'+32 000 00 00 00',phRua:'Rua, avenida\u2026',
+        phPais:'Selecione o pa\u00eds',
+        intro:'Precisamos desses dados para emitir a fatura e combinar a entrega.',
+        lgpd:'Seus dados s\u00e3o usados apenas para emitir a fatura e realizar a entrega.',
+        eCep:'Informe o c\u00f3digo postal',eZap:'Telefone incompleto',ePais:'Selecione o pa\u00eds'},
+    en:{cep:'Postal code',zap:'Phone',pais:'Country',end:'Address',
+        num:'Number',phCep:'0000 AB',phZap:'+32 000 00 00 00',phRua:'Street',
+        phPais:'Select your country',
+        intro:'We need these details to issue the invoice and arrange delivery.',
+        lgpd:'Your details are used only to issue the invoice and deliver your order.',
+        eCep:'Enter your postal code',eZap:'Phone number incomplete',ePais:'Select your country'},
+    es:{cep:'C\u00f3digo postal',zap:'Tel\u00e9fono',pais:'Pa\u00eds',end:'Direcci\u00f3n',
+        num:'N\u00famero',phCep:'0000 AB',phZap:'+32 000 00 00 00',phRua:'Calle, avenida\u2026',
+        phPais:'Selecciona el pa\u00eds',
+        intro:'Necesitamos estos datos para emitir la factura y coordinar la entrega.',
+        lgpd:'Tus datos se usan solo para emitir la factura y entregar tu pedido.',
+        eCep:'Indica el c\u00f3digo postal',eZap:'Tel\u00e9fono incompleto',ePais:'Selecciona el pa\u00eds'},
+    fr:{cep:'Code postal',zap:'T\u00e9l\u00e9phone',pais:'Pays',end:'Adresse',
+        num:'Num\u00e9ro',phCep:'0000 AB',phZap:'+32 000 00 00 00',phRua:'Rue, avenue\u2026',
+        phPais:'S\u00e9lectionnez le pays',
+        intro:'Nous avons besoin de ces informations pour \u00e9tablir la facture et organiser la livraison.',
+        lgpd:'Vos donn\u00e9es servent uniquement \u00e0 \u00e9tablir la facture et \u00e0 livrer votre commande.',
+        eCep:'Indiquez le code postal',eZap:'Num\u00e9ro de t\u00e9l\u00e9phone incomplet',ePais:'S\u00e9lectionnez le pays'}
+  };
+  function T(){ return TXT[idioma()]||TXT.pt; }
+
+  function grupo(id){
+    var el=document.getElementById(id);
+    if(!el)return null;
+    var g=el.parentNode;
+    while(g&&g!==document.body&&!(g.className||'').split(' ').indexOf&&false){}
+    while(g&&g!==document.body&&(' '+(g.className||'')+' ').indexOf(' frm-g ')<0)g=g.parentNode;
+    return (g&&g!==document.body)?g:null;
+  }
+  function guarda(el,attr,valor){
+    if(el.getAttribute('data-orig-'+attr)===null||el.getAttribute('data-orig-'+attr)===undefined){
+      el.setAttribute('data-orig-'+attr, valor==null?'':valor);
+    }
+  }
+  function rotulo(id){
+    var g=grupo(id); return g?g.querySelector('label'):null;
+  }
+  /* O tradutor guarda o placeholder original em el.__ptph e o restaura a cada
+     mudanca no DOM. Trocar so o atributo dura menos de um segundo. Entao a
+     troca avisa o tradutor qual e' o novo "original" desta regiao. */
+  function poePlaceholder(el,txt){
+    if(!el)return;
+    el.setAttribute('placeholder',txt);
+    try{ el.__ptph=txt; }catch(e){}
+  }
+  function ligaDesliga(id,ligado){
+    var el=document.getElementById(id), g=grupo(id);
+    if(!el)return;
+    if(ligado){ el.removeAttribute('data-off'); if(g)g.style.display=''; }
+    else{ el.setAttribute('data-off','1'); if(g)g.style.display='none'; }
+  }
+
+  /* lista de paises: a mesma que a etapa de frete ja usa */
+  function opcoesPais(){
+    var sel=document.getElementById('fpFretePaisSel');
+    var lista=[];
+    if(sel&&sel.options&&sel.options.length){
+      for(var i=0;i<sel.options.length;i++)
+        lista.push({v:sel.options[i].value,t:sel.options[i].textContent});
+    }
+    if(!lista.length){
+      lista=[['BE','B\u00e9lgica / Belgium'],['NL','Pa\u00edses Baixos / Netherlands'],
+             ['DE','Alemanha / Germany'],['FR','Fran\u00e7a / France'],
+             ['LU','Luxemburgo / Luxembourg'],['ES','Espanha / Spain'],
+             ['IT','It\u00e1lia / Italy'],['PT','Portugal']]
+        .map(function(p){return {v:p[0],t:p[1]};});
+    }
+    if(regiao()==='US'&&!lista.some(function(o){return o.v==='US';}))
+      lista.unshift({v:'US',t:'United States'});
+    return lista;
+  }
+
+  function criaPais(){
+    if(document.getElementById('fPais'))return;
+    var gCid=grupo('fCidade'); if(!gCid)return;
+    var g=document.createElement('div');
+    g.className='frm-g';
+    g.id='gPais';
+    var lb=document.createElement('label');
+    lb.setAttribute('for','fPais');
+    lb.id='lbPais';
+    var sel=document.createElement('select');
+    sel.id='fPais';
+    sel.className='inp';
+    sel.setAttribute('autocomplete','country');
+    sel.style.cssText='width:100%;background:#101010;border:1px solid #2c2c2c;color:#eee;'+
+      'border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;';
+    var err=document.createElement('div');
+    err.className='frm-err'; err.id='ePais';
+    g.appendChild(lb); g.appendChild(sel); g.appendChild(err);
+    gCid.parentNode.insertBefore(g,gCid.nextSibling);
+    sel.addEventListener('change',function(){
+      try{_frmValidaCampo({id:'fPais',err:'ePais',obrig:true,chk:function(v){return v.trim().length>0||T().ePais;}},true);}catch(e){}
+      try{_frmValidaTudo(false);}catch(e){}
+      try{if(typeof _cliSalva==='function')_cliSalva();}catch(e){}
+    });
+    if(typeof FRM_CAMPOS!=='undefined'&&!FRM_CAMPOS.some(function(c){return c.id==='fPais';})){
+      FRM_CAMPOS.push({id:'fPais',err:'ePais',obrig:true,
+        chk:function(v){ return v.trim().length>0 || T().ePais; }});
+    }
+  }
+
+  function pintaPais(){
+    var sel=document.getElementById('fPais'); if(!sel)return;
+    var atual=sel.value;
+    var ops=opcoesPais();
+    sel.innerHTML='<option value="">'+T().phPais+'</option>'+
+      ops.map(function(o){return '<option value="'+o.v+'">'+o.t+'</option>';}).join('');
+    /* so pre-seleciona se a geolocalizacao souber onde o cliente esta.
+       Herdar o primeiro item da lista de frete faria um cliente holandes
+       fechar o pedido com a Belgica marcada sem perceber. */
+    var pref=atual;
+    if(!pref){ try{ if(window.FP&&FP.geoCountry)pref=FP.geoCountry; }catch(e){} }
+    if(pref&&[].some.call(sel.options,function(o){return o.value===pref;}))sel.value=pref;
+    var lb=document.getElementById('lbPais'); if(lb)lb.textContent=T().pais;
+  }
+
+  /* regras de CEP e telefone passam a depender da regiao */
+  var _regrasTrocadas=false;
+  function trocaRegras(){
+    if(_regrasTrocadas||typeof FRM_CAMPOS==='undefined')return;
+    _regrasTrocadas=true;
+    FRM_CAMPOS.forEach(function(c){
+      if(c.id==='fCep'){
+        var o=c.chk;
+        c.chk=function(v){ return _fpBR()?o(v):(v.trim().length>=3||T().eCep); };
+      }
+      if(c.id==='fZap'){
+        var o2=c.chk;
+        c.chk=function(v){
+          if(_fpBR())return o2(v);
+          var d=_so(v);
+          return (d.length>=6&&d.length<=15)||T().eZap;
+        };
+      }
+    });
+  }
+
+  function aplica(){
+    var form=document.getElementById('cartForm');
+    if(!form||typeof FRM_CAMPOS==='undefined')return;
+    trocaRegras();
+    var br=_fpBR(), t=T();
+    var cep=document.getElementById('fCep'), zap=document.getElementById('fZap'),
+        rua=document.getElementById('fRua');
+    [['fCep',cep],['fZap',zap],['fRua',rua]].forEach(function(p){
+      if(p[1]){ guarda(p[1],'ph',p[1].getAttribute('placeholder')); guarda(p[1],'ml',p[1].getAttribute('maxlength')); }
+    });
+    ['fCep','fZap','fRua','fNum'].forEach(function(id){
+      var l=rotulo(id); if(l)guarda(l,'txt',l.textContent);
+    });
+    var intro=form.querySelector('.frm-intro'), lgpd=form.querySelector('.frm-lgpd');
+    if(intro)guarda(intro,'txt',intro.textContent);
+    if(lgpd)guarda(lgpd,'txt',lgpd.textContent);
+
+    if(br){
+      ligaDesliga('fCpf',true); ligaDesliga('fBairro',true); ligaDesliga('fUf',true);
+      ligaDesliga('fPais',false);
+      [['fCep',cep],['fZap',zap],['fRua',rua]].forEach(function(p){
+        if(!p[1])return;
+        var ph=p[1].getAttribute('data-orig-ph'), ml=p[1].getAttribute('data-orig-ml');
+        if(ph!==null)poePlaceholder(p[1],ph);
+        if(ml)p[1].setAttribute('maxlength',ml);
+      });
+      ['fCep','fZap','fRua','fNum'].forEach(function(id){
+        var l=rotulo(id), o=l&&l.getAttribute('data-orig-txt');
+        if(l&&o)l.textContent=o;
+      });
+      ['fCompl','fCidade'].forEach(function(id){
+        var el=document.getElementById(id), o=el&&el.getAttribute('data-orig-ph');
+        if(el&&o!==null&&o!==undefined)poePlaceholder(el,o);
+      });
+      if(intro&&intro.getAttribute('data-orig-txt'))intro.textContent=intro.getAttribute('data-orig-txt');
+      if(lgpd&&lgpd.getAttribute('data-orig-txt'))lgpd.textContent=lgpd.getAttribute('data-orig-txt');
+    }else{
+      criaPais();
+      ligaDesliga('fCpf',false); ligaDesliga('fBairro',false); ligaDesliga('fUf',false);
+      ligaDesliga('fPais',true);
+      pintaPais();
+      if(cep){ poePlaceholder(cep,t.phCep); cep.setAttribute('maxlength','12');
+               cep.setAttribute('inputmode','text'); }
+      if(zap){ poePlaceholder(zap,t.phZap); zap.setAttribute('maxlength','20');
+               zap.setAttribute('inputmode','tel'); }
+      if(rua)poePlaceholder(rua,t.phRua);
+      var compl=document.getElementById('fCompl');
+      if(compl){ guarda(compl,'ph',compl.getAttribute('placeholder')); poePlaceholder(compl,''); }
+      var cid=document.getElementById('fCidade');
+      if(cid){ guarda(cid,'ph',cid.getAttribute('placeholder')); poePlaceholder(cid,''); }
+      var lc=rotulo('fCep'); if(lc)lc.textContent=t.cep;
+      var lz=rotulo('fZap'); if(lz)lz.textContent=t.zap;
+      var lr=rotulo('fRua'); if(lr)lr.textContent=t.end;
+      var ln=rotulo('fNum'); if(ln)ln.textContent=t.num;
+      if(intro)intro.textContent=t.intro;
+      if(lgpd)lgpd.textContent=t.lgpd;
+    }
+    try{_frmValidaTudo(false);}catch(e){}
+  }
+  window._fpFormRegiao=aplica;
+
+  /* texto do pedido no WhatsApp: no Brasil, identico ao de sempre */
+  window._fpDadosTexto=function(c){
+    if(_fpBR()){
+      return 'Nome: '+c.nome+'\nCPF: '+_mascCpf(c.cpf)+'\nWhatsApp: '+_mascTel(c.whatsapp)+
+             '\nE-mail: '+c.email+'\nEndere\u00e7o: '+c.rua+', '+c.numero+
+             (c.complemento?' - '+c.complemento:'')+'\n'+c.bairro+' - '+c.cidade+'/'+c.uf+
+             '\nCEP: '+_mascCep(c.cep);
+    }
+    var t=T(), sel=document.getElementById('fPais');
+    var nomePais=(sel&&sel.selectedIndex>0)?sel.options[sel.selectedIndex].textContent:(c.pais||'');
+    var telInt=(document.getElementById('fZap')||{}).value||c.whatsapp;
+    return 'Nome: '+c.nome+'\n'+t.zap+': '+telInt+
+           '\nE-mail: '+c.email+'\n'+t.end+': '+c.rua+', '+c.numero+
+           (c.complemento?' - '+c.complemento:'')+'\n'+c.cidade+
+           '\n'+t.cep+': '+c.cep+'\n'+t.pais+': '+nomePais;
+  };
+
+  function liga(){
+    if(typeof window.carrinhoPasso==='function'){
+      var o=window.carrinhoPasso;
+      window.carrinhoPasso=function(n){
+        var r=o.apply(this,arguments);
+        if(n===2){ try{aplica();}catch(e){} }
+        return r;
+      };
+    }
+    try{
+      if(window.FP&&typeof FP.setRegion==='function'){
+        var oR=FP.setRegion;
+        FP.setRegion=function(){ var r=oR.apply(this,arguments); try{aplica();}catch(e){} return r; };
+      }
+      if(window.FP&&typeof FP.setLang==='function'){
+        var oL=FP.setLang;
+        FP.setLang=function(){ var r=oL.apply(this,arguments); try{aplica();}catch(e){} return r; };
+      }
+    }catch(e){}
+    try{aplica();}catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,60);});
+  else setTimeout(liga,60);
 })();
