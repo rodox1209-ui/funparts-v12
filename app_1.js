@@ -3632,7 +3632,11 @@ function fecharPedidoWpp(){
   .then(function(r){ return r.json(); })
   .then(function(d){
     clearTimeout(to);
-    if(!d||!d.ok||!d.codigo)throw new Error('resposta invalida');
+    if(!d||!d.ok||!d.codigo){
+      /* o motivo que o servidor mandou nao pode se perder no caminho:
+         e' ele que vira a mensagem na tela. */
+      var _e=new Error('resposta invalida'); _e._fp=(d&&d.erro)||''; throw _e;
+    }
     // pedido gravado: agora busca o link de pagamento Pagar.me
     return fetch(API_FUNPARTS+'/pagamento',{
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -3640,15 +3644,21 @@ function fecharPedidoWpp(){
     })
     .then(function(r2){ return r2.json(); })
     .then(function(pg){
-      if(typeof _rascLimpa==='function')_rascLimpa();
-      CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
       if(pg && pg.ok && pg.url){
+        /* So esvazia o carrinho quando o pagamento REALMENTE abriu.
+           Antes ele era esvaziado antes da conferencia, entao uma falha
+           custava o carrinho do cliente junto. */
+        if(typeof _rascLimpa==='function')_rascLimpa();
+        CART=[]; _cartSave(); _cartRender(); carrinhoPasso(1); fecharCarrinho();
         // redireciona a aba jÃÂ¡ aberta para o checkout Pagar.me
         if(aba && !aba.closed){ aba.location.href=pg.url; }
         else { window.open(pg.url,'_blank'); }
         if(btn){ btn.disabled=false; btn.textContent='Finalizar e pagar Ã¢ÂÂ'; }
+      } else if(typeof window._fpFalhaPgto==='function'){
+        /* mostra o motivo na tela e deixa o WhatsApp como escolha */
+        window._fpFalhaPgto((pg&&pg.erro)||'', d, c, aba, btn, _resumoLongo);
       } else {
-        // Pagar.me falhou: fallback WhatsApp para nÃÂ£o perder a venda
+        // reserva: se o bloco da mensagem nao carregou, vale o de antes
         _abrirZap(
           'OlÃÂ¡! Fechei meu pedido na Funparts.\n\n'+
           '*Pedido:* '+d.codigo+'\n'+
@@ -3660,10 +3670,15 @@ function fecharPedidoWpp(){
       }
     });
   })
-  .catch(function(){
+  .catch(function(_err){
     clearTimeout(to);
-    // servidor fora do ar nao pode impedir a venda: manda o resumo completo no texto
-    _abrirZap(_resumoLongo());
+    var _motivo=(_err&&_err._fp)?_err._fp:'__rede__';
+    if(typeof window._fpFalhaPgto==='function'){
+      window._fpFalhaPgto(_motivo, null, c, aba, btn, _resumoLongo);
+    }else{
+      // reserva: servidor fora do ar nao pode impedir a venda
+      _abrirZap(_resumoLongo());
+    }
   });
 }// Ã¢ÂÂÃ¢ÂÂ handler de retorno de pagamento (?pago=1) Ã¢ÂÂÃ¢ÂÂ
 (function(){

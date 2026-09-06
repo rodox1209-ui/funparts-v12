@@ -3515,6 +3515,9 @@ function _startOb14(){
    euro, o item nao e' vendido na Europa - some da lista ou desliga o botao. */
 (function(){
   var BRUTO=null;              /* catalogo como veio do banco, intacto */
+  /* as chaves que o calculo do site consulta de verdade. Conferido no
+     app_1.js: bases por prefixo e estes seis opcionais. */
+  var USADAS=/^(lego_base_|mini_base_)|^(opt_moldura_fibra|opt_led_rgb_sem|opt_mini_comprar|opt_disp_3d|opt_relevo_bandeira|opt_relevo_piloto)$/;
   var FALTA=[];                /* chaves sem preco em euro */
 
   function reg(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
@@ -3541,7 +3544,11 @@ function _startOb14(){
     FALTA=[];
     Object.keys(pr).forEach(function(k){
       if(pe[k]!=null)out.precos[k]=pe[k];
-      else FALTA.push(k);
+      /* So trava por chave que o site REALMENTE consulta. O banco tem
+         chaves de LED antigo que o painel esconde e o site nao usa; exigir
+         euro delas deixava a Europa sem preco para sempre, sem ter como
+         preencher. */
+      else if(USADAS.test(k))FALTA.push(k);
     });
     if(out.mini){
       Object.keys(out.mini).forEach(function(m){
@@ -3728,4 +3735,104 @@ function _startOb14(){
   if(document.readyState==='loading')
     document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,250);});
   else setTimeout(liga,250);
+})();
+
+
+/* ============ QUANDO O PAGAMENTO NAO ABRE ============
+   Antes daqui, qualquer falha no pagamento esvaziava o carrinho, fechava o
+   painel e abria o WhatsApp, sem uma palavra. O cliente nao sabia o que tinha
+   acontecido e a Funparts tambem nao: gateway fora do ar e pedido abaixo do
+   valor minimo eram indistinguiveis.
+
+   Agora a tela diz o motivo, o carrinho continua montado e o WhatsApp vira uma
+   escolha, num botao, em vez de um desvio automatico. */
+(function(){
+  var T={
+    pt:{ tit:'N\u00e3o foi poss\u00edvel abrir o pagamento',
+         ped:'Pedido', tentar:'Tentar de novo', zap:'Falar no WhatsApp',
+         rede:'N\u00e3o conseguimos falar com o servidor. Seu carrinho continua aqui.',
+         minimo:'O total do pedido est\u00e1 abaixo do valor m\u00ednimo aceito pelo pagamento (R$ 1,00).',
+         semcfg:'O meio de pagamento n\u00e3o est\u00e1 configurado no momento.',
+         semeuro:'Este item ainda n\u00e3o tem pre\u00e7o em euro definido.',
+         generico:'O pagamento n\u00e3o p\u00f4de ser criado agora. Seu carrinho continua aqui.' },
+    en:{ tit:'We could not open the payment',
+         ped:'Order', tentar:'Try again', zap:'Message on WhatsApp',
+         rede:'We could not reach the server. Your cart is still here.',
+         minimo:'The order total is below the minimum accepted by the payment provider.',
+         semcfg:'The payment method is not available right now.',
+         semeuro:'This item has no price in euro yet.',
+         generico:'The payment could not be created right now. Your cart is still here.' },
+    es:{ tit:'No pudimos abrir el pago',
+         ped:'Pedido', tentar:'Intentar de nuevo', zap:'Escribir por WhatsApp',
+         rede:'No pudimos contactar el servidor. Tu carrito sigue aqu\u00ed.',
+         minimo:'El total del pedido est\u00e1 por debajo del m\u00ednimo aceptado por el pago.',
+         semcfg:'El medio de pago no est\u00e1 disponible en este momento.',
+         semeuro:'Este art\u00edculo a\u00fan no tiene precio en euros.',
+         generico:'El pago no pudo crearse ahora. Tu carrito sigue aqu\u00ed.' },
+    fr:{ tit:'Le paiement n\u2019a pas pu s\u2019ouvrir',
+         ped:'Commande', tentar:'R\u00e9essayer', zap:'\u00c9crire sur WhatsApp',
+         rede:'Nous n\u2019avons pas pu joindre le serveur. Votre panier est toujours l\u00e0.',
+         minimo:'Le total de la commande est inf\u00e9rieur au minimum accept\u00e9 par le paiement.',
+         semcfg:'Le moyen de paiement n\u2019est pas disponible pour le moment.',
+         semeuro:'Cet article n\u2019a pas encore de prix en euros.',
+         generico:'Le paiement n\u2019a pas pu \u00eatre cr\u00e9\u00e9. Votre panier est toujours l\u00e0.' }
+  };
+  function t(){ var l='pt'; try{ l=(window.FP&&FP.lang)||'pt'; }catch(e){} return T[l]||T.pt; }
+
+  /* traduz o que o servidor respondeu para uma frase que o cliente entende */
+  function explica(motivo){
+    var x=t(), m=String(motivo||'');
+    if(m==='__rede__')return x.rede;
+    if(/valor invalido/i.test(m))return x.minimo;
+    if(/nao configurad/i.test(m))return x.semcfg;
+    if(/preco em euro/i.test(m))return x.semeuro;
+    if(m&&m.length<160&&!/^http/i.test(m))return m;   /* mensagem propria do servidor */
+    return x.generico;
+  }
+
+  window._fpFalhaPgto=function(motivo, pedido, cliente, aba, btn, textoZap){
+    var x=t();
+    /* a aba em branco foi aberta no clique; sem pagamento, ela nao serve */
+    try{ if(aba && !aba.closed) aba.close(); }catch(e){}
+    try{ if(btn){ btn.disabled=false; btn.textContent='FECHAR PEDIDO \u2192'; } }catch(e){}
+
+    var alvo=document.getElementById('cartFoot2')||document.getElementById('cartFoot')
+             ||document.getElementById('cartPanel');
+    if(!alvo){ try{ if(typeof textoZap==='function')window.open('https://wa.me/5511910646157?text='+encodeURIComponent(textoZap()),'_blank'); }catch(e){} return; }
+
+    var velho=document.getElementById('fpPgtoFalha');
+    if(velho)velho.remove();
+    var cx=document.createElement('div');
+    cx.id='fpPgtoFalha';
+    cx.style.cssText='margin:10px 0;padding:12px 13px;border:1px solid #7a3b34;'
+      +'background:#2a1512;color:#f0cdc7;border-radius:9px;font-size:13px;line-height:1.55';
+    var cod=(pedido&&pedido.codigo)?('<div style="margin-top:6px;opacity:.75">'+x.ped+': '+String(pedido.codigo).replace(/[<>&"]/g,'')+'</div>'):'';
+    cx.innerHTML='<div style="font-weight:700;margin-bottom:4px">'+x.tit+'</div>'
+      +'<div>'+explica(motivo)+'</div>'+cod
+      +'<div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap">'
+      +'<button type="button" id="fpPgtoTentar" style="flex:1 1 130px;background:#e07b00;border:0;color:#fff;'
+      +'padding:10px 12px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">'+x.tentar+'</button>'
+      +'<button type="button" id="fpPgtoZap" style="flex:1 1 130px;background:transparent;border:1px solid #4a4a4a;'
+      +'color:#ddd;padding:10px 12px;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer">'+x.zap+'</button>'
+      +'</div>';
+    alvo.insertBefore(cx, alvo.firstChild);
+    try{ cx.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){}
+
+    var bt=document.getElementById('fpPgtoTentar');
+    if(bt)bt.addEventListener('click',function(){
+      cx.remove();
+      try{ if(typeof window.fecharPedidoWpp==='function')window.fecharPedidoWpp(); }catch(e){}
+    });
+    var bz=document.getElementById('fpPgtoZap');
+    if(bz)bz.addEventListener('click',function(){
+      var txt='';
+      try{ if(typeof textoZap==='function')txt=textoZap(); }catch(e){}
+      if(!txt){
+        txt='Ol\u00e1! Tentei fechar meu pedido na Funparts e o pagamento n\u00e3o abriu.';
+        if(pedido&&pedido.codigo)txt+='\nPedido: '+pedido.codigo;
+        if(cliente&&cliente.nome)txt+='\nCliente: '+cliente.nome;
+      }
+      try{ window.open('https://wa.me/5511910646157?text='+encodeURIComponent(txt),'_blank'); }catch(e){}
+    });
+  };
 })();
