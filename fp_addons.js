@@ -3655,3 +3655,77 @@ function _startOb14(){
     document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,200);});
   else setTimeout(liga,200);
 })();
+
+
+/* ============ A RETIRADA NAO PODE SUMIR DA LISTA ============
+   Dois paineis de frete escrevem na mesma caixa. O painel do botao "Calcular"
+   substitui o conteudo inteiro quando as opcoes chegam, e leva junto a linha
+   "RETIRAR NA FABRICA", que o painel antigo coloca so uma vez ao abrir a tela.
+   Resultado: quem calculava o frete perdia a opcao de retirar.
+
+   Aqui a linha e' garantida depois de qualquer redesenho: se sumiu, volta; se
+   duplicou, fica uma so. O texto e o clique sao os mesmos de sempre. Fora do
+   Brasil, o bloco anterior troca o conteudo pela retirada em Braine-l'Alleud. */
+(function(){
+  var NOME='RETIRAR NA F\u00c1BRICA', PRAZO='Combinar retirada', GRATIS='Gr\u00e1tis';
+
+  function novaLinha(){
+    var d=document.createElement('div');
+    d.className='fp-frete-opt';
+    d.setAttribute('data-retirada','1');
+    d.innerHTML='<div class="fp-frete-radio"></div>'
+      +'<div class="fp-frete-info">'
+      +'<div class="fp-frete-nome">'+NOME+'</div>'
+      +'<div class="fp-frete-prazo">'+PRAZO+'</div>'
+      +'</div>'
+      +'<div class="fp-frete-preco">'+GRATIS+'</div>';
+    d.addEventListener('click',function(){
+      /* Fora do Brasil quem cuida desta linha e' o bloco da retirada europeia,
+         que ja poe o rotulo e a moeda certos. Chamar a funcao do painel
+         brasileiro aqui deixaria "RETIRAR NA FABRICA" em real no pedido. */
+      try{ if(window.FP&&FP.region&&FP.region!=='BR')return; }catch(e){}
+      try{ if(typeof window._selRetirada==='function'){ window._selRetirada(); return; } }catch(e){}
+      /* reserva, caso a funcao do painel antigo nao exista */
+      try{
+        window._freteEscolhido={label:NOME,price:0,carrier:null,currency:'BRL'};
+        document.querySelectorAll('#fpFreteOpts .fp-frete-opt')
+          .forEach(function(x){ x.classList.remove('on'); });
+        d.classList.add('on');
+      }catch(e){}
+    });
+    return d;
+  }
+
+  function garante(){
+    var caixas=document.querySelectorAll('#fpFreteOpts');
+    for(var i=0;i<caixas.length;i++){
+      var cx=caixas[i];
+      var todas=cx.querySelectorAll('.fp-frete-opt');
+      if(!todas.length)continue;                 /* lista vazia: nao e' hora ainda */
+      var rets=cx.querySelectorAll('[data-retirada="1"]');
+      if(rets.length>1){                          /* duplicou: mantem a primeira */
+        for(var k=1;k<rets.length;k++){
+          try{ rets[k].parentNode.removeChild(rets[k]); }catch(e){}
+        }
+        continue;
+      }
+      if(rets.length===1)continue;                /* ja esta la */
+      /* a linha do total, quando existe, fica sempre por ultimo */
+      var tot=cx.querySelector('.fp-frete-tot');
+      try{
+        if(tot)cx.insertBefore(novaLinha(),tot);
+        else cx.appendChild(novaLinha());
+      }catch(e){}
+    }
+  }
+
+  var t=null;
+  function agenda(){ clearTimeout(t); t=setTimeout(function(){ try{garante();}catch(e){} },90); }
+  function liga(){
+    agenda();
+    try{ new MutationObserver(agenda).observe(document.body,{childList:true,subtree:true}); }catch(e){}
+  }
+  if(document.readyState==='loading')
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,250);});
+  else setTimeout(liga,250);
+})();
