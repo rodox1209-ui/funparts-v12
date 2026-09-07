@@ -3712,12 +3712,36 @@ function _fpgtoMsgSucesso(cod){
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:flex;align-items:center;justify-content:center;';
   var box=document.createElement('div');
   box.style.cssText='background:#1a1a1a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:40px 32px;max-width:420px;width:90%;text-align:center;color:#fff;font-family:inherit;';
+  /* A caixa inteira estava em portugues: quem pagou em euro, na Belgica, via
+     "Pagamento confirmado!" e "Fechar" em portugues logo depois de gastar 300
+     euros. Agora segue o idioma da tela.
+
+     O idioma vem do localStorage, nao de FP.lang: esta caixa abre no primeiro
+     instante da pagina, quando a Stripe devolve o cliente, e nesse momento o
+     tradutor ainda nao carregou. E' a mesma chave que o proprio tradutor grava. */
+  var _pgT={
+    pt:{ tit:'Pagamento confirmado!', ped:'Pedido',
+         msg:'Voc\u00ea receber\u00e1 as atualiza\u00e7\u00f5es por email. Obrigado por comprar na Funparts',
+         fec:'Fechar' },
+    en:{ tit:'Payment confirmed!', ped:'Order',
+         msg:'You will receive updates by email. Thank you for buying from Funparts',
+         fec:'Close' },
+    fr:{ tit:'Paiement confirm\u00e9 !', ped:'Commande',
+         msg:'Vous recevrez les mises \u00e0 jour par e-mail. Merci d\u2019avoir achet\u00e9 chez Funparts',
+         fec:'Fermer' },
+    es:{ tit:'\u00a1Pago confirmado!', ped:'Pedido',
+         msg:'Recibir\u00e1s las actualizaciones por email. Gracias por comprar en Funparts',
+         fec:'Cerrar' }
+  };
+  var _pgL='pt';
+  try{ _pgL=(window.FP&&FP.lang)||localStorage.getItem('fp_lang')||'pt'; }catch(e){}
+  var _pg=_pgT[String(_pgL).slice(0,2)]||_pgT.pt;
   box.innerHTML=
-    '<div style="font-size:48px;margin-bottom:16px">Ã¢ÂÂ</div>'+
-    '<div style="font-size:22px;font-weight:700;margin-bottom:8px">Pagamento confirmado!</div>'+
-    (cod?'<div style="font-size:14px;color:#e07b00;margin-bottom:16px">Pedido '+cod+'</div>':'')+
-    '<div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px">VocÃÂª receberÃÂ¡ as atualizaÃÂ§ÃÂµes pelo WhatsApp. Obrigado por comprar na Funparts!</div>'+
-    '<button onclick="this.closest(\'[data-pgto-ov]\').remove()" style="background:#e07b00;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;cursor:pointer;">Fechar</button>';
+    '<div style="font-size:48px;margin-bottom:16px">\u2705</div>'+
+    '<div style="font-size:22px;font-weight:700;margin-bottom:8px">'+_pg.tit+'</div>'+
+    (cod?'<div style="font-size:14px;color:#e07b00;margin-bottom:16px">'+_pg.ped+' '+cod+'</div>':'')+
+    '<div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px">'+_pg.msg+'</div>'+
+    '<button onclick="this.closest(\'[data-pgto-ov]\').remove()" style="background:#e07b00;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;cursor:pointer;">'+_pg.fec+'</button>';
   ov.setAttribute('data-pgto-ov','1');
   ov.appendChild(box);
   document.body.appendChild(ov);
