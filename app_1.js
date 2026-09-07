@@ -3625,6 +3625,10 @@ function fecharPedidoWpp(){
 
   var corpo={
     rascunhoToken:(typeof _rascToken==='function'?_rascToken():'')||undefined,
+    /* O idioma da tela vai junto com o pedido. Sem isso o servidor so tem o
+       pais para adivinhar, e um belga que comprou em ingles receberia o
+       e-mail em frances. */
+    idioma:(function(){ try{ return (window.FP&&FP.lang)||'pt'; }catch(e){ return 'pt'; } })(),
     cliente:c,
     frete:_freteEscolhido||undefined,
     itens:CART.map(function(i){
