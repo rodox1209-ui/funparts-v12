@@ -2908,35 +2908,47 @@ function _startOb14(){
 })();
 
 
-/* ━━ FIX v2: moldura 49×49cm — corrige #legoDetQuadro diretamente ━━━━━
-   O elemento #legoDetQuadro recebe aspect-ratio:53/83 por inline style
-   mesmo quando o produto é 49×49cm. Este patch corrige o inline style
-   diretamente via MutationObserver, sem depender de classes CSS.      */
+/* ━━ Proporcao da moldura no preview ━━━━━━━━━━━━━━━━━━━━━
+   O #legoDetQuadro nasce com aspect-ratio:53/83 escrito no proprio HTML.
+   Quando a rotina que deveria corrigir isso nao roda (ou roda antes da
+   dimensao existir), o produto 49x49 fica desenhado com a moldura do 53x83.
+   Este bloco e' a ultima palavra: le a dimensao do proprio produto -- a
+   mesma que aparece embaixo do nome na tela -- e aplica a proporcao dela
+   nos dois quadros de preview.                                        */
 (function(){
-  var MODELOS_49 = [
-    'McLaren GTR',
-    'McLaren MP4/4 Senna 49x49cm',
-    'Porsche 911 Targa 1970'
-  ];
-
-  function is49x49(){
-    try {
-      var m = (typeof S !== 'undefined' && S.legoModel) ? S.legoModel : '';
-      return MODELOS_49.some(function(n){ return m.indexOf(n) !== -1 || n.indexOf(m) !== -1; });
-    } catch(e){ return false; }
+  /* A dimensao e' a fonte da verdade, nao uma lista de nomes escrita a mao:
+     dos 8 quadros 49x49 do catalogo so 3 estavam na lista antiga, e os
+     outros 5 (DeLorean, Renault F1, Mini F1, Mercedes AMG One, BMW GS 1250)
+     apareciam com a moldura do 53x83. Produto novo entra sozinho. */
+  function _fpRatioDaDim(dim){
+    var n = String(dim || '').match(/\d+(?:[.,]\d+)?/g);
+    if (!n || n.length < 2) return '';
+    var a = parseFloat(String(n[0]).replace(',', '.'));
+    var b = parseFloat(String(n[1]).replace(',', '.'));
+    if (!(a > 0 && b > 0)) return '';
+    /* quadrado sai como 1/1 para falar a mesma lingua do outro bloco de
+       correcao -- se um escrevesse 49/49 e o outro 1/1, os dois ficariam
+       se corrigindo em looping */
+    if (Math.abs(a - b) < 0.001) return '1/1';
+    return a + '/' + b;
   }
 
   var _fixing49v2 = false;
   function fixDetQuadro(){
     if(_fixing49v2) return;
-    if(!is49x49()) return;
-    var el = document.getElementById('legoDetQuadro');
-    if(!el) return;
-    var ar = el.style.aspectRatio.replace(/\s/g,'');
-    if(ar === '1/1') return; // já correto
-    _fixing49v2 = true;
-    el.style.aspectRatio = '1/1';
-    _fixing49v2 = false;
+    try {
+      if (typeof S === 'undefined' || S.tipo !== 'lego') return;
+      var r = _fpRatioDaDim(S.legoDim);
+      if (!r) return;                    /* dimensao ilegivel: nao mexe em nada */
+      _fixing49v2 = true;
+      [document.getElementById('legoDetQuadro'),
+       document.querySelector('#livePv .quadro')].forEach(function(el){
+        if (!el) return;
+        if (String(el.style.aspectRatio || '').replace(/\s/g, '') === r) return;
+        el.style.aspectRatio = r;
+      });
+    } catch(e){
+    } finally { _fixing49v2 = false; }
   }
 
   // Rodar imediatamente e após cada renderização
@@ -2968,8 +2980,9 @@ function _startOb14(){
   // MutationObserver: corrige quando o style de #legoDetQuadro muda
   var _ob49v2;
   function startObs49v2(){
-    var el = document.getElementById('legoDetQuadro');
-    var target = el || document.body;
+    /* body, e nao so o #legoDetQuadro: o quadro do visualizador (#livePv)
+       tambem precisa ser vigiado, e ele nem sempre existe no inicio */
+    var target = document.body;
     if(_ob49v2){ _ob49v2.disconnect(); }
     _ob49v2 = new MutationObserver(function(ms){
       var relevant = ms.some(function(m){
