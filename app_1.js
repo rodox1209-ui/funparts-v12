@@ -2717,13 +2717,25 @@ function renderLegoBrandCards(){
   var el=document.getElementById('legoBrands'); if(!el) return;
   var nomes=Object.keys(LEGO_CATALOG||{});
   if(!nomes.length) return;        /* catalogo vazio: mantem o que ja esta na tela */
-  var sel=(typeof S!=='undefined')&&S.legoBrand;
+  /* NAO escolher marca sozinho: a etapa tem que abrir sem nenhuma selecionada.
+     S.legoBrand ja nasce preenchido com um valor padrao, entao ele nao serve
+     para essa decisao -- quem manda e' o que ja estava marcado NA TELA. */
+  var sel=null;
   /* ATENCAO: o bloco da lista de modelos e' MOVIDO para dentro desta faixa pelo
      ajuste de layout. Trocar o innerHTML inteiro destruiria esse bloco e
      quebraria a etapa -- por isso troco so os cartoes, um a um. */
   var antigos=[];
   for(var i=0;i<el.children.length;i++){
     if(el.children[i].classList&&el.children[i].classList.contains('bcard'))antigos.push(el.children[i]);
+  }
+  /* se o cliente ja tinha clicado numa categoria antes de o catalogo chegar,
+     a escolha dele e' preservada; se nao clicou em nada, continua sem nada */
+  for(var j=0;j<antigos.length;j++){
+    if(antigos[j].classList.contains('sel')){
+      sel=antigos[j].getAttribute('data-ib')||
+          ((antigos[j].querySelector('.bnm')||{}).textContent||'').trim();
+      break;
+    }
   }
   var ref=antigos.length?antigos[0]:el.firstChild;
   var frag=document.createDocumentFragment();
