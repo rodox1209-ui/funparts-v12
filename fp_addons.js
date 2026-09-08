@@ -1400,7 +1400,7 @@ window.FP_traduzTudo=function(lang){
     setEl('fpH2','Region / Delivery');
     setEl('fpFreteT','Shipping / Delivery');
     setEl('fixedTL','\uD83C\uDFC1 Formula 1 Logo \u2014 Top left corner');
-    setEl('relevoNenhumMsg','This product does not include the high relief option.');
+    if(window._relevoMsgAplica)window._relevoMsgAplica();
     setQ('#cartBtn .lbl','Cart');
     applyFpFreteHNode('en');
     applyMap(EN);
@@ -1409,7 +1409,7 @@ window.FP_traduzTudo=function(lang){
     setEl('fpH2','Regi\u00E3o / Entrega');
     setEl('fpFreteT','Frete / Entrega');
     setEl('fixedTL','\uD83C\uDFC1 Logo F\u00F3rmula 1 \u2014 Canto superior esquerdo');
-    setEl('relevoNenhumMsg','Este produto n\u00E3o cont\u00E9m a op\u00E7\u00E3o de alto relevo.');
+    if(window._relevoMsgAplica)window._relevoMsgAplica();
     setQ('#cartBtn .lbl','Carrinho');
     applyFpFreteHNode('pt');
     applyMap(PT);
@@ -1582,12 +1582,13 @@ function applyFpFreteHNode(lang){
 window.FP_traduzTudo=function(lang){
   /* chama a cadeia original Ã¢ÂÂ ignora erro de TreeWalker do original */
   try{_fp_chain.call(window,lang);}catch(e){}
+  try{ if(window._relevoMsgAplica)window._relevoMsgAplica(); }catch(e){}
   /* reaplica nossas traduÃÂ§ÃÂµes de forma garantida */
   if(lang==='en'){
     setEl('fpH2','Region / Delivery');
     setEl('fpFreteT','Shipping / Delivery');
     setEl('fixedTL','\uD83C\uDFC1 Formula 1 Logo \u2014 Top left corner');
-    setEl('relevoNenhumMsg','This product does not include the high relief option.');
+    if(window._relevoMsgAplica)window._relevoMsgAplica();
     setQ('#cartBtn .lbl','Cart');
     applyFpFreteHNode('en');
     applyMap(ALL_EN);
@@ -1596,7 +1597,7 @@ window.FP_traduzTudo=function(lang){
     setEl('fpH2','Regi\u00E3o / Entrega');
     setEl('fpFreteT','Frete / Entrega');
     setEl('fixedTL','\uD83C\uDFC1 Logo F\u00F3rmula 1 \u2014 Canto superior esquerdo');
-    setEl('relevoNenhumMsg','Este produto n\u00E3o cont\u00E9m a op\u00E7\u00E3o de alto relevo.');
+    if(window._relevoMsgAplica)window._relevoMsgAplica();
     setQ('#cartBtn .lbl','Carrinho');
     applyFpFreteHNode('pt');
     applyMap(ALL_PT);

@@ -2380,6 +2380,44 @@ function _aplicaRelevoOcultosLego(){
 // Ajusta a ETAPA Alto-relevo (LEGO): esconde a caixa de relevo fixo quando o topo
 // ÃÂ© "nenhum", esconde o rÃÂ³tulo de opcionais quando nÃÂ£o hÃÂ¡ opÃÂ§ÃÂ£o, e mostra a frase
 // "Este produto nÃÂ£o contÃÂ©m a opÃÂ§ÃÂ£o de alto relevo" quando nÃÂ£o sobra nenhum relevo.
+/* Texto da caixa da etapa Alto-relevo, nos quatro idiomas. Fica aqui, num lugar
+   so, porque o tradutor generico do site nao alcanca texto criado por script. */
+var _RELEVO_MSG={
+  pt:{ imagem:['Este produto n\u00e3o cont\u00e9m a op\u00e7\u00e3o de edi\u00e7\u00e3o para o alto relevo.',''],
+       nenhum:['Este produto cont\u00e9m alto relevo por\u00e9m n\u00e3o \u00e9 edit\u00e1vel.','N\u00e3o incluso na vers\u00e3o "Fosco".'] },
+  en:{ imagem:['This product does not include the high relief editing option.',''],
+       nenhum:['This product includes relief, but it is not editable.','Not included in the "Matte" version.'] },
+  es:{ imagem:['Este producto no incluye la opci\u00f3n de edici\u00f3n del altorrelieve.',''],
+       nenhum:['Este producto incluye altorrelieve, pero no es editable.','No incluido en la versi\u00f3n "Mate".'] },
+  fr:{ imagem:['Ce produit ne permet pas de modifier le relief.',''],
+       nenhum:['Ce produit comporte un relief, mais il n\u2019est pas modifiable.','Non inclus dans la version \u00ab\u00a0Mat\u00a0\u00bb.'] }
+};
+/* garante as duas linhas dentro da caixa (e as recria se algum outro script apagar) */
+function _relevoMsgLinhas(msg){
+  if(!msg) return null;
+  var a=msg.querySelector('#relevoNenhumL1'), b=msg.querySelector('#relevoNenhumL2');
+  if(!a){ a=document.createElement('div'); a.id='relevoNenhumL1'; msg.appendChild(a); }
+  if(!b){ b=document.createElement('div'); b.id='relevoNenhumL2'; b.style.cssText='margin-top:5px;opacity:.72;'; msg.appendChild(b); }
+  return [a,b];
+}
+/* escreve a frase do modo guardado, no idioma da tela */
+function _relevoMsgAplica(){
+  var msg=document.getElementById('relevoNenhumMsg');
+  if(!msg) return;
+  var modo=msg.getAttribute('data-modo')||'';
+  if(!modo){ msg.style.display='none'; return; }
+  var lg='pt';
+  try{ lg=(window.FP&&FP.lang)||localStorage.getItem('fp_lang')||'pt'; }catch(e){}
+  var tab=_RELEVO_MSG[String(lg).slice(0,2)]||_RELEVO_MSG.pt;
+  var par=tab[modo]||_RELEVO_MSG.pt[modo];
+  if(!par){ msg.style.display='none'; return; }
+  var ls=_relevoMsgLinhas(msg);
+  ls[0].textContent=par[0];
+  ls[1].textContent=par[1]||'';
+  ls[1].style.display=par[1]?'':'none';
+  msg.style.display='';
+}
+try{ window._relevoMsgAplica=_relevoMsgAplica; }catch(e){}
 function _relevoStep7Layout(){
   // acha o rÃÂ³tulo "Relevos opcionais" pelo texto (a ordem no DOM nÃÂ£o ÃÂ© confiÃÂ¡vel)
   function _achaOpcLabel(){
@@ -2412,7 +2450,7 @@ function _relevoStep7Layout(){
     msg=document.createElement('div');
     msg.id='relevoNenhumMsg';
     msg.style.cssText='padding:12px 14px;border:1px solid var(--border,#2c2c2c);border-radius:5px;background:var(--s2,#1a1a1a);color:var(--t2,#aaa);font-size:12px;line-height:1.5;';
-    msg.textContent='Este produto nÃÂ£o contÃÂ©m a opÃÂ§ÃÂ£o de alto relevo.';
+    _relevoMsgLinhas(msg);
     flexCol.parentElement.insertBefore(msg, flexCol.nextSibling);
   }
   // a caixa editÃÂ¡vel (logo + cor) sÃÂ³ aparece no modo PadrÃÂ£o
@@ -2426,10 +2464,10 @@ function _relevoStep7Layout(){
   if(opcLabel)opcLabel.style.display=algumaOpc?'':'none';
   // frase conforme o modo:
   // imagem -> nÃÂ£o hÃÂ¡ ediÃÂ§ÃÂ£o do relevo; nenhum sem opcionais -> nÃÂ£o hÃÂ¡ relevo
-  var frase='';
-  if(topoModo==='imagem') frase='Este produto nÃÂ£o contÃÂ©m a opÃÂ§ÃÂ£o de ediÃÂ§ÃÂ£o para o alto relevo.';
-  else if(topoModo==='nenhum' && !algumaOpc) frase='Este produto nÃÂ£o contÃÂ©m a opÃÂ§ÃÂ£o de alto relevo.';
-  if(msg){ if(frase){ msg.textContent=frase; msg.style.display=''; } else { msg.style.display='none'; } }
+  var modoMsg='';
+  if(topoModo==='imagem') modoMsg='imagem';
+  else if(topoModo==='nenhum' && !algumaOpc) modoMsg='nenhum';
+  if(msg){ msg.setAttribute('data-modo',modoMsg); _relevoMsgAplica(); }
 }
 function updateBadgeBR(text,color){
   const marca=text||(S.tipo==='lego'?S.legoBrand:S.miniBrand)||'FUNPARTS';
