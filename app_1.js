@@ -2679,11 +2679,68 @@ var LEGO_FUNDOS_DB=null; // fundos LEGO por modelo, vindos do banco (Fase 4)
 var INFOS=null; // textos/imagens de ajuda ("?") por opÃÂ§ÃÂ£o, do banco
 // preÃÂ§o de uma chave do banco, com valor de reserva se o banco nÃÂ£o respondeu
 function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT_PRECOS[chave] : fb; }
+/* Os icones da faixa de categorias LEGO. Sao os MESMOS que estavam escritos a
+   mao no index.html -- ficam aqui como padrao, para o site continuar identico
+   enquanto o painel nao escolher outro. */
+var LEGO_CAT_ICONE={'Formula 1':'images/img_010.png','F\u00f3rmula 1':'images/img_010.png',
+ 'Ferrari':'images/img_011.png','McLaren':'images/img_012.png','Porsche':'images/img_013.png',
+ 'Lamborghini':'images/img_014.png','Mercedes':'images/img_015.png','Bugatti':'images/img_016.png',
+ 'BMW':'images/img_017.png','Ford':'images/img_018.png','Dodge':'images/img_019.png',
+ 'Nissan':'images/img_020.png','Land Rover':'images/img_021.png','Motos':'images/img_022.png',
+ 'Filmes':'images/img_024.png','Outros':'images/img_025.png'};
+var LEGO_CAT_ICONE_DB={};   /* o que o painel escolheu, por nome de categoria */
+function _fpIconeCat(nome){
+  var k=String(LEGO_CAT_ICONE_DB[nome]||'');
+  if(k==='-') return '';                       /* categoria sem icone, de proposito */
+  if(k) return /^(https?:|images\/|data:)/.test(k)
+    ? k : ('https://funparts-ai-proxy.rodox1209.workers.dev/img/'+encodeURIComponent(k));
+  return LEGO_CAT_ICONE[nome]||'';
+}
+function _fpCardCat(nome, marcado){
+  var d=document.createElement('div');
+  d.className='bcard'+(marcado?' sel':'');
+  d.setAttribute('data-ib', nome);
+  d.onclick=function(){ selLegoBrand(d, nome); };
+  var ico=document.createElement('div'); ico.className='bico';
+  var src=_fpIconeCat(nome);
+  if(src){ var im=document.createElement('img'); im.src=src; im.alt=nome; ico.appendChild(im); }
+  else { var sp=document.createElement('span'); sp.style.fontSize='17px'; sp.textContent='\ud83c\udfc1'; ico.appendChild(sp); }
+  var nm=document.createElement('div'); nm.className='bnm'; nm.textContent=nome;
+  d.appendChild(ico); d.appendChild(nm);
+  return d;
+}
+/* A faixa de categorias passa a nascer do catalogo. Antes os 15 cartoes eram
+   fixos no index.html: categoria nova nao aparecia, categoria renomeada ficava
+   com o nome velho no cartao e sem nenhum produto dentro, e categoria desligada
+   deixava a prateleira vazia no lugar. */
+function renderLegoBrandCards(){
+  var el=document.getElementById('legoBrands'); if(!el) return;
+  var nomes=Object.keys(LEGO_CATALOG||{});
+  if(!nomes.length) return;        /* catalogo vazio: mantem o que ja esta na tela */
+  var sel=(typeof S!=='undefined')&&S.legoBrand;
+  /* ATENCAO: o bloco da lista de modelos e' MOVIDO para dentro desta faixa pelo
+     ajuste de layout. Trocar o innerHTML inteiro destruiria esse bloco e
+     quebraria a etapa -- por isso troco so os cartoes, um a um. */
+  var antigos=[];
+  for(var i=0;i<el.children.length;i++){
+    if(el.children[i].classList&&el.children[i].classList.contains('bcard'))antigos.push(el.children[i]);
+  }
+  var ref=antigos.length?antigos[0]:el.firstChild;
+  var frag=document.createDocumentFragment();
+  nomes.forEach(function(b){ frag.appendChild(_fpCardCat(b, sel===b)); });
+  el.insertBefore(frag, ref);
+  antigos.forEach(function(c){ if(c.parentNode)c.parentNode.removeChild(c); });
+  /* redesenha a lista da categoria escolhida: e' o que recoloca o bloco no
+     lugar certo dentro da faixa */
+  try{ if(sel && typeof renderLegoModels==='function' && LEGO_CATALOG[sel]) renderLegoModels(sel); }catch(e){}
+}
 function _aplicaCatalogoBanco(c){
   if(!c) return;
+  if(c.lego_logos) LEGO_CAT_ICONE_DB=c.lego_logos;
   if(c.lego && Object.keys(c.lego).length){
     Object.keys(LEGO_CATALOG).forEach(function(k){ delete LEGO_CATALOG[k]; });
     Object.keys(c.lego).forEach(function(k){ LEGO_CATALOG[k]=c.lego[k]; });
+    try{ renderLegoBrandCards(); }catch(e){}
   }
   if(c.mini && Object.keys(c.mini).length){
     Object.keys(INCLUSO_CATALOG).forEach(function(k){ delete INCLUSO_CATALOG[k]; });
