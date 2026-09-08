@@ -3601,8 +3601,12 @@ function fecharPedidoWpp(){
   _cliSalva();
   var c=dadosCliente();
 
-  // abre a aba JA, no clique, senao o navegador bloqueia como popup
-  var aba=window.open('','_blank');
+  /* Abre a aba JA, no clique, senao o navegador bloqueia como popup. Ela abre
+     numa pagina de espera do proprio site em vez de em branco: o endereco do
+     pagamento so chega ~7 segundos depois (gravar o pedido + a Stripe ou a
+     Pagar.me criar a sessao), e tela branca depois de clicar em pagar parece
+     erro -- o cliente fecha e a venda morre ali. */
+  var aba=window.open('/aguarde.html','_blank');
   if(btn){ btn.disabled=true; btn.textContent='EnviandoÃ¢ÂÂ¦'; }
 
   function _abrirZap(txt){

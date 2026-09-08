@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Funparts</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:#0d0d0d;color:#ececec;
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+       display:flex;align-items:center;justify-content:center;padding:24px}
+  .cx{max-width:420px;text-align:center}
+  .mk{font-size:22px;font-weight:700;letter-spacing:6px}
+  .rl{height:2px;width:40px;background:#e07b00;margin:12px auto 26px}
+  .sp{width:44px;height:44px;margin:0 auto 24px;border-radius:50%;
+      border:3px solid rgba(255,255,255,.14);border-top-color:#e07b00;
+      animation:g 900ms linear infinite}
+  @keyframes g{to{transform:rotate(360deg)}}
+  h1{font-size:20px;font-weight:700;margin:0 0 10px}
+  p{font-size:14.5px;line-height:1.6;color:#9a9a9a;margin:0 0 8px}
+  .nf{color:#e0a44a;font-weight:600}
+  .gw{margin-top:26px;font-size:12px;color:#6e6e6e;letter-spacing:.3px}
+  .dm{display:none;margin-top:22px;font-size:13px;color:#d98a82;line-height:1.6}
+  @media (prefers-reduced-motion:reduce){ .sp{animation:none} }
+</style>
+</head>
+<body>
+<div class="cx">
+  <div class="mk">FUNPARTS</div>
+  <div class="rl"></div>
+  <div class="sp"></div>
+  <h1 id="tit"></h1>
+  <p id="txt"></p>
+  <p class="nf" id="nao"></p>
+  <div class="gw" id="gw"></div>
+  <div class="dm" id="dm"></div>
+</div>
+<script>
+/* Mesma origem do site, entao o idioma e a regiao vem direto do que o proprio
+   site guardou -- nada precisa ser passado pela janela que abriu esta aba. */
+(function(){
+  var T={
+    pt:{ tit:'Preparando seu pagamento',
+         txt:'Estamos te levando para o ambiente de pagamento seguro. Isso leva alguns segundos.',
+         nao:'N\u00e3o feche esta janela.',
+         por:'Pagamento processado por',
+         dem:'Est\u00e1 demorando mais que o normal. Volte \u00e0 aba anterior e tente de novo.' },
+    en:{ tit:'Preparing your payment',
+         txt:'We are taking you to the secure payment page. This takes a few seconds.',
+         nao:'Please do not close this window.',
+         por:'Payment processed by',
+         dem:'This is taking longer than usual. Go back to the previous tab and try again.' },
+    fr:{ tit:'Pr\u00e9paration de votre paiement',
+         txt:'Nous vous dirigeons vers la page de paiement s\u00e9curis\u00e9e. Cela prend quelques secondes.',
+         nao:'Ne fermez pas cette fen\u00eatre.',
+         por:'Paiement trait\u00e9 par',
+         dem:'Cela prend plus de temps que d\u2019habitude. Revenez \u00e0 l\u2019onglet pr\u00e9c\u00e9dent et r\u00e9essayez.' },
+    es:{ tit:'Preparando tu pago',
+         txt:'Te estamos llevando a la p\u00e1gina de pago seguro. Esto tarda unos segundos.',
+         nao:'No cierres esta ventana.',
+         por:'Pago procesado por',
+         dem:'Est\u00e1 tardando m\u00e1s de lo normal. Vuelve a la pesta\u00f1a anterior e int\u00e9ntalo de nuevo.' }
+  };
+  var lg='pt', reg='BR';
+  try{ lg=localStorage.getItem('fp_lang')||'pt'; }catch(e){}
+  try{ reg=localStorage.getItem('fp_region')||'BR'; }catch(e){}
+  var t=T[String(lg).slice(0,2)]||T.pt;
+  /* dizer o nome do gateway vale mais que prometer seguranca no abstrato:
+     o cliente reconhece a marca */
+  var gw=(String(reg)==='BR')?'Pagar.me':'Stripe';
+  document.documentElement.lang=String(lg).slice(0,2);
+  document.title=t.tit+' \u00b7 Funparts';
+  document.getElementById('tit').textContent=t.tit;
+  document.getElementById('txt').textContent=t.txt;
+  document.getElementById('nao').textContent=t.nao;
+  document.getElementById('gw').textContent=t.por+' '+gw;
+  var dm=document.getElementById('dm');
+  dm.textContent=t.dem;
+  /* se em 25 segundos nada aconteceu, o cliente ganha uma saida em vez de
+     ficar preso olhando um circulo girar */
+  setTimeout(function(){ dm.style.display='block'; },25000);
+})();
+</script>
+</body>
+</html>
