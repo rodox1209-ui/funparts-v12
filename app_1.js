@@ -2751,7 +2751,7 @@ function renderLegoBrandCards(){
      lugar certo dentro da faixa */
   try{ if(sel && typeof renderLegoModels==='function' && LEGO_CATALOG[sel]) renderLegoModels(sel); }catch(e){}
 }
-/* GALERIA DA ETAPA "QUADRO PARA MINIATURAS"
+/* CARROSSEL DA ETAPA "QUADRO PARA MINIATURAS"
    A caixa da esquerda dessa etapa (miniStep1HeroImg) nasceu vazia -- preta.
    Agora ela recebe as fotos que o painel publicar nas chaves galmini_1..N
    de cat_info, exatamente como o carrossel da primeira tela recebe as dele
@@ -2764,8 +2764,6 @@ var _GAL_MINI={
   base:'https://funparts-ai-proxy.rodox1209.workers.dev',
   prefixo:'galmini_',
   troca:5000,
-  /* fita: mostra as miniaturas das fotos embaixo da galeria */
-  fita:true,
   i:0,n:0,timer:null,x0:null,dx:0,arr:false,ligado:false
 };
 function _galMiniEsc(s){
@@ -2814,9 +2812,6 @@ function _galMiniIr(k){
     var im=tr.children[_GAL_MINI.i]?tr.children[_GAL_MINI.i].querySelector('img'):null;
     cap.textContent=im?(im.getAttribute('alt')||''):'';
   }
-  var ft=document.getElementById('fpFitaMini');
-  if(ft) for(var z=0;z<ft.children.length;z++)
-    ft.children[z].style.borderColor=(z===_GAL_MINI.i)?'#e07b00':'rgba(255,255,255,.16)';
 }
 function _galMiniLiga(){
   var car=document.getElementById('fpCarMini'),tr=document.getElementById('fpTrackMini');
@@ -2894,45 +2889,23 @@ function _galMiniAplica(){
     caixa.setAttribute('data-gal',assin);
     caixa.style.padding='10px 40px';
     caixa.style.boxSizing='border-box';
-    /* a caixa e' um flex de uma linha so; para empilhar galeria + fita eu
-       ponho tudo dentro de uma coluna com a mesma largura do carrossel da
-       primeira tela (760px), para as duas telas terem o mesmo tamanho */
-    var h='<div style="width:100%;max-width:760px;display:flex;flex-direction:column;">'+
-          '<div class="fp-car" id="fpCarMini"><div class="fp-track" id="fpTrackMini">';
+    /* mesma marcacao do carrossel da primeira tela: .fp-car > .fp-track >
+       .fp-slide, com o mesmo CSS e o mesmo limite de 760px de largura.
+       Sem nada em volta -- as duas telas tem que ficar identicas. */
+    var h='<div class="fp-car" id="fpCarMini"><div class="fp-track" id="fpTrackMini">';
     for(var k=0;k<fotos.length;k++){
       h+='<div class="fp-slide"><img src="'+_galMiniEsc(fotos[k].url)+'" alt="'+
          _galMiniEsc(fotos[k].legenda)+'" loading="lazy" draggable="false"></div>';
     }
     /* veu escuro so no pe da foto: as legendas e as bolinhas do carrossel sao
        claras, e aqui as fotos de produto costumam ter fundo claro -- sem o veu
-       elas somem. So dentro desta galeria; a primeira tela nao muda. */
+       elas somem. So dentro deste carrossel; a primeira tela nao muda. */
     h+='</div><div style="position:absolute;left:0;right:0;bottom:0;height:82px;'+
        'z-index:2;pointer-events:none;background:linear-gradient(to top,'+
        'rgba(0,0,0,.72),rgba(0,0,0,.34) 45%,rgba(0,0,0,0));"></div>'+
        '<div class="fp-cap" id="fpCapMini"></div>'+
        '<div class="fp-dots" id="fpDotsMini"></div></div>';
-    if(_GAL_MINI.fita && fotos.length>1){
-      h+='<div id="fpFitaMini" style="display:flex;gap:8px;justify-content:center;'+
-         'flex-wrap:wrap;margin-top:12px;">';
-      for(var t=0;t<fotos.length;t++){
-        h+='<div data-i="'+t+'" title="'+_galMiniEsc(fotos[t].legenda)+'" '+
-           'style="width:66px;height:52px;border-radius:6px;overflow:hidden;cursor:pointer;'+
-           'background:#111;border:1px solid '+(t===0?'#e07b00':'rgba(255,255,255,.16)')+';'+
-           'transition:border-color .2s;flex:0 0 auto;">'+
-           '<img src="'+_galMiniEsc(fotos[t].url)+'" loading="lazy" draggable="false" '+
-           'style="width:100%;height:100%;object-fit:cover;display:block;"></div>';
-      }
-      h+='</div>';
-    }
-    h+='</div>';
     caixa.innerHTML=h;
-    var ft=document.getElementById('fpFitaMini');
-    if(ft) for(var y=0;y<ft.children.length;y++){
-      ft.children[y].onclick=function(e){
-        _galMiniIr(+e.currentTarget.getAttribute('data-i'));
-        _galMiniPara(); _galMiniAnda();
-      };
-    }
     _galMiniLiga();
   }catch(e){}
 }
