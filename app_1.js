@@ -2769,6 +2769,43 @@ function _aplicaCatalogoBanco(c){
     if(ib && ib.children.length && typeof renderInclusoBrands==='function') renderInclusoBrands();
   }catch(e){}
 }
+/* ATALHO DE ANUNCIO -- o cliente que clica num anuncio de uma linha especifica
+   cai direto na etapa dela, sem passar pela escolha de tipo. Tres enderecos:
+       ?p=lego       Quadros para LEGO
+       ?p=miniatura  Quadro com a miniatura inclusa
+       ?p=quadro     Somente o quadro (para a miniatura que o cliente ja tem)
+   Vale tambem com # no lugar de ? (funparts.com.br/#lego), para o endereco
+   caber num anuncio falado. Sem o parametro, ou com um valor que eu nao
+   conheco, o site abre normal, do comeco -- anuncio com endereco errado nao
+   pode virar tela quebrada. Os parametros de campanha (utm_*, fbclid, gclid)
+   viajam junto sem atrapalhar: eu leio so o p. */
+var _FP_ATALHOS={
+  lego:['lego',null], legos:['lego',null],
+  miniatura:['mini','incluso'], miniaturas:['mini','incluso'], incluso:['mini','incluso'],
+  quadro:['mini','apenas'], quadros:['mini','apenas'], somente:['mini','apenas']
+};
+function _fpAtalhoAnuncio(){
+  var p='';
+  try{
+    p=String(new URLSearchParams(location.search).get('p')||'');
+    if(!p) p=String(location.hash||'').replace('#','');
+    p=p.toLowerCase().trim();
+  }catch(e){}
+  var r=_FP_ATALHOS[p];
+  if(!r) return;
+  try{
+    if(typeof selectTipo==='function') selectTipo(r[0]);
+    if(typeof goStep==='function') goStep(1);
+    if(r[1] && typeof selMiniChoice==='function') selMiniChoice(r[1]);
+  }catch(e){}
+}
+(function(){
+  /* depois que o site terminou de se montar, senao a etapa e' desenhada por
+     cima do atalho */
+  function ir(){ setTimeout(_fpAtalhoAnuncio, 300); }
+  if(document.readyState!=='loading') ir();
+  else document.addEventListener('DOMContentLoaded', ir);
+})();
 function carregarCatalogoDoBanco(){
   try{
     fetch('https://funparts-ai-proxy.rodox1209.workers.dev/catalogo',{cache:'no-store'})
