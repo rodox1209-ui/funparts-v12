@@ -2889,6 +2889,12 @@ function _galMiniAplica(){
     caixa.setAttribute('data-gal',assin);
     caixa.style.padding='10px 40px';
     caixa.style.boxSizing='border-box';
+    /* a caixa nasceu no HTML com fundo #1a1a1a e isso desenhava um retangulo
+       cinza atras das fotos. O bloco da primeira tela (heroImg) nao tem fundo
+       nenhum -- deixa o fundo do painel aparecer. Igualo os dois aqui, e nao
+       no HTML, para a caixa VAZIA (sem foto publicada) continuar como esta
+       hoje e para a tela da IA, que pinta a propria caixa, nao ser afetada. */
+    caixa.style.background='transparent';
     /* mesma marcacao do carrossel da primeira tela: .fp-car > .fp-track >
        .fp-slide, com o mesmo CSS e o mesmo limite de 760px de largura.
        Sem nada em volta -- as duas telas tem que ficar identicas. */
