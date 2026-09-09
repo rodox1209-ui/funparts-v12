@@ -2903,14 +2903,15 @@ function _galMiniAplica(){
       h+='<div class="fp-slide"><img src="'+_galMiniEsc(fotos[k].url)+'" alt="'+
          _galMiniEsc(fotos[k].legenda)+'" loading="lazy" draggable="false"></div>';
     }
-    /* veu escuro so no pe da foto: as legendas e as bolinhas do carrossel sao
-       claras, e aqui as fotos de produto costumam ter fundo claro -- sem o veu
-       elas somem. So dentro deste carrossel; a primeira tela nao muda. */
-    h+='</div><div style="position:absolute;left:0;right:0;bottom:0;height:82px;'+
-       'z-index:2;pointer-events:none;background:linear-gradient(to top,'+
-       'rgba(0,0,0,.72),rgba(0,0,0,.34) 45%,rgba(0,0,0,0));"></div>'+
-       '<div class="fp-cap" id="fpCapMini"></div>'+
-       '<div class="fp-dots" id="fpDotsMini"></div></div>';
+    /* NADA de faixa escura no pe: a foto quase nunca preenche a altura toda do
+       quadro, entao qualquer fundo ali vira uma tarja visivel embaixo dela.
+       Para a legenda e as bolinhas nao sumirem quando caem sobre uma foto
+       clara, eu dou sombra nelas mesmas -- sombra nao desenha retangulo. */
+    h+='</div>'+
+       '<div class="fp-cap" id="fpCapMini" style="text-shadow:0 1px 4px rgba(0,0,0,.9)'+
+       ',0 0 2px rgba(0,0,0,.75);"></div>'+
+       '<div class="fp-dots" id="fpDotsMini" style="filter:drop-shadow(0 1px 2px '+
+       'rgba(0,0,0,.9));"></div></div>';
     caixa.innerHTML=h;
     _galMiniLiga();
   }catch(e){}
