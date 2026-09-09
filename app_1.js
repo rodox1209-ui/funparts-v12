@@ -236,7 +236,12 @@ function goStep(n){
     var miniStep1Hero=document.getElementById('miniStep1HeroImg');
     hero.style.display=n===0?'flex':'none';
     legoHero.style.display=(n===1&&(typeof S==='undefined'||S.tipo!=='mini'))?'flex':'none';
-    if(miniStep1Hero)miniStep1Hero.style.display=(n===1&&typeof S!=='undefined'&&S.tipo==='mini')?'flex':'none';
+    if(miniStep1Hero){
+      var _mostraM1=(n===1&&typeof S!=='undefined'&&S.tipo==='mini');
+      miniStep1Hero.style.display=_mostraM1?'flex':'none';
+      /* so gira enquanto esta na tela: fora dela, para o relogio */
+      try{ _mostraM1?_galMiniAplica():(window._galMiniPara&&_galMiniPara()); }catch(e){}
+    }
     if(miniHero)miniHero.style.display=n===2?'flex':'none';
     var isLegoFlow=(typeof S!=='undefined'&&S.tipo==='lego');
     live.style.display=(n===0||n===1||n===2||isLegoFlow)?'none':'flex';
@@ -2746,6 +2751,192 @@ function renderLegoBrandCards(){
      lugar certo dentro da faixa */
   try{ if(sel && typeof renderLegoModels==='function' && LEGO_CATALOG[sel]) renderLegoModels(sel); }catch(e){}
 }
+/* GALERIA DA ETAPA "QUADRO PARA MINIATURAS"
+   A caixa da esquerda dessa etapa (miniStep1HeroImg) nasceu vazia -- preta.
+   Agora ela recebe as fotos que o painel publicar nas chaves galmini_1..N
+   de cat_info, exatamente como o carrossel da primeira tela recebe as dele
+   nas chaves carrossel_1..N. Prefixo diferente de proposito: 'galmini_' nao
+   comeca com 'carrossel_', entao as duas galerias nunca se misturam, nem no
+   site nem no painel.
+   Sem foto publicada, nao mexo em nada: a caixa continua igual esta hoje.
+   Nada aqui pode derrubar a etapa -- tudo dentro de try, e sem foto eu saio. */
+var _GAL_MINI={
+  base:'https://funparts-ai-proxy.rodox1209.workers.dev',
+  prefixo:'galmini_',
+  troca:5000,
+  /* fita: mostra as miniaturas das fotos embaixo da galeria */
+  fita:true,
+  i:0,n:0,timer:null,x0:null,dx:0,arr:false,ligado:false
+};
+function _galMiniEsc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+         .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function _galMiniFotos(){
+  var out=[];
+  try{
+    var inf=(typeof INFOS!=='undefined'&&INFOS)?INFOS:null;
+    if(!inf) return out;
+    var re=new RegExp('^'+_GAL_MINI.prefixo+'(\\d+)$');
+    var ks=[],k;
+    for(k in inf){ if(re.test(k)) ks.push(k); }
+    ks.sort(function(a,b){
+      return (+String(a).replace(re,'$1'))-(+String(b).replace(re,'$1'));
+    });
+    for(var q=0;q<ks.length;q++){
+      var it=inf[ks[q]]||{};
+      if(!it.img) continue;
+      out.push({url:_GAL_MINI.base+'/img/'+encodeURIComponent(it.img),
+                legenda:it.texto||''});
+    }
+  }catch(e){}
+  return out;
+}
+function _galMiniPara(){
+  if(_GAL_MINI.timer){ clearInterval(_GAL_MINI.timer); _GAL_MINI.timer=null; }
+}
+function _galMiniAnda(){
+  var red=false;
+  try{ red=window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  if(!_GAL_MINI.timer && !red && _GAL_MINI.n>1)
+    _GAL_MINI.timer=setInterval(function(){ _galMiniIr(_GAL_MINI.i+1); },_GAL_MINI.troca);
+}
+function _galMiniIr(k){
+  var tr=document.getElementById('fpTrackMini');
+  if(!tr||!_GAL_MINI.n) return;
+  _GAL_MINI.i=((k%_GAL_MINI.n)+_GAL_MINI.n)%_GAL_MINI.n;
+  tr.style.transform='translateX('+(-_GAL_MINI.i*100)+'%)';
+  var ds=document.getElementById('fpDotsMini');
+  if(ds) for(var j=0;j<ds.children.length;j++)
+    ds.children[j].className='fp-dot'+(j===_GAL_MINI.i?' on':'');
+  var cap=document.getElementById('fpCapMini');
+  if(cap){
+    var im=tr.children[_GAL_MINI.i]?tr.children[_GAL_MINI.i].querySelector('img'):null;
+    cap.textContent=im?(im.getAttribute('alt')||''):'';
+  }
+  var ft=document.getElementById('fpFitaMini');
+  if(ft) for(var z=0;z<ft.children.length;z++)
+    ft.children[z].style.borderColor=(z===_GAL_MINI.i)?'#e07b00':'rgba(255,255,255,.16)';
+}
+function _galMiniLiga(){
+  var car=document.getElementById('fpCarMini'),tr=document.getElementById('fpTrackMini');
+  if(!car||!tr) return;
+  _GAL_MINI.n=tr.children.length; _GAL_MINI.i=0;
+  var ds=document.getElementById('fpDotsMini'),cap=document.getElementById('fpCapMini');
+  if(ds){
+    ds.innerHTML='';
+    if(_GAL_MINI.n<2){ ds.style.display='none'; if(cap)cap.style.display='none'; }
+    else{
+      ds.style.display=''; if(cap)cap.style.display='';
+      for(var k=0;k<_GAL_MINI.n;k++){
+        var b=document.createElement('button');
+        b.className='fp-dot'+(k===0?' on':''); b.type='button';
+        b.setAttribute('aria-label','Foto '+(k+1));
+        b.setAttribute('data-i',k);
+        b.onclick=function(e){ _galMiniIr(+e.currentTarget.getAttribute('data-i'));
+                               _galMiniPara(); _galMiniAnda(); };
+        ds.appendChild(b);
+      }
+    }
+  }
+  if(!_GAL_MINI.ligado){
+    /* o arrasto e' ligado uma vez so, no documento: a caixa e' refeita
+       sempre que o painel muda as fotos, e eu nao quero empilhar ouvinte */
+    _GAL_MINI.ligado=true;
+    function dentro(ev){
+      var c=document.getElementById('fpCarMini');
+      return !!(c && ev.target && c.contains(ev.target));
+    }
+    function ini(x){ _GAL_MINI.x0=x; _GAL_MINI.dx=0; _GAL_MINI.arr=true;
+      _galMiniPara();
+      var t=document.getElementById('fpTrackMini'); if(t)t.className='fp-track fp-drag'; }
+    function mov(x){ if(!_GAL_MINI.arr) return; _GAL_MINI.dx=x-_GAL_MINI.x0;
+      var t=document.getElementById('fpTrackMini');
+      if(t)t.style.transform='translateX(calc('+(-_GAL_MINI.i*100)+'% + '+_GAL_MINI.dx+'px))'; }
+    function fim(){ if(!_GAL_MINI.arr) return; _GAL_MINI.arr=false;
+      var t=document.getElementById('fpTrackMini'); if(t)t.className='fp-track';
+      var c=document.getElementById('fpCarMini');
+      var lim=(c?c.clientWidth:300)*0.18;
+      if(_GAL_MINI.dx<-lim)_galMiniIr(_GAL_MINI.i+1);
+      else if(_GAL_MINI.dx>lim)_galMiniIr(_GAL_MINI.i-1);
+      else _galMiniIr(_GAL_MINI.i);
+      _galMiniAnda(); }
+    document.addEventListener('touchstart',function(e){ if(dentro(e))ini(e.touches[0].clientX); },{passive:true});
+    document.addEventListener('touchmove',function(e){ mov(e.touches[0].clientX); },{passive:true});
+    document.addEventListener('touchend',fim);
+    document.addEventListener('mousedown',function(e){ if(dentro(e)){ e.preventDefault(); ini(e.clientX); } });
+    window.addEventListener('mousemove',function(e){ mov(e.clientX); });
+    window.addEventListener('mouseup',fim);
+    document.addEventListener('mouseover',function(e){ if(dentro(e))_galMiniPara(); });
+    document.addEventListener('mouseout',function(e){
+      var c=document.getElementById('fpCarMini');
+      if(c && e.relatedTarget && !c.contains(e.relatedTarget))_galMiniAnda(); });
+    document.addEventListener('visibilitychange',function(){
+      document.hidden?_galMiniPara():_galMiniAnda(); });
+  }
+  _galMiniIr(0); _galMiniPara(); _galMiniAnda();
+}
+function _galMiniAplica(){
+  try{
+    var caixa=document.getElementById('miniStep1HeroImg');
+    if(!caixa) return;
+    var fotos=_galMiniFotos();
+    /* nenhuma foto no painel: nao encosto na caixa, ela fica como esta hoje */
+    if(!fotos.length){ _galMiniPara(); return; }
+    var assin=fotos.map(function(f){ return f.url+'|'+f.legenda; }).join('~~');
+    /* ja esta montada e igual: nao refaco (a etapa "somente quadro" troca o
+       conteudo dessa caixa pela imagem da IA -- se isso acontecer, o track
+       some e eu remonto na proxima visita) */
+    if(caixa.getAttribute('data-gal')===assin && document.getElementById('fpTrackMini')){
+      _galMiniAnda(); return;
+    }
+    _galMiniPara();
+    caixa.setAttribute('data-gal',assin);
+    caixa.style.padding='10px 40px';
+    caixa.style.boxSizing='border-box';
+    /* a caixa e' um flex de uma linha so; para empilhar galeria + fita eu
+       ponho tudo dentro de uma coluna com a mesma largura do carrossel da
+       primeira tela (760px), para as duas telas terem o mesmo tamanho */
+    var h='<div style="width:100%;max-width:760px;display:flex;flex-direction:column;">'+
+          '<div class="fp-car" id="fpCarMini"><div class="fp-track" id="fpTrackMini">';
+    for(var k=0;k<fotos.length;k++){
+      h+='<div class="fp-slide"><img src="'+_galMiniEsc(fotos[k].url)+'" alt="'+
+         _galMiniEsc(fotos[k].legenda)+'" loading="lazy" draggable="false"></div>';
+    }
+    /* veu escuro so no pe da foto: as legendas e as bolinhas do carrossel sao
+       claras, e aqui as fotos de produto costumam ter fundo claro -- sem o veu
+       elas somem. So dentro desta galeria; a primeira tela nao muda. */
+    h+='</div><div style="position:absolute;left:0;right:0;bottom:0;height:82px;'+
+       'z-index:2;pointer-events:none;background:linear-gradient(to top,'+
+       'rgba(0,0,0,.72),rgba(0,0,0,.34) 45%,rgba(0,0,0,0));"></div>'+
+       '<div class="fp-cap" id="fpCapMini"></div>'+
+       '<div class="fp-dots" id="fpDotsMini"></div></div>';
+    if(_GAL_MINI.fita && fotos.length>1){
+      h+='<div id="fpFitaMini" style="display:flex;gap:8px;justify-content:center;'+
+         'flex-wrap:wrap;margin-top:12px;">';
+      for(var t=0;t<fotos.length;t++){
+        h+='<div data-i="'+t+'" title="'+_galMiniEsc(fotos[t].legenda)+'" '+
+           'style="width:66px;height:52px;border-radius:6px;overflow:hidden;cursor:pointer;'+
+           'background:#111;border:1px solid '+(t===0?'#e07b00':'rgba(255,255,255,.16)')+';'+
+           'transition:border-color .2s;flex:0 0 auto;">'+
+           '<img src="'+_galMiniEsc(fotos[t].url)+'" loading="lazy" draggable="false" '+
+           'style="width:100%;height:100%;object-fit:cover;display:block;"></div>';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+    caixa.innerHTML=h;
+    var ft=document.getElementById('fpFitaMini');
+    if(ft) for(var y=0;y<ft.children.length;y++){
+      ft.children[y].onclick=function(e){
+        _galMiniIr(+e.currentTarget.getAttribute('data-i'));
+        _galMiniPara(); _galMiniAnda();
+      };
+    }
+    _galMiniLiga();
+  }catch(e){}
+}
+try{ window._galMiniAplica=_galMiniAplica; window._galMiniPara=_galMiniPara; }catch(e){}
 function _aplicaCatalogoBanco(c){
   if(!c) return;
   if(c.lego_logos) LEGO_CAT_ICONE_DB=c.lego_logos;
@@ -2760,7 +2951,8 @@ function _aplicaCatalogoBanco(c){
   }
   if(c.precos) CAT_PRECOS=c.precos;
   if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
-  if(c.infos){ INFOS=c.infos; if(typeof _injetaAjuda==='function') setTimeout(_injetaAjuda,60); }
+  if(c.infos){ INFOS=c.infos; if(typeof _injetaAjuda==='function') setTimeout(_injetaAjuda,60);
+               try{ _galMiniAplica(); }catch(e){} }
   // se alguma lista jÃÂ¡ estiver na tela, atualiza sem exigir novo clique
   try{
     var lm=document.getElementById('legoModels');
