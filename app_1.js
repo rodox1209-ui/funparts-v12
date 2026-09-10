@@ -2537,6 +2537,38 @@ var LEGO_MODEL_SKU={
   'BMW 1000RR':'FP-031',
   'Ford Mustang GT 1960':'FP-032',
 };
+/* A CHAVE DE PRECO DA MEDIDA
+   O preco base do quadro LEGO deixou de ser um valor unico por acabamento e
+   passou a variar por medida. Cada medida tem duas chaves no painel:
+       lego_base_carbono_53x83     lego_base_fosco_53x83
+   Se a medida nao tiver preco proprio, cai no padrao de sempre
+   (lego_base_carbono / lego_base_fosco) -- entao nada quebra enquanto voce
+   ainda nao preencheu.
+   A medida vem escrita de jeitos diferentes no cadastro: '53x83cm', '63x126',
+   '40x66,5cm'. Normalizo antes de virar chave: minuscula, sem espaco, sem
+   'cm', e o x sempre o comum. Assim as duas grafias caem na MESMA chave, e
+   arrumar um cadastro torto depois nao orfana o preco ja preenchido.
+   Esta regra existe igual em quatro lugares -- site, montador do pedido
+   manual, verificacao do servidor e painel. Se mudar aqui, mude nos quatro:
+   se dois discordarem, o cliente ve um preco e paga outro. */
+function _dimChave(d){
+  return String(d==null?'':d).toLowerCase()
+    .replace(/\s+/g,'')
+    .replace(/[\u00d7\u2715\u2716]/g,'x')
+    .replace(/cm/g,'')
+    .replace(/[^0-9x,.]/g,'');
+}
+/* o preco base do LEGO: primeiro a medida, depois o padrao, depois a reserva */
+function _legoBase(dim, fosco){
+  var raiz = fosco ? 'lego_base_fosco' : 'lego_base_carbono';
+  var k = _dimChave(dim);
+  /* zero conta como NAO preenchido: apagar o campo no painel volta ao padrao
+     em vez de deixar o quadro sair de graca */
+  var v = (typeof CAT_PRECOS!=='undefined' && CAT_PRECOS) ? CAT_PRECOS[raiz+'_'+k] : null;
+  if(k && v!=null && Number(v)>0) return Number(v);
+  return _preco(raiz, fosco?589:689);
+}
+try{ window._dimChave=_dimChave; window._legoBase=_legoBase; }catch(e){}
 function calcPrice(){
   // Produto pronto do catalogo: o preco e o do proprio produto
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
@@ -2548,17 +2580,11 @@ function calcPrice(){
     return;
   }
   // 1. Base pelo produto (Medida ÃÂ Fundo para LEGO, Escala ÃÂ Medida para Mini)
-  const LEGO_PRICE={
-    '53ÃÂ83cm':{c:689,f:589},'83ÃÂ53cm':{c:689,f:589},
-    '49ÃÂ49cm':{c:689,f:589},'25ÃÂ35cm':{c:689,f:589},
-    '63ÃÂ128cm':{c:689,f:589},'60ÃÂ125cm':{c:689,f:589},
-    '114ÃÂ49cm':{c:689,f:589},'34ÃÂ134cm':{c:689,f:589},
-    '40ÃÂ66,5cm':{c:689,f:589},
-  };
+  /* a tabela fixa de medidas saiu daqui: o preco de cada medida agora e' do
+     painel, e o padrao continua valendo para medida sem preco proprio */
   let base=479;
   if(S.tipo==='lego'){
-    const tier=LEGO_PRICE[S.legoDim]||{c:479,f:365};
-    base=(S.fundo==='f-fosco')?_preco('lego_base_fosco',tier.f):_preco('lego_base_carbono',tier.c);
+    base=_legoBase(S.legoDim, S.fundo==='f-fosco');
   } else if(S.tipo==='mini'){
     const sz=MINI_SIZES.find(s=>s.id===S.miniSize);
     base=_preco('mini_base_'+S.miniSize, sz?sz.base:1990);
