@@ -1485,6 +1485,10 @@ function updateDetPreview(){
       var _lctv=(typeof LEGO_FUNDOS_DB!=='undefined'&&LEGO_FUNDOS_DB&&LEGO_FUNDOS_DB[S.legoModel]&&LEGO_FUNDOS_DB[S.legoModel].topview)||[];
       lcar.src=_lctv.length?_fotoUrl(_lctv[0].img):'https://lh3.googleusercontent.com/d/1e50Ft2Ixks4Rh0jOTcBfnhMCa9GSrh95';
       lcar.style.display='block';
+      /* 0.8 e' o tamanho de sempre; a lista de excecoes multiplica em cima
+         dele. Escrevo o valor sempre, mesmo quando nao ha excecao, para o
+         quadro nunca ficar com a escala de um produto anterior. */
+      lcar.style.transform='scale('+(0.8*_topviewEscala(S.legoModel)).toFixed(4)+')';
     }
     // Quadro aspect-ratio
     var ldq=document.getElementById('legoDetQuadro');
@@ -2569,6 +2573,33 @@ function _legoBase(dim, fosco){
   return _preco(raiz, fosco?589:689);
 }
 try{ window._dimChave=_dimChave; window._legoBase=_legoBase; }catch(e){}
+/* ESCALA DA TOP-VIEW, POR PRODUTO
+   A arte top-view de todo quadro LEGO entra a 0.8 do tamanho do fundo. Um
+   produto ou outro vem com margem propria na arte e precisa de um respiro
+   diferente. Aqui ficam as EXCECOES -- e o numero e' MULTIPLICADOR sobre o
+   0.8 de sempre: 1.10 = 10% maior. Produto que nao estiver nesta lista sai
+   exatamente como sai hoje.
+   A comparacao e' por PEDACO do nome, sem acento e sem ligar para maiuscula:
+   o nome no painel pode sair 'Lego' ou 'LEGO', e um detalhe desses nao pode
+   desfazer o ajuste sem ninguem perceber. */
+var LEGO_TOPVIEW_ESCALA=[
+  { contem:'minifigures f1', escala:1.10 }
+];
+function _semAcento(s){
+  s=String(s==null?'':s).toLowerCase();
+  try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){}
+  return s.replace(/\s+/g,' ').trim();
+}
+function _topviewEscala(nome){
+  var n=_semAcento(nome);
+  if(!n) return 1;
+  for(var i=0;i<LEGO_TOPVIEW_ESCALA.length;i++){
+    var r=LEGO_TOPVIEW_ESCALA[i];
+    if(r && r.contem && n.indexOf(_semAcento(r.contem))>=0) return Number(r.escala)||1;
+  }
+  return 1;
+}
+try{ window._topviewEscala=_topviewEscala; }catch(e){}
 function calcPrice(){
   // Produto pronto do catalogo: o preco e o do proprio produto
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
