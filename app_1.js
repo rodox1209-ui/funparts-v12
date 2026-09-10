@@ -1488,7 +1488,12 @@ function updateDetPreview(){
       /* 0.8 e' o tamanho de sempre; a lista de excecoes multiplica em cima
          dele. Escrevo o valor sempre, mesmo quando nao ha excecao, para o
          quadro nunca ficar com a escala de um produto anterior. */
-      lcar.style.transform='scale('+(0.8*_topviewEscala(S.legoModel)).toFixed(4)+')';
+      /* a ordem importa: o translate vem ANTES do scale para o deslocamento
+         ser de 15 pixels de verdade. Escrito ao contrario, os 15px tambem
+         seriam esticados pela escala e andariam 16,5px. */
+      var _tvA=_topviewAjuste(S.legoModel);
+      lcar.style.transform=(_tvA.esquerda?('translateX(-'+_tvA.esquerda+'px) '):'')
+        +'scale('+(0.8*_tvA.escala).toFixed(4)+')';
     }
     // Quadro aspect-ratio
     var ldq=document.getElementById('legoDetQuadro');
@@ -2582,24 +2587,30 @@ try{ window._dimChave=_dimChave; window._legoBase=_legoBase; }catch(e){}
    A comparacao e' por PEDACO do nome, sem acento e sem ligar para maiuscula:
    o nome no painel pode sair 'Lego' ou 'LEGO', e um detalhe desses nao pode
    desfazer o ajuste sem ninguem perceber. */
+/* escala:   multiplicador sobre o 0.8 de sempre (1.10 = 10% maior)
+   esquerda: quantos PIXELS a arte anda para a esquerda (15 = 15px) */
 var LEGO_TOPVIEW_ESCALA=[
-  { contem:'minifigures f1', escala:1.10 }
+  { contem:'minifigures f1', escala:1.10, esquerda:15 }
 ];
 function _semAcento(s){
   s=String(s==null?'':s).toLowerCase();
   try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){}
   return s.replace(/\s+/g,' ').trim();
 }
-function _topviewEscala(nome){
+/* devolve o ajuste inteiro do produto: quanto cresce e quanto anda */
+function _topviewAjuste(nome){
   var n=_semAcento(nome);
-  if(!n) return 1;
+  var pad={escala:1, esquerda:0};
+  if(!n) return pad;
   for(var i=0;i<LEGO_TOPVIEW_ESCALA.length;i++){
     var r=LEGO_TOPVIEW_ESCALA[i];
-    if(r && r.contem && n.indexOf(_semAcento(r.contem))>=0) return Number(r.escala)||1;
+    if(r && r.contem && n.indexOf(_semAcento(r.contem))>=0)
+      return { escala:(Number(r.escala)||1), esquerda:(Number(r.esquerda)||0) };
   }
-  return 1;
+  return pad;
 }
-try{ window._topviewEscala=_topviewEscala; }catch(e){}
+function _topviewEscala(nome){ return _topviewAjuste(nome).escala; }
+try{ window._topviewEscala=_topviewEscala; window._topviewAjuste=_topviewAjuste; }catch(e){}
 function calcPrice(){
   // Produto pronto do catalogo: o preco e o do proprio produto
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
