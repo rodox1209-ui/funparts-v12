@@ -1489,8 +1489,8 @@ function updateDetPreview(){
          dele. Escrevo o valor sempre, mesmo quando nao ha excecao, para o
          quadro nunca ficar com a escala de um produto anterior. */
       /* a ordem importa: o translate vem ANTES do scale para o deslocamento
-         ser de 15 pixels de verdade. Escrito ao contrario, os 15px tambem
-         seriam esticados pela escala e andariam 16,5px. */
+         ser de 22 pixels de verdade. Escrito ao contrario, os 22px tambem
+         seriam esticados pela escala e andariam 24,2px. */
       var _tvA=_topviewAjuste(S.legoModel);
       lcar.style.transform=(_tvA.esquerda?('translateX(-'+_tvA.esquerda+'px) '):'')
         +'scale('+(0.8*_tvA.escala).toFixed(4)+')';
@@ -2588,9 +2588,9 @@ try{ window._dimChave=_dimChave; window._legoBase=_legoBase; }catch(e){}
    o nome no painel pode sair 'Lego' ou 'LEGO', e um detalhe desses nao pode
    desfazer o ajuste sem ninguem perceber. */
 /* escala:   multiplicador sobre o 0.8 de sempre (1.10 = 10% maior)
-   esquerda: quantos PIXELS a arte anda para a esquerda (15 = 15px) */
+   esquerda: quantos PIXELS a arte anda para a esquerda (22 = 22px) */
 var LEGO_TOPVIEW_ESCALA=[
-  { contem:'minifigures f1', escala:1.10, esquerda:15 }
+  { contem:'minifigures f1', escala:1.10, esquerda:22 }
 ];
 function _semAcento(s){
   s=String(s==null?'':s).toLowerCase();
