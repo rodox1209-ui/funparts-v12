@@ -1414,12 +1414,31 @@ function _fpQuadroMobile(el,ratio){
   var naoEhRetrato=(l>0&&a>0&&l>=a);
   var celular=false;
   try{celular=window.innerWidth<=720;}catch(e){}
-  if(celular&&naoEhRetrato){
+  var _col=el.parentNode;
+  /* QUEM MANDA E' O LADO QUE APERTA
+     A caixa nasce com height:100% e max-width:100%. Quando a largura que a
+     proporcao pede estoura a coluna, o navegador corta a largura e MANTEM
+     a altura -- a proporcao vai embora em silencio, sem erro nenhum.
+     Medido no 114x49 no computador: pedia 2,327 e desenhava 1,165, quase
+     a metade. No celular a coluna e' estreita e isso acontecia tambem com
+     quadro em pe (o 53x83 desenhava 0,615 no lugar de 0,639).
+     Entao: no celular quem manda e' sempre a largura; no computador, so
+     quando o quadro e' mais largo que alto. Quadro em pe no computador
+     continua exatamente como esta hoje. */
+  if(celular||naoEhRetrato){
     el.style.width='100%';
     el.style.height='auto';
   }else{
     el.style.width='auto';      /* volta ao padrao que vem do HTML */
     el.style.height='100%';
+  }
+  /* quadro deitado e' baixo: sem isto ele fica colado no topo da coluna e
+     sobra um vazio grande embaixo. E ao voltar para um quadro em pe tem de
+     desfazer, senao o ajuste de um produto gruda no seguinte. */
+  if(_col&&_col.id!=='legoPreviewWrap'&&!celular){
+    _col.style.display=naoEhRetrato?'flex':'';
+    _col.style.flexDirection=naoEhRetrato?'column':'';
+    _col.style.justifyContent=naoEhRetrato?'center':'';
   }
 }
 /* refaz o ajuste quando o celular gira ou a janela muda de tamanho */
@@ -1437,7 +1456,26 @@ function _fpQuadroMobile(el,ratio){
     });
   }catch(e){}
 })();
+/* A DIMENSAO E' LIDA PELOS NUMEROS, nao pelo separador.
+   O 'x' que estava escrito aqui nao e' o mesmo caractere que separa as
+   medidas no cadastro -- por isso '114x49cm' e '53x83cm' caiam fora e o
+   quadro herdava a proporcao do produto anterior. Lendo os dois numeros,
+   qualquer grafia funciona: '114x49cm', '63x126', '40x66,5cm'.
+   Quadrado sai como 1/1 de proposito: e' a mesma lingua que o bloco de
+   correcao do fp_addons fala. Se um escrevesse 49/49 e o outro 1/1, os
+   dois ficariam se corrigindo em looping.
+   A regra antiga fica logo abaixo como reserva, para nenhuma grafia que
+   funcionava antes deixar de funcionar agora. */
 function _legoLegacyRatio(dim){
+  var _n=String(dim==null?'':dim).match(/[0-9]+(?:[.,][0-9]+)?/g);
+  if(_n&&_n.length>=2){
+    var _a=parseFloat(String(_n[0]).replace(',','.'));
+    var _b=parseFloat(String(_n[1]).replace(',','.'));
+    if(_a>0&&_b>0) return (Math.abs(_a-_b)<0.001)?'1/1':(_a+'/'+_b);
+  }
+  return _legoLegacyRatioAntigo(dim);
+}
+function _legoLegacyRatioAntigo(dim){
   // Compute CSS aspect-ratio from LEGO dim strings like "53ÃÂ83cm"
   if(!dim) return '';
   var sep=dim.indexOf('ÃÂ')>=0?'ÃÂ':'x';
