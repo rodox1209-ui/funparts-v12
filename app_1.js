@@ -1505,11 +1505,27 @@ function updateDetPreview(){
     // por object-fit:fill num quadro quadrado, afinava as bordas de cima/baixo.
     // Usa as molduras QUADRADAS do fluxo Miniatura (fibra/laca) sÃÂ³ nessa dimensÃÂ£o.
     var _LEGO_FRAMES_49={'fibra':'https://lh3.googleusercontent.com/d/1SZLlOB6U2IKWYTr2CWC2G6craO8LgGv7','laca':'https://lh3.googleusercontent.com/d/1OXb1ET16x7qKrN5mxB8WTTPfKEFzpSbv'};
+    /* MOLDURA POR MEDIDA
+       A moldura entra esticada por cima do quadro (object-fit:fill). Se a
+       arte da moldura nao tiver a MESMA proporcao da medida, a borda sai
+       grossa de um lado e fina do outro -- foi por isso que o 49x49 ja
+       tinha a dele. Aqui ficam as medidas com arte propria; quem nao esta
+       na lista continua usando a moldura retrato de sempre.
+       A chave e' a mesma normalizacao de medida usada nos precos, entao
+       '114x49cm', '114 x 49' e '114X49CM' caem todas no mesmo lugar.
+       AINDA SEM ARTE PROPRIA: 83x53 (deitado, 1,566) -- hoje usa a moldura
+       retrato esticada, que e' o que ja acontecia antes desta lista. */
+    var _LEGO_MOLDURAS={
+      '49x49':  _LEGO_FRAMES_49,
+      '114x49': {'fibra':'images/moldura-lego-114x49-fibra.png',
+                 'laca':'images/moldura-lego-114x49-laca.png'}
+    };
     var _is4949=/^49\s*[ÃÂx]\s*49/.test(S.legoDim||'');
     var ldfr=document.getElementById('legoDetFrame');
     if(ldfr){
       var _fk=(S.moldura==='m-fibra')?'fibra':'laca';
-      ldfr.src=(_is4949?_LEGO_FRAMES_49:_LEGO_FRAMES)[_fk];
+      var _mold=_LEGO_MOLDURAS[_dimChave(S.legoDim)]||_LEGO_FRAMES;
+      ldfr.src=_mold[_fk];
       ldfr.style.display='block';
       ldfr.style.height=''; ldfr.style.top=''; // moldura quadrada jÃÂ¡ fica proporcional; sem hack de +5px
     }
