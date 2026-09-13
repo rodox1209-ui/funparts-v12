@@ -3187,11 +3187,43 @@ function _fpAtalhoAnuncio(){
   if(document.readyState!=='loading') ir();
   else document.addEventListener('DOMContentLoaded', ir);
 })();
+/* O CATALOGO DA ULTIMA VISITA FICA GUARDADO NO NAVEGADOR
+   O site desenha a primeira tela com o catalogo embutido no arquivo -- e esse
+   embutido nao conhece as redomas. A tela so fica certa quando o /catalogo
+   responde, e como o servidor monta essa resposta lendo o banco inteiro, ele
+   demora. Nesse intervalo o cliente olha uma home errada: sem o card de
+   redoma. Quem clica em "Nova personalizacao" ve isso toda vez, porque o
+   botao recarrega a pagina.
+   Guardando aqui a ultima resposta boa, a home ja nasce certa: eu aplico a
+   copia ANTES de pedir a nova, e quando a nova chega ela passa por cima.
+   A copia so serve para desenhar rapido -- quem manda continua sendo o
+   servidor. Copia com mais de 24h eu ignoro, para nada velho ir para a tela. */
+var _CAT_CACHE_KEY='funparts_catalogo_v1';
+var _CAT_CACHE_HORAS=24;
+function _catCacheLer(){
+  try{
+    var s=localStorage.getItem(_CAT_CACHE_KEY);
+    if(!s) return null;
+    var o=JSON.parse(s);
+    if(!o || !o.em || !o.cat) return null;
+    if((Date.now()-Number(o.em))>_CAT_CACHE_HORAS*3600000) return null;
+    return o.cat;
+  }catch(e){ return null; }
+}
+function _catCacheGravar(c){
+  try{
+    var s=JSON.stringify({em:Date.now(),cat:c});
+    if(s.length>2000000) return;  /* grande demais: nao vale ocupar o espaco */
+    localStorage.setItem(_CAT_CACHE_KEY,s);
+  }catch(e){}                     /* aba anonima ou espaco cheio: segue sem */
+}
 function carregarCatalogoDoBanco(){
   try{
+    var _ant=_catCacheLer();
+    if(_ant){ try{ _aplicaCatalogoBanco(_ant); }catch(e){} }
     fetch('https://funparts-ai-proxy.rodox1209.workers.dev/catalogo',{cache:'no-store'})
       .then(function(r){ return r.ok?r.json():null; })
-      .then(function(c){ if(c && !c.erro) _aplicaCatalogoBanco(c); })
+      .then(function(c){ if(c && !c.erro){ _aplicaCatalogoBanco(c); _catCacheGravar(c); } })
       .catch(function(){}); // falhou: fica com o embutido
   }catch(e){}
 }
