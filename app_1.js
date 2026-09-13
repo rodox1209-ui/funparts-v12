@@ -2970,12 +2970,23 @@ function _galMiniEsc(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')
          .replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-function _galMiniFotos(){
+/* CADA TELA TEM A SUA GALERIA NO PAINEL
+       galmini_  ->  tela QUADRO PARA MINIATURAS
+       galred_   ->  tela DISPLAYS / REDOMAS DE ACRILICO
+   Por dentro a redoma anda pela estrada da miniatura (S.tipo fica 'mini'), e
+   por isso ela herdava o carrossel da miniatura: uma galeria so' para as duas
+   telas. Agora quem escolhe o prefixo e' o fluxo em que o cliente esta.
+   ENQUANTO O RODOLFO NAO PUBLICAR NENHUMA FOTO EM "Redomas", a tela segue
+   mostrando as de miniaturas -- exatamente como esta hoje. Prateleira preta e'
+   pior do que foto emprestada, e ninguem merece ver o site piorar por causa de
+   uma melhoria. A primeira foto publicada em Redomas assume a tela inteira. */
+var _GAL_RED_PREFIXO='galred_';
+function _galMiniLista(prefixo){
   var out=[];
   try{
     var inf=(typeof INFOS!=='undefined'&&INFOS)?INFOS:null;
     if(!inf) return out;
-    var re=new RegExp('^'+_GAL_MINI.prefixo+'(\\d+)$');
+    var re=new RegExp('^'+prefixo+'(\\d+)$');
     var ks=[],k;
     for(k in inf){ if(re.test(k)) ks.push(k); }
     ks.sort(function(a,b){
@@ -2989,6 +3000,15 @@ function _galMiniFotos(){
     }
   }catch(e){}
   return out;
+}
+function _galMiniFotos(){
+  var ehR=false;
+  try{ ehR=(typeof _ehRedoma==='function') && _ehRedoma(); }catch(e){}
+  if(ehR){
+    var r=_galMiniLista(_GAL_RED_PREFIXO);
+    if(r.length) return r;          /* galeria propria: manda nela */
+  }
+  return _galMiniLista(_GAL_MINI.prefixo);
 }
 function _galMiniPara(){
   if(_GAL_MINI.timer){ clearInterval(_GAL_MINI.timer); _GAL_MINI.timer=null; }
