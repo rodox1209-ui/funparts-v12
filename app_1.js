@@ -3953,6 +3953,28 @@ function _pvDoItem(i){
 }
 
 function _cartMontaItem(){
+  /* REDOMA: item proprio. Descrito como redoma (medida, envio desmontado,
+     prazo) e -- o que mais importa -- carregando o ID. E' por esse id que o
+     servidor vai buscar no banco a caixa do frete e o preco; nada disso pode
+     depender do que o navegador manda. */
+  if(_ehRedoma() && S.incProduto){
+    var r=S.incProduto;
+    var _med=_redomaMedida(r);
+    return {
+      id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
+      via:'catalogo', tipo:'redoma',
+      titulo:r.n, sub:(S.incBrand||S.incBrandSel||''),
+      linhas:[_med, 'Enviada desmontada \u2014 montagem por encaixe',
+              'Produ\u00e7\u00e3o em 7 dias \u00fateis'].filter(function(x){return !!x;}),
+      preco:r.p,
+      imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
+      preview:null,
+      resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
+      cfg:{ redoma_id:r.id, categoria:(S.incBrand||S.incBrandSel||''),
+            produto:r.n, medida:_med, larg:r.larg, prof:r.prof, alt:r.alt,
+            preco:r.p }
+    };
+  }
   var catalogo=(S.tipo==='mini'&&S.miniChoice==='incluso'&&S.incProduto);
   if(catalogo){
     var p=S.incProduto;
@@ -4529,7 +4551,10 @@ function _fpFreteCalc(){
   if(bloco)bloco.style.display='';
   var items=CART.map(function(i){
     var dim=(i.cfg&&i.cfg.dim)||(i.linhas&&i.linhas.length?i.linhas[0]:'');
-    return {dim:dim,qty:1};
+    /* redoma: o servidor busca a caixa no banco pelo id. A medida sozinha nao
+       serve -- a tabela de caixas do servidor e' de quadro. */
+    var rid=(i.cfg&&i.cfg.redoma_id)||null;
+    return rid?{dim:dim,qty:1,redoma_id:rid}:{dim:dim,qty:1};
   });
   fetch(API_FUNPARTS+'/frete',{
     method:'POST',headers:{'Content-Type':'application/json'},

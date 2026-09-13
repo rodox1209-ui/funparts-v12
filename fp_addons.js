@@ -918,7 +918,16 @@ window._priceFix={ran:true};
     var m=txt.match(/\d{1,3}(?:[.,]\d)?\s*[ÃÂx]\s*\d{1,3}(?:[.,]\d)?\s*cm/i);
     return m?m[0]:'';
   }
-  function _freteItens(){ return (window.CART||[]).map(function(i){return {dim:_freteDim(i),qty:1};}).filter(function(x){return x.dim;}); }
+  /* redoma viaja pelo id: o servidor busca a caixa no banco. Item de redoma
+     entra na lista mesmo sem medida legivel, porque quem manda e' o id. */
+  function _freteItens(){
+    return (window.CART||[]).map(function(i){
+      var rid=(i.cfg&&i.cfg.redoma_id)||null;
+      var o={dim:_freteDim(i),qty:1};
+      if(rid)o.redoma_id=rid;
+      return o;
+    }).filter(function(x){ return x.dim||x.redoma_id; });
+  }
   function atualizaFreteLabels(){
     var t=FP.t,e;
     e=document.getElementById('fpFreteT'); if(e)e.textContent=t('frete.title');
