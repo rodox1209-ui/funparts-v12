@@ -145,6 +145,64 @@ function _aiProgFinish(){
   if(pct)pct.textContent='100%';
   if(st)st.textContent='Pronto!';
 }
+/* REPINTAR A ETAPA AO CHEGAR NELA -- ESTA E' A CORRECAO PRINCIPAL
+
+   O site pintava cada tela no caminho de IDA: quem desenha a lista de linhas
+   da redoma e' o clique no card da categoria; quem desenha a ficha do produto
+   e' o clique no produto. O goStep, que e' o que troca de etapa, so trocava a
+   aba ativa -- nao repintava nada.
+   Enquanto o Voltar do desktop era um botao proprio para cada tela (cada um
+   refazendo a pintura na mao), isso se sustentava. A seta do celular, nao: ela
+   chama goStep direto. Resultado medido: voltar da ficha do produto no celular
+   caia numa etapa com ZERO pixel de conteudo -- a tela em branco que o cliente
+   ve como "sumiu tudo", sem outra saida a nao ser recomecar.
+
+   Em vez de remendar cada botao de voltar (e ter o mesmo bug de novo no
+   proximo caminho que alguem criar), a etapa passa a se repintar sozinha ao
+   receber o cliente. Quem chega por onde for -- botao, seta do celular,
+   carrinho -- encontra a tela montada.
+
+   Repintar e' de graca quando ja esta certo: sao os mesmos valores de display
+   que a ida ja tinha posto. */
+function _pintaEtapa(n){
+  try{
+    if(typeof S==='undefined' || !S) return;
+    if(n===0){
+      if(typeof _mostraCardRedoma==='function') _mostraCardRedoma();
+      return;
+    }
+    if(n===1){
+      /* qual das quatro telas da etapa 2 e' a do cliente agora */
+      var t=S.tela1||((S.tipo==='lego')?'lego':'escolha');
+      var ehR=(typeof _ehRedoma==='function') && _ehRedoma();
+      setStyle('legoSection','display',        t==='lego'    ?'block':'none');
+      setStyle('miniChoiceSection','display',  t==='escolha' ?'block':'none');
+      setStyle('miniInclusoAISection','display',t==='catalogo'?'block':'none');
+      setStyle('miniApenasSection','display',  t==='apenas'  ?'block':'none');
+      setStyle('miniSection','display','none');
+      setStyle('step1NavBtns','display',       t==='lego'    ?'':'none');
+      /* na tela de escolha o titulo fica escondido de proposito (o texto esta
+         dentro dos proprios cards); nas outras tres ele aparece */
+      setStyle('step1Title','display', t==='escolha'?'none':'');
+      setStyle('step1Sub','display',   t==='escolha'?'none':'');
+      setStyle('sidebarMiniInfo','display', (t==='catalogo'||t==='lego')?'none':'block');
+      if(t==='catalogo'){
+        /* a lista pode ter sido esvaziada por outro fluxo -- se estiver vazia,
+           desenho de novo em vez de entregar uma prateleira sem nada */
+        if(!document.querySelectorAll('#inclusoBrands .bcard').length
+           && typeof renderInclusoBrands==='function') renderInclusoBrands();
+        if(typeof _rotuloRedoma==='function') _rotuloRedoma(!!ehR);
+      }
+      return;
+    }
+    if(n===2 && S.incProduto){
+      /* veio do catalogo (produto pronto ou redoma): a etapa Produto e' a
+         ficha dele, e nao a tela generica de miniatura */
+      setStyle('step2RegularContent','display','none');
+      setStyle('inclusoProdutoSection','display','block');
+    }
+  }catch(e){}
+}
 function goStep(n){
   // Restaurar resumo padrÃÂ£o se saindo do contexto incluso
   if(n!==6){
@@ -388,6 +446,8 @@ function goStep(n){
     if(typeof _relevoStep7Layout==='function')_relevoStep7Layout();
   }}
   if(n===7){_sumRemoved={moldura:false,led:false,rel:[]};buildSummary();}
+  /* por ultimo, para nao ser desfeito pelos ajustes acima */
+  _pintaEtapa(n);
   calcPrice();
 }
 
@@ -448,7 +508,7 @@ function selectTipo(t){
      que ja esta testada em producao. O S.ehRedoma e' o que diz a verdade para
      quem precisa saber -- as telas, o resumo e, na fase 3, o frete. */
   if(t==='redoma'){
-    S.tipo='mini'; S.miniChoice='incluso'; S.ehRedoma=true;
+    S.tipo='mini'; S.miniChoice='incluso'; S.ehRedoma=true; S.tela1='catalogo';
     S.incProduto=null; S.incBrandSel=null;
     var _cR=document.getElementById('tRedoma'); if(_cR)_cR.classList.add('sel');
     var _cL=document.getElementById('tLego');   if(_cL)_cL.classList.remove('sel');
@@ -473,6 +533,9 @@ function selectTipo(t){
     return;
   }
   S.ehRedoma=false;
+  /* a etapa 2 tem quatro telas possiveis; S.tela1 diz qual esta valendo, e e'
+     com ela que o Voltar consegue repintar a etapa certa mais tarde */
+  S.tela1=(t==='lego')?'lego':'escolha';
   _rotuloRedoma(false);
   var _cR0=document.getElementById('tRedoma'); if(_cR0)_cR0.classList.remove('sel');
   setStyle('miniInclusoAISection','display','none');
@@ -1023,9 +1086,17 @@ async function gerarVisualizacaoIA(){
 }
 
 function backToMiniChoice(){
+  /* A REDOMA NAO PASSA POR ESTA TELA.
+     "Ja tenho a miniatura / quero com a miniatura inclusa" e' pergunta do
+     fluxo de QUADRO. Quem estava comprando uma redoma e clicava em Voltar caia
+     nela: a lista de linhas sumia, o titulo continuava dizendo Redomas, e a
+     unica saida era "Iniciar nova personalizacao".
+     No fluxo de redoma, Voltar volta para a escolha de categoria. */
+  if(typeof _ehRedoma==='function' && _ehRedoma()){ goStep(0); return; }
   setStyle('miniInclusoAISection','display','none');
   setStyle('miniApenasSection','display','none');
   setStyle('miniChoiceSection','display','block');
+  S.tela1='escolha';
   S.incProduto=null;
   if(typeof aplicarModoCatalogo==='function')aplicarModoCatalogo(false);
   setStyle('step1NavBtns','display','none');
@@ -1033,6 +1104,7 @@ function backToMiniChoice(){
 
 function selMiniChoice(choice){
   S.miniChoice=choice;
+  S.tela1=(choice==='incluso')?'catalogo':'apenas';
   // fora do catalogo o aviso lateral volta ao normal
   if(choice!=='incluso') setStyle('sidebarMiniInfo','display','block');
   setStyle('miniChoiceSection','display','none');
@@ -3431,6 +3503,7 @@ function editarConfiguracao(){
 }
 
 function voltarInclusoCatalogo(){
+  S.tela1='catalogo';
   S.incProduto=null;
   aplicarModoCatalogo(false);
   setStyle('inclusoProdutoSection','display','none');
