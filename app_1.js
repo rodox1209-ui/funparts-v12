@@ -3276,9 +3276,15 @@ function _catGaleriaHTML(soFoto){
   var _box=_mobG
     ? 'width:100%;display:flex;align-items:flex-start;justify-content:center;'
     : 'flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;';
+  /* ALTURA MAXIMA DA FOTO NO DESKTOP: 682 px.
+     Antes era max-height:100%. Porcentagem de altura so vale quando o pai
+     tem altura definida, e aqui ele nao tem -- entao aquele limite nunca
+     valeu de nada: medi a foto com 1.280 px de altura numa tela de 1.200.
+     Um numero fixo nao depende do pai e e' o que o Rodolfo pediu.
+     O CELULAR NAO MUDA: continua com os 46vh de sempre. */
   var _img=_mobG
     ? 'width:100%;max-height:46vh;object-fit:contain;border-radius:10px;display:block;'
-    : 'max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;display:block;';
+    : 'max-width:100%;max-height:682px;object-fit:contain;border-radius:10px;display:block;';
   return '<div style="'+_wrap+'">'
     +'<div style="'+_box+'">'
     +'<img id="catMainPhoto" src="'+(_F[idx]||_F[0])+'" style="'+_img+'">'
