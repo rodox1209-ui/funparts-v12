@@ -444,6 +444,38 @@ function restoreSumItem(type, key, label){
 
 // Ã¢ÂÂÃ¢ÂÂ STEP 1: TIPO Ã¢ÂÂÃ¢ÂÂ
 function selectTipo(t){
+  /* REDOMA: por dentro ela viaja pela estrada do produto pronto da miniatura,
+     que ja esta testada em producao. O S.ehRedoma e' o que diz a verdade para
+     quem precisa saber -- as telas, o resumo e, na fase 3, o frete. */
+  if(t==='redoma'){
+    S.tipo='mini'; S.miniChoice='incluso'; S.ehRedoma=true;
+    S.incProduto=null; S.incBrandSel=null;
+    var _cR=document.getElementById('tRedoma'); if(_cR)_cR.classList.add('sel');
+    var _cL=document.getElementById('tLego');   if(_cL)_cL.classList.remove('sel');
+    var _cM=document.getElementById('tMini');   if(_cM)_cM.classList.remove('sel');
+    if(typeof aplicarModoCatalogo==='function')aplicarModoCatalogo(false);
+    setStyle('legoSection','display','none');
+    setStyle('miniSection','display','none');
+    setStyle('miniChoiceSection','display','none');
+    setStyle('miniInclusoAISection','display','block');
+    setStyle('step1NavBtns','display','none');
+    setStyle('step1Title','display','');
+    setStyle('step1Sub','display','');
+    setEl('step1Title','Displays / Redomas de Acr\u00edlico');
+    setEl('step1Sub','Produtos prontos \u2014 escolha a linha e depois o modelo');
+    setEl('pvCat','Redoma / Display');
+    var _t2r=document.getElementById('tabStep2'); if(_t2r)_t2r.style.display='none';
+    var _smiR=document.getElementById('sidebarMiniInfo'); if(_smiR)_smiR.style.display='none';
+    var _sliR=document.getElementById('sidebarLegoInfo'); if(_sliR)_sliR.style.display='none';
+    _rotuloRedoma(true);
+    renderInclusoBrands();
+    calcPrice();
+    return;
+  }
+  S.ehRedoma=false;
+  _rotuloRedoma(false);
+  var _cR0=document.getElementById('tRedoma'); if(_cR0)_cR0.classList.remove('sel');
+  setStyle('miniInclusoAISection','display','none');
   S.tipo=t;
   // sair do modo catalogo logo no inicio (garante reset mesmo se algo abaixo falhar)
   S.incProduto=null;
@@ -2666,6 +2698,17 @@ function _topviewAjuste(nome){
 function _topviewEscala(nome){ return _topviewAjuste(nome).escala; }
 try{ window._topviewEscala=_topviewEscala; window._topviewAjuste=_topviewAjuste; }catch(e){}
 function calcPrice(){
+  /* Navegando nas redomas e ainda sem produto escolhido, o total nao pode
+     mostrar o preco de um quadro LEGO -- era o que acontecia, porque o calculo
+     caia no caminho do quadro. Enquanto nao ha escolha, nao ha total. */
+  if(_ehRedoma() && !S.incProduto){
+    S._total=0;
+    var _tr='\u2014';
+    setEl('pvPrice',_tr);
+    var _mbr=document.getElementById('mobBarPrice'); if(_mbr)_mbr.textContent=_tr;
+    var _dbr=document.getElementById('deskBarPrice'); if(_dbr)_dbr.textContent=_tr;
+    return;
+  }
   // Produto pronto do catalogo: o preco e o do proprio produto
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
     S._total=S.incProduto.p;
@@ -2792,6 +2835,41 @@ function abreAjuda(chave){
 function fechaAjuda(){ var ov=document.getElementById('ajudaOverlay'); if(ov)ov.style.display='none'; }
 
 // fotos do produto atual (do banco); se nao houver, usa as 4 padrao
+/* "17 x 17 x 20 cm" a partir dos tres numeros do cadastro. Se faltar algum,
+   devolve vazio em vez de escrever "undefined" na cara do cliente. */
+/* Os rotulos da tela de navegacao sao da miniatura ("Escolha a marca",
+   "Modelos disponiveis"). Numa redoma isso soa errado -- nao existe marca nem
+   modelo, existe linha e produto. Troco o texto sem tocar no HTML, para o
+   fluxo de miniatura continuar com as palavras dele. */
+function _rotuloRedoma(on){
+  try{
+    var ib=document.getElementById('inclusoBrands');
+    var t1=ib?ib.previousElementSibling:null;
+    if(t1&&t1.classList.contains('sec-sub')){
+      if(!t1.getAttribute('data-pt0'))t1.setAttribute('data-pt0',t1.textContent);
+      t1.textContent=on?'Escolha a linha':t1.getAttribute('data-pt0');
+    }
+    var w=document.getElementById('inclusoModelsWrap');
+    var t2=w?w.querySelector('.sec-sub'):null;
+    /* so o primeiro pedaco de texto: o contador "(1)" vive num span ao lado e
+       nao pode ser apagado junto */
+    if(t2&&t2.firstChild&&t2.firstChild.nodeType===3){
+      if(!t2.getAttribute('data-pt0'))t2.setAttribute('data-pt0',t2.firstChild.nodeValue);
+      t2.firstChild.nodeValue=on?'Produtos dispon\u00edveis ':t2.getAttribute('data-pt0');
+    }
+  }catch(e){}
+}
+function _redomaMedida(it){
+  if(!it)return '';
+  var n=[it.larg,it.prof,it.alt].map(function(x){return Number(x);});
+  if(n.some(function(x){return !isFinite(x)||x<=0;}))return '';
+  return n.map(function(x){return String(x).replace('.',',');}).join(' x ')+' cm';
+}
+/* a descricao vem do painel: texto do cliente nunca entra como HTML */
+function _escTxt(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 function _catFotos(){
   var p=(typeof S!=='undefined')?S.incProduto:null;
   if(p && p.fotos && p.fotos.length) return p.fotos.map(_fotoUrl);
@@ -3051,6 +3129,15 @@ function _aplicaCatalogoBanco(c){
     Object.keys(INCLUSO_CATALOG).forEach(function(k){ delete INCLUSO_CATALOG[k]; });
     Object.keys(c.mini).forEach(function(k){ INCLUSO_CATALOG[k]=c.mini[k]; });
   }
+  /* REDOMAS -- bloco proprio. Banco sem redoma nenhuma deixa a lista vazia e o
+     card do passo 1 simplesmente nao aparece; o site segue igual ao de hoje. */
+  try{
+    Object.keys(REDOMA_CATALOG).forEach(function(k){ delete REDOMA_CATALOG[k]; });
+    if(c.redoma) Object.keys(c.redoma).forEach(function(k){ REDOMA_CATALOG[k]=c.redoma[k]; });
+    _mostraCardRedoma();
+    var _ibR=document.getElementById('inclusoBrands');
+    if(_ehRedoma() && _ibR) renderInclusoBrands();
+  }catch(_er){ console.error('redoma-catalogo', _er && _er.message); }
   if(c.precos) CAT_PRECOS=c.precos;
   if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
   if(c.infos){ INFOS=c.infos; if(typeof _injetaAjuda==='function') setTimeout(_injetaAjuda,60);
@@ -3116,11 +3203,34 @@ function carregarCatalogoDoBanco(){
 function _brl(v){var _r=(window.FP&&window.FP.region)||'BR';var _n=Number(v);if(_r==='US')return '$ '+_n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});if(_r==='EU')return 'â¬'+_n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});return 'R$ '+_n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function _linProd(k,v){return '<div style="display:flex;justify-content:space-between;gap:12px;"><span style="color:#888;">'+k+'</span><span style="color:#ddd;text-align:right;">'+v+'</span></div>';}
 
+/* ═══ REDOMAS: a MESMA estrada do produto pronto ═══
+   O caminho "Quadro incluso miniatura" ja faz tudo que a redoma precisa:
+   grade de categorias, lista de produtos, pagina do produto com galeria e
+   descricao, salto direto para o Pedido e as etapas de personalizacao
+   escondidas. Em vez de escrever tudo de novo, a redoma entra nessa mesma
+   estrada trocando so a FONTE do catalogo.
+   O S.ehRedoma e' a unica chave: com ele ligado, as telas leem REDOMA_CATALOG
+   em vez de INCLUSO_CATALOG. Desligado, o fluxo de miniatura sai
+   caractere por caractere igual ao que esta no ar hoje. */
+var REDOMA_CATALOG={};
+function _ehRedoma(){ return typeof S!=='undefined' && !!S.ehRedoma; }
+function _catFonte(){ return _ehRedoma()?REDOMA_CATALOG:INCLUSO_CATALOG; }
+/* ha redoma para vender? categoria vazia ja nao chega aqui (o servidor corta) */
+function _temRedoma(){
+  try{ return Object.keys(REDOMA_CATALOG).length>0; }catch(e){ return false; }
+}
+/* o card do passo 1 so aparece quando ha o que vender -- prateleira vazia
+   espanta mais do que categoria que ainda nao existe */
+function _mostraCardRedoma(){
+  var l=document.getElementById('tipoRedomaLinha');
+  if(l)l.style.display=_temRedoma()?'':'none';
+}
 function renderInclusoBrands(){
   var el=document.getElementById('inclusoBrands'); if(!el)return;
   var h='';
-  Object.keys(INCLUSO_CATALOG).forEach(function(b){
-    var c=INCLUSO_CATALOG[b];
+  var _FONTE=_catFonte();
+  Object.keys(_FONTE).forEach(function(b){
+    var c=_FONTE[b];
     var ico=c.logo?('<img src="'+c.logo+'" alt="">'):'<span style="font-size:16px;">\uD83C\uDFC1</span>';
     h+='<div class="bcard" data-ib="'+b+'" onclick="selInclusoBrand(this.getAttribute(\'data-ib\'))"><div class="bico">'+ico+'</div><div class="bnm">'+b+'</div></div>';
   });
@@ -3131,12 +3241,14 @@ function renderInclusoBrands(){
 function selInclusoBrand(b){
   S.incBrandSel=b;
   document.querySelectorAll('#inclusoBrands .bcard').forEach(function(c){c.classList.toggle('sel',c.getAttribute('data-ib')===b);});
-  var its=((INCLUSO_CATALOG[b]||{}).itens)||[];
+  var its=((_catFonte()[b]||{}).itens)||[];
   var w=document.getElementById('inclusoModelsWrap'); if(w)w.style.display='block';
   var cnt=document.getElementById('inclusoModelsCount'); if(cnt)cnt.textContent='('+its.length+')';
   var lst=document.getElementById('inclusoModels'); if(!lst)return;
   lst.innerHTML=its.map(function(it,i){
-    return '<div class="mrow" data-ii="'+i+'" onclick="selInclusoProduto(this.getAttribute(\'data-ii\'))"><span>'+it.n+'</span><span class="mrow-tag">'+it.esc+' \u00b7 '+_brl(it.p)+'</span></div>';
+    /* a redoma nao tem escala de miniatura: no lugar dela vai a medida */
+    var _tag=_ehRedoma()?_redomaMedida(it):it.esc;
+    return '<div class="mrow" data-ii="'+i+'" onclick="selInclusoProduto(this.getAttribute(\'data-ii\'))"><span>'+it.n+'</span><span class="mrow-tag">'+(_tag?(_tag+' \u00b7 '):'')+_brl(it.p)+'</span></div>';
   }).join('');
 }
 
@@ -3189,7 +3301,7 @@ function aplicarModoCatalogo(on){
 
 function selInclusoProduto(i){
   i=parseInt(i,10);
-  var b=S.incBrandSel, it=(((INCLUSO_CATALOG[b]||{}).itens)||[])[i];
+  var b=S.incBrandSel, it=(((_catFonte()[b]||{}).itens)||[])[i];
   if(!it)return;
   S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
   setEl('tabStep2Lbl','Produto');
@@ -3204,7 +3316,17 @@ function selInclusoProduto(i){
   if(th)th.style.display='none';
   // ficha tecnica
   var d=document.getElementById('ip2Desc');
-  if(d){
+  if(d && _ehRedoma()){
+    /* a redoma tem ficha propria: medida, material e o texto de venda que o
+       Rodolfo escreve no painel. Nada de escala, moldura ou miniatura. */
+    d.innerHTML='<div style="display:flex;flex-direction:column;gap:7px;">'
+      +_linProd('Categoria',b)
+      +_linProd('Medida',_redomaMedida(it))
+      +_linProd('Envio','<span style="color:#7bd67b;">Desmontada, montagem por encaixe</span>')
+      +_linProd('Prazo de produ\u00e7\u00e3o','7 dias \u00fateis')
+      +'</div>'
+      +(it.desc?('<div style="margin-top:14px;color:rgba(255,255,255,.62);font-size:12.5px;line-height:1.75;white-space:pre-line;">'+_escTxt(it.desc)+'</div>'):'');
+  } else if(d){
     d.innerHTML='<div style="display:flex;flex-direction:column;gap:7px;">'
       +_linProd('Marca',b)
       +_linProd('Dimens\u00e3o do quadro',it.dim)
@@ -3263,6 +3385,22 @@ function voltarInclusoCatalogo(){
 // Ã¢ÂÂÃ¢ÂÂ SUMÃÂRIO Ã¢ÂÂÃ¢ÂÂ
 function buildSummary(){
   // Produto pronto do catalogo: resumo com todos os dados para cobranca
+  if(_ehRedoma() && S.incProduto){
+    /* a redoma tem resumo proprio: o do quadro falaria de moldura, fundo e
+       miniatura, que aqui nao existem */
+    var _ir=S.incProduto;
+    setEl('sumCat','Display / Redoma de Acr\u00edlico');
+    setEl('sumMod',(S.incBrand?S.incBrand+' \u2014 ':'')+_ir.n);
+    setEl('sumDim',_redomaMedida(_ir)||'\u2014');
+    setEl('sumMold','\u2014');
+    setEl('sumFund','Acr\u00edlico cristal');
+    setEl('sumLed','\u2014');
+    setEl('sumMini','\u2014');
+    setEl('sumRel','\u2014');
+    setEl('pvSku','Redoma / '+(_redomaMedida(_ir)||'\u2014'));
+    setEl('sumTotal',_brl(_ir.p));
+    return;
+  }
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
     var _it=S.incProduto;
     setEl('sumCat','Quadro para Miniaturas \u2014 Produto pronto');
