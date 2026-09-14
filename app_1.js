@@ -3241,6 +3241,13 @@ function _aplicaCatalogoBanco(c){
     var ib=document.getElementById('inclusoBrands');
     if(ib && ib.children.length && typeof renderInclusoBrands==='function') renderInclusoBrands();
   }catch(e){}
+  /* O CATALOGO CHEGOU. Se um anuncio pediu a categoria de redoma e eu tive de
+     esperar, e' agora que o cliente vai para a tela certa.
+     Isto fica no FIM de proposito: o bloco logo acima redesenha a lista de
+     marcas, e redesenhar FECHA a lista de modelos. Rodando antes dele, o
+     cliente do anuncio via a linha fechar sozinha na cara dele -- foi o que o
+     teste pegou. */
+  try{ if(_FP_ATALHO_ESPERA && typeof _fpAtalhoAnuncio==='function') _fpAtalhoAnuncio(); }catch(e){}
 }
 /* ATALHO DE ANUNCIO -- o cliente que clica num anuncio de uma linha especifica
    cai direto na etapa dela, sem passar pela escolha de tipo. Tres enderecos:
@@ -3255,8 +3262,18 @@ function _aplicaCatalogoBanco(c){
 var _FP_ATALHOS={
   lego:['lego',null], legos:['lego',null],
   miniatura:['mini','incluso'], miniaturas:['mini','incluso'], incluso:['mini','incluso'],
-  quadro:['mini','apenas'], quadros:['mini','apenas'], somente:['mini','apenas']
+  quadro:['mini','apenas'], quadros:['mini','apenas'], somente:['mini','apenas'],
+  /* REDOMAS -- varias escritas para a mesma tela, porque quem monta o anuncio
+     nem sempre lembra qual foi a combinada */
+  redoma:['redoma',null], redomas:['redoma',null],
+  display:['redoma',null], displays:['redoma',null], acrilico:['redoma',null]
 };
+/* o atalho de redoma depende do catalogo do banco, que chega DEPOIS da pagina.
+   Quem vem de anuncio e' visitante novo: nao tem copia guardada no navegador,
+   entao a lista ainda esta vazia quando o atalho roda. Este sinal manda refazer
+   o atalho assim que o banco responde -- senao o cliente do anuncio cairia
+   numa prateleira vazia, que e' o pior lugar para gastar clique pago. */
+var _FP_ATALHO_ESPERA=false;
 function _fpAtalhoAnuncio(){
   var p='';
   try{
@@ -3266,10 +3283,24 @@ function _fpAtalhoAnuncio(){
   }catch(e){}
   var r=_FP_ATALHOS[p];
   if(!r) return;
+  /* catalogo ainda nao chegou: em vez de abrir a categoria vazia, eu espero */
+  if(r[0]==='redoma' && typeof _temRedoma==='function' && !_temRedoma()){
+    _FP_ATALHO_ESPERA=true;
+    return;
+  }
+  _FP_ATALHO_ESPERA=false;
   try{
     if(typeof selectTipo==='function') selectTipo(r[0]);
     if(typeof goStep==='function') goStep(1);
     if(r[1] && typeof selMiniChoice==='function') selMiniChoice(r[1]);
+    /* SO EXISTE UMA LINHA de redoma hoje. Obrigar quem veio de anuncio a
+       clicar nela antes de ver qualquer produto e' um passo a toa -- e passo a
+       toa em trafego pago custa dinheiro. Com uma linha so, ela ja vem aberta.
+       Com duas ou mais, o cliente escolhe, como nas outras categorias. */
+    if(r[0]==='redoma' && typeof selInclusoBrand==='function'){
+      var _ls=Object.keys(REDOMA_CATALOG||{});
+      if(_ls.length===1) selInclusoBrand(_ls[0]);
+    }
   }catch(e){}
 }
 (function(){
