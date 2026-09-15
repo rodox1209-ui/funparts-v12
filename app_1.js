@@ -2800,6 +2800,10 @@ function calcPrice(){
     const sz=MINI_SIZES.find(s=>s.id===S.miniSize);
     base=_preco('mini_base_'+S.miniSize, sz?sz.base:1990);
   }
+  /* aqui, e nao em outro lugar: e' o unico ponto por onde TODA mudanca de
+     medida, de fundo, de regiao e de catalogo passa. O cartao nunca fica
+     atrasado em relacao ao total porque os dois saem da mesma passagem. */
+  _precoFundoCartoes();
   // 2. Upgrades (preÃÂ§os vindos do banco, com reserva)
   if(S.moldura==='m-fibra')base+=_preco('opt_moldura_fibra',75);
   if(S.led){
@@ -2956,6 +2960,46 @@ var LEGO_FUNDOS_DB=null; // fundos LEGO por modelo, vindos do banco (Fase 4)
 var INFOS=null; // textos/imagens de ajuda ("?") por opÃÂ§ÃÂ£o, do banco
 // preÃÂ§o de uma chave do banco, com valor de reserva se o banco nÃÂ£o respondeu
 function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT_PRECOS[chave] : fb; }
+/* O PRECO ESCRITO NO CARTAO DE FUNDO
+   Os tres cartoes da etapa Fundo nasceram com "R$ 689,00" escrito a mao no
+   index.html e nunca foram ligados a tabela de precos. Enquanto havia um preco
+   so, ninguem notou. Quando o preco passou a ser por MEDIDA, o TOTAL passou a
+   sair certo e o cartao ficou para tras -- em toda medida:
+       49x49    cartao R$ 689   cobranca R$ 399   (289 a mais na tela)
+       53x83    cartao R$ 689   cobranca R$ 495 no fosco
+       114x49   cartao R$ 689   cobranca R$ 964   (275 aparecendo so no fim)
+   Os dois lados custam venda: no quadro de entrada o cliente ve caro e vai
+   embora; no quadro grande ele ve barato e leva susto no total.
+   E em euro era pior: o cartao dizia "R$" com o total em EUR.
+
+   A correcao NAO e' escrever os numeros certos a mao -- seria o mesmo erro de
+   novo no dia em que voce mexer no painel. O cartao passa a chamar a MESMA
+   funcao que o total (_legoBase / mini_base_*), entao nao ha como um mudar sem
+   o outro mudar junto.
+   Carbono e Acrilico Brilho dividem o mesmo preco: e' assim que o painel
+   mostra a linha ("fibra de carbono / brilho"). So o Fosco tem preco proprio. */
+function _precoFundoCartoes(){
+  try{
+    if(typeof S==='undefined' || !S) return;
+    var cards=document.querySelectorAll('.fundo-cards .ocard');
+    for(var i=0;i<cards.length;i++){
+      var b=cards[i].querySelector('.rbadge'); if(!b) continue;
+      var oc=String(cards[i].getAttribute('onclick')||'');
+      var v;
+      if(S.tipo==='mini'){
+        /* no fluxo de miniatura o fundo nao muda o preco: o que manda e' a
+           escala/medida escolhida na etapa do produto */
+        var _sz=(typeof MINI_SIZES!=='undefined')
+          ? MINI_SIZES.filter(function(s){return s.id===S.miniSize;})[0] : null;
+        v=_preco('mini_base_'+S.miniSize, _sz?_sz.base:1990);
+      }else{
+        v=_legoBase(S.legoDim, oc.indexOf('f-fosco')>=0);
+      }
+      var txt=_brl(v);
+      if(b.textContent!==txt) b.textContent=txt;
+    }
+  }catch(e){}
+}
 /* Os icones da faixa de categorias LEGO. Sao os MESMOS que estavam escritos a
    mao no index.html -- ficam aqui como padrao, para o site continuar identico
    enquanto o painel nao escolher outro. */
