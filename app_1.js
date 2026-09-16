@@ -600,7 +600,13 @@ function renderLegoModels(brand){
     d.onclick=()=>selLegoModel(d,m);
     el.appendChild(d);
   });
-  if(models.length>0)selLegoModel(el.querySelector('.mrow'),models[0]);
+  if(models.length>0){
+    /* a primeira medida ja nasce marcada ao abrir a marca -- a tela continua
+       exatamente igual, so nao conta isso como produto visto */
+    _fbAutoSel=true;
+    try{ selLegoModel(el.querySelector('.mrow'),models[0]); }
+    finally{ _fbAutoSel=false; }
+  }
 }
 
 
@@ -653,7 +659,78 @@ var MODEL_RELEVO_IMAGES={
     bandeira_right:'calc(6% + 5px)',
   },
 };
+/* ===== PIXEL DA META: OS EVENTOS DO NAVEGADOR =====================
+   O Purchase continua saindo do SERVIDOR, no momento em que o pedido vira
+   pago -- nao e' disparado aqui, e por isso nao ha risco de contar a mesma
+   venda duas vezes.
+   O que sai daqui sao os tres eventos que so existem no navegador:
+   ViewContent (olhou um produto), AddToCart (pos no carrinho) e
+   InitiateCheckout (saiu do carrinho para fechar o pedido).
+   Tudo passa por _fbEvento, que nao faz nada se o pixel nao tiver carregado.
+   Nenhum destes eventos pode derrubar a tela: se qualquer um falhar, o
+   cliente nem fica sabendo. */
+function _fbOk(){ try{ return typeof fbq==='function'; }catch(e){ return false; } }
+function _fbMoeda(){
+  try{ return ((window.FP&&FP.region)==='EU')?'EUR':'BRL'; }catch(e){ return 'BRL'; }
+}
+function _fbCookie(n){
+  try{
+    var m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');
+    return m?decodeURIComponent(m[2]):'';
+  }catch(e){ return ''; }
+}
+/* AS DUAS PISTAS QUE O SERVIDOR PRECISA
+   _fbp diz QUEM e' o navegador; _fbc diz DE QUAL ANUNCIO aquela visita veio.
+   Sao cookies do dominio -- o servidor nao tem como ve-los sozinho, e por
+   isso o Purchase saia sem eles ate hoje.
+   O _fbc so e' escrito quando o pixel carrega. Se o cliente chegou do anuncio
+   e fechou o pedido antes disso, o fbclid que veio na URL ainda salva a
+   ligacao: e' com ele que a Meta monta o mesmo identificador. */
+function _fbIds(){
+  var fbp=_fbCookie('_fbp'), fbc=_fbCookie('_fbc');
+  if(!fbc){
+    try{
+      var q=new URLSearchParams(location.search).get('fbclid');
+      if(q) fbc='fb.1.'+Date.now()+'.'+q;
+    }catch(e){}
+  }
+  var o={};
+  if(fbp)o.fbp=fbp;
+  if(fbc)o.fbc=fbc;
+  return o;
+}
+function _fbEvento(nome,dados){
+  if(!_fbOk())return;
+  try{ fbq('track',nome,dados||{}); }catch(e){}
+}
+/* PORQUE ESTE SINALIZADOR EXISTE
+   Ao abrir uma marca, a tela ja deixa a primeira medida marcada sozinha. Isso
+   nao e' o cliente escolhendo um produto: se contasse, quem passeia por cinco
+   marcas geraria cinco visualizacoes de produtos que ele nem olhou -- e sao
+   justamente esses ids que a Meta usa para remarketing. */
+var _fbAutoSel=false;
+/* o mesmo produto aberto tres vezes na mesma visita e' UMA visualizacao:
+   sem isto, quem navega pelo catalogo infla o relatorio sozinho */
+var _fbJaVi={};
+function _fbViewContent(id,nome,valor){
+  if(_fbAutoSel)return;
+  var k=String(id||nome||'');
+  if(!k||_fbJaVi[k])return;
+  _fbJaVi[k]=1;
+  _fbEvento('ViewContent',{ content_ids:[k], content_type:'product',
+    content_name:String(nome||'').slice(0,120),
+    value:Number(valor)||0, currency:_fbMoeda() });
+}
+var _fbCheckoutFeito=false;
+
 function selLegoModel(row,model){
+  /* o quadro LEGO nao tem preco proprio: o valor vem da MEDIDA escolhida,
+     entao e' esse que vai no evento */
+  try{
+    var _fbV=0;
+    try{ _fbV=_legoBase(model.dim,false)||0; }catch(e){}
+    _fbViewContent('lego|'+model.name, model.name, _fbV);
+  }catch(e){}
   var iCarro=document.getElementById('iCarro');
   if(iCarro){
     iCarro.src=MODEL_CAR_IMAGES[model.name]||DEFAULT_CAR_SRC;
@@ -3509,6 +3586,8 @@ function selInclusoProduto(i){
   var b=S.incBrandSel, it=(((_catFonte()[b]||{}).itens)||[])[i];
   if(!it)return;
   S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
+  /* vale para quadro de catalogo E para redoma: os dois passam por aqui */
+  try{ _fbViewContent(it.id?('p'+it.id):(b+'|'+it.n), it.n, it.p); }catch(e){}
   setEl('tabStep2Lbl','Produto');
   setEl('step2Title', it.n);
   setEl('step2Sub', b);
@@ -4246,6 +4325,14 @@ function adicionarAoCarrinho(){
   // o item entra na hora; a miniatura chega depois, se chegar.
   // nunca deixar o cliente clicar e nada acontecer.
   CART.push(it);
+  try{
+    var _fbId=(it.cfg&&(it.cfg.redoma_id||it.cfg.produto_id))
+      ? String(it.cfg.redoma_id||it.cfg.produto_id)
+      : ('lego|'+String((it.cfg&&it.cfg.legoDim)||it.tipo||'item'));
+    _fbEvento('AddToCart',{ content_ids:[_fbId], content_type:'product',
+      content_name:String(it.titulo||'').slice(0,120),
+      value:Number(it.preco)||0, currency:_fbMoeda() });
+  }catch(e){}
   _cartSave();
   _cartRender();
   _cartPulse();
@@ -4438,6 +4525,8 @@ function fecharPedidoWpp(){
        e-mail em frances. */
     idioma:(function(){ try{ return (window.FP&&FP.lang)||'pt'; }catch(e){ return 'pt'; } })(),
     cliente:c,
+    /* sem isto o Purchase do servidor nao sabe de qual anuncio veio a venda */
+    fb:_fbIds(),
     frete:_freteEscolhido||undefined,
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
@@ -5126,6 +5215,9 @@ function _rascEnvia(){
     rascunho:true,
     rascunhoToken:_rascToken()||undefined,
     cliente:c,
+    /* o rascunho tambem leva: se o cliente voltar depois por link direto, o
+       servidor ja guardou de qual anuncio ele veio na primeira visita */
+    fb:_fbIds(),
     itens:CART.map(function(i){
       return { titulo:i.titulo, sub:i.sub, linhas:i.linhas, via:i.via, tipo:i.tipo,
                preco:i.preco, imgKey:i.imgKey||null, imgKeys:i.imgKeys||null, cfg:i.cfg||null,
@@ -5243,6 +5335,17 @@ function _rascEnvia(){
       if(f1)f1.style.display='';
       if(f2)f2.style.display='none';
       if(tit)tit.textContent='Escolha o frete';
+      /* UMA vez por visita: daqui ate a tela de dados o cliente vai e volta
+         varias vezes enquanto preenche, e cada ida nao e' um checkout novo */
+      if(!_fbCheckoutFeito){
+        _fbCheckoutFeito=true;
+        try{
+          _fbEvento('InitiateCheckout',{
+            num_items:CART.length, value:Number(_cartTotal())||0, currency:_fbMoeda(),
+            content_ids:CART.map(function(x){ return String((x.cfg&&(x.cfg.redoma_id||x.cfg.produto_id))||x.tipo||'item'); })
+          });
+        }catch(e){}
+      }
       if(volta)volta.style.display='';
       var bG=f1?f1.querySelector('.btn-cart-go'):null;
       if(bG)bG.textContent='Continuar Ã¢ÂÂ';
