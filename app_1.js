@@ -709,6 +709,24 @@ function _fbEvento(nome,dados){
    marcas geraria cinco visualizacoes de produtos que ele nem olhou -- e sao
    justamente esses ids que a Meta usa para remarketing. */
 var _fbAutoSel=false;
+/* UM UNICO LUGAR DECIDE O IDENTIFICADOR DO PRODUTO
+   Os tres eventos tem de chamar o mesmo produto pelo mesmo nome, senao a Meta
+   nao liga "olhou" com "pos no carrinho" e o remarketing por produto nao se
+   forma. Para o que veio do catalogo -- quadro pronto e redoma -- vale o id
+   do banco, que e' o unico que sobrevive a uma renomeacao no painel. Para o
+   quadro personalizado, que nao existe no banco, vale o modelo escolhido: e'
+   exatamente o mesmo texto que o ViewContent usa la em cima. */
+function _fbIdItem(it){
+  try{
+    var c=(it&&it.cfg)||{};
+    /* 'r' e 'p' porque redoma e quadro de catalogo sao DUAS tabelas, cada uma
+       com a sua contagem: existe redoma 1 e existe quadro 1, e sem a letra os
+       dois virariam o mesmo produto para a Meta. */
+    if(c.redoma_id!=null&&c.redoma_id!=='')return 'r'+c.redoma_id;
+    if(c.produto_id!=null&&c.produto_id!=='')return 'p'+c.produto_id;
+    return String((it&&it.tipo)||'item')+'|'+String((it&&it.titulo)||'');
+  }catch(e){ return 'item'; }
+}
 /* o mesmo produto aberto tres vezes na mesma visita e' UMA visualizacao:
    sem isto, quem navega pelo catalogo infla o relatorio sozinho */
 var _fbJaVi={};
@@ -3586,8 +3604,12 @@ function selInclusoProduto(i){
   var b=S.incBrandSel, it=(((_catFonte()[b]||{}).itens)||[])[i];
   if(!it)return;
   S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
-  /* vale para quadro de catalogo E para redoma: os dois passam por aqui */
-  try{ _fbViewContent(it.id?('p'+it.id):(b+'|'+it.n), it.n, it.p); }catch(e){}
+  /* vale para quadro de catalogo E para redoma: os dois passam por aqui --
+     por isso a letra, que e' o que separa as duas tabelas */
+  try{
+    var _pre=(function(){ try{ return _ehRedoma()?'r':'p'; }catch(e){ return 'p'; } })();
+    _fbViewContent(it.id?(_pre+it.id):(b+'|'+it.n), it.n, it.p);
+  }catch(e){}
   setEl('tabStep2Lbl','Produto');
   setEl('step2Title', it.n);
   setEl('step2Sub', b);
@@ -4272,8 +4294,12 @@ function _cartMontaItem(){
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
       resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
-      cfg:{ marca:(S.incBrand||S.incBrandSel||''), produto:p.n, escala:p.esc,
-            dim:p.dim, moldura:p.mol, preco:p.p }
+      /* produto_id: e' por ele que o servidor acha o preco no banco. Sem ele
+         a busca e' por nome+medida, e uma renomeacao no painel faz o preco
+         cair para o que o navegador mandou -- calado. O nome e a medida
+         continuam indo, para os pedidos antigos e para o e-mail. */
+      cfg:{ produto_id:p.id, marca:(S.incBrand||S.incBrandSel||''), produto:p.n,
+            escala:p.esc, dim:p.dim, moldura:p.mol, preco:p.p }
     };
   }
   var ehLego=(S.tipo==='lego');
@@ -4326,10 +4352,7 @@ function adicionarAoCarrinho(){
   // nunca deixar o cliente clicar e nada acontecer.
   CART.push(it);
   try{
-    var _fbId=(it.cfg&&(it.cfg.redoma_id||it.cfg.produto_id))
-      ? String(it.cfg.redoma_id||it.cfg.produto_id)
-      : ('lego|'+String((it.cfg&&it.cfg.legoDim)||it.tipo||'item'));
-    _fbEvento('AddToCart',{ content_ids:[_fbId], content_type:'product',
+    _fbEvento('AddToCart',{ content_ids:[_fbIdItem(it)], content_type:'product',
       content_name:String(it.titulo||'').slice(0,120),
       value:Number(it.preco)||0, currency:_fbMoeda() });
   }catch(e){}
@@ -5342,7 +5365,7 @@ function _rascEnvia(){
         try{
           _fbEvento('InitiateCheckout',{
             num_items:CART.length, value:Number(_cartTotal())||0, currency:_fbMoeda(),
-            content_ids:CART.map(function(x){ return String((x.cfg&&(x.cfg.redoma_id||x.cfg.produto_id))||x.tipo||'item'); })
+            content_ids:CART.map(_fbIdItem)
           });
         }catch(e){}
       }
