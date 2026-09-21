@@ -26,6 +26,12 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
   window._editandoId = window._editandoId || null;
 
   // Carrinho: adiciona "editar produto" nos itens LEGO personalizados
+  /* ===== O CARRINHO AGRUPA O QUE E' IGUAL =============================
+     Quem desenha o carrinho e' ESTE arquivo, nao o app_1.js: a linha abaixo
+     substitui a de la. As ferramentas (_cartGrupos, _cartMaisUm, ...) vivem
+     no app_1.js e sao usadas daqui.
+     Se elas nao existirem -- app_1.js revertido, por exemplo -- a tela volta
+     sozinha ao desenho antigo, uma linha por item, em vez de quebrar. */
   window._cartRender = function(){
     var n=CART.length;
     var c=document.getElementById('cartCount');
@@ -39,18 +45,44 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
       if(foot)foot.style.display='none';
       return;
     }
-    body.innerHTML=CART.map(function(i){
+    var _agrupa=(typeof _cartGrupos==='function');
+    if(_agrupa && typeof _cartQtdCss==='function')_cartQtdCss();
+    var _lista=_agrupa?_cartGrupos():CART.map(function(x){return {item:x,itens:[x]};});
+    var _teto=(typeof _CART_MAX==='number')?_CART_MAX:20;
+    body.innerHTML=_lista.map(function(g,gi){
+      var i=g.item, q=g.itens.length;
       var img=i.thumb ? '<img src="'+i.thumb+'" alt="">' : '<div class="ph">'+(i.tipo==='lego'?'ÃÂ°ÃÂÃÂ§ÃÂ±':'ÃÂ°ÃÂÃÂÃÂÃÂ¯ÃÂ¸ÃÂ')+'</div>';
-      var editavel=(i.cfg && i.via!=='catalogo' && (i.tipo==='lego' || (i.tipo==='mini' && i.cfg.miniScale!==undefined)));
+      /* "editar produto" so com UMA unidade: editar uma de tres partiria a
+         linha em duas sem o cliente ter pedido */
+      var editavel=(q===1 && i.cfg && i.via!=='catalogo' && (i.tipo==='lego' || (i.tipo==='mini' && i.cfg.miniScale!==undefined)));
       var edBtn=editavel ? '<button class="cart-ed" onclick="editarProduto(\''+i.id+'\')">'+_T('cart.edit','editar produto')+'</button>' : '';
+      var rmBtn='<button class="cart-rm" onclick="'+(_agrupa?('_cartRemoverGrupo('+gi+')'):('removerDoCarrinho(\''+i.id+'\')'))+'">'+_T('cart.remove','remover')+'</button>';
+      var ctrl=_agrupa
+        ? '<div class="cart-qtd">'
+            +'<button type="button" aria-label="tirar uma unidade"'+(q<=1?' disabled':'')
+              +' onclick="_cartMenosUm('+gi+')">\u2212</button>'
+            +'<b>'+q+'</b>'
+            +'<button type="button" aria-label="somar uma unidade"'+(q>=_teto?' disabled':'')
+              +' onclick="_cartMaisUm('+gi+')">+</button>'
+          +'</div>'
+        : '';
+      /* o "cada" so aparece com mais de uma unidade: com uma seria repetir o
+         mesmo numero duas vezes */
+      var unit=(q>1)?('<div class="cart-un">'+_brlCart(i.preco)+' cada</div>'):'';
       return '<div class="cart-item">'
         +'<div class="cart-thumb">'+img+'</div>'
         +'<div class="cart-info">'
           +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
-          +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' ÃÂ· ')+'</div>'
+          +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' \u00b7 ')+'</div>'
           +'<div class="cart-foot-row">'
-            +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
-            +'<div class="cart-acts">'+edBtn+'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">'+_T('cart.remove','remover')+'</button></div>'
+            +ctrl
+            +'<div style="text-align:right">'
+              +'<div class="cart-price">'+_brlCart((Number(i.preco)||0)*q)+'</div>'
+              +unit
+            +'</div>'
+          +'</div>'
+          +'<div class="cart-foot-row" style="margin-top:6px;justify-content:flex-end">'
+            +'<div class="cart-acts">'+edBtn+rmBtn+'</div>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -58,7 +90,37 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(foot)foot.style.display='';
     var t=document.getElementById('cartTotal');
     if(t)t.textContent=_brlCart(_cartTotal());
+    _freteSegueOCarrinho(n);
   };
+
+  /* ===== O FRETE TEM DE SEGUIR O CARRINHO ==============================
+     O painel de frete so calculava quando o cliente clicava em "Calcular".
+     Mudou o carrinho depois disso -- e agora mudar e' um clique no "+" --
+     e o valor na tela continuava o do carrinho antigo. Cobrar o frete de
+     uma unidade e mandar duas e' prejuizo silencioso.
+     Entao: mudou a quantidade de itens, com o CEP ja preenchido e o painel
+     aberto, recalcula sozinho. O cliente escolhe a entrega de novo, que e'
+     o certo: o preco mudou. */
+  var _qtdNoUltimoDesenho=null;
+  function _freteSegueOCarrinho(n){
+    try{
+      if(_qtdNoUltimoDesenho===null){ _qtdNoUltimoDesenho=n; return; }
+      if(_qtdNoUltimoDesenho===n) return;
+      _qtdNoUltimoDesenho=n;
+      var cep=document.getElementById('fpCep');
+      var btn=document.getElementById('fpCalcBtn');
+      var opts=document.getElementById('fpFreteOpts');
+      if(!cep||!btn||!opts) return;
+      var v=String(cep.value||'').replace(/[^0-9A-Za-z]/g,'');
+      var min=((window.FP&&FP.region)==='BR')?8:4;
+      if(v.length<min) return;
+      /* so se ja havia uma cotacao na tela: nao calcular frete para quem
+         ainda nem chegou nessa etapa */
+      if(!opts.innerHTML) return;
+      clearTimeout(window._freteSegueT);
+      window._freteSegueT=setTimeout(function(){ try{ btn.click(); }catch(e){} },150);
+    }catch(e){}
+  }
 
   // Resumo: em modo edicao o botao vira "Atualizar pedido"
   var _origBotoes = window._botoesResumo;
