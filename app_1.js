@@ -596,7 +596,7 @@ function renderLegoModels(brand){
   models.forEach(m=>{
     const d=document.createElement('div');
     d.className='mrow';
-    d.innerHTML=`<span>${m.name}</span><span class="mrow-tag">${m.dim} · ${m.scale}</span>`;
+    d.innerHTML=`<span>${m.name}</span><span class="mrow-tag">${m.dim} \u00b7 ${m.scale}</span>`;
     d.onclick=()=>selLegoModel(d,m);
     el.appendChild(d);
   });
@@ -799,7 +799,7 @@ function selLegoModel(row,model){
     if(_mm2&&_mm2[_mk2]) _iMold.src=_mm2[_mk2];
   }
   var hSub=document.getElementById('headerSub');
-  if(hSub)hSub.textContent='Visualizador · '+model.name+' LEGO';
+  if(hSub)hSub.textContent='Visualizador \u00b7 '+model.name+' LEGO';
   document.querySelectorAll('#legoModels .mrow').forEach(r=>r.classList.remove('sel'));
   row.classList.add('sel');
   S.legoModel=model.name;
@@ -1162,7 +1162,7 @@ async function gerarVisualizacaoIA(){
   S.incBrand=brand;
   try{
     var imgUrl=await generateCarImage(brand,model,year,color);
-    var fakeModel={name:color+' '+carName,imgs:[imgUrl],price:null,desc:'VisualizaÃÂ§ÃÂ£o gerada por IA · '+color+' '+carName};
+    var fakeModel={name:color+' '+carName,imgs:[imgUrl],price:null,desc:'VisualizaÃÂ§ÃÂ£o gerada por IA \u00b7 '+color+' '+carName};
     setStyle('aiLoadingState','display','none');
     setStyle('aiGenerateBtn','display','block');
     hideAiPopup();
@@ -4289,7 +4289,7 @@ function _cartMontaItem(){
       id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
       via:'catalogo', tipo:'mini',
       titulo:p.n, sub:(S.incBrand||S.incBrandSel||''),
-      linhas:[p.esc+' · '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
+      linhas:[p.esc+' \u00b7 '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
@@ -4433,6 +4433,99 @@ function _cartToast(nome){
   window._cartToastT=setTimeout(function(){ t.classList.remove('on'); },4200);
 }
 
+/* ===== QUANTIDADE NO CARRINHO =========================================
+   Cada unidade continua sendo um item proprio da lista, com id proprio --
+   e' isso que faz o frete cotar uma caixa para cada uma, o servidor conferir
+   o preco de cada uma no banco e a producao receber uma ficha para cada uma.
+   A tela e' que passa a agrupar o que e' igual. */
+function _cartAssina(i){
+  try{
+    var c=(i&&i.cfg)||{};
+    /* o que define "e' o mesmo produto": o id do banco quando existe; a
+       configuracao inteira quando e' quadro personalizado. A foto e o id da
+       linha ficam de fora de proposito -- dois quadros montados exatamente
+       iguais SAO o mesmo produto para quem esta comprando. */
+    if(c.redoma_id!=null&&c.redoma_id!=='')return 'r'+c.redoma_id;
+    if(c.produto_id!=null&&c.produto_id!=='')return 'p'+c.produto_id;
+    return 'c|'+String((i&&i.titulo)||'')+'|'+String((i&&i.preco)||0)
+          +'|'+JSON.stringify(c);
+  }catch(e){ return 'x'+((i&&i.id)||''); }
+}
+function _cartGrupos(){
+  var ordem=[], mapa={};
+  CART.forEach(function(i){
+    var k=_cartAssina(i);
+    if(!mapa[k]){ mapa[k]={chave:k, item:i, itens:[]}; ordem.push(mapa[k]); }
+    mapa[k].itens.push(i);
+  });
+  return ordem;
+}
+function _cartDoGrupo(gi){
+  var g=_cartGrupos()[gi];
+  return g?g.itens:[];
+}
+/* teto de seguranca: pedido de 30 unidades por engano no celular e' prejuizo
+   de producao, nao venda */
+var _CART_MAX=20;
+function _cartMaisUm(gi){
+  try{
+    var iguais=_cartDoGrupo(gi);
+    if(!iguais.length || iguais.length>=_CART_MAX) return;
+    var base=iguais[iguais.length-1];
+    /* copia rasa de proposito: a configuracao e' compartilhada (ninguem a
+       altera depois de criada) e so o id precisa ser novo */
+    var novo={}; for(var k in base){ if(Object.prototype.hasOwnProperty.call(base,k)) novo[k]=base[k]; }
+    novo.id='it'+Date.now()+Math.random().toString(36).slice(2,7);
+    CART.push(novo);
+    try{
+      _fbEvento('AddToCart',{ content_ids:[_fbIdItem(novo)], content_type:'product',
+        content_name:String(novo.titulo||'').slice(0,120),
+        value:Number(novo.preco)||0, currency:_fbMoeda() });
+    }catch(e){}
+    _cartSave(); _cartRender();
+    if(typeof _cartPulse==='function')_cartPulse();
+    if(typeof _fpFreteCalc==='function')_fpFreteCalc();
+  }catch(e){}
+}
+function _cartMenosUm(gi){
+  try{
+    var iguais=_cartDoGrupo(gi);
+    if(iguais.length<=1) return;               /* o ultimo sai pelo "remover" */
+    var fora=iguais[iguais.length-1].id;
+    CART=CART.filter(function(i){ return i.id!==fora; });
+    _cartSave(); _cartRender();
+    if(typeof _fpFreteCalc==='function')_fpFreteCalc();
+  }catch(e){}
+}
+function _cartRemoverGrupo(gi){
+  try{
+    var fora={};
+    _cartDoGrupo(gi).forEach(function(i){ fora[i.id]=1; });
+    if(!Object.keys(fora).length)return;
+    CART=CART.filter(function(i){ return !fora[i.id]; });
+    _cartSave(); _cartRender();
+    if(typeof _fpFreteCalc==='function')_fpFreteCalc();
+    if(!CART.length && typeof fecharCarrinho==='function')fecharCarrinho();
+  }catch(e){}
+}
+/* o estilo vive aqui, e nao no arquivo de CSS, para esta mudanca tocar UM
+   arquivo so. Entra uma vez e nunca repete. */
+function _cartQtdCss(){
+  if(document.getElementById('fpQtdCss'))return;
+  var st=document.createElement('style');
+  st.id='fpQtdCss';
+  st.textContent=
+    '.cart-qtd{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.14);'+
+      'border-radius:7px;overflow:hidden;height:26px;}'+
+    '.cart-qtd button{width:26px;height:100%;border:none;background:rgba(255,255,255,.04);'+
+      'color:#ccc;font-family:inherit;font-size:14px;line-height:1;cursor:pointer;padding:0;}'+
+    '.cart-qtd button:hover:not([disabled]){background:#e07b00;color:#111;}'+
+    '.cart-qtd button[disabled]{opacity:.28;cursor:default;}'+
+    '.cart-qtd b{min-width:30px;text-align:center;font-size:12.5px;font-weight:700;color:#fff;}'+
+    '.cart-un{font-size:10px;color:#666;margin-top:3px;}';
+  (document.head||document.documentElement).appendChild(st);
+}
+
 function _cartRender(){
   var n=CART.length;
   var c=document.getElementById('cartCount');
@@ -4445,18 +4538,36 @@ function _cartRender(){
     if(foot)foot.style.display='none';
     return;
   }
-  body.innerHTML=CART.map(function(i){
+  _cartQtdCss();
+  body.innerHTML=_cartGrupos().map(function(g,gi){
+    var i=g.item, q=g.itens.length;
     var img=i.thumb
       ? '<img src="'+i.thumb+'" alt="">'
-      : '<div class="ph">'+(i.tipo==='lego'?'Ã°ÂÂ§Â±':'Ã°ÂÂÂÃ¯Â¸Â')+'</div>';
+      : '<div class="ph">'+(i.tipo==='lego'?'\ud83e\uddf1':'\ud83c\udfce\ufe0f')+'</div>';
+    /* os botoes levam a POSICAO do grupo, nao a assinatura dele: a assinatura
+       de um quadro personalizado carrega a configuracao inteira, com aspas e
+       acentos, e nao tem por que isso passear dentro de um atributo HTML */
+    var unit=(q>1)?('<div class="cart-un">'+_brlCart(i.preco)+' cada</div>'):'';
     return '<div class="cart-item">'
       +'<div class="cart-thumb">'+img+'</div>'
       +'<div class="cart-info">'
         +'<div class="cart-nm">'+_esc(i.titulo)+'</div>'
-        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' · ')+'</div>'
+        +'<div class="cart-dt">'+_esc(i.sub)+'<br>'+i.linhas.map(_esc).join(' \u00b7 ')+'</div>'
         +'<div class="cart-foot-row">'
-          +'<div class="cart-price">'+_brlCart(i.preco)+'</div>'
-          +'<button class="cart-rm" onclick="removerDoCarrinho(\''+i.id+'\')">remover</button>'
+          +'<div class="cart-qtd">'
+            +'<button type="button" aria-label="tirar uma unidade"'+(q<=1?' disabled':'')
+              +' onclick="_cartMenosUm('+gi+')">\u2212</button>'
+            +'<b>'+q+'</b>'
+            +'<button type="button" aria-label="somar uma unidade"'+(q>=_CART_MAX?' disabled':'')
+              +' onclick="_cartMaisUm('+gi+')">+</button>'
+          +'</div>'
+          +'<div style="text-align:right">'
+            +'<div class="cart-price">'+_brlCart((Number(i.preco)||0)*q)+'</div>'
+            +unit
+          +'</div>'
+        +'</div>'
+        +'<div class="cart-foot-row" style="margin-top:6px;justify-content:flex-end">'
+          +'<button class="cart-rm" onclick="_cartRemoverGrupo('+gi+')">remover</button>'
         +'</div>'
       +'</div>'
     +'</div>';
@@ -4529,10 +4640,17 @@ function fecharPedidoWpp(){
     if(btn){ btn.disabled=false; btn.textContent='Fechar pedido via WhatsApp'; }
   }
   function _resumoLongo(){
-    var itens=CART.map(function(i,k){
-      return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
-           +'\n   '+i.linhas.join(' \u00b7 ')+'\n   '+_brlCart(i.preco);
-    }).join('\n');
+    /* agrupado igual ao carrinho: a mensagem nao pode dizer uma coisa e a
+       tela outra */
+    var itens=(typeof _cartGrupos==='function'?_cartGrupos():CART.map(function(x){return {item:x,itens:[x]};}))
+      .map(function(g,k){
+        var i=g.item, q=g.itens.length;
+        return (k+1)+') '+i.titulo+(i.sub?' ('+i.sub+')':'')
+             +(q>1?'  ['+q+' unidades]':'')
+             +'\n   '+i.linhas.join(' \u00b7 ')
+             +'\n   '+_brlCart((Number(i.preco)||0)*q)
+             +(q>1?'  ('+_brlCart(i.preco)+' cada)':'');
+      }).join('\n');
     var _frv=_freteEscolhido?Number(_freteEscolhido.price||0):0;
     var _tot=_cartTotal()+_frv;
     return 'Ol\u00e1! Quero fechar meu pedido na Funparts.\n\n*ITENS*\n'+itens+
@@ -5201,7 +5319,7 @@ function _capturaResumo(){
       if(S.uvStripeAccent)out.push({k:'Cor de destaque',v:S.uvStripeAccent});
       if(S.uvColor&&S.uvLayoutType==='deg')out.push({k:'Cor do fundo',v:S.uvColor});
     }
-    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' · '+(S.ledFio==='sem'?'sem fio':'com fio')});
+    if(S.led)out.push({k:'LED',v:(S.ledTipo==='rgb'?'RGB':'Branco quente')+' \u00b7 '+(S.ledFio==='sem'?'sem fio':'com fio')});
     var pil=(document.getElementById('relPilotoNome')||{}).value;
     if(pil&&pil.trim())out.push({k:'Nome do piloto',v:pil.trim()});
     if(S.relTL)out.push({k:'Cor do relevo superior',v:S.relTL});
