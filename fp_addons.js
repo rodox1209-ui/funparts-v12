@@ -3641,15 +3641,26 @@ function _startOb14(){
          preencher. */
       else if(USADAS.test(k))FALTA.push(k);
     });
-    if(out.mini){
-      Object.keys(out.mini).forEach(function(m){
-        var itens=((out.mini[m]||{}).itens)||[];
+    /* PRODUTO PRONTO: quadro de catalogo (out.mini) e redoma (out.redoma)
+       seguem a mesma regra -- o preco em euro do painel entra no lugar do
+       real, e o que nao tem euro nao e' vendido na Europa.
+
+       ISTO ERA ESCRITO SO PARA out.mini. A redoma nasceu depois, numa chave
+       nova, e este bloco nunca soube que ela existia: na Europa ela saia com
+       o preco em REAL e o simbolo do euro (\u20ac 219 no lugar de \u20ac 29).
+       Por isso agora e' UM laco percorrendo as familias, e nao duas copias do
+       mesmo codigo -- a proxima familia entra acrescentando uma palavra. */
+    ['mini','redoma'].forEach(function(fam){
+      var grupo=out[fam];
+      if(!grupo)return;
+      Object.keys(grupo).forEach(function(m){
+        var itens=((grupo[m]||{}).itens)||[];
         var vivos=itens.filter(function(p){ return p&&p.p_eur!=null; });
         vivos.forEach(function(p){ p.p=p.p_eur; });
-        if(vivos.length)out.mini[m].itens=vivos;
-        else delete out.mini[m];
+        if(vivos.length)grupo[m].itens=vivos;
+        else delete grupo[m];
       });
-    }
+    });
     return out;
   }
 
