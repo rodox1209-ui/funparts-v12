@@ -985,10 +985,12 @@ window._priceFix={ran:true};
   function _freteItens(){
     return (window.CART||[]).map(function(i){
       var rid=(i.cfg&&i.cfg.redoma_id)||null;
+      var sm=(i.cfg&&i.cfg.redoma_sm)||null;
       var o={dim:_freteDim(i),qty:1};
-      if(rid)o.redoma_id=rid;
+      if(sm&&sm.l)o.redoma_sm={l:sm.l,p:sm.p,a:sm.a};   /* caixa pela regra, no servidor */
+      else if(rid)o.redoma_id=rid;
       return o;
-    }).filter(function(x){ return x.dim||x.redoma_id; });
+    }).filter(function(x){ return x.dim||x.redoma_id||x.redoma_sm; });
   }
   function atualizaFreteLabels(){
     var t=FP.t,e;
@@ -3215,9 +3217,42 @@ function _startOb14(){
     {pt:"Finalizar e pagar \u2192",en:"Checkout \u2192",es:"Finalizar y pagar \u2192",fr:"Finaliser et payer \u2192"},
     {pt:"\u2190 Voltar",en:"\u2190 Back",es:"\u2190 Volver",fr:"\u2190 Retour"},
     {pt:"\u2190 Voltar aos itens",en:"\u2190 Back to items",es:"\u2190 Volver a los art\u00edculos",fr:"\u2190 Retour aux articles"},
-    {pt:"\u2190 Editar configura\u00e7\u00e3o",en:"\u2190 Edit configuration",es:"\u2190 Editar configuraci\u00f3n",fr:"\u2190 Modifier la configuration"}
+    {pt:"\u2190 Editar configura\u00e7\u00e3o",en:"\u2190 Edit configuration",es:"\u2190 Editar configuraci\u00f3n",fr:"\u2190 Modifier la configuration"},
+    /* redoma sob medida (22/09/2026) */
+    {pt:"Como voc\u00ea quer sua redoma?",en:"How would you like your display case?",es:"\u00bfC\u00f3mo quieres tu vitrina?",fr:"Comment voulez-vous votre vitrine ?"},
+    {pt:"Redoma pronta",en:"Ready-made case",es:"Vitrina lista",fr:"Vitrine pr\u00eate"},
+    {pt:"Modelos da linha, prontos para o seu item",en:"Models from our range, ready for your piece",es:"Modelos de la l\u00ednea, listos para tu pieza",fr:"Mod\u00e8les de la gamme, pr\u00eats pour votre pi\u00e8ce"},
+    {pt:"Personalize",en:"Customize",es:"Personaliza",fr:"Personnalisez"},
+    {pt:"Sob medida",en:"Made to measure",es:"A medida",fr:"Sur mesure"},
+    {pt:"Voc\u00ea informa a medida, o pre\u00e7o sai na hora",en:"You enter the size, the price appears instantly",es:"T\u00fa indicas la medida, el precio sale al instante",fr:"Vous indiquez la mesure, le prix s\u2019affiche aussit\u00f4t"},
+    {pt:"Qual a medida da sua redoma?",en:"What size is your display case?",es:"\u00bfQu\u00e9 medida tiene tu vitrina?",fr:"Quelle est la mesure de votre vitrine ?"},
+    {pt:"Largura",en:"Width",es:"Ancho",fr:"Largeur"},
+    {pt:"Profundidade",en:"Depth",es:"Profundidad",fr:"Profondeur"},
+    {pt:"Altura",en:"Height",es:"Altura",fr:"Hauteur"},
+    {pt:"Medidas internas do v\u00e3o.",en:"Inside clearance dimensions.",es:"Medidas internas del hueco.",fr:"Dimensions int\u00e9rieures utiles."},
+    {pt:"De",en:"From",es:"De",fr:"De"},
+    {pt:"a",en:"to",es:"a",fr:"\u00e0"},
+    {pt:"cm por lado.",en:"cm per side.",es:"cm por lado.",fr:"cm par c\u00f4t\u00e9."},
+    {pt:"Fora do limite:",en:"Out of range:",es:"Fuera del l\u00edmite:",fr:"Hors limite :"},
+    {pt:"de",en:"from",es:"de",fr:"de"},
+    {pt:"Use cent\u00edmetros inteiros.",en:"Use whole centimetres.",es:"Usa cent\u00edmetros enteros.",fr:"Utilisez des centim\u00e8tres entiers."},
+    {pt:"Sob medida ainda n\u00e3o dispon\u00edvel nesta regi\u00e3o.",en:"Made to measure is not available in this region yet.",es:"A medida a\u00fan no disponible en esta regi\u00f3n.",fr:"Le sur mesure n\u2019est pas encore disponible dans cette r\u00e9gion."},
+    {pt:"N\u00e3o consegui calcular agora. Tente de novo.",en:"Could not calculate right now. Please try again.",es:"No pude calcular ahora. Int\u00e9ntalo de nuevo.",fr:"Calcul impossible pour le moment. R\u00e9essayez."},
+    {pt:"Calculando\u2026",en:"Calculating\u2026",es:"Calculando\u2026",fr:"Calcul en cours\u2026"},
+    {pt:"Sua redoma",en:"Your display case",es:"Tu vitrina",fr:"Votre vitrine"},
+    {pt:"Acr\u00edlico cristal 3 mm",en:"3 mm clear acrylic",es:"Acr\u00edlico cristal de 3 mm",fr:"Acrylique cristal 3 mm"},
+    {pt:"Base em dois n\u00edveis (black piano + 5 mm)",en:"Two-level base (piano black + 5 mm)",es:"Base de dos niveles (negro piano + 5 mm)",fr:"Socle \u00e0 deux niveaux (noir piano + 5 mm)"},
+    {pt:"Caixa de envio",en:"Shipping box",es:"Caja de env\u00edo",fr:"Carton d\u2019exp\u00e9dition"},
+    {pt:"Produzida sob medida \u00b7 7 dias \u00fateis",en:"Made to order \u00b7 7 business days",es:"Fabricada a medida \u00b7 7 d\u00edas h\u00e1biles",fr:"Fabriqu\u00e9e sur mesure \u00b7 7 jours ouvr\u00e9s"},
+    {pt:"Continuar \u2192",en:"Continue \u2192",es:"Continuar \u2192",fr:"Continuer \u2192"},
+    {pt:"Redomas que j\u00e1 fizemos",en:"Cases we have made",es:"Vitrinas que ya hicimos",fr:"Vitrines d\u00e9j\u00e0 r\u00e9alis\u00e9es"},
+    {pt:"Prontas ou sob medida \u2014 escolha e veja o pre\u00e7o na hora",en:"Ready-made or made to measure \u2014 choose and see the price instantly",es:"Listas o a medida \u2014 elige y ve el precio al instante",fr:"Pr\u00eates ou sur mesure \u2014 choisissez et voyez le prix aussit\u00f4t"},
+    {pt:"Produtos prontos \u2014 escolha a linha e depois o modelo",en:"Ready-made products \u2014 choose the range, then the model",es:"Productos listos \u2014 elige la l\u00ednea y luego el modelo",fr:"Produits pr\u00eats \u2014 choisissez la gamme puis le mod\u00e8le"},
+    {pt:"Displays / Redomas de Acr\u00edlico",en:"Acrylic Display Cases",es:"Vitrinas de acr\u00edlico",fr:"Vitrines en acrylique"},
+    {pt:"Redoma / Display",en:"Display case",es:"Vitrina",fr:"Vitrine"}
   ];
   var PEDACOS=[
+    {pt:"Redoma sob medida ",en:"Made-to-measure case ",es:"Vitrina a medida ",fr:"Vitrine sur mesure "},
     {pt:"Visualizador \u00b7 ",en:"Viewer \u00b7 ",es:"Visualizador \u00b7 ",fr:"Visualiseur \u00b7 "},
     {pt:"\" adicionado",en:"\" added",es:"\" a\u00f1adido",fr:"\" ajout\u00e9"}
   ];
@@ -3749,7 +3784,10 @@ function _startOb14(){
     try{
       if(window.FP&&typeof FP.setRegion==='function'){
         var o=FP.setRegion;
-        FP.setRegion=function(){ var r=o.apply(this,arguments); setTimeout(reaplica,40); return r; };
+        FP.setRegion=function(){ var r=o.apply(this,arguments); setTimeout(reaplica,40);
+          /* redoma sob medida: o preco e' perguntado de novo, na moeda nova */
+          try{ if(typeof _smRegiaoMudou==='function')setTimeout(_smRegiaoMudou,80); }catch(e){}
+          return r; };
       }
       if(window.FP&&typeof FP.setLang==='function'){
         var o2=FP.setLang;

@@ -522,7 +522,8 @@ function selectTipo(t){
     setStyle('step1Title','display','');
     setStyle('step1Sub','display','');
     setEl('step1Title','Displays / Redomas de Acr\u00edlico');
-    setEl('step1Sub','Produtos prontos \u2014 escolha a linha e depois o modelo');
+    setEl('step1Sub',(typeof _smSubtitulo==='function')?_smSubtitulo():'Produtos prontos \u2014 escolha a linha e depois o modelo');
+    S.smModo='pronta';   /* entrar na tela das redomas comeca nas prontas, como hoje */
     setEl('pvCat','Redoma / Display');
     var _t2r=document.getElementById('tabStep2'); if(_t2r)_t2r.style.display='none';
     var _smiR=document.getElementById('sidebarMiniInfo'); if(_smiR)_smiR.style.display='none';
@@ -722,6 +723,7 @@ function _fbIdItem(it){
     /* 'r' e 'p' porque redoma e quadro de catalogo sao DUAS tabelas, cada uma
        com a sua contagem: existe redoma 1 e existe quadro 1, e sem a letra os
        dois virariam o mesmo produto para a Meta. */
+    if(c.redoma_sm&&c.redoma_sm.l)return 'rsm|'+c.redoma_sm.l+'x'+c.redoma_sm.p+'x'+c.redoma_sm.a;
     if(c.redoma_id!=null&&c.redoma_id!=='')return 'r'+c.redoma_id;
     if(c.produto_id!=null&&c.produto_id!=='')return 'p'+c.produto_id;
     return String((it&&it.tipo)||'item')+'|'+String((it&&it.titulo)||'');
@@ -3365,6 +3367,7 @@ function _aplicaCatalogoBanco(c){
   try{
     Object.keys(REDOMA_CATALOG).forEach(function(k){ delete REDOMA_CATALOG[k]; });
     if(c.redoma) Object.keys(c.redoma).forEach(function(k){ REDOMA_CATALOG[k]=c.redoma[k]; });
+    REDOMA_SM=c.redoma_sm||null;
     _mostraCardRedoma();
     var _ibR=document.getElementById('inclusoBrands');
     if(_ehRedoma() && _ibR) renderInclusoBrands();
@@ -3511,7 +3514,7 @@ function _ehRedoma(){ return typeof S!=='undefined' && !!S.ehRedoma; }
 function _catFonte(){ return _ehRedoma()?REDOMA_CATALOG:INCLUSO_CATALOG; }
 /* ha redoma para vender? categoria vazia ja nao chega aqui (o servidor corta) */
 function _temRedoma(){
-  try{ return Object.keys(REDOMA_CATALOG).length>0; }catch(e){ return false; }
+  try{ return Object.keys(REDOMA_CATALOG).length>0 || (typeof _smDisponivel==='function'&&_smDisponivel()); }catch(e){ return false; }
 }
 /* o card do passo 1 so aparece quando ha o que vender -- prateleira vazia
    espanta mais do que categoria que ainda nao existe */
@@ -3530,6 +3533,8 @@ function renderInclusoBrands(){
   });
   el.innerHTML=h;
   var w=document.getElementById('inclusoModelsWrap'); if(w)w.style.display='none';
+  /* redoma: os cartoes "Redoma pronta / Personalize" acima da grade */
+  try{ if(typeof _smEscolha==='function')_smEscolha(el); }catch(e){}
 }
 
 function selInclusoBrand(b){
@@ -3603,6 +3608,11 @@ function selInclusoProduto(i){
   i=parseInt(i,10);
   var b=S.incBrandSel, it=(((_catFonte()[b]||{}).itens)||[])[i];
   if(!it)return;
+  _abreProdutoIncluso(it,b,i);
+}
+/* a ficha do produto pronto -- quadro de catalogo, redoma pronta e, agora, a
+   redoma sob medida (que chega aqui montada pelo formulario, sem indice) */
+function _abreProdutoIncluso(it,b,i){
   S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
   /* vale para quadro de catalogo E para redoma: os dois passam por aqui --
      por isso a letra, que e' o que separa as duas tabelas */
@@ -4277,7 +4287,7 @@ function _cartMontaItem(){
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:null,
       resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
-      cfg:{ redoma_id:r.id, categoria:(S.incBrand||S.incBrandSel||''),
+      cfg:{ redoma_id:r.id, redoma_sm:(r.sm||null), categoria:(S.incBrand||S.incBrandSel||''),
             produto:r.n, medida:_med, larg:r.larg, prof:r.prof, alt:r.alt,
             preco:r.p }
     };
@@ -4445,6 +4455,7 @@ function _cartAssina(i){
        configuracao inteira quando e' quadro personalizado. A foto e o id da
        linha ficam de fora de proposito -- dois quadros montados exatamente
        iguais SAO o mesmo produto para quem esta comprando. */
+    if(c.redoma_sm&&c.redoma_sm.l)return 'rsm|'+c.redoma_sm.l+'x'+c.redoma_sm.p+'x'+c.redoma_sm.a;
     if(c.redoma_id!=null&&c.redoma_id!=='')return 'r'+c.redoma_id;
     if(c.produto_id!=null&&c.produto_id!=='')return 'p'+c.produto_id;
     return 'c|'+String((i&&i.titulo)||'')+'|'+String((i&&i.preco)||0)
@@ -4990,6 +5001,8 @@ function _fpFreteCalc(){
     /* redoma: o servidor busca a caixa no banco pelo id. A medida sozinha nao
        serve -- a tabela de caixas do servidor e' de quadro. */
     var rid=(i.cfg&&i.cfg.redoma_id)||null;
+    var sm=(i.cfg&&i.cfg.redoma_sm)||null;
+    if(sm&&sm.l)return {dim:dim,qty:1,redoma_sm:{l:sm.l,p:sm.p,a:sm.a}};
     return rid?{dim:dim,qty:1,redoma_id:rid}:{dim:dim,qty:1};
   });
   fetch(API_FUNPARTS+'/frete',{
@@ -5791,3 +5804,408 @@ function _rascEnvia(){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(liga,60);});
   else setTimeout(liga,60);
 })();
+
+
+/* =============== REDOMA SOB MEDIDA ===============
+   O cliente escolhe "Personalize" na tela das redomas, digita largura x
+   profundidade x altura (medida interna do vao, em cm), e o preco aparece na
+   hora. QUEM CALCULA E' O SERVIDOR: a cada medida valida o site pergunta ao
+   /redoma-preco e mostra o que ele responder. Nenhum preco de chapa, nenhuma
+   margem, nenhuma formula mora aqui -- e o numero mostrado e' exatamente o
+   que o servidor vai cobrar no pedido (ele recalcula la, pela medida).
+
+   De onde vem o que aparece:
+     . se o Personalize existe, e os limites (8 a 60 cm): do /catalogo
+       (redoma_sm), que o painel controla
+     . o preco e a caixa de envio: do /redoma-preco, a cada medida
+     . as fotos do carrossel: as mesmas do carrossel "Redomas" do painel
+       (chaves galred_N), que ja vestem a tela das redomas
+     . o desenho em escala: feito aqui, em SVG, a partir da medida
+
+   A redoma sob medida depois segue a MESMA estrada da redoma pronta: vira
+   S.incProduto, abre a ficha do produto, entra no carrinho com cfg.redoma_sm,
+   e o frete e o servidor a reconhecem por esse campo. */
+var REDOMA_SM=null;
+var _SM={ultimo:null,timer:null,pedido:0,gal:{i:0,n:0,timer:null,ligado:false}};
+
+function _smRegiao(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
+function _smMoeda(){ return _smRegiao()==='EU'?'EUR':'BRL'; }
+/* existe Personalize para esta regiao? (Europa so com os numeros em euro) */
+function _smDisponivel(){
+  try{
+    if(!REDOMA_SM||!REDOMA_SM.ativo) return false;
+    return _smRegiao()==='EU' ? !!REDOMA_SM.eur : !!REDOMA_SM.brl;
+  }catch(e){ return false; }
+}
+function _smSubtitulo(){
+  return _smDisponivel()
+    ? 'Prontas ou sob medida \u2014 escolha e veja o pre\u00e7o na hora'
+    : 'Produtos prontos \u2014 escolha a linha e depois o modelo';
+}
+function _smLim(){
+  var mn=(REDOMA_SM&&Number(REDOMA_SM.min)>0)?Number(REDOMA_SM.min):8;
+  var mx=(REDOMA_SM&&Number(REDOMA_SM.max)>0)?Number(REDOMA_SM.max):60;
+  return {min:mn,max:mx};
+}
+
+/* ---- os dois cartoes, acima da grade de linhas ---- */
+function _smEscolha(grid){
+  var sec=document.getElementById('miniInclusoAISection'); if(!sec||!grid) return;
+  var box=document.getElementById('smEscolha');
+  var ehR=false; try{ ehR=_ehRedoma(); }catch(e){}
+  if(!ehR||!_smDisponivel()){
+    /* sem Personalize nesta regiao: a tela volta a ser exatamente a de hoje,
+       inclusive se o cliente estava no formulario quando trocou de regiao */
+    if(box)box.style.display='none';
+    _smMostra(false);
+    if(S.incProduto&&S.incProduto.sm){ S.incProduto=null; try{ calcPrice(); }catch(e){} }
+    S.smModo='pronta';
+    var rot0=sec.querySelector(':scope > .sec-sub'); if(rot0)rot0.style.display='';
+    grid.style.display='';
+    return;
+  }
+  if(!box){
+    _smCss();
+    box=document.createElement('div'); box.id='smEscolha';
+    box.innerHTML=
+      '<div class="sec-sub" style="margin-bottom:8px;">Como voc\u00ea quer sua redoma?</div>'
+      +'<div class="sm-cards">'
+        +'<div class="sm-card" id="smCardPronta" onclick="_smModo(\'pronta\')">'
+          +'<div class="ic">\ud83c\udfc1</div><div class="tt">Redoma pronta</div>'
+          +'<div class="sb">Modelos da linha, prontos para o seu item</div></div>'
+        +'<div class="sm-card" id="smCardSm" onclick="_smModo(\'sm\')">'
+          +'<span class="tag">Sob medida</span>'
+          +'<div class="ic">\ud83d\udcd0</div><div class="tt">Personalize</div>'
+          +'<div class="sb">Voc\u00ea informa a medida, o pre\u00e7o sai na hora</div></div>'
+      +'</div>';
+    sec.insertBefore(box,grid);
+  }
+  box.style.display='';
+  if(!S.smModo) S.smModo='pronta';
+  _smModo(S.smModo,true);
+}
+function _smModo(m,silencioso){
+  S.smModo=(m==='sm')?'sm':'pronta';
+  var a=document.getElementById('smCardPronta'), b=document.getElementById('smCardSm');
+  if(a)a.classList.toggle('sel',S.smModo==='pronta');
+  if(b)b.classList.toggle('sel',S.smModo==='sm');
+  var sec=document.getElementById('miniInclusoAISection');
+  var rot=sec?sec.querySelector(':scope > .sec-sub'):null;   /* "Escolha a linha" */
+  var grid=document.getElementById('inclusoBrands');
+  var wrap=document.getElementById('inclusoModelsWrap');
+  if(S.smModo==='sm'){
+    if(rot)rot.style.display='none';
+    if(grid)grid.style.display='none';
+    if(wrap)wrap.style.display='none';
+    _smMostra(true);
+    if(!silencioso){
+      var l=document.getElementById('smL');
+      if(l){ try{ l.focus({preventScroll:true}); }catch(e){} }
+    }
+  }else{
+    if(rot)rot.style.display='';
+    if(grid)grid.style.display='';
+    _smMostra(false);
+    /* saiu do sob medida com uma redoma sob medida escolhida: solta */
+    if(S.incProduto&&S.incProduto.sm){ S.incProduto=null; try{ calcPrice(); }catch(e){} }
+  }
+}
+
+/* ---- o formulario ---- */
+function _smMostra(on){
+  var f=document.getElementById('smForm');
+  if(!on){ if(f)f.style.display='none'; _smGalPara(); return; }
+  if(!f){
+    var sec=document.getElementById('miniInclusoAISection');
+    var grid=document.getElementById('inclusoBrands');
+    if(!sec||!grid) return;
+    f=document.createElement('div'); f.id='smForm'; f.className='sm-form';
+    var L=_smLim();
+    f.innerHTML=
+      '<div class="h">Qual a medida da sua redoma?</div>'
+      +'<div class="sm-fields">'
+        +_smCampo('smL','Largura')+_smCampo('smP','Profundidade')+_smCampo('smA','Altura')
+      +'</div>'
+      +'<div class="sm-hint"><span>Medidas internas do v\u00e3o.</span> <span>De</span> <b id="smMin">'+L.min+'</b> <span>a</span> <b id="smMax">'+L.max+'</b> <span>cm por lado.</span></div>'
+      +'<div class="sm-msg" id="smMsg" style="display:none"></div>'
+      +'<div class="sm-preview" id="smPrev" style="display:none"></div>'
+      +'<div id="smGal" style="display:none"></div>'
+      +'<div class="sm-price" id="smPrecoBox" style="display:none">'
+        +'<div class="l">Sua redoma</div><div class="v" id="smPreco"></div></div>'
+      +'<div class="sm-specs" id="smSpecs" style="display:none">'
+        +'<div>Acr\u00edlico cristal 3 mm</div>'
+        +'<div>Base em dois n\u00edveis (black piano + 5 mm)</div>'
+        +'<div><span><span>Caixa de envio</span> <span id="smCaixa"></span></span></div>'
+        +'<div>Produzida sob medida \u00b7 7 dias \u00fateis</div>'
+      +'</div>'
+      +'<button type="button" class="sm-btn" id="smBtn" onclick="_smConfirma()" disabled>Continuar \u2192</button>';
+    sec.insertBefore(f,grid.nextSibling);
+    ['smL','smP','smA'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){ el.addEventListener('input',_smInput); el.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); _smConfirma(); } }); }
+    });
+  }
+  f.style.display='';
+  _smGaleria();
+  _smInput();
+}
+function _smCampo(id,rot){
+  var L=_smLim();
+  return '<div class="sm-f"><label for="'+id+'">'+rot+'</label>'
+    +'<div class="in"><input id="'+id+'" type="number" inputmode="numeric" min="'+L.min+'" max="'+L.max+'" step="1" placeholder="\u2013"><span>cm</span></div></div>';
+}
+function _smLe(){
+  var g=function(id){ var e=document.getElementById(id); var v=e?String(e.value||'').trim():''; return v===''?null:Number(v); };
+  return {l:g('smL'),p:g('smP'),a:g('smA')};
+}
+/* valido = tres inteiros dentro do limite. Devolve null se ainda nao da */
+function _smValida(m){
+  var L=_smLim();
+  var v=[m.l,m.p,m.a];
+  if(v.some(function(x){ return x==null||!isFinite(x); })) return {ok:false,vazio:true};
+  if(v.some(function(x){ return x<L.min||x>L.max; })) return {ok:false,motivo:'limite'};
+  if(v.some(function(x){ return Math.round(x)!==x; })) return {ok:false,motivo:'inteiro'};
+  return {ok:true};
+}
+function _smInput(){
+  var m=_smLe(), v=_smValida(m);
+  var prev=document.getElementById('smPrev'), msg=document.getElementById('smMsg');
+  var box=document.getElementById('smPrecoBox'), specs=document.getElementById('smSpecs'), btn=document.getElementById('smBtn');
+  _SM.ultimo=null;
+  if(btn)btn.disabled=true;
+  clearTimeout(_SM.timer);
+  if(!v.ok){
+    if(prev)prev.style.display='none';
+    if(box)box.style.display='none';
+    if(specs)specs.style.display='none';
+    if(msg){
+      if(v.vazio){ msg.style.display='none'; }
+      else{ msg.style.display=''; msg.innerHTML=_smMsgTexto(v.motivo); }
+    }
+    return;
+  }
+  if(msg)msg.style.display='none';
+  if(prev){ prev.style.display=''; prev.innerHTML=_smIso(m.l,m.p,m.a,340,230); }
+  if(box){ box.style.display=''; var p=document.getElementById('smPreco'); if(p)p.innerHTML='<span class="calc">Calculando\u2026</span>'; }
+  _SM.timer=setTimeout(_smConsulta,350);
+}
+function _smMsgTexto(motivo){
+  var L=_smLim();
+  if(motivo==='limite') return '<span>Fora do limite:</span> <span>de</span> '+L.min+' <span>a</span> '+L.max+' <span>cm por lado.</span>';
+  if(motivo==='inteiro') return '<span>Use cent\u00edmetros inteiros.</span>';
+  if(motivo==='sem_parametros') return '<span>Sob medida ainda n\u00e3o dispon\u00edvel nesta regi\u00e3o.</span>';
+  return '<span>N\u00e3o consegui calcular agora. Tente de novo.</span>';
+}
+function _smConsulta(){
+  var m=_smLe(), v=_smValida(m);
+  if(!v.ok) return;
+  var meu=++_SM.pedido, moeda=_smMoeda();
+  var u=API_FUNPARTS+'/redoma-preco?l='+m.l+'&p='+m.p+'&a='+m.a+'&moeda='+moeda;
+  fetch(u,{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+    if(meu!==_SM.pedido) return;                 /* o cliente ja digitou outra medida */
+    var box=document.getElementById('smPrecoBox'), specs=document.getElementById('smSpecs');
+    var btn=document.getElementById('smBtn'), msg=document.getElementById('smMsg'), p=document.getElementById('smPreco');
+    if(!d||!d.ok){
+      _SM.ultimo=null;
+      if(box)box.style.display='none';
+      if(specs)specs.style.display='none';
+      if(msg){ msg.style.display=''; msg.innerHTML=_smMsgTexto(d&&d.motivo); }
+      return;
+    }
+    _SM.ultimo={l:m.l,p:m.p,a:m.a,preco:Number(d.preco),caixa:d.caixa||null,moeda:d.moeda||moeda};
+    if(p)p.textContent=_brl(_SM.ultimo.preco);
+    if(box)box.style.display='';
+    var cx=document.getElementById('smCaixa');
+    if(cx&&d.caixa)cx.textContent=_smFmt(d.caixa.w)+' \u00d7 '+_smFmt(d.caixa.l)+' \u00d7 '+_smFmt(d.caixa.h)+' cm';
+    if(specs)specs.style.display='';
+    if(btn)btn.disabled=false;
+  }).catch(function(){
+    if(meu!==_SM.pedido) return;
+    var msg=document.getElementById('smMsg');
+    if(msg){ msg.style.display=''; msg.innerHTML=_smMsgTexto('erro'); }
+  });
+}
+function _smFmt(n){ n=Number(n)||0; return (Math.round(n*10)/10).toString().replace('.',','); }
+function _smMedidaTxt(m){ return m.l+' \u00d7 '+m.p+' \u00d7 '+m.a+' cm'; }
+
+/* ---- a redoma sob medida vira produto e segue a estrada da pronta ---- */
+function _smConfirma(){
+  var m=_smLe(), u=_SM.ultimo;
+  if(!u||u.l!==m.l||u.p!==m.p||u.a!==m.a){ _smInput(); return; }
+  var fotos=[_smIsoUrl(u.l,u.p,u.a)];
+  try{ _galMiniLista(_GAL_RED_PREFIXO).forEach(function(f){ fotos.push(f.url); }); }catch(e){}
+  var it={
+    id:null, sm:{l:u.l,p:u.p,a:u.a},
+    n:'Redoma sob medida '+_smMedidaTxt(u), desc:'',
+    larg:u.l, prof:u.p, alt:u.a,
+    p:u.preco, p_eur:(u.moeda==='EUR'?u.preco:null),
+    cx:u.caixa, fotos:fotos
+  };
+  S.incBrandSel='Sob medida';
+  _abreProdutoIncluso(it,'Sob medida',-1);
+}
+/* mudou a regiao com o formulario aberto ou com uma sob medida escolhida:
+   o preco tem de ser perguntado de novo, na moeda nova */
+function _smRegiaoMudou(){
+  try{
+    var f=document.getElementById('smForm');
+    if(f&&f.style.display!=='none'){ _smInput(); }
+    var box=document.getElementById('smEscolha');
+    if(box){ var grid=document.getElementById('inclusoBrands'); if(grid)_smEscolha(grid); }
+    var it=S.incProduto;
+    if(it&&it.sm){
+      var moeda=_smMoeda();
+      fetch(API_FUNPARTS+'/redoma-preco?l='+it.sm.l+'&p='+it.sm.p+'&a='+it.sm.a+'&moeda='+moeda,{cache:'no-store'})
+        .then(function(r){ return r.json(); }).then(function(d){
+          if(!S.incProduto||S.incProduto!==it) return;
+          if(d&&d.ok){ it.p=Number(d.preco); it.p_eur=(d.moeda==='EUR'?it.p:null); }
+          else { S.incProduto=null; S.smModo='sm'; }
+          try{ calcPrice(); }catch(e){}
+        }).catch(function(){});
+    }
+  }catch(e){}
+}
+
+/* ---- o carrossel com as fotos reais, embaixo do desenho ---- */
+function _smGaleria(){
+  var gal=document.getElementById('smGal'); if(!gal) return;
+  var fotos=[]; try{ fotos=_galMiniLista(_GAL_RED_PREFIXO); }catch(e){}
+  if(!fotos.length){ gal.style.display='none'; gal.innerHTML=''; _smGalPara(); return; }
+  var assin=fotos.map(function(f){ return f.url; }).join('~');
+  if(gal.getAttribute('data-gal')===assin){ gal.style.display=''; _smGalAnda(); return; }
+  gal.setAttribute('data-gal',assin);
+  var h='<div class="sm-gal-rot">Redomas que j\u00e1 fizemos</div>'
+    +'<div class="fp-car sm-car" id="smCar"><div class="fp-track" id="smTrack">';
+  for(var k=0;k<fotos.length;k++){
+    h+='<div class="fp-slide"><img src="'+_galMiniEsc(fotos[k].url)+'" alt="'+_galMiniEsc(fotos[k].legenda)+'" loading="lazy" draggable="false"></div>';
+  }
+  h+='</div><div class="fp-dots" id="smDots" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.9));"></div></div>';
+  gal.innerHTML=h; gal.style.display='';
+  _SM.gal.n=fotos.length; _SM.gal.i=0;
+  var ds=document.getElementById('smDots');
+  if(ds){
+    ds.innerHTML='';
+    if(_SM.gal.n<2) ds.style.display='none';
+    else for(var q=0;q<_SM.gal.n;q++){
+      var b=document.createElement('button'); b.type='button'; b.className='fp-dot'+(q===0?' on':'');
+      b.setAttribute('data-i',q); b.setAttribute('aria-label','Foto '+(q+1));
+      b.onclick=function(e){ _smGalIr(+e.currentTarget.getAttribute('data-i')); _smGalPara(); _smGalAnda(); };
+      ds.appendChild(b);
+    }
+  }
+  if(!_SM.gal.ligado){
+    _SM.gal.ligado=true;
+    var x0=0,dx=0,arr=false;
+    function dentro(ev){ var c=document.getElementById('smCar'); return !!(c&&ev.target&&c.contains(ev.target)); }
+    function ini(x){ x0=x; dx=0; arr=true; _smGalPara(); var t=document.getElementById('smTrack'); if(t)t.className='fp-track fp-drag'; }
+    function mov(x){ if(!arr) return; dx=x-x0; var t=document.getElementById('smTrack'); if(t)t.style.transform='translateX(calc('+(-_SM.gal.i*100)+'% + '+dx+'px))'; }
+    function fim(){ if(!arr) return; arr=false; var t=document.getElementById('smTrack'); if(t)t.className='fp-track';
+      var c=document.getElementById('smCar'); var lim=(c?c.clientWidth:300)*0.18;
+      if(dx<-lim)_smGalIr(_SM.gal.i+1); else if(dx>lim)_smGalIr(_SM.gal.i-1); else _smGalIr(_SM.gal.i);
+      _smGalAnda(); }
+    document.addEventListener('touchstart',function(e){ if(dentro(e))ini(e.touches[0].clientX); },{passive:true});
+    document.addEventListener('touchmove',function(e){ if(arr)mov(e.touches[0].clientX); },{passive:true});
+    document.addEventListener('touchend',fim);
+    document.addEventListener('mousedown',function(e){ if(dentro(e)){ e.preventDefault(); ini(e.clientX); } });
+    window.addEventListener('mousemove',function(e){ if(arr)mov(e.clientX); });
+    window.addEventListener('mouseup',fim);
+  }
+  _smGalIr(0); _smGalAnda();
+}
+function _smGalIr(k){
+  var tr=document.getElementById('smTrack'); if(!tr||!_SM.gal.n) return;
+  _SM.gal.i=((k%_SM.gal.n)+_SM.gal.n)%_SM.gal.n;
+  tr.style.transform='translateX('+(-_SM.gal.i*100)+'%)';
+  var ds=document.getElementById('smDots');
+  if(ds) for(var j=0;j<ds.children.length;j++) ds.children[j].className='fp-dot'+(j===_SM.gal.i?' on':'');
+}
+function _smGalPara(){ if(_SM.gal.timer){ clearInterval(_SM.gal.timer); _SM.gal.timer=null; } }
+function _smGalAnda(){
+  var red=false; try{ red=window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  if(!_SM.gal.timer&&!red&&_SM.gal.n>1) _SM.gal.timer=setInterval(function(){ _smGalIr(_SM.gal.i+1); },5000);
+}
+
+/* ---- o desenho em escala ---- */
+function _smIso(L,P,A,w,h){
+  L=Number(L)||1; P=Number(P)||1; A=Number(A)||1;
+  var s=Math.min(w*0.62/(L+P), h*0.78/(A+(L+P)*0.28));
+  var cx=w/2, cy=h*0.9;
+  function p(x,y,z){ return [cx+(x-y)*0.866*s, cy-(x+y)*0.5*s-z*s]; }
+  function poly(pts,fill,stroke){ return '<polygon points="'+pts.map(function(q){ return q[0].toFixed(1)+','+q[1].toFixed(1); }).join(' ')+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2"/>'; }
+  var b=1.5, t=0.9, out='';
+  out+=poly([p(-b,-b,-t*2),p(L+b,-b,-t*2),p(L+b,P+b,-t*2),p(-b,P+b,-t*2)],'#0e0e0e','#3a3a3a');
+  out+=poly([p(-b,-b,-t*2),p(L+b,-b,-t*2),p(L+b,-b,-t),p(-b,-b,-t)],'#161616','#3a3a3a');
+  out+=poly([p(L+b,-b,-t*2),p(L+b,P+b,-t*2),p(L+b,P+b,-t),p(L+b,-b,-t)],'#111','#3a3a3a');
+  out+=poly([p(-b,-b,-t),p(L+b,-b,-t),p(L+b,P+b,-t),p(-b,P+b,-t)],'#1a1a1a','#3a3a3a');
+  out+=poly([p(0,0,-t),p(L,0,-t),p(L,P,-t),p(0,P,-t)],'#0a0a0a','#444');
+  out+=poly([p(0,0,0),p(L,0,0),p(L,P,0),p(0,P,0)],'#050505','#555');
+  var g='rgba(120,190,230,';
+  out+=poly([p(0,P,0),p(L,P,0),p(L,P,A),p(0,P,A)],g+'0.06)',g+'0.35)');
+  out+=poly([p(L,0,0),p(L,P,0),p(L,P,A),p(L,0,A)],g+'0.06)',g+'0.35)');
+  out+=poly([p(0,0,A),p(L,0,A),p(L,P,A),p(0,P,A)],g+'0.22)',g+'0.85)');
+  out+=poly([p(0,0,0),p(0,P,0),p(0,P,A),p(0,0,A)],g+'0.12)',g+'0.85)');
+  out+=poly([p(0,0,0),p(L,0,0),p(L,0,A),p(0,0,A)],g+'0.16)',g+'0.85)');
+  var r1=p(L*0.06,0,A*0.9), r2=p(L*0.06,0,A*0.25);
+  out+='<line x1="'+r1[0].toFixed(1)+'" y1="'+r1[1].toFixed(1)+'" x2="'+r2[0].toFixed(1)+'" y2="'+r2[1].toFixed(1)+'" stroke="rgba(255,255,255,.28)" stroke-width="1.6" stroke-linecap="round"/>';
+  var c='#E8600A';
+  function cota(a1,b1,txt,dx,dy){
+    return '<line x1="'+a1[0].toFixed(1)+'" y1="'+a1[1].toFixed(1)+'" x2="'+b1[0].toFixed(1)+'" y2="'+b1[1].toFixed(1)+'" stroke="'+c+'" stroke-width="1" stroke-dasharray="3 3"/>'
+      +'<text x="'+(((a1[0]+b1[0])/2)+dx).toFixed(1)+'" y="'+(((a1[1]+b1[1])/2)+dy).toFixed(1)+'" fill="'+c+'" font-size="11" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" text-anchor="middle">'+txt+'</text>';
+  }
+  out+=cota(p(0,-b-4,-t*2),p(L,-b-4,-t*2),L+' cm',8,16);
+  out+=cota(p(-b-4,0,-t*2),p(-b-4,P,-t*2),P+' cm',-26,6);
+  out+=cota(p(L+b+4,-b-2,0),p(L+b+4,-b-2,A),A+' cm',24,4);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block;max-height:'+h+'px">'+out+'</svg>';
+}
+/* o mesmo desenho como "foto" da ficha do produto e do carrinho */
+function _smIsoUrl(L,P,A){
+  var w=800,h=520;
+  /* na foto grande as cotas ganham corpo: o desenho e' 800 px de largura */
+  var svg=_smIso(L,P,A,w,h)
+    .split('font-size="11"').join('font-size="18"')
+    .split('stroke-width="1.2"').join('stroke-width="1.6"')
+    .replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block;max-height:'+h+'px">',
+             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'"><rect width="100%" height="100%" fill="#0b0b0b"/>');
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+
+/* ---- estilo, injetado uma vez, no vocabulario visual das outras telas ---- */
+function _smCss(){
+  if(document.getElementById('smCss')) return;
+  var st=document.createElement('style'); st.id='smCss';
+  st.textContent=
+   '.sm-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}'
+  +'.sm-card{border:1px solid var(--border);border-radius:8px;padding:14px 12px;background:var(--s2);cursor:pointer;display:flex;flex-direction:column;gap:6px;position:relative;min-height:92px;transition:all .2s}'
+  +'.sm-card:hover{border-color:rgba(58,156,200,.35)}'
+  +'.sm-card.sel{border-color:var(--orange);background:rgba(232,96,10,.06)}'
+  +'.sm-card .ic{font-size:22px;line-height:1}'
+  +".sm-card .tt{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#fff}"
+  +'.sm-card.sel .tt{color:var(--orange)}'
+  +'.sm-card .sb{font-size:11.5px;color:var(--t2);line-height:1.4}'
+  +".sm-card .tag{position:absolute;top:8px;right:8px;font-family:'Barlow Condensed',sans-serif;font-size:9.5px;letter-spacing:1px;padding:2px 6px;border-radius:3px;background:var(--orange);color:#fff;font-weight:700;text-transform:uppercase}"
+  +'.sm-form{border:1px solid var(--border);border-radius:10px;background:var(--s1);padding:16px 14px;margin-top:4px}'
+  +".sm-form .h{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);font-weight:700;margin-bottom:10px}"
+  +'.sm-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}'
+  +".sm-f label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t2);margin-bottom:4px}"
+  +'.sm-f .in{display:flex;align-items:baseline;border:1px solid #3a3a3a;border-radius:6px;background:#0d0d0d;padding:6px 10px}'
+  +'.sm-f .in:focus-within{border-color:var(--orange)}'
+  +".sm-f input{width:100%;min-width:0;border:none;background:transparent;color:#fff;font-size:20px;font-weight:600;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;outline:none;padding:3px 0;-moz-appearance:textfield}"
+  +'.sm-f input::-webkit-outer-spin-button,.sm-f input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}'
+  +'.sm-f .in span{font-size:11px;color:var(--t2);margin-left:4px}'
+  +'.sm-hint{font-size:11px;color:var(--t3);margin-top:8px}'
+  +'.sm-msg{margin-top:10px;padding:9px 11px;border:1px solid #6a4a12;background:#241a06;color:#e8c37a;border-radius:8px;font-size:12.5px;line-height:1.5}'
+  +'.sm-preview{margin:14px 0 6px;border:1px solid #232323;border-radius:8px;background:radial-gradient(ellipse at 50% 90%,#1c1c1c,#0b0b0b 70%);padding:6px}'
+  +".sm-gal-rot{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);margin:12px 0 6px}"
+  +'.sm-car{max-width:none;border-radius:8px;overflow:hidden}'
+  +'.sm-price{display:flex;align-items:flex-end;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:1px solid #262626}'
+  +".sm-price .l{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2)}"
+  +".sm-price .v{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;color:#fff;line-height:1}"
+  +'.sm-price .v .calc{font-size:14px;color:var(--t2);font-weight:600}'
+  +'.sm-specs{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}'
+  +'.sm-specs div{font-size:11.5px;color:#bbb;display:flex;gap:6px;align-items:center}'
+  +".sm-specs div:before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);flex:none}"
+  +'.sm-btn{margin-top:14px;width:100%;padding:13px;background:#e07b00;color:#fff;border:none;border-radius:8px;font-size:13.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s}'
+  +'.sm-btn:hover{background:#c96a00}'
+  +'.sm-btn:disabled{opacity:.45;cursor:default}';
+  document.head.appendChild(st);
+}
