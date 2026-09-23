@@ -723,7 +723,7 @@ function _fbIdItem(it){
     /* 'r' e 'p' porque redoma e quadro de catalogo sao DUAS tabelas, cada uma
        com a sua contagem: existe redoma 1 e existe quadro 1, e sem a letra os
        dois virariam o mesmo produto para a Meta. */
-    if(c.redoma_sm&&c.redoma_sm.l)return 'rsm|'+c.redoma_sm.l+'x'+c.redoma_sm.p+'x'+c.redoma_sm.a;
+    if(c.redoma_sm&&c.redoma_sm.l)return 'rsm|'+c.redoma_sm.l+'x'+c.redoma_sm.p+'x'+c.redoma_sm.a+(c.redoma_sm.imp?'|imp':'');
     if(c.redoma_id!=null&&c.redoma_id!=='')return 'r'+c.redoma_id;
     if(c.produto_id!=null&&c.produto_id!=='')return 'p'+c.produto_id;
     return String((it&&it.tipo)||'item')+'|'+String((it&&it.titulo)||'');
@@ -3638,6 +3638,7 @@ function _abreProdutoIncluso(it,b,i){
     d.innerHTML='<div style="display:flex;flex-direction:column;gap:7px;">'
       +_linProd('Categoria',b)
       +_linProd('Medida',_redomaMedida(it))
+      +((it.sm&&it.sm.imp)?_linProd('Fundo','<span style="color:#7bd67b;">Impress\u00e3o UV '+it.sm.l+' \u00d7 '+it.sm.a+' cm</span>'+(it.sm.img?'':' <span style="color:rgba(255,255,255,.5)">\u00b7 imagem a enviar</span>')):'')
       +_linProd('Envio','<span style="color:#7bd67b;">Desmontada, montagem por encaixe</span>')
       +_linProd('Prazo de produ\u00e7\u00e3o','7 dias \u00fateis')
       +'</div>'
@@ -4281,13 +4282,17 @@ function _cartMontaItem(){
       id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
       via:'catalogo', tipo:'redoma',
       titulo:r.n, sub:(S.incBrand||S.incBrandSel||''),
-      linhas:[_med, 'Enviada desmontada \u2014 montagem por encaixe',
+      linhas:[_med, (r.sm&&r.sm.imp)?('Impress\u00e3o UV no fundo ('+r.sm.l+' \u00d7 '+r.sm.a+' cm) \u2014 '+((r.sm.img)?'imagem enviada':'imagem a enviar pelo cliente')):'',
+              'Enviada desmontada \u2014 montagem por encaixe',
               'Produ\u00e7\u00e3o em 7 dias \u00fateis'].filter(function(x){return !!x;}),
       preco:r.p,
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:null,
       resumo:(typeof _capturaResumo==='function'?_capturaResumo():[]),
-      cfg:{ redoma_id:r.id, redoma_sm:(r.sm||null), categoria:(S.incBrand||S.incBrandSel||''),
+      /* a imagem do cliente NAO entra no cfg (estouraria o localStorage): vai
+         a parte, sobe para o servidor e so a chave fica no item (imgKey) */
+      _imgFundo:(r.sm&&r.sm.imp&&r.sm.img)||null,
+      cfg:{ redoma_id:r.id, redoma_sm:(r.sm?{l:r.sm.l,p:r.sm.p,a:r.sm.a,imp:(r.sm.imp?1:0)}:null), categoria:(S.incBrand||S.incBrandSel||''),
             produto:r.n, medida:_med, larg:r.larg, prof:r.prof, alt:r.alt,
             preco:r.p }
     };
@@ -4353,6 +4358,7 @@ function _cartMontaItem(){
 function adicionarAoCarrinho(){
   var it=_cartMontaItem();
   var src=it.imgSrc; delete it.imgSrc;
+  var _imgFundo=it._imgFundo||null; delete it._imgFundo;
   it.thumb='';
   // as imagens em base64 saem do item antes de ser guardado: elas sobem
   // para o servidor a parte, senao estouram o localStorage e o pedido
@@ -4379,6 +4385,18 @@ function adicionarAoCarrinho(){
     _cartSave();
     _cartRender();
   });
+  // redoma sob medida com impressao: a imagem do cliente sobe inteira (e' o
+  // arquivo da producao) e a chave fica no item -- e-mail e painel mostram
+  if(_imgFundo){
+    _subirImagemItem(_imgFundo,function(chave){
+      if(!chave)return;
+      var alvo=CART.filter(function(x){return x.id===it.id;})[0];
+      if(!alvo)return;
+      alvo.imgKey=chave;
+      if(alvo.cfg&&alvo.cfg.redoma_sm)alvo.cfg.redoma_sm.img=chave;
+      _cartSave();
+    });
+  }
   // imagem gerada por IA: sobe para o servidor e guarda so a chave.
   // e isso que permite a imagem chegar ate voce no pedido.
   if(it.via!=='catalogo' && src && src.indexOf('data:')===0){
@@ -4455,7 +4473,7 @@ function _cartAssina(i){
        configuracao inteira quando e' quadro personalizado. A foto e o id da
        linha ficam de fora de proposito -- dois quadros montados exatamente
        iguais SAO o mesmo produto para quem esta comprando. */
-    if(c.redoma_sm&&c.redoma_sm.l)return 'rsm|'+c.redoma_sm.l+'x'+c.redoma_sm.p+'x'+c.redoma_sm.a;
+    if(c.redoma_sm&&c.redoma_sm.l)return 'rsm|'+c.redoma_sm.l+'x'+c.redoma_sm.p+'x'+c.redoma_sm.a+(c.redoma_sm.imp?'|imp':'');
     if(c.redoma_id!=null&&c.redoma_id!=='')return 'r'+c.redoma_id;
     if(c.produto_id!=null&&c.produto_id!=='')return 'p'+c.produto_id;
     return 'c|'+String((i&&i.titulo)||'')+'|'+String((i&&i.preco)||0)
@@ -5826,7 +5844,7 @@ function _rascEnvia(){
    S.incProduto, abre a ficha do produto, entra no carrinho com cfg.redoma_sm,
    e o frete e o servidor a reconhecem por esse campo. */
 var REDOMA_SM=null;
-var _SM={ultimo:null,timer:null,pedido:0};
+var _SM={ultimo:null,timer:null,pedido:0,imp:false,img:null,imgPrev:null,imgNome:''};
 
 function _smRegiao(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
 function _smMoeda(){ return _smRegiao()==='EU'?'EUR':'BRL'; }
@@ -5947,6 +5965,16 @@ function _smMostra(on){
       +'<div class="sm-hint"><span>Medidas internas do v\u00e3o.</span> <span>De</span> <b id="smMin">'+L.min+'</b> <span>a</span> <b id="smMax">'+L.max+'</b> <span>cm por lado.</span></div>'
       +'<div class="sm-msg" id="smMsg" style="display:none"></div>'
       +'<div class="sm-preview" id="smPrev" style="display:none"></div>'
+      +'<div class="sm-opt" id="smOpt" style="display:none">'
+        +'<label class="sm-opt-row" for="smImpChk">'
+          +'<input type="checkbox" id="smImpChk" onchange="_smImpToggle(this.checked)">'
+          +'<span class="sw"></span>'
+          +'<span class="tx"><b>Imagem impressa no fundo</b>'
+            +'<small><span>Sua foto, logo ou arte em impress\u00e3o UV na parede de tr\u00e1s</span> (<span id="smImpArea"></span>)</small></span>'
+          +'<span class="pr" id="smImpPreco"></span>'
+        +'</label>'
+        +_smImpEnvioHtml()
+      +'</div>'
       +'<div class="sm-price" id="smPrecoBox" style="display:none">'
         +'<div class="l">Sua redoma</div><div class="v" id="smPreco"></div></div>'
       +'<div class="sm-specs" id="smSpecs" style="display:none">'
@@ -5994,6 +6022,7 @@ function _smInput(){
     if(prev)prev.style.display='none';
     if(box)box.style.display='none';
     if(specs)specs.style.display='none';
+    var _o=document.getElementById('smOpt'); if(_o)_o.style.display='none';
     if(msg){
       if(v.vazio){ msg.style.display='none'; }
       else{ msg.style.display=''; msg.innerHTML=_smMsgTexto(v.motivo); }
@@ -6001,7 +6030,7 @@ function _smInput(){
     return;
   }
   if(msg)msg.style.display='none';
-  if(prev){ prev.style.display=''; prev.innerHTML=_smIso(m.l,m.p,m.a,340,255); }
+  if(prev){ prev.style.display=''; prev.innerHTML=_smIso(m.l,m.p,m.a,340,255,_smIsoOp()); }
   if(box){ box.style.display=''; var p=document.getElementById('smPreco'); if(p)p.innerHTML='<span class="calc">Calculando\u2026</span>'; }
   _SM.timer=setTimeout(_smConsulta,350);
 }
@@ -6028,8 +6057,9 @@ function _smConsulta(){
       if(msg){ msg.style.display=''; msg.innerHTML=_smMsgTexto(d&&d.motivo); }
       return;
     }
-    _SM.ultimo={l:m.l,p:m.p,a:m.a,preco:Number(d.preco),caixa:d.caixa||null,moeda:d.moeda||moeda};
-    if(p)p.textContent=_brl(_SM.ultimo.preco);
+    _SM.ultimo={l:m.l,p:m.p,a:m.a,preco:Number(d.preco),caixa:d.caixa||null,moeda:d.moeda||moeda,
+      impressao:(d.impressao&&Number(d.impressao.preco)>0)?{preco:Number(d.impressao.preco),area_cm2:Number(d.impressao.area_cm2)||0}:null};
+    _smPrecoMostra();
     if(box)box.style.display='';
     var cx=document.getElementById('smCaixa');
     if(cx&&d.caixa)cx.textContent=_smFmt(d.caixa.w)+' \u00d7 '+_smFmt(d.caixa.l)+' \u00d7 '+_smFmt(d.caixa.h)+' cm';
@@ -6048,13 +6078,15 @@ function _smMedidaTxt(m){ return m.l+' \u00d7 '+m.p+' \u00d7 '+m.a+' cm'; }
 function _smConfirma(){
   var m=_smLe(), u=_SM.ultimo;
   if(!u||u.l!==m.l||u.p!==m.p||u.a!==m.a){ _smInput(); return; }
-  var fotos=[_smIsoUrl(u.l,u.p,u.a)];
+  var imp=!!(_SM.imp&&u.impressao);
+  var fotos=[_smIsoUrl(u.l,u.p,u.a,imp?_smIsoOp():null)];
   try{ _galMiniLista(_GAL_RED_PREFIXO).forEach(function(f){ fotos.push(f.url); }); }catch(e){}
+  var total=_smPrecoTotal(u);
   var it={
-    id:null, sm:{l:u.l,p:u.p,a:u.a},
-    n:'Redoma sob medida '+_smMedidaTxt(u), desc:'',
+    id:null, sm:{l:u.l,p:u.p,a:u.a,imp:imp?1:0,imp_preco:imp?u.impressao.preco:0,img:imp?_SM.img:null,imgPrev:imp?_SM.imgPrev:null,imgNome:imp?_SM.imgNome:''},
+    n:'Redoma sob medida '+_smMedidaTxt(u)+(imp?' + impress\u00e3o no fundo':''), desc:'',
     larg:u.l, prof:u.p, alt:u.a,
-    p:u.preco, p_eur:(u.moeda==='EUR'?u.preco:null),
+    p:total, p_eur:(u.moeda==='EUR'?total:null),
     cx:u.caixa, fotos:fotos
   };
   S.incBrandSel='Sob medida';
@@ -6074,7 +6106,8 @@ function _smRegiaoMudou(){
       fetch(API_FUNPARTS+'/redoma-preco?l='+it.sm.l+'&p='+it.sm.p+'&a='+it.sm.a+'&moeda='+moeda,{cache:'no-store'})
         .then(function(r){ return r.json(); }).then(function(d){
           if(!S.incProduto||S.incProduto!==it) return;
-          if(d&&d.ok){ it.p=Number(d.preco); it.p_eur=(d.moeda==='EUR'?it.p:null); }
+          var _imp=(it.sm.imp&&d&&d.ok&&d.impressao&&Number(d.impressao.preco)>0)?Number(d.impressao.preco):0;
+          if(d&&d.ok&&(!it.sm.imp||_imp>0)){ it.sm.imp_preco=_imp; it.p=Number(d.preco)+_imp; it.p_eur=(d.moeda==='EUR'?it.p:null); }
           else { S.incProduto=null; S.smModo='sm'; }
           try{ calcPrice(); }catch(e){}
         }).catch(function(){});
@@ -6085,7 +6118,7 @@ function _smRegiaoMudou(){
 /* (o carrossel que ficava aqui saiu em 23/09/2026 a pedido do Rodolfo: o
    lado esquerdo da tela ja mostra o carrossel "Redomas" do painel) */
 /* ---- o desenho em escala ---- */
-function _smIso(L,P,A,w,h){
+function _smIso(L,P,A,w,h,op){
   L=Number(L)||1; P=Number(P)||1; A=Number(A)||1;
   /* A ESCALA SAI DA CAIXA QUE O DESENHO OCUPA, nao de um chute.
      Na projecao, um ponto (x,y,z) vai para
@@ -6115,6 +6148,25 @@ function _smIso(L,P,A,w,h){
   out+=poly([p(0,0,0),p(L,0,0),p(L,P,0),p(0,P,0)],'#050505','#555');
   var g='rgba(120,190,230,';
   out+=poly([p(0,P,0),p(L,P,0),p(L,P,A),p(0,P,A)],g+'0.06)',g+'0.35)');
+  /* IMPRESSAO NO FUNDO: a parede de tras (x de 0 a L, y = P, z de 0 a A) e'
+     um paralelogramo na projecao. A imagem e' desenhada em "cm" (largura L,
+     altura A) e a matriz leva cada cm para o lugar certo:
+        X = X0 + u*0.866*s        Y = Y0 - u*0.5*s + v*s
+     com (X0,Y0) = canto de cima-esquerda da parede, u para a direita e v
+     para baixo. Sem imagem ainda, um painel discreto marca o lugar. */
+  if(op&&op.imp){
+    var o0=p(0,P,A);
+    var mt='matrix('+(0.866*s).toFixed(4)+','+(-0.5*s).toFixed(4)+',0,'+s.toFixed(4)+','+o0[0].toFixed(1)+','+o0[1].toFixed(1)+')';
+    var gid='smImpG'+w;
+    if(op.img){
+      out+='<g transform="'+mt+'"><image href="'+op.img+'" x="0" y="0" width="'+L+'" height="'+A+'" preserveAspectRatio="xMidYMid slice"/></g>';
+    }else{
+      var fs=Math.max(1.2,Math.min(Math.min(L,A)*0.22,L/7));
+      out+='<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2a2a"/><stop offset="1" stop-color="#141414"/></linearGradient></defs>'
+        +'<g transform="'+mt+'"><rect x="0" y="0" width="'+L+'" height="'+A+'" fill="url(#'+gid+')" stroke="#E8600A" stroke-width="'+(0.35).toFixed(2)+'" stroke-dasharray="'+(1.2).toFixed(1)+' '+(0.8).toFixed(1)+'"/>'
+        +'<text x="'+(L/2).toFixed(2)+'" y="'+(A/2).toFixed(2)+'" fill="#E8600A" font-size="'+fs.toFixed(2)+'" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle" letter-spacing="'+(fs*0.12).toFixed(2)+'">SUA IMAGEM</text></g>';
+    }
+  }
   out+=poly([p(L,0,0),p(L,P,0),p(L,P,A),p(L,0,A)],g+'0.06)',g+'0.35)');
   out+=poly([p(0,0,A),p(L,0,A),p(L,P,A),p(0,P,A)],g+'0.22)',g+'0.85)');
   out+=poly([p(0,0,0),p(0,P,0),p(0,P,A),p(0,0,A)],g+'0.12)',g+'0.85)');
@@ -6132,18 +6184,96 @@ function _smIso(L,P,A,w,h){
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block;max-height:'+h+'px">'+out+'</svg>';
 }
 /* o mesmo desenho como "foto" da ficha do produto e do carrinho */
-function _smIsoUrl(L,P,A){
+function _smIsoUrl(L,P,A,op){
   /* 4:3, a proporcao das fotos das redomas: na ficha o desenho ocupa o mesmo
      lugar que elas, e as miniaturas ficam do mesmo tamanho */
   var w=800,h=600;
   /* na foto grande as cotas ganham corpo: o desenho e' 800 px de largura */
-  var svg=_smIso(L,P,A,w,h)
+  var svg=_smIso(L,P,A,w,h,op)
     .split('font-size="11"').join('font-size="18"')
     .split('stroke-width="1.2"').join('stroke-width="1.6"')
     .replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block;max-height:'+h+'px">',
              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="'+w+'" height="'+h+'"><rect width="100%" height="100%" fill="#0b0b0b"/>');
   return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
 }
+
+/* ---- impressao UV no fundo (opcional, 23/09/2026) ----
+   O preco do opcional vem do servidor junto com o da redoma (`impressao`),
+   calculado pela parede de tras (L x A) com a taxa de arte; o site so soma e
+   mostra. A imagem e' OPCIONAL: sem ela a compra segue e a producao pede
+   depois. Com ela: aparece no desenho, na ficha e vai junto do pedido. */
+function _smIsoOp(){ return {imp:!!_SM.imp, img:_SM.imgPrev||null}; }
+function _smPrecoTotal(u){ u=u||_SM.ultimo; if(!u)return 0; return Number(u.preco)+((_SM.imp&&u.impressao)?Number(u.impressao.preco):0); }
+function _smImpEnvioHtml(){
+  return '<div class="sm-opt-img" id="smImpImg" style="display:none">'
+    +'<img id="smImpThumb" alt="" style="display:none">'
+    +'<div class="sm-opt-img-t">'
+      +'<button type="button" class="sm-up" onclick="document.getElementById(\'smImpFile\').click()"><span id="smImpUpTxt">Enviar imagem (opcional)</span></button>'
+      +'<input type="file" id="smImpFile" accept="image/*" style="display:none" onchange="_smImpArquivo(this)">'
+      +'<div class="sm-up-hint" id="smImpHint"><span>Pode enviar agora ou depois da compra, pelo WhatsApp.</span></div>'
+    +'</div>'
+  +'</div>';
+}
+function _smPrecoMostra(){
+  var u=_SM.ultimo, p=document.getElementById('smPreco'), opt=document.getElementById('smOpt');
+  if(!u){ if(opt)opt.style.display='none'; return; }
+  var disp=!!(u.impressao&&u.impressao.preco>0);
+  if(!disp&&_SM.imp){ _SM.imp=false; }
+  if(p)p.textContent=_brl(_smPrecoTotal(u));
+  if(opt)opt.style.display=disp?'':'none';
+  if(!disp)return;
+  var pr=document.getElementById('smImpPreco'); if(pr)pr.textContent='+ '+_brl(u.impressao.preco);
+  var ar=document.getElementById('smImpArea'); if(ar)ar.textContent=u.l+' \u00d7 '+u.a+' cm';
+  var chk=document.getElementById('smImpChk'); if(chk)chk.checked=!!_SM.imp;
+  var on=document.getElementById('smImpOn'), off=document.getElementById('smImpOff');
+  if(on)on.classList.toggle('sel',!!_SM.imp);
+  if(off)off.classList.toggle('sel',!_SM.imp);
+  var box=document.getElementById('smImpImg'); if(box)box.style.display=_SM.imp?'':'none';
+}
+function _smImpToggle(on){
+  _SM.imp=!!on;
+  _smPrecoMostra();
+  var m=_smLe(), prev=document.getElementById('smPrev');
+  if(prev&&_SM.ultimo&&_smValida(m).ok)prev.innerHTML=_smIso(m.l,m.p,m.a,340,255,_smIsoOp());
+}
+/* o arquivo do cliente: o ORIGINAL sobe para a producao (ate 8 MB; acima
+   disso vai reduzido a 3000 px, que ainda imprime bem uma parede de 60 cm);
+   uma copia pequena serve para o desenho e a ficha */
+function _smImpArquivo(inp){
+  var f=inp&&inp.files&&inp.files[0]; if(!f)return;
+  if(String(f.type||'').indexOf('image/')!==0){ var h0=document.getElementById('smImpHint'); if(h0)h0.innerHTML='<span>Envie um arquivo de imagem (JPG ou PNG).</span>'; return; }
+  var rd=new FileReader();
+  rd.onload=function(ev){
+    var src=ev.target.result;
+    var grande=f.size>8*1024*1024;
+    _smImgReduz(src,grande?3000:0,0.92,function(orig){
+      _smImgReduz(src,900,0.85,function(prev){
+        _SM.img=orig; _SM.imgPrev=prev; _SM.imgNome=f.name||'';
+        var t=document.getElementById('smImpUpTxt'); if(t)t.textContent='Trocar imagem';
+        var th=document.getElementById('smImpThumb'); if(th){ th.src=prev; th.style.display=''; }
+        var h=document.getElementById('smImpHint'); if(h)h.innerHTML='<span>Imagem recebida:</span> '+_smEsc(f.name||'')+'<span>. Ela aparece no desenho e vai junto do pedido.</span>';
+        _smImpToggle(true);
+      });
+    });
+  };
+  rd.readAsDataURL(f);
+}
+function _smImgReduz(src,maxPx,q,cb){
+  if(!maxPx){ cb(src); return; }
+  var im=new Image();
+  im.onload=function(){
+    try{
+      var w0=im.naturalWidth||im.width, h0=im.naturalHeight||im.height, k=Math.min(1,maxPx/Math.max(w0,h0));
+      if(k>=1&&src.length<1.5e6){ cb(src); return; }
+      var c=document.createElement('canvas'); c.width=Math.max(1,Math.round(w0*k)); c.height=Math.max(1,Math.round(h0*k));
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      cb(c.toDataURL('image/jpeg',q));
+    }catch(e){ cb(src); }
+  };
+  im.onerror=function(){ cb(src); };
+  im.src=src;
+}
+function _smEsc(s){ return String(s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
 /* ---- estilo, injetado uma vez, no vocabulario visual das outras telas ---- */
 function _smCss(){
@@ -6171,6 +6301,23 @@ function _smCss(){
   +'.sm-hint{font-size:11px;color:var(--t3);margin-top:8px}'
   +'.sm-msg{margin-top:10px;padding:9px 11px;border:1px solid #6a4a12;background:#241a06;color:#e8c37a;border-radius:8px;font-size:12.5px;line-height:1.5}'
   +'.sm-preview{margin:14px 0 6px;border:1px solid #232323;border-radius:8px;background:radial-gradient(ellipse at 50% 90%,#1c1c1c,#0b0b0b 70%);padding:6px}'
+  +'.sm-opt{margin-top:12px;border:1px solid #262626;border-radius:8px;background:#0f0f0f;padding:10px 12px}'
+  +'.sm-opt-row{display:flex;align-items:center;gap:10px;cursor:pointer}'
+  +'.sm-opt-row input{position:absolute;opacity:0;width:0;height:0}'
+  +'.sm-opt-row .sw{flex:none;width:38px;height:22px;border-radius:11px;background:#2c2c2c;border:1px solid #3a3a3a;position:relative;transition:background .2s}'
+  +'.sm-opt-row .sw:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#bbb;transition:transform .2s,background .2s}'
+  +'.sm-opt-row input:checked+.sw{background:var(--orange);border-color:var(--orange)}'
+  +'.sm-opt-row input:checked+.sw:after{transform:translateX(16px);background:#fff}'
+  +'.sm-opt-row .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}'
+  +".sm-opt-row .tx b{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff}"
+  +'.sm-opt-row .tx small{font-size:11px;color:var(--t2);line-height:1.35}'
+  +".sm-opt-row .pr{flex:none;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--orange);white-space:nowrap}"
+  +'.sm-opt-img{display:flex;gap:10px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #222}'
+  +'.sm-opt-img img{flex:none;width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #333}'
+  +'.sm-opt-img-t{flex:1;min-width:0}'
+  +".sm-up{width:100%;padding:9px 10px;border:1px dashed #555;border-radius:6px;background:transparent;color:#eee;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;cursor:pointer}"
+  +'.sm-up:hover{border-color:var(--orange);color:var(--orange)}'
+  +'.sm-up-hint{font-size:10.5px;color:var(--t3);margin-top:5px;line-height:1.35}'
   +'.sm-price{display:flex;align-items:flex-end;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:1px solid #262626}'
   +".sm-price .l{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2)}"
   +".sm-price .v{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;color:#fff;line-height:1}"

@@ -245,12 +245,16 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     if(idx<0){ window._editandoId=null; return; }
     var novo=_cartMontaItem();
     var src=novo.imgSrc; delete novo.imgSrc;
+    var _imgFundo=novo._imgFundo||null; delete novo._imgFundo;
     novo.thumb=CART[idx].thumb||'';
     var _lista=(novo.preview&&novo.preview.imgs)||[]; if(novo.preview)delete novo.preview.imgs;
     novo.id=window._editandoId;
     CART[idx]=novo;
     _cartSave(); _cartRender();
     if(typeof _cartThumb==='function')_cartThumb(src,function(thumb){ if(!thumb)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){a.thumb=thumb;_cartSave();_cartRender();} });
+    if(_imgFundo && typeof _subirImagemItem==='function'){
+      _subirImagemItem(_imgFundo,function(ch){ if(!ch)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){ a.imgKey=ch; if(a.cfg&&a.cfg.redoma_sm)a.cfg.redoma_sm.img=ch; _cartSave(); } });
+    }
     if(novo.via!=='catalogo' && src && src.indexOf('data:')===0 && typeof _subirImagemItem==='function'){
       _subirImagemItem(src,function(ch){ if(!ch)return; var a=CART.filter(function(x){return x.id===novo.id;})[0]; if(a){a.imgKey=ch;_cartSave();} });
     }
@@ -3249,10 +3253,20 @@ function _startOb14(){
     {pt:"Prontas ou sob medida \u2014 escolha e veja o pre\u00e7o na hora",en:"Ready-made or made to measure \u2014 choose and see the price instantly",es:"Listas o a medida \u2014 elige y ve el precio al instante",fr:"Pr\u00eates ou sur mesure \u2014 choisissez et voyez le prix aussit\u00f4t"},
     {pt:"Produtos prontos \u2014 escolha a linha e depois o modelo",en:"Ready-made products \u2014 choose the range, then the model",es:"Productos listos \u2014 elige la l\u00ednea y luego el modelo",fr:"Produits pr\u00eats \u2014 choisissez la gamme puis le mod\u00e8le"},
     {pt:"Displays / Redomas de Acr\u00edlico",en:"Acrylic Display Cases",es:"Vitrinas de acr\u00edlico",fr:"Vitrines en acrylique"},
-    {pt:"Redoma / Display",en:"Display case",es:"Vitrina",fr:"Vitrine"}
+    {pt:"Redoma / Display",en:"Display case",es:"Vitrina",fr:"Vitrine"},
+    /* impressao UV no fundo (23/09/2026) */
+    {pt:"Imagem impressa no fundo",en:"Printed image on the back",es:"Imagen impresa en el fondo",fr:"Image imprim\u00e9e au fond"},
+    {pt:"Sua foto, logo ou arte em impress\u00e3o UV na parede de tr\u00e1s",en:"Your photo, logo or artwork UV-printed on the back wall",es:"Tu foto, logo o arte en impresi\u00f3n UV en la pared trasera",fr:"Votre photo, logo ou visuel imprim\u00e9 UV sur la paroi arri\u00e8re"},
+    {pt:"Enviar imagem (opcional)",en:"Upload image (optional)",es:"Enviar imagen (opcional)",fr:"Envoyer l\u2019image (facultatif)"},
+    {pt:"Trocar imagem",en:"Change image",es:"Cambiar imagen",fr:"Changer l\u2019image"},
+    {pt:"Pode enviar agora ou depois da compra, pelo WhatsApp.",en:"You can upload it now or after purchase, via WhatsApp or e-mail.",es:"Puedes enviarla ahora o despu\u00e9s de la compra, por WhatsApp.",fr:"Vous pouvez l\u2019envoyer maintenant ou apr\u00e8s l\u2019achat, par WhatsApp ou e-mail."},
+    {pt:"Imagem recebida:",en:"Image received:",es:"Imagen recibida:",fr:"Image re\u00e7ue :"},
+    {pt:". Ela aparece no desenho e vai junto do pedido.",en:". It shows on the drawing and goes with your order.",es:". Aparece en el dibujo y va junto con el pedido.",fr:". Elle appara\u00eet sur le dessin et accompagne la commande."},
+    {pt:"Envie um arquivo de imagem (JPG ou PNG).",en:"Please upload an image file (JPG or PNG).",es:"Env\u00eda un archivo de imagen (JPG o PNG).",fr:"Envoyez un fichier image (JPG ou PNG)."}
   ];
   var PEDACOS=[
     {pt:"Redoma sob medida ",en:"Made-to-measure case ",es:"Vitrina a medida ",fr:"Vitrine sur mesure "},
+    {pt:" + impress\u00e3o no fundo",en:" + printed back",es:" + impresi\u00f3n en el fondo",fr:" + impression au fond"},
     {pt:"Visualizador \u00b7 ",en:"Viewer \u00b7 ",es:"Visualizador \u00b7 ",fr:"Visualiseur \u00b7 "},
     {pt:"\" adicionado",en:"\" added",es:"\" a\u00f1adido",fr:"\" ajout\u00e9"}
   ];
