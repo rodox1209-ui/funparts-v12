@@ -1,0 +1,32 @@
+# Enderecos da loja antiga (Nuvemshop) que o Google e os anuncios ainda conhecem.
+# O que existe no site novo cai na tela certa; o que so existe na loja antiga
+# vai para loja.funparts.com.br (a Nuvemshop, ate ser desligada).
+
+# --- categorias que existem no configurador ---
+/quadros-para-lego/*           /?p=lego        301
+/quadros-para-lego             /?p=lego        301
+/quadros-com-miniatura/*       /?p=miniatura   301
+/quadros-com-miniatura         /?p=miniatura   301
+/redomas-de-acrilico-geral/*   /?p=redoma      301
+/redomas-de-acrilico-geral     /?p=redoma      301
+
+# --- paginas institucionais ---
+/contato/                      /contato.html                  301
+/contato                       /contato.html                  301
+/trocas-e-devolucoes/          /trocas-e-devolucoes.html      301
+/trocas-e-devolucoes           /trocas-e-devolucoes.html      301
+
+# --- o que so existe na loja antiga ---
+/quadros-decorativos/*         https://loja.funparts.com.br/quadros-decorativos/:splat          301
+/quadros-hotwheels/*           https://loja.funparts.com.br/quadros-hotwheels/:splat            301
+/quebra-cabecas/*              https://loja.funparts.com.br/quebra-cabecas/:splat               301
+/somente-ganchos-para-parede/* https://loja.funparts.com.br/somente-ganchos-para-parede/:splat  301
+/outros/*                      https://loja.funparts.com.br/outros/:splat                       301
+/produtos/*                    https://loja.funparts.com.br/produtos/:splat                     301
+/produtos                      https://loja.funparts.com.br/produtos/                           301
+/blog/*                        https://loja.funparts.com.br/blog/:splat                         301
+/sitemap_blog.xml/             https://loja.funparts.com.br/sitemap_blog.xml/                   301
+/account/*                     https://loja.funparts.com.br/account/:splat                      301
+/checkout/*                    https://loja.funparts.com.br/checkout/:splat                     301
+/cart/*                        https://loja.funparts.com.br/cart/:splat                         301
+/search/*                      https://loja.funparts.com.br/search/:splat                       301

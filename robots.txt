@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin-precos.html
+Disallow: /admin-molduras.html
+Disallow: /criar-pedido.html
+Disallow: /aguarde.html
+Disallow: /painel-enhance.js
+
+Sitemap: https://www.funparts.com.br/sitemap.xml
