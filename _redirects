@@ -11,10 +11,8 @@
 /redomas-de-acrilico-geral     /?p=redoma      301
 
 # --- paginas institucionais ---
-/contato/                      /contato.html                  301
-/contato                       /contato.html                  301
-/trocas-e-devolucoes/          /trocas-e-devolucoes.html      301
-/trocas-e-devolucoes           /trocas-e-devolucoes.html      301
+/contato/                      /contato                  301
+/trocas-e-devolucoes/          /trocas-e-devolucoes      301
 
 # --- o que so existe na loja antiga ---
 /quadros-decorativos/*         https://loja.funparts.com.br/quadros-decorativos/:splat          301
