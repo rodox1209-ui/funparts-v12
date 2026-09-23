@@ -5826,7 +5826,7 @@ function _rascEnvia(){
    S.incProduto, abre a ficha do produto, entra no carrinho com cfg.redoma_sm,
    e o frete e o servidor a reconhecem por esse campo. */
 var REDOMA_SM=null;
-var _SM={ultimo:null,timer:null,pedido:0,gal:{i:0,n:0,timer:null,ligado:false}};
+var _SM={ultimo:null,timer:null,pedido:0};
 
 function _smRegiao(){ try{ return (window.FP&&FP.region)||'BR'; }catch(e){ return 'BR'; } }
 function _smMoeda(){ return _smRegiao()==='EU'?'EUR':'BRL'; }
@@ -5906,6 +5906,24 @@ function _smModo(m,silencioso){
     if(rot)rot.style.display='';
     if(grid)grid.style.display='';
     _smMostra(false);
+    /* UMA linha so: escolher a linha e' um clique sem escolha. Ela entra
+       sozinha e os produtos aparecem logo abaixo dos cartoes. Com duas ou
+       mais linhas a grade volta, porque ai a escolha existe. */
+    try{
+      var _ls=Object.keys(_catFonte()||{});
+      if(_ls.length===1){
+        if(rot)rot.style.display='none';
+        if(grid)grid.style.display='none';
+        if(S.incBrandSel!==_ls[0]||!(wrap&&wrap.style.display!=='none')) selInclusoBrand(_ls[0]);
+        /* o index.html leva a lista de modelos para DENTRO da grade, logo
+           abaixo do cartao escolhido -- e a grade esta escondida. Tiro a lista
+           de la (fica logo depois da grade) e desmarco o cartao, senao o
+           mesmo script a devolve para dentro no proximo redimensionamento. */
+        if(grid&&wrap&&grid.contains(wrap)) grid.parentNode.insertBefore(wrap,grid.nextSibling);
+        if(grid) grid.querySelectorAll('.bcard.sel').forEach(function(c){ c.classList.remove('sel'); });
+        if(wrap) wrap.style.gridColumn='';
+      }
+    }catch(e){}
     /* saiu do sob medida com uma redoma sob medida escolhida: solta */
     if(S.incProduto&&S.incProduto.sm){ S.incProduto=null; try{ calcPrice(); }catch(e){} }
   }
@@ -5914,7 +5932,7 @@ function _smModo(m,silencioso){
 /* ---- o formulario ---- */
 function _smMostra(on){
   var f=document.getElementById('smForm');
-  if(!on){ if(f)f.style.display='none'; _smGalPara(); return; }
+  if(!on){ if(f)f.style.display='none'; return; }
   if(!f){
     var sec=document.getElementById('miniInclusoAISection');
     var grid=document.getElementById('inclusoBrands');
@@ -5929,7 +5947,6 @@ function _smMostra(on){
       +'<div class="sm-hint"><span>Medidas internas do v\u00e3o.</span> <span>De</span> <b id="smMin">'+L.min+'</b> <span>a</span> <b id="smMax">'+L.max+'</b> <span>cm por lado.</span></div>'
       +'<div class="sm-msg" id="smMsg" style="display:none"></div>'
       +'<div class="sm-preview" id="smPrev" style="display:none"></div>'
-      +'<div id="smGal" style="display:none"></div>'
       +'<div class="sm-price" id="smPrecoBox" style="display:none">'
         +'<div class="l">Sua redoma</div><div class="v" id="smPreco"></div></div>'
       +'<div class="sm-specs" id="smSpecs" style="display:none">'
@@ -5946,7 +5963,6 @@ function _smMostra(on){
     });
   }
   f.style.display='';
-  _smGaleria();
   _smInput();
 }
 function _smCampo(id,rot){
@@ -6066,65 +6082,8 @@ function _smRegiaoMudou(){
   }catch(e){}
 }
 
-/* ---- o carrossel com as fotos reais, embaixo do desenho ---- */
-function _smGaleria(){
-  var gal=document.getElementById('smGal'); if(!gal) return;
-  var fotos=[]; try{ fotos=_galMiniLista(_GAL_RED_PREFIXO); }catch(e){}
-  if(!fotos.length){ gal.style.display='none'; gal.innerHTML=''; _smGalPara(); return; }
-  var assin=fotos.map(function(f){ return f.url; }).join('~');
-  if(gal.getAttribute('data-gal')===assin){ gal.style.display=''; _smGalAnda(); return; }
-  gal.setAttribute('data-gal',assin);
-  var h='<div class="sm-gal-rot">Redomas que j\u00e1 fizemos</div>'
-    +'<div class="fp-car sm-car" id="smCar"><div class="fp-track" id="smTrack">';
-  for(var k=0;k<fotos.length;k++){
-    h+='<div class="fp-slide"><img src="'+_galMiniEsc(fotos[k].url)+'" alt="'+_galMiniEsc(fotos[k].legenda)+'" loading="lazy" draggable="false"></div>';
-  }
-  h+='</div><div class="fp-dots" id="smDots" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.9));"></div></div>';
-  gal.innerHTML=h; gal.style.display='';
-  _SM.gal.n=fotos.length; _SM.gal.i=0;
-  var ds=document.getElementById('smDots');
-  if(ds){
-    ds.innerHTML='';
-    if(_SM.gal.n<2) ds.style.display='none';
-    else for(var q=0;q<_SM.gal.n;q++){
-      var b=document.createElement('button'); b.type='button'; b.className='fp-dot'+(q===0?' on':'');
-      b.setAttribute('data-i',q); b.setAttribute('aria-label','Foto '+(q+1));
-      b.onclick=function(e){ _smGalIr(+e.currentTarget.getAttribute('data-i')); _smGalPara(); _smGalAnda(); };
-      ds.appendChild(b);
-    }
-  }
-  if(!_SM.gal.ligado){
-    _SM.gal.ligado=true;
-    var x0=0,dx=0,arr=false;
-    function dentro(ev){ var c=document.getElementById('smCar'); return !!(c&&ev.target&&c.contains(ev.target)); }
-    function ini(x){ x0=x; dx=0; arr=true; _smGalPara(); var t=document.getElementById('smTrack'); if(t)t.className='fp-track fp-drag'; }
-    function mov(x){ if(!arr) return; dx=x-x0; var t=document.getElementById('smTrack'); if(t)t.style.transform='translateX(calc('+(-_SM.gal.i*100)+'% + '+dx+'px))'; }
-    function fim(){ if(!arr) return; arr=false; var t=document.getElementById('smTrack'); if(t)t.className='fp-track';
-      var c=document.getElementById('smCar'); var lim=(c?c.clientWidth:300)*0.18;
-      if(dx<-lim)_smGalIr(_SM.gal.i+1); else if(dx>lim)_smGalIr(_SM.gal.i-1); else _smGalIr(_SM.gal.i);
-      _smGalAnda(); }
-    document.addEventListener('touchstart',function(e){ if(dentro(e))ini(e.touches[0].clientX); },{passive:true});
-    document.addEventListener('touchmove',function(e){ if(arr)mov(e.touches[0].clientX); },{passive:true});
-    document.addEventListener('touchend',fim);
-    document.addEventListener('mousedown',function(e){ if(dentro(e)){ e.preventDefault(); ini(e.clientX); } });
-    window.addEventListener('mousemove',function(e){ if(arr)mov(e.clientX); });
-    window.addEventListener('mouseup',fim);
-  }
-  _smGalIr(0); _smGalAnda();
-}
-function _smGalIr(k){
-  var tr=document.getElementById('smTrack'); if(!tr||!_SM.gal.n) return;
-  _SM.gal.i=((k%_SM.gal.n)+_SM.gal.n)%_SM.gal.n;
-  tr.style.transform='translateX('+(-_SM.gal.i*100)+'%)';
-  var ds=document.getElementById('smDots');
-  if(ds) for(var j=0;j<ds.children.length;j++) ds.children[j].className='fp-dot'+(j===_SM.gal.i?' on':'');
-}
-function _smGalPara(){ if(_SM.gal.timer){ clearInterval(_SM.gal.timer); _SM.gal.timer=null; } }
-function _smGalAnda(){
-  var red=false; try{ red=window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
-  if(!_SM.gal.timer&&!red&&_SM.gal.n>1) _SM.gal.timer=setInterval(function(){ _smGalIr(_SM.gal.i+1); },5000);
-}
-
+/* (o carrossel que ficava aqui saiu em 23/09/2026 a pedido do Rodolfo: o
+   lado esquerdo da tela ja mostra o carrossel "Redomas" do painel) */
 /* ---- o desenho em escala ---- */
 function _smIso(L,P,A,w,h){
   L=Number(L)||1; P=Number(P)||1; A=Number(A)||1;
@@ -6212,8 +6171,6 @@ function _smCss(){
   +'.sm-hint{font-size:11px;color:var(--t3);margin-top:8px}'
   +'.sm-msg{margin-top:10px;padding:9px 11px;border:1px solid #6a4a12;background:#241a06;color:#e8c37a;border-radius:8px;font-size:12.5px;line-height:1.5}'
   +'.sm-preview{margin:14px 0 6px;border:1px solid #232323;border-radius:8px;background:radial-gradient(ellipse at 50% 90%,#1c1c1c,#0b0b0b 70%);padding:6px}'
-  +".sm-gal-rot{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);margin:12px 0 6px}"
-  +'.sm-car{max-width:none;border-radius:8px;overflow:hidden}'
   +'.sm-price{display:flex;align-items:flex-end;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:1px solid #262626}'
   +".sm-price .l{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2)}"
   +".sm-price .v{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:700;color:#fff;line-height:1}"
