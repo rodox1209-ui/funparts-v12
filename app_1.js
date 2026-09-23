@@ -5985,7 +5985,7 @@ function _smInput(){
     return;
   }
   if(msg)msg.style.display='none';
-  if(prev){ prev.style.display=''; prev.innerHTML=_smIso(m.l,m.p,m.a,340,230); }
+  if(prev){ prev.style.display=''; prev.innerHTML=_smIso(m.l,m.p,m.a,340,255); }
   if(box){ box.style.display=''; var p=document.getElementById('smPreco'); if(p)p.innerHTML='<span class="calc">Calculando\u2026</span>'; }
   _SM.timer=setTimeout(_smConsulta,350);
 }
@@ -6128,11 +6128,26 @@ function _smGalAnda(){
 /* ---- o desenho em escala ---- */
 function _smIso(L,P,A,w,h){
   L=Number(L)||1; P=Number(P)||1; A=Number(A)||1;
-  var s=Math.min(w*0.62/(L+P), h*0.78/(A+(L+P)*0.28));
-  var cx=w/2, cy=h*0.9;
+  /* A ESCALA SAI DA CAIXA QUE O DESENHO OCUPA, nao de um chute.
+     Na projecao, um ponto (x,y,z) vai para
+        X = cx + (x - y) * 0.866 * s      Y = cy - (x + y) * 0.5 * s - z * s
+     O ponto mais alto e' o canto do fundo do topo (x+y = L+P, z = A). O mais
+     baixo e' o canto da frente do pedestal (x+y = -2b, z = -2t), e ainda ha a
+     cota escrita embaixo dele. Nas laterais, as cotas com o texto. Com isso a
+     escala e' a maior que faz tudo caber com folga, e o centro e' o centro
+     dessa caixa. Numa 17x17x22 o topo saia pelo alto e a cota pelo pe. */
+  var b=1.5, t=0.9;
+  var padX=56, padTopo=14, padPe=30;                     /* px: textos das cotas */
+  var alturaU=0.5*(L+P+2*b)+A+2*t;                       /* em unidades de s */
+  var esqU=-(b+4+P), dirU=(L+b+4)+(b+2);                 /* extremos em (x - y) */
+  var largU=0.866*(dirU-esqU);
+  var s=Math.min((w-2*padX)/largU, (h-padTopo-padPe)/alturaU);
+  var cx=w/2-0.866*s*(dirU+esqU)/2;
+  var topoU=0.5*(L+P)+A, peU=b+2*t;                      /* acima e abaixo de cy */
+  var cy=(h+padTopo-padPe)/2+(topoU-peU)*s/2;
   function p(x,y,z){ return [cx+(x-y)*0.866*s, cy-(x+y)*0.5*s-z*s]; }
   function poly(pts,fill,stroke){ return '<polygon points="'+pts.map(function(q){ return q[0].toFixed(1)+','+q[1].toFixed(1); }).join(' ')+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2"/>'; }
-  var b=1.5, t=0.9, out='';
+  var out='';
   out+=poly([p(-b,-b,-t*2),p(L+b,-b,-t*2),p(L+b,P+b,-t*2),p(-b,P+b,-t*2)],'#0e0e0e','#3a3a3a');
   out+=poly([p(-b,-b,-t*2),p(L+b,-b,-t*2),p(L+b,-b,-t),p(-b,-b,-t)],'#161616','#3a3a3a');
   out+=poly([p(L+b,-b,-t*2),p(L+b,P+b,-t*2),p(L+b,P+b,-t),p(L+b,-b,-t)],'#111','#3a3a3a');
@@ -6159,7 +6174,9 @@ function _smIso(L,P,A,w,h){
 }
 /* o mesmo desenho como "foto" da ficha do produto e do carrinho */
 function _smIsoUrl(L,P,A){
-  var w=800,h=520;
+  /* 4:3, a proporcao das fotos das redomas: na ficha o desenho ocupa o mesmo
+     lugar que elas, e as miniaturas ficam do mesmo tamanho */
+  var w=800,h=600;
   /* na foto grande as cotas ganham corpo: o desenho e' 800 px de largura */
   var svg=_smIso(L,P,A,w,h)
     .split('font-size="11"').join('font-size="18"')
