@@ -5880,6 +5880,8 @@ function _smEscolha(grid){
     S.smModo='pronta';
     var rot0=sec.querySelector(':scope > .sec-sub'); if(rot0)rot0.style.display='';
     grid.style.display='';
+    /* sem Personalize (Europa): a linha unica tambem abre direto */
+    if(ehR) _smLinhaUnica();
     return;
   }
   if(!box){
@@ -5901,6 +5903,35 @@ function _smEscolha(grid){
   box.style.display='';
   if(!S.smModo) S.smModo='pronta';
   _smModo(S.smModo,true);
+}
+/* UMA linha so: escolher a linha e' um clique sem escolha. Ela entra sozinha
+   e os produtos aparecem logo abaixo. Vale com o Personalize (Brasil) e sem
+   ele (Europa enquanto o euro nao estiver no painel). Com duas ou mais linhas
+   a grade volta, porque ai a escolha existe. */
+function _smLinhaUnica(){
+  try{
+    var sec=document.getElementById('miniInclusoAISection');
+    var rot=sec?sec.querySelector(':scope > .sec-sub'):null;
+    var grid=document.getElementById('inclusoBrands');
+    var wrap=document.getElementById('inclusoModelsWrap');
+    var _ls=Object.keys(_catFonte()||{});
+    if(_ls.length!==1) return false;
+    if(rot)rot.style.display='none';
+    if(grid)grid.style.display='none';
+    if(S.incBrandSel!==_ls[0]||!(wrap&&wrap.style.display!=='none')) selInclusoBrand(_ls[0]);
+    /* o index.html leva a lista de modelos para DENTRO da grade, logo abaixo
+       do cartao escolhido -- e a grade esta escondida. Tiro a lista de la e
+       desmarco o cartao, senao o mesmo script a devolve no redimensionamento */
+    if(grid&&wrap&&grid.contains(wrap)) grid.parentNode.insertBefore(wrap,grid.nextSibling);
+    if(grid) grid.querySelectorAll('.bcard.sel').forEach(function(c){ c.classList.remove('sel'); });
+    if(wrap) wrap.style.gridColumn='';
+    return true;
+  }catch(e){ return false; }
+}
+/* o texto escrito dentro do desenho (e da foto da ficha) no idioma da tela */
+function _smTxtImg(){
+  var l='pt'; try{ l=(window.FP&&FP.lang)||'pt'; }catch(e){}
+  return ({pt:'SUA IMAGEM',en:'YOUR IMAGE',es:'TU IMAGEN',fr:'VOTRE IMAGE'})[l]||'SUA IMAGEM';
 }
 function _smModo(m,silencioso){
   S.smModo=(m==='sm')?'sm':'pronta';
@@ -5927,21 +5958,7 @@ function _smModo(m,silencioso){
     /* UMA linha so: escolher a linha e' um clique sem escolha. Ela entra
        sozinha e os produtos aparecem logo abaixo dos cartoes. Com duas ou
        mais linhas a grade volta, porque ai a escolha existe. */
-    try{
-      var _ls=Object.keys(_catFonte()||{});
-      if(_ls.length===1){
-        if(rot)rot.style.display='none';
-        if(grid)grid.style.display='none';
-        if(S.incBrandSel!==_ls[0]||!(wrap&&wrap.style.display!=='none')) selInclusoBrand(_ls[0]);
-        /* o index.html leva a lista de modelos para DENTRO da grade, logo
-           abaixo do cartao escolhido -- e a grade esta escondida. Tiro a lista
-           de la (fica logo depois da grade) e desmarco o cartao, senao o
-           mesmo script a devolve para dentro no proximo redimensionamento. */
-        if(grid&&wrap&&grid.contains(wrap)) grid.parentNode.insertBefore(wrap,grid.nextSibling);
-        if(grid) grid.querySelectorAll('.bcard.sel').forEach(function(c){ c.classList.remove('sel'); });
-        if(wrap) wrap.style.gridColumn='';
-      }
-    }catch(e){}
+    _smLinhaUnica();
     /* saiu do sob medida com uma redoma sob medida escolhida: solta */
     if(S.incProduto&&S.incProduto.sm){ S.incProduto=null; try{ calcPrice(); }catch(e){} }
   }
@@ -6164,7 +6181,7 @@ function _smIso(L,P,A,w,h,op){
       var fs=Math.max(1.2,Math.min(Math.min(L,A)*0.22,L/7));
       out+='<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2a2a"/><stop offset="1" stop-color="#141414"/></linearGradient></defs>'
         +'<g transform="'+mt+'"><rect x="0" y="0" width="'+L+'" height="'+A+'" fill="url(#'+gid+')" stroke="#E8600A" stroke-width="'+(0.35).toFixed(2)+'" stroke-dasharray="'+(1.2).toFixed(1)+' '+(0.8).toFixed(1)+'"/>'
-        +'<text x="'+(L/2).toFixed(2)+'" y="'+(A/2).toFixed(2)+'" fill="#E8600A" font-size="'+fs.toFixed(2)+'" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle" letter-spacing="'+(fs*0.12).toFixed(2)+'">SUA IMAGEM</text></g>';
+        +'<text x="'+(L/2).toFixed(2)+'" y="'+(A/2).toFixed(2)+'" fill="#E8600A" font-size="'+fs.toFixed(2)+'" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle" letter-spacing="'+(fs*0.12).toFixed(2)+'">'+_smTxtImg()+'</text></g>';
     }
   }
   out+=poly([p(L,0,0),p(L,P,0),p(L,P,A),p(L,0,A)],g+'0.06)',g+'0.35)');
