@@ -3416,6 +3416,41 @@ var _FP_ATALHOS={
    o atalho assim que o banco responde -- senao o cliente do anuncio cairia
    numa prateleira vazia, que e' o pior lugar para gastar clique pago. */
 var _FP_ATALHO_ESPERA=false;
+/* LINK DE UM PRODUTO SO (24/09/2026) -- para o anuncio de UM produto cair
+   direto na ficha dele, sem o cliente procurar na lista:
+       ?p=r7   redoma de id 7          ?p=p3   quadro de catalogo de id 3
+   E' o mesmo codigo que o pixel da Meta ja manda no ViewContent, entao o
+   anuncio, o link e o evento falam do mesmo produto. O id e' o do banco: nao
+   muda quando o nome, o preco ou a ordem mudam no painel.
+   Produto que nao existe mais (apagado ou oculto) nao vira tela quebrada: o
+   cliente cai na categoria dele. Mas so decido isso DEPOIS que o servidor
+   respondeu -- produto novo ainda nao esta na copia guardada no navegador. */
+var _FP_CAT_RESPONDEU=false;
+function _fpAchaProduto(tipo,id){
+  var cat=(tipo==='r')?REDOMA_CATALOG:INCLUSO_CATALOG, achou=null;
+  try{
+    Object.keys(cat||{}).forEach(function(b){
+      (((cat[b]||{}).itens)||[]).forEach(function(it,i){
+        if(!achou && it && Number(it.id)===id) achou={b:b,i:i};
+      });
+    });
+  }catch(e){}
+  return achou;
+}
+function _fpAtalhoDeNovo(){
+  try{ if(_FP_ATALHO_ESPERA) _fpAtalhoAnuncio(); }catch(e){}
+}
+/* depois de abrir o produto, o p sai do endereco (o resto -- utm, fbclid --
+   fica). Sem isso, "Continuar comprando" e "Nova personalizacao", que
+   recarregam a pagina, abririam o MESMO produto de novo em vez da home. */
+function _fpTiraP(){
+  try{
+    var u=new URL(location.href);
+    u.searchParams.delete('p');
+    if(/^#[rp]\d+$/i.test(u.hash)) u.hash='';
+    history.replaceState(history.state,'',u.pathname+u.search+u.hash);
+  }catch(e){}
+}
 function _fpAtalhoAnuncio(){
   var p='';
   try{
@@ -3424,6 +3459,12 @@ function _fpAtalhoAnuncio(){
     p=p.toLowerCase().trim();
   }catch(e){}
   var r=_FP_ATALHOS[p];
+  var _pm=/^([rp])(\d+)$/.exec(p), _alvo=null;
+  if(!r && _pm){
+    _alvo=_fpAchaProduto(_pm[1],parseInt(_pm[2],10));
+    if(!_alvo && !_FP_CAT_RESPONDEU){ _FP_ATALHO_ESPERA=true; return; }
+    r=_FP_ATALHOS[_pm[1]==='r'?'redoma':'miniatura'];
+  }
   if(!r) return;
   /* catalogo ainda nao chegou: em vez de abrir a categoria vazia, eu espero */
   if(r[0]==='redoma' && typeof _temRedoma==='function' && !_temRedoma()){
@@ -3441,9 +3482,25 @@ function _fpAtalhoAnuncio(){
        Com duas ou mais, o cliente escolhe, como nas outras categorias. */
     if(r[0]==='redoma' && typeof selInclusoBrand==='function'){
       var _ls=Object.keys(REDOMA_CATALOG||{});
-      if(_ls.length===1) selInclusoBrand(_ls[0]);
+      if(_ls.length===1){
+        selInclusoBrand(_ls[0]);
+        /* CONSERTO (24/09/2026): o selInclusoBrand marca o cartao da linha, e o
+           index.html leva a lista para DENTRO da grade, logo abaixo dele -- so
+           que com uma linha so a grade fica escondida. Resultado: quem chegava
+           pelo anuncio de redoma pela 1a vez (sem catalogo guardado) via
+           "Redoma pronta" marcada e NENHUM produto. O _smLinhaUnica tira a
+           lista da grade e desmarca o cartao, que e' o estado certo. */
+        try{ if(typeof _smLinhaUnica==='function') _smLinhaUnica(); }catch(e){}
+      }
+    }
+    /* link de produto: abre a linha dele e a ficha, como se o cliente tivesse
+       clicado na lista (o VOLTAR da ficha leva para essa lista) */
+    if(_alvo && typeof selInclusoProduto==='function'){
+      if(S.incBrandSel!==_alvo.b) selInclusoBrand(_alvo.b);
+      selInclusoProduto(_alvo.i);
     }
   }catch(e){}
+  if(_pm) _fpTiraP();
 }
 (function(){
   /* depois que o site terminou de se montar, senao a etapa e' desenhada por
@@ -3488,8 +3545,8 @@ function carregarCatalogoDoBanco(){
     if(_ant){ try{ _aplicaCatalogoBanco(_ant); }catch(e){} }
     fetch('https://funparts-ai-proxy.rodox1209.workers.dev/catalogo',{cache:'no-store'})
       .then(function(r){ return r.ok?r.json():null; })
-      .then(function(c){ if(c && !c.erro){ _aplicaCatalogoBanco(c); _catCacheGravar(c); } })
-      .catch(function(){}); // falhou: fica com o embutido
+      .then(function(c){ _FP_CAT_RESPONDEU=true; if(c && !c.erro){ _aplicaCatalogoBanco(c); _catCacheGravar(c); } else _fpAtalhoDeNovo(); })
+      .catch(function(){ _FP_CAT_RESPONDEU=true; _fpAtalhoDeNovo(); }); // falhou: fica com o embutido
   }catch(e){}
 }
 (function(){
