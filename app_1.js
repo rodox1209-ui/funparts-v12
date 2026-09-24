@@ -3544,13 +3544,42 @@ function selInclusoBrand(b){
   var w=document.getElementById('inclusoModelsWrap'); if(w)w.style.display='block';
   var cnt=document.getElementById('inclusoModelsCount'); if(cnt)cnt.textContent='('+its.length+')';
   var lst=document.getElementById('inclusoModels'); if(!lst)return;
+  _mrowCss();
   lst.innerHTML=its.map(function(it,i){
     /* a redoma nao tem escala de miniatura: no lugar dela vai a medida */
     var _tag=_ehRedoma()?_redomaMedida(it):it.esc;
-    return '<div class="mrow" data-ii="'+i+'" onclick="selInclusoProduto(this.getAttribute(\'data-ii\'))"><span>'+it.n+'</span><span class="mrow-tag">'+(_tag?(_tag+' \u00b7 '):'')+_brl(it.p)+'</span></div>';
+    /* MINIATURA DA FOTO (24/09/2026): o cliente acha o produto pela imagem,
+       nao pelo nome. E' a primeira foto do produto no painel -- para trocar,
+       reordene as fotos la. Produto sem foto fica com um quadro neutro. */
+    var _f=(it.fotos&&it.fotos.length)?_fotoUrl(it.fotos[0]):'';
+    var _img=_f?'<img src="'+_f+'" alt="" loading="lazy" decoding="async">':'<i>\ud83c\udfc1</i>';
+    return '<div class="mrow mrow-f" data-ii="'+i+'" onclick="selInclusoProduto(this.getAttribute(\'data-ii\'))">'
+      +'<span class="mrow-img">'+_img+'</span>'
+      +'<span class="mrow-tx"><span class="mrow-n">'+it.n+'</span>'
+      +'<span class="mrow-g">'+(_tag?('<span>'+_tag+'</span> \u00b7 '):'')+'<b>'+_brl(it.p)+'</b></span></span>'
+      +'<span class="mrow-ch">\u203a</span></div>';
   }).join('');
 }
 
+/* estilo da linha com miniatura, injetado uma vez. So vale para .mrow-f --
+   a lista de modelos LEGO usa .mrow sozinha e nao muda. */
+function _mrowCss(){
+  if(document.getElementById('mrowCss')) return;
+  var st=document.createElement('style'); st.id='mrowCss';
+  st.textContent=
+   '.mrow.mrow-f{justify-content:flex-start;gap:12px;padding:8px;border-radius:8px;margin-bottom:3px}'
+  +'.mrow.mrow-f:not(.sel){color:#ddd}'
+  +'.mrow-f .mrow-img{flex:none;width:64px;height:64px;border-radius:6px;overflow:hidden;background:#0b0b0b;display:flex;align-items:center;justify-content:center}'
+  +'.mrow-f .mrow-img img{width:100%;height:100%;object-fit:cover;display:block}'
+  +'.mrow-f .mrow-img i{font-style:normal;font-size:20px;opacity:.5}'
+  +'.mrow-f .mrow-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}'
+  +'.mrow-f .mrow-n{line-height:1.25}'
+  +'.mrow-f .mrow-g{font-size:10px;letter-spacing:1px;color:#E8600A;font-weight:600}'
+  +'.mrow-f .mrow-g b{color:#fff;font-weight:700}'
+  +'.mrow-f .mrow-ch{flex:none;margin-left:auto;color:#555;font-size:18px;padding-right:4px;line-height:1}'
+  +'.mrow-f:hover .mrow-ch,.mrow-f.sel .mrow-ch{color:var(--orange)}';
+  document.head.appendChild(st);
+}
 function trocarFotoIncluso(k){
   k=parseInt(k,10); S.incFotoIdx=k;
   var F=_catFotos();
