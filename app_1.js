@@ -4750,7 +4750,7 @@ function fecharPedidoWpp(){
   if(btn){ btn.disabled=true; btn.textContent='EnviandoÃ¢ÂÂ¦'; }
 
   function _abrirZap(txt){
-    var url='https://wa.me/5511910646157?text='+encodeURIComponent(txt);
+    var url='https://wa.me/5511910646157?text='+encodeURIComponent((window._fpZap||String)(txt));
     if(aba && !aba.closed){ aba.location.href=url; } else { window.open(url,'_blank'); }
     if(btn){ btn.disabled=false; btn.textContent='Fechar pedido via WhatsApp'; }
   }

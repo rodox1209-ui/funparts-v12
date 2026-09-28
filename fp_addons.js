@@ -3987,7 +3987,7 @@ function _startOb14(){
 
     var alvo=document.getElementById('cartFoot2')||document.getElementById('cartFoot')
              ||document.getElementById('cartPanel');
-    if(!alvo){ try{ if(typeof textoZap==='function')window.open('https://wa.me/5511910646157?text='+encodeURIComponent(textoZap()),'_blank'); }catch(e){} return; }
+    if(!alvo){ try{ if(typeof textoZap==='function')window.open('https://wa.me/5511910646157?text='+encodeURIComponent((window._fpZap||String)(textoZap())),'_blank'); }catch(e){} return; }
 
     var velho=document.getElementById('fpPgtoFalha');
     if(velho)velho.remove();
@@ -4021,7 +4021,7 @@ function _startOb14(){
         if(pedido&&pedido.codigo)txt+='\nPedido: '+pedido.codigo;
         if(cliente&&cliente.nome)txt+='\nCliente: '+cliente.nome;
       }
-      try{ window.open('https://wa.me/5511910646157?text='+encodeURIComponent(txt),'_blank'); }catch(e){}
+      try{ window.open('https://wa.me/5511910646157?text='+encodeURIComponent((window._fpZap||String)(txt)),'_blank'); }catch(e){}
     });
   };
 })();
@@ -4154,4 +4154,106 @@ function _startOb14(){
   }
   setTimeout(envolve,300); setTimeout(envolve,1200); setTimeout(envolve,2500);
   setTimeout(passada,1500);
+})();
+
+/* ============ WHATSAPP: MENSAGEM LIMPA (28/09/2026) ============
+   O botao "Tirar duvidas no WhatsApp" do resumo montava a mensagem com
+   variaveis do app_1.js que (1) guardam texto com acentuacao corrompida e
+   (2) nao sabem de redoma nem de produto pronto -- a redoma saia como
+   "Tipo: Miniatura / Modelo: Ferrari / 25 x 35 cm". Agora a mensagem sai do
+   PROPRIO RESUMO que o cliente esta vendo (ja consertado e traduzido na
+   tela), e todo texto que vai para o WhatsApp passa por _fpZap, que desfaz
+   a corrupcao por trecho. Fonte so em ASCII (\u) de proposito. */
+(function(){
+  var CP={0x20AC:0x80,0x201A:0x82,0x0192:0x83,0x201E:0x84,0x2026:0x85,0x2020:0x86,0x2021:0x87,
+          0x02C6:0x88,0x2030:0x89,0x0160:0x8A,0x2039:0x8B,0x0152:0x8C,0x017D:0x8E,0x2018:0x91,
+          0x2019:0x92,0x201C:0x93,0x201D:0x94,0x2022:0x95,0x2013:0x96,0x2014:0x97,0x02DC:0x98,
+          0x2122:0x99,0x0161:0x9A,0x203A:0x9B,0x0153:0x9C,0x017E:0x9E,0x0178:0x9F};
+  var RUN=/[\u0080-\u00ff\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u0192\u02c6\u02dc\u2013\u2014\u2018-\u201a\u201c-\u201e\u2020-\u2022\u2026\u2030\u2039\u203a\u20ac\u2122]{2,}/g;
+  function rodada(run){
+    var b=new Uint8Array(run.length);
+    for(var i=0;i<run.length;i++){
+      var c=run.charCodeAt(i);
+      if(c<256)b[i]=c; else if(CP[c]!=null)b[i]=CP[c]; else return null;
+    }
+    try{ return new TextDecoder('utf-8',{fatal:true}).decode(b); }catch(e){ return null; }
+  }
+  function conserta(s){
+    s=String(s==null?'':s);
+    for(var k=0;k<4;k++){
+      var mudou=false;
+      s=s.replace(RUN,function(run){
+        var d=rodada(run);
+        if(d!=null&&d!==run&&d.length<run.length){ mudou=true; return d; }
+        return run;
+      });
+      if(!mudou)break;
+    }
+    return s.replace(/[\ufffd\u0080-\u009F]/g,'');
+  }
+  window._fpZap=conserta;
+
+  var TXT={
+    pt:{oi:'Ol\u00e1! Tenho uma d\u00favida sobre esta configura\u00e7\u00e3o no site da Funparts:',tot:'Total estimado',ver:'Ver o produto'},
+    en:{oi:'Hi! I have a question about this configuration on the Funparts website:',tot:'Estimated total',ver:'See the product'},
+    es:{oi:'\u00a1Hola! Tengo una duda sobre esta configuraci\u00f3n en el sitio de Funparts:',tot:'Total estimado',ver:'Ver el producto'},
+    fr:{oi:'Bonjour ! J\u2019ai une question sur cette configuration sur le site Funparts :',tot:'Total estim\u00e9',ver:'Voir le produit'}
+  };
+  var ICO={sumDim:'\ud83d\udcd0',sumMold:'\ud83d\uddbc\ufe0f',sumFund:'\ud83c\udfa8',sumLed:'\ud83d\udca1',
+           sumMini:'\ud83d\ude97',sumRel:'\u2728',pvSku:'\ud83d\udd16'};
+  var ESTILO=window.__fpZapEstilo||'B';
+
+  function txt(el){ return el?conserta(String(el.textContent||'')).replace(/\s+/g,' ').trim():''; }
+  function vazio(v){ return !v||/^[\u2014\u2013\-\u00b7.\s]*$/.test(v); }
+  function vis(el){ return !!(el&&el.style.display!=='none'&&getComputedStyle(el).display!=='none'); }
+
+  function linkProduto(){
+    try{
+      var p=(typeof S!=='undefined')?S.incProduto:null;
+      if(!p||p.sm||p.id==null)return '';
+      return 'https://www.funparts.com.br/?p='+(S.ehRedoma?'r':'p')+p.id;
+    }catch(e){ return ''; }
+  }
+
+  function montar(){
+    var L=(window.FP&&TXT[FP.lang])||TXT.pt, B=(ESTILO==='B');
+    var t=[L.oi,''], total='', titulo='', sub='';
+    var inc=document.getElementById('inclusoSummaryBlock');
+    if(vis(inc)){
+      titulo=txt(document.getElementById('iSumBrand'));
+      sub=txt(document.getElementById('iSumName'));
+      total=txt(document.getElementById('iSumPrice'));
+      if(titulo&&sub){ t.push((B?'\ud83c\udff7\ufe0f ':'')+'*'+titulo+'*'); t.push(sub); }
+      else if(sub||titulo){ t.push((B?'\ud83c\udff7\ufe0f ':'')+'*'+(sub||titulo)+'*'); }
+    }else{
+      var cat=txt(document.getElementById('sumCat')), mod=txt(document.getElementById('sumMod'));
+      if(!vazio(cat))t.push((B?'\ud83c\udff7\ufe0f ':'')+'*'+cat+'*');
+      if(!vazio(mod))t.push(mod);
+      var extra=[];
+      var rows=document.querySelectorAll('#step-7 .sum-block .sum-row');
+      for(var i=0;i<rows.length;i++){
+        var v=rows[i].querySelector('.sum-val'), k=rows[i].querySelector('.sum-key');
+        if(!v||v.id==='sumCat'||v.id==='sumMod')continue;
+        var val=txt(v), key=txt(k);
+        if(vazio(val)||!key)continue;
+        if(v.id==='pvSku')key='SKU';
+        extra.push((B&&ICO[v.id]?ICO[v.id]+' ':'')+key+': '+val);
+      }
+      if(extra.length){ t.push(''); t=t.concat(extra); }
+      total=txt(document.getElementById('sumTotal'));
+    }
+    if(!vazio(total)){ t.push(''); t.push((B?'\ud83d\udcb0 ':'')+'*'+L.tot+': '+total+'*'); }
+    var lk=linkProduto();
+    if(lk){ t.push(''); t.push((B?'\ud83d\udd17 ':'')+L.ver+': '+lk); }
+    return conserta(t.join('\n'));
+  }
+  window._fpZapTexto=montar;
+
+  var velho=window.abrirWpp;
+  window.abrirWpp=function(){
+    var m='';
+    try{ m=montar(); }catch(e){ m=''; }
+    if(!m){ try{ if(typeof velho==='function')return velho.apply(this,arguments); }catch(e){} return; }
+    window.open('https://wa.me/5511910646157?text='+encodeURIComponent(m),'_blank');
+  };
 })();
