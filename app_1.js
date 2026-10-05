@@ -3434,6 +3434,7 @@ function _aplicaCatalogoBanco(c){
   try{
     Object.keys(PRONTO_CATALOG).forEach(function(k){ delete PRONTO_CATALOG[k]; });
     if(c.pronto) Object.keys(c.pronto).forEach(function(k){ PRONTO_CATALOG[k]=c.pronto[k]; });
+    _montaProntoVista();
   }catch(_ep){}
   if(c.precos) CAT_PRECOS=c.precos;
   if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
@@ -3504,8 +3505,8 @@ function _fpAchaProduto(tipo,id){
   /* quadro pronto (sem miniatura): mesma tabela do banco, entao o mesmo p<id> */
   if(!achou && tipo!=='r'){
     try{
-      Object.keys(PRONTO_CATALOG||{}).forEach(function(b){
-        (((PRONTO_CATALOG[b]||{}).itens)||[]).forEach(function(it,i){
+      Object.keys(PRONTO_VISTA||{}).forEach(function(b){
+        (((PRONTO_VISTA[b]||{}).itens)||[]).forEach(function(it,i){
           if(!achou && it && Number(it.id)===id) achou={b:b,i:i,pronto:true};
         });
       });
@@ -3649,9 +3650,21 @@ function _linProd(k,v){return '<div style="display:flex;justify-content:space-be
    caractere por caractere igual ao que esta no ar hoje. */
 var REDOMA_CATALOG={};
 function _ehRedoma(){ return typeof S!=='undefined' && !!S.ehRedoma; }
-function _catFonte(){ return _ehRedoma()?REDOMA_CATALOG:(_ehPronto()?PRONTO_CATALOG:INCLUSO_CATALOG); }
+function _catFonte(){ return _ehRedoma()?REDOMA_CATALOG:(_ehPronto()?PRONTO_VISTA:INCLUSO_CATALOG); }
 /* QUADROS PRONTOS (sem miniatura) -- chave "pronto" do /catalogo */
 var PRONTO_CATALOG={};
+/* o cliente vai DIRETO para os produtos (pedido dele, 05/10/2026): a tela
+   le uma lista unica com os produtos de todas as categorias, na ordem do
+   painel. Cada produto guarda a categoria de origem em _cat. */
+var PRONTO_TODOS='Quadros prontos';
+var PRONTO_VISTA={};
+function _montaProntoVista(){
+  var it=[];
+  Object.keys(PRONTO_CATALOG).forEach(function(b){
+    (((PRONTO_CATALOG[b]||{}).itens)||[]).forEach(function(p){ var q={}; for(var k in p)q[k]=p[k]; q._cat=b; it.push(q); });
+  });
+  PRONTO_VISTA={}; if(it.length) PRONTO_VISTA[PRONTO_TODOS]={logo:'',itens:it};
+}
 function _ehPronto(){ return typeof S!=='undefined' && !!S.ehPronto && !S.ehRedoma; }
 function _temPronto(){ try{ return Object.keys(PRONTO_CATALOG).length>0; }catch(e){ return false; } }
 /* ha redoma para vender? categoria vazia ja nao chega aqui (o servidor corta) */
@@ -3784,6 +3797,7 @@ function selInclusoProduto(i){
 /* a ficha do produto pronto -- quadro de catalogo, redoma pronta e, agora, a
    redoma sob medida (que chega aqui montada pelo formulario, sem indice) */
 function _abreProdutoIncluso(it,b,i){
+  if(_ehPronto() && it && it._cat) b=(Object.keys(PRONTO_CATALOG).length>1)?it._cat:PRONTO_TODOS;
   S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
   /* vale para quadro de catalogo E para redoma: os dois passam por aqui --
      por isso a letra, que e' o que separa as duas tabelas */
@@ -3816,7 +3830,7 @@ function _abreProdutoIncluso(it,b,i){
       +(it.desc?('<div style="margin-top:14px;color:rgba(255,255,255,.62);font-size:12.5px;line-height:1.75;white-space:pre-line;">'+_escTxt(it.desc)+'</div>'):'');
   } else if(d){
     d.innerHTML='<div style="display:flex;flex-direction:column;gap:7px;">'
-      +_linProd('Marca',b)
+      +((_ehPronto() && Object.keys(PRONTO_CATALOG).length<2)?'':_linProd('Marca',b))
       +_linProd('Dimens\u00e3o do quadro',it.dim)
       +_linProd('Escala da miniatura',it.esc)
       +_linProd('Moldura',it.mol)
@@ -6053,7 +6067,7 @@ function _smEscolha(grid){
     var rot0=sec.querySelector(':scope > .sec-sub'); if(rot0)rot0.style.display='';
     grid.style.display='';
     /* sem Personalize (Europa): a linha unica tambem abre direto */
-    if(ehR) _smLinhaUnica();
+    if(ehR || (typeof _ehPronto==='function' && _ehPronto())) _smLinhaUnica();
     return;
   }
   if(!box){
