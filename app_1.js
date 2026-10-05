@@ -3796,6 +3796,25 @@ function selInclusoProduto(i){
 }
 /* a ficha do produto pronto -- quadro de catalogo, redoma pronta e, agora, a
    redoma sob medida (que chega aqui montada pelo formulario, sem indice) */
+/* TEXTO DO PRODUTO (05/10/2026): o texto que o Rodolfo escreve no painel, no
+   idioma do cliente; idioma vazio cai no portugues. Fica ABAIXO da ficha
+   (opcao A). textContent: texto do painel nunca entra como HTML. */
+function _txDoItem(it){
+  var t=(it&&it.tx)||null; if(!t) return '';
+  var l='pt'; try{ l=(window.FP&&FP.lang)||'pt'; }catch(e){}
+  return String(t[l]||t.pt||'').trim();
+}
+function _txPinta(it){
+  var el=document.getElementById('ip2Txt'); if(!el) return;
+  var x=_txDoItem(it);
+  el.textContent=x; el.style.display=x?'':'none';
+  try{
+    if(window.FP && typeof FP.setLang==='function' && !FP.__txGancho){
+      var o=FP.setLang; FP.__txGancho=1;
+      FP.setLang=function(){ var r=o.apply(this,arguments); try{ _txPinta((S.incProduto&&!_ehRedoma())?S.incProduto:null); }catch(e){} return r; };
+    }
+  }catch(e){}
+}
 function _abreProdutoIncluso(it,b,i){
   if(_ehPronto() && it && it._cat) b=(Object.keys(PRONTO_CATALOG).length>1)?it._cat:PRONTO_TODOS;
   S.incProduto=it; S.incBrand=b; S.miniChoice='incluso'; S.incProdIdx=i;
@@ -3839,6 +3858,7 @@ function _abreProdutoIncluso(it,b,i){
                    :_linProd('Miniatura','<span style="color:#7bd67b;">Inclusa</span>'))
       +'</div>';
   }
+  _txPinta(_ehRedoma()?null:it);
   setStyle('miniInclusoAISection','display','none');
   setStyle('step2RegularContent','display','none');
   setStyle('inclusoProdutoSection','display','block');
