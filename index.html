@@ -400,6 +400,29 @@ alt=""/></noscript>
   </div>
 
 
+  <!-- SOMENTE QUADRO: os dois caminhos (05/10/2026). Aparece so quando ha
+       quadro pronto publicado no painel; sem nenhum, "Somente quadro" vai
+       direto para a IA, como sempre foi. -->
+  <div id="miniEscolhaApenasSection" style="display:none;">
+    <div class="sec-title" style="margin-bottom:2px;">SOMENTE QUADRO</div>
+    <div class="sec-sub" style="margin-bottom:12px;">Como voc&ecirc; quer o seu quadro?</div>
+    <div class="toggle2" style="gap:14px;">
+      <div class="tcard" id="tApenasPronto" onclick="selApenasCaminho('pronto')" style="cursor:pointer;">
+        <div style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#3a2c12,#6b4a12);border:1px solid #8a6420;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c26b" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7.5" y="7.5" width="9" height="9" rx="1"/></svg></div>
+        <div class="ttitle">Quadros prontos para sua miniatura</div>
+        <div class="tdesc">Modelos j&aacute; criados para miniaturas espec&iacute;ficas. Escolha a marca e o modelo.</div>
+      </div>
+      <div class="tcard" id="tApenasIA" onclick="selApenasCaminho('ia')" style="cursor:pointer;">
+        <div style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#0f2a3d,#1d5a86);border:1px solid #2b7ab4;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#bfe3ff" aria-hidden="true"><path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z"/></svg></div>
+        <div class="ttitle">Personalize o quadro para sua miniatura</div>
+        <div class="tdesc">Monte o fundo do seu jeito e veja a pr&eacute;via gerada por Intelig&ecirc;ncia Artificial.</div>
+      </div>
+    </div>
+    <div class="nav-btns" style="margin-top:18px;">
+      <button class="btn-back" onclick="backToMiniChoice()">&larr; Voltar</button>
+    </div>
+  </div>
+
   <!-- INCLUSO: model gallery section -->
   <div id="miniInclusoModelSection" style="display:none;">
     <div class="sec-sub" style="margin-bottom:8px;" id="inclusoModelTitle">Modelos disponÃÂ­veis</div>
@@ -957,7 +980,7 @@ alt=""/></noscript>
   <button class="btn-back" onclick="editarConfiguracao()">Ã¢ÂÂ Editar configuraÃÂ§ÃÂ£o</button>
 </div>
 
-<div id="sidebarMiniInfo" style="display:none;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div id="miniInfoPaths"><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:12px;">Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ dois caminhos:</div><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">1)</span>Escolher quadros para sua miniatura(s);</div><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">2)</span>Escolher quadros prontos que jÃÂ¡ contenham miniaturas inclusas.</div></div></div><div id="miniInfoAI" style="display:none;"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:#fa0;letter-spacing:1.2px;font-weight:700;text-transform:uppercase;margin-bottom:9px;">Sobre esta visualizaÃÂ§ÃÂ£o</div><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:9px;">A imagem do veÃÂ­culo foi gerada por InteligÃÂªncia Artificial para facilitar a visualizaÃÂ§ÃÂ£o de como a sua miniatura ficarÃÂ¡ aplicada no quadro.</div><div style="font-size:11px;color:#999;line-height:1.6;margin-bottom:9px;">Por esse motivo, alguns detalhes, como rodas, farÃÂ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃÂ§as em relaÃÂ§ÃÂ£o ÃÂ  miniatura que vocÃÂª possui.</div><div style="font-size:11px;color:#ccc;line-height:1.6;">Nesta etapa, o objetivo principal ÃÂ© demonstrar a <strong style="color:#fa0;">proporÃÂ§ÃÂ£o do veÃÂ­culo em relaÃÂ§ÃÂ£o ao quadro</strong>. Assim, na prÃÂ³xima etapa, vocÃÂª poderÃÂ¡ comparar os diferentes tamanhos disponÃÂ­veis e escolher com mais seguranÃÂ§a o modelo que melhor valoriza e acomoda a sua miniatura.</div></div></div></div>
+<div id="sidebarMiniInfo" style="display:none;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div id="miniInfoPaths"><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:12px;">Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ dois caminhos:</div><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;"><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">1)</span>Escolher quadros para sua miniatura(s);</div><div style="font-size:11px;color:#ccc;line-height:1.5;"><span style="color:#fa0;font-weight:700;margin-right:4px;">2)</span>Escolher quadros prontos que jÃÂ¡ contenham miniaturas inclusas.</div></div></div><div id="miniInfoApenas" style="display:none;"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:11px;color:#ccc;line-height:1.6;">Nessa op&ccedil;&atilde;o a miniatura n&atilde;o est&aacute; inclusa. Produzimos e vendemos apenas o quadro para a sua miniatura.</div></div></div><div id="miniInfoAI" style="display:none;"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:#fa0;letter-spacing:1.2px;font-weight:700;text-transform:uppercase;margin-bottom:9px;">Sobre esta visualizaÃÂ§ÃÂ£o</div><div style="font-size:11px;color:#ccc;line-height:1.6;margin-bottom:9px;">A imagem do veÃÂ­culo foi gerada por InteligÃÂªncia Artificial para facilitar a visualizaÃÂ§ÃÂ£o de como a sua miniatura ficarÃÂ¡ aplicada no quadro.</div><div style="font-size:11px;color:#999;line-height:1.6;margin-bottom:9px;">Por esse motivo, alguns detalhes, como rodas, farÃÂ³is, tonalidades e acabamentos, podem apresentar pequenas diferenÃÂ§as em relaÃÂ§ÃÂ£o ÃÂ  miniatura que vocÃÂª possui.</div><div style="font-size:11px;color:#ccc;line-height:1.6;">Nesta etapa, o objetivo principal ÃÂ© demonstrar a <strong style="color:#fa0;">proporÃÂ§ÃÂ£o do veÃÂ­culo em relaÃÂ§ÃÂ£o ao quadro</strong>. Assim, na prÃÂ³xima etapa, vocÃÂª poderÃÂ¡ comparar os diferentes tamanhos disponÃÂ­veis e escolher com mais seguranÃÂ§a o modelo que melhor valoriza e acomoda a sua miniatura.</div></div></div></div>
 
 <div id="sidebarLegoInfo" style="display:block;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06);"><div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:8px;padding:12px 14px;"><div style="font-size:11px;color:#ccc;line-height:1.6;">Se escolher essa opÃÂ§ÃÂ£o vocÃÂª terÃÂ¡ <strong style="color:#fa0;">dezenas de modelos de quadros</strong> para fixar sua miniatura de Lego.</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,200,0,0.18);font-size:10px;color:#999;line-height:1.6;"><span style="color:#fa0;font-weight:700;">ObservaÃÂ§ÃÂ£o:</span> Nessa opÃÂ§ÃÂ£o nÃÂ£o estÃÂ¡ incluso a miniatura. Produzimos e vendemos apenas os quadros <strong style="color:#ddd;">PREMIUM</strong> para Lego.</div></div></div>
 

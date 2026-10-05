@@ -179,14 +179,18 @@ function _pintaEtapa(n){
       setStyle('miniChoiceSection','display',  t==='escolha' ?'block':'none');
       setStyle('miniInclusoAISection','display',t==='catalogo'?'block':'none');
       setStyle('miniApenasSection','display',  t==='apenas'  ?'block':'none');
+      setStyle('miniEscolhaApenasSection','display', t==='escolhaApenas'?'block':'none');
       setStyle('miniSection','display','none');
       setStyle('step1NavBtns','display',       t==='lego'    ?'':'none');
       /* na tela de escolha o titulo fica escondido de proposito (o texto esta
          dentro dos proprios cards); nas outras tres ele aparece */
-      setStyle('step1Title','display', t==='escolha'?'none':'');
-      setStyle('step1Sub','display',   t==='escolha'?'none':'');
+      setStyle('step1Title','display', (t==='escolha'||t==='escolhaApenas')?'none':'');
+      setStyle('step1Sub','display',   (t==='escolha'||t==='escolhaApenas')?'none':'');
       setStyle('sidebarMiniInfo','display', (t==='catalogo'||t==='lego')?'none':'block');
+      _infoApenas(t==='escolhaApenas');
       if(t==='catalogo'){
+        if(_ehPronto()){ setEl('step1Title','Quadros prontos para sua miniatura');
+                         setEl('step1Sub','Selecione o quadro da sua prefer\u00eancia'); }
         /* a lista pode ter sido esvaziada por outro fluxo -- se estiver vazia,
            desenho de novo em vez de entregar uma prateleira sem nada */
         if(!document.querySelectorAll('#inclusoBrands .bcard').length
@@ -508,7 +512,7 @@ function selectTipo(t){
      que ja esta testada em producao. O S.ehRedoma e' o que diz a verdade para
      quem precisa saber -- as telas, o resumo e, na fase 3, o frete. */
   if(t==='redoma'){
-    S.tipo='mini'; S.miniChoice='incluso'; S.ehRedoma=true; S.tela1='catalogo';
+    S.tipo='mini'; S.miniChoice='incluso'; S.ehRedoma=true; S.tela1='catalogo'; S.ehPronto=false;
     S.incProduto=null; S.incBrandSel=null;
     var _cR=document.getElementById('tRedoma'); if(_cR)_cR.classList.add('sel');
     var _cL=document.getElementById('tLego');   if(_cL)_cL.classList.remove('sel');
@@ -533,7 +537,7 @@ function selectTipo(t){
     calcPrice();
     return;
   }
-  S.ehRedoma=false;
+  S.ehRedoma=false; S.ehPronto=false;
   /* a etapa 2 tem quatro telas possiveis; S.tela1 diz qual esta valendo, e e'
      com ela que o Voltar consegue repintar a etapa certa mais tarde */
   S.tela1=(t==='lego')?'lego':'escolha';
@@ -1190,6 +1194,12 @@ function backToMiniChoice(){
      unica saida era "Iniciar nova personalizacao".
      No fluxo de redoma, Voltar volta para a escolha de categoria. */
   if(typeof _ehRedoma==='function' && _ehRedoma()){ goStep(0); return; }
+  /* SOMENTE QUADRO (05/10/2026): quem esta nos quadros prontos ou na IA
+     volta para a tela dos dois caminhos; dela, para "Com ou sem miniatura" */
+  if((S.ehPronto || S.tela1==='apenas') && _temPronto()){ _mostraEscolhaApenas(); return; }
+  S.ehPronto=false;
+  setStyle('miniEscolhaApenasSection','display','none');
+  _infoApenas(false);
   setStyle('miniInclusoAISection','display','none');
   setStyle('miniApenasSection','display','none');
   setStyle('miniChoiceSection','display','block');
@@ -1199,7 +1209,56 @@ function backToMiniChoice(){
   setStyle('step1NavBtns','display','none');
 }
 
+/* === SOMENTE QUADRO: DOIS CAMINHOS (05/10/2026) ===
+   "Somente quadro" deixa de ir direto para a IA e oferece:
+     1) Quadros prontos para sua miniatura -- produtos de catalogo SEM a
+        miniatura, cadastrados no painel (aba "Quadros prontos"), com
+        categorias proprias. Viajam pela mesma estrada do "Quadro incluso
+        miniatura" (lista, ficha, carrinho, preco conferido no servidor pelo
+        produto_id); o S.ehPronto so troca a FONTE do catalogo e os textos
+        que falam da miniatura.
+     2) Personalize o quadro para sua miniatura -- a tela da IA, intocada.
+   Sem nenhum quadro pronto publicado, "Somente quadro" continua indo direto
+   para a IA: a tela nova nunca aparece com uma prateleira vazia. */
 function selMiniChoice(choice){
+  if(choice==='pronto'||choice==='ia'){ selApenasCaminho(choice); return; }
+  if(choice==='apenas' && _temPronto()){ _mostraEscolhaApenas(); return; }
+  S.ehPronto=false;
+  _selMiniChoiceBase(choice);
+}
+function _mostraEscolhaApenas(){
+  S.miniChoice='apenas'; S.ehPronto=false; S.tela1='escolhaApenas'; S.incProduto=null;
+  if(typeof aplicarModoCatalogo==='function')aplicarModoCatalogo(false);
+  ['miniChoiceSection','miniInclusoAISection','miniApenasSection','miniSection'].forEach(function(id){ setStyle(id,'display','none'); });
+  setStyle('miniEscolhaApenasSection','display','block');
+  setStyle('step1NavBtns','display','none');
+  setStyle('step1Title','display','none');
+  setStyle('step1Sub','display','none');
+  setStyle('sidebarMiniInfo','display','block');
+  _infoApenas(true);
+  try{ _rotuloRedoma(false); }catch(e){}
+}
+function selApenasCaminho(c){
+  setStyle('miniEscolhaApenasSection','display','none');
+  _infoApenas(false);
+  if(c==='pronto' && _temPronto()){
+    S.ehPronto=true;
+    _selMiniChoiceBase('incluso');
+    setEl('step1Title','Quadros prontos para sua miniatura');
+    setEl('step1Sub','Selecione o quadro da sua prefer\u00eancia');
+    return;
+  }
+  S.ehPronto=false;
+  _selMiniChoiceBase('apenas');
+}
+/* o aviso lateral da tela nova; ao sair dela o aviso antigo volta como estava */
+function _infoApenas(on){
+  var a=document.getElementById('miniInfoApenas'), p=document.getElementById('miniInfoPaths');
+  if(!a) return;
+  if(on){ a.style.display='block'; if(p)p.style.display='none'; }
+  else if(a.style.display!=='none'){ a.style.display='none'; if(p)p.style.display='block'; }
+}
+function _selMiniChoiceBase(choice){
   S.miniChoice=choice;
   S.tela1=(choice==='incluso')?'catalogo':'apenas';
   // fora do catalogo o aviso lateral volta ao normal
@@ -3372,6 +3431,10 @@ function _aplicaCatalogoBanco(c){
     var _ibR=document.getElementById('inclusoBrands');
     if(_ehRedoma() && _ibR) renderInclusoBrands();
   }catch(_er){ console.error('redoma-catalogo', _er && _er.message); }
+  try{
+    Object.keys(PRONTO_CATALOG).forEach(function(k){ delete PRONTO_CATALOG[k]; });
+    if(c.pronto) Object.keys(c.pronto).forEach(function(k){ PRONTO_CATALOG[k]=c.pronto[k]; });
+  }catch(_ep){}
   if(c.precos) CAT_PRECOS=c.precos;
   if(c.fundos) LEGO_FUNDOS_DB=c.fundos;
   if(c.infos){ INFOS=c.infos; if(typeof _injetaAjuda==='function') setTimeout(_injetaAjuda,60);
@@ -3405,6 +3468,9 @@ var _FP_ATALHOS={
   lego:['lego',null], legos:['lego',null],
   miniatura:['mini','incluso'], miniaturas:['mini','incluso'], incluso:['mini','incluso'],
   quadro:['mini','apenas'], quadros:['mini','apenas'], somente:['mini','apenas'],
+  /* os dois caminhos de "Somente quadro" (05/10/2026) */
+  prontos:['mini','pronto'], pronto:['mini','pronto'], 'quadros-prontos':['mini','pronto'],
+  personalize:['mini','ia'], personalizar:['mini','ia'], ia:['mini','ia'],
   /* REDOMAS -- varias escritas para a mesma tela, porque quem monta o anuncio
      nem sempre lembra qual foi a combinada */
   redoma:['redoma',null], redomas:['redoma',null],
@@ -3435,6 +3501,16 @@ function _fpAchaProduto(tipo,id){
       });
     });
   }catch(e){}
+  /* quadro pronto (sem miniatura): mesma tabela do banco, entao o mesmo p<id> */
+  if(!achou && tipo!=='r'){
+    try{
+      Object.keys(PRONTO_CATALOG||{}).forEach(function(b){
+        (((PRONTO_CATALOG[b]||{}).itens)||[]).forEach(function(it,i){
+          if(!achou && it && Number(it.id)===id) achou={b:b,i:i,pronto:true};
+        });
+      });
+    }catch(e){}
+  }
   return achou;
 }
 function _fpAtalhoDeNovo(){
@@ -3463,13 +3539,18 @@ function _fpAtalhoAnuncio(){
   if(!r && _pm){
     _alvo=_fpAchaProduto(_pm[1],parseInt(_pm[2],10));
     if(!_alvo && !_FP_CAT_RESPONDEU){ _FP_ATALHO_ESPERA=true; return; }
-    r=_FP_ATALHOS[_pm[1]==='r'?'redoma':'miniatura'];
+    r=_FP_ATALHOS[_pm[1]==='r'?'redoma':((_alvo&&_alvo.pronto)?'prontos':'miniatura')];
   }
   if(!r) return;
   /* catalogo ainda nao chegou: em vez de abrir a categoria vazia, eu espero */
   if(r[0]==='redoma' && typeof _temRedoma==='function' && !_temRedoma()){
     _FP_ATALHO_ESPERA=true;
     return;
+  }
+  /* quadros prontos ainda nao chegaram do banco: espero, como na redoma */
+  if(r[1]==='pronto' && !_temPronto()){
+    if(!_FP_CAT_RESPONDEU){ _FP_ATALHO_ESPERA=true; return; }
+    r=_FP_ATALHOS.quadro;
   }
   _FP_ATALHO_ESPERA=false;
   try{
@@ -3568,7 +3649,11 @@ function _linProd(k,v){return '<div style="display:flex;justify-content:space-be
    caractere por caractere igual ao que esta no ar hoje. */
 var REDOMA_CATALOG={};
 function _ehRedoma(){ return typeof S!=='undefined' && !!S.ehRedoma; }
-function _catFonte(){ return _ehRedoma()?REDOMA_CATALOG:INCLUSO_CATALOG; }
+function _catFonte(){ return _ehRedoma()?REDOMA_CATALOG:(_ehPronto()?PRONTO_CATALOG:INCLUSO_CATALOG); }
+/* QUADROS PRONTOS (sem miniatura) -- chave "pronto" do /catalogo */
+var PRONTO_CATALOG={};
+function _ehPronto(){ return typeof S!=='undefined' && !!S.ehPronto && !S.ehRedoma; }
+function _temPronto(){ try{ return Object.keys(PRONTO_CATALOG).length>0; }catch(e){ return false; } }
 /* ha redoma para vender? categoria vazia ja nao chega aqui (o servidor corta) */
 function _temRedoma(){
   try{ return Object.keys(REDOMA_CATALOG).length>0 || (typeof _smDisponivel==='function'&&_smDisponivel()); }catch(e){ return false; }
@@ -3736,7 +3821,8 @@ function _abreProdutoIncluso(it,b,i){
       +_linProd('Escala da miniatura',it.esc)
       +_linProd('Moldura',it.mol)
       +_linProd('Fundo','Acr\u00edlico Brilho com Impress\u00e3o UV')
-      +_linProd('Miniatura','<span style="color:#7bd67b;">Inclusa</span>')
+      +(_ehPronto()?_linProd('Miniatura','<span style="color:#ffaa00;">N\u00e3o inclusa</span>')
+                   :_linProd('Miniatura','<span style="color:#7bd67b;">Inclusa</span>'))
       +'</div>';
   }
   setStyle('miniInclusoAISection','display','none');
@@ -3807,13 +3893,13 @@ function buildSummary(){
   }
   if(S.tipo==='mini' && S.miniChoice==='incluso' && S.incProduto){
     var _it=S.incProduto;
-    setEl('sumCat','Quadro para Miniaturas \u2014 Produto pronto');
+    setEl('sumCat',_ehPronto()?'Quadro para Miniaturas \u2014 Quadro pronto (sem miniatura)':'Quadro para Miniaturas \u2014 Produto pronto');
     setEl('sumMod',(S.incBrand?S.incBrand+' \u2014 ':'')+_it.n);
     setEl('sumDim',_it.dim);
     setEl('sumMold',_it.mol);
     setEl('sumFund','Acr\u00edlico Brilho com Impress\u00e3o UV');
     setEl('sumLed','Sem LED');
-    setEl('sumMini','Inclusa');
+    setEl('sumMini',_ehPronto()?'N\u00e3o inclusa':'Inclusa');
     setEl('sumRel','Incluso');
     setEl('pvSku',_it.esc+' / '+_it.dim);
     setEl('sumTotal',_brl(_it.p));
@@ -4390,7 +4476,7 @@ function _cartMontaItem(){
       id:'it'+Date.now()+Math.random().toString(36).slice(2,7),
       via:'catalogo', tipo:'mini',
       titulo:p.n, sub:(S.incBrand||S.incBrandSel||''),
-      linhas:[p.esc+' \u00b7 '+p.dim, 'Moldura '+p.mol, 'Miniatura inclusa'],
+      linhas:[p.esc+' \u00b7 '+p.dim, 'Moldura '+p.mol, _ehPronto()?'Miniatura n\u00e3o inclusa':'Miniatura inclusa'],
       preco:p.p,
       imgSrc:(function(){var a=_catFotos();return a[(S.incFotoIdx)||0]||a[0]||'';})(),
       preview:(typeof _capturaPreview==='function'?_capturaPreview():null),
@@ -4399,7 +4485,7 @@ function _cartMontaItem(){
          a busca e' por nome+medida, e uma renomeacao no painel faz o preco
          cair para o que o navegador mandou -- calado. O nome e a medida
          continuam indo, para os pedidos antigos e para o e-mail. */
-      cfg:{ produto_id:p.id, marca:(S.incBrand||S.incBrandSel||''), produto:p.n,
+      cfg:{ produto_id:p.id, sem_miniatura:(_ehPronto()?1:0), marca:(S.incBrand||S.incBrandSel||''), produto:p.n,
             escala:p.esc, dim:p.dim, moldura:p.mol, preco:p.p }
     };
   }
