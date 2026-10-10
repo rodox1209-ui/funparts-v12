@@ -6553,3 +6553,235 @@ function _smCss(){
   +'.sm-btn:disabled{opacity:.45;cursor:default}';
   document.head.appendChild(st);
 }
+
+/* BUSCA DE QUADROS PRONTOS (10/10/2026) -- opcao B, escolhida pelo Rodolfo
+   entre tres renderizadas: barra na tela inicial, logo abaixo de "Tipo de
+   quadro". Procura SO nos produtos prontos: quadros com miniatura
+   (INCLUSO_CATALOG) e quadros prontos sem miniatura (PRONTO_VISTA) -- os dois
+   ja chegam pelo /catalogo, entao nada muda no Worker nem no banco.
+   - sem acento e sem maiuscula; "le mans" acha "Lemans" (compara tambem sem espaco)
+   - procura no nome, na categoria, na escala, na medida e no texto do produto
+   - tocar no resultado abre a ficha pelo MESMO caminho do link ?p=p<id>
+     (_fpAtalhoAnuncio), que ja trata quadro com miniatura e quadro pronto
+   - enquanto ha busca, os cartoes de tipo saem da tela (classe fb-ativo no
+     #step-0); limpar a busca devolve a tela exatamente como era
+   - textos proprios nos 4 idiomas; o placeholder avisa o tradutor (__ptph)
+   - evento Search da Meta, uma vez por termo, depois que o cliente para de digitar */
+(function(){
+  var TX={
+    pt:{ph:'Buscar quadro pronto',um:'%n quadro para \u201c%q\u201d',v:'%n quadros para \u201c%q\u201d',lp:'limpar',
+        nada:'Nenhum quadro pronto para \u201c%q\u201d',m:'Com miniatura',p:'S\u00f3 o quadro',
+        iaA:'N\u00e3o encontrou o seu carro?',iaB:'Fazemos o quadro para a sua miniatura \u2014 veja como fica com IA.',iaG:'Personalizar'},
+    en:{ph:'Search ready-made frames',um:'%n frame for \u201c%q\u201d',v:'%n frames for \u201c%q\u201d',lp:'clear',
+        nada:'No ready-made frame for \u201c%q\u201d',m:'With model car',p:'Frame only',
+        iaA:'Can\u2019t find your car?',iaB:'We make the frame for your model car \u2014 preview it with AI.',iaG:'Customize'},
+    es:{ph:'Buscar cuadro listo',um:'%n cuadro para \u201c%q\u201d',v:'%n cuadros para \u201c%q\u201d',lp:'borrar',
+        nada:'Ning\u00fan cuadro listo para \u201c%q\u201d',m:'Con miniatura',p:'Solo el cuadro',
+        iaA:'\u00bfNo encuentras tu coche?',iaB:'Hacemos el cuadro para tu miniatura \u2014 m\u00edralo con IA.',iaG:'Personalizar'},
+    fr:{ph:'Rechercher un cadre pr\u00eat',um:'%n cadre pour \u00ab\u00a0%q\u00a0\u00bb',v:'%n cadres pour \u00ab\u00a0%q\u00a0\u00bb',lp:'effacer',
+        nada:'Aucun cadre pr\u00eat pour \u00ab\u00a0%q\u00a0\u00bb',m:'Avec miniature',p:'Cadre seul',
+        iaA:'Vous ne trouvez pas votre voiture\u00a0?',iaB:'Nous cr\u00e9ons le cadre pour votre miniature \u2014 visualisez-le avec l\u2019IA.',iaG:'Personnaliser'}
+  };
+  /* atalhos: so aparece o que tem resultado no catalogo do momento */
+  var CHIPS=['Ferrari','Senna','Shell','Le Mans','1:43'];
+  function lg(){ try{ return (window.FP&&FP.lang)||localStorage.getItem('fp_lang')||'pt'; }catch(e){ return 'pt'; } }
+  function T(){ return TX[lg()]||TX.pt; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function sem(s){ return String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+  function semEsp(s){ return sem(s).replace(/\s+/g,''); }
+  function preco(v){ try{ return _brl(v); }catch(e){ return String(v); } }
+  function foto(it){ try{ return (it.fotos&&it.fotos.length)?_fotoUrl(it.fotos[0]):''; }catch(e){ return ''; } }
+
+  function todos(){
+    var a=[];
+    function poe(cat,t){
+      try{
+        Object.keys(cat||{}).forEach(function(b){
+          (((cat[b]||{}).itens)||[]).forEach(function(it){
+            if(!it||it.id==null||it.id==='') return;
+            var tx=''; try{ if(it.tx&&typeof it.tx==='object'){ for(var k in it.tx) tx+=' '+it.tx[k]; } }catch(e){}
+            var h=[it.n,it._cat||b,it.esc,it.dim,tx].join(' ');
+            a.push({it:it,t:t,h:sem(h),hs:semEsp(h),n:sem(it.n)});
+          });
+        });
+      }catch(e){}
+    }
+    poe(typeof INCLUSO_CATALOG!=='undefined'?INCLUSO_CATALOG:null,'m');
+    poe(typeof PRONTO_VISTA!=='undefined'?PRONTO_VISTA:null,'p');
+    return a;
+  }
+  function busca(q,lista){
+    var s=sem(q).trim(); if(!s) return [];
+    var tk=s.split(/\s+/), ss=semEsp(q);
+    var r=(lista||todos()).filter(function(o){
+      if(ss&&o.hs.indexOf(ss)>=0) return true;
+      for(var i=0;i<tk.length;i++){ if(o.h.indexOf(tk[i])<0) return false; }
+      return true;
+    });
+    /* o que tem o termo no NOME vem primeiro; dentro de cada grupo, a ordem do painel */
+    var a=[],b=[]; r.forEach(function(o){ (o.n.indexOf(s)>=0?a:b).push(o); });
+    return a.concat(b).slice(0,40);
+  }
+  /* destaca o termo no nome (o nome normalizado tem o mesmo tamanho do original) */
+  function marca(nome,q){
+    var n=String(nome||''), a=sem(n), s=sem(q).trim();
+    if(!s||a.length!==n.length) return esc(n);
+    var i=a.indexOf(s); if(i<0) return esc(n);
+    return esc(n.slice(0,i))+'<b>'+esc(n.slice(i,i+s.length))+'</b>'+esc(n.slice(i+s.length));
+  }
+
+  var CSS=
+   '#fbBusca{margin:14px 0 16px}'
+  +'#fbBusca .fb-in{display:flex;align-items:center;gap:10px;height:48px;background:#141414;border:1px solid #2e2e2e;border-radius:10px;padding:0 6px 0 14px;transition:border-color .15s,box-shadow .15s}'
+  +'#fbBusca .fb-in.on{border-color:#E8600A;box-shadow:0 0 0 3px rgba(232,96,10,.12)}'
+  +'#fbBusca .fb-in svg{flex:none}'
+  +'#fbBusca input{flex:1;min-width:0;height:100%;background:transparent;border:0;outline:0;color:#fff;font-family:Barlow,sans-serif;font-size:16px;font-weight:500;padding:0;-webkit-appearance:none;appearance:none}'
+  +'#fbBusca input::placeholder{color:#6b6b6b;font-weight:400}'
+  +'#fbBusca input::-webkit-search-cancel-button{display:none}'
+  +'#fbBusca .fb-x{flex:none;width:36px;height:36px;border:0;background:transparent;color:#888;font-size:20px;line-height:1;cursor:pointer;border-radius:8px}'
+  +'#fbBusca .fb-x:hover{color:#fff}'
+  +'#fbBusca .fb-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}'
+  +'#fbBusca .fb-chip{font-family:Barlow,sans-serif;font-size:11px;font-weight:600;letter-spacing:.6px;color:#bbb;border:1px solid #2e2e2e;background:#161616;border-radius:999px;padding:6px 11px;white-space:nowrap;cursor:pointer}'
+  +'#fbBusca .fb-chip:hover{border-color:#E8600A;color:#fff}'
+  +'#fbBusca .fb-meta{font-family:"Barlow Condensed",sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.8px;color:#8a8a8a;text-transform:uppercase;margin:14px 2px 10px}'
+  +'#fbBusca .fb-meta b{color:#fff}'
+  +'#fbBusca .fb-meta span{color:#E8600A;cursor:pointer}'
+  +'#fbBusca .fb-r{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px;border-radius:8px;border:1px solid transparent;margin:0 0 4px;background:#121212;cursor:pointer;font:inherit;color:inherit}'
+  +'#fbBusca .fb-r:hover,#fbBusca .fb-r:focus-visible{border-color:#3a2a1a;background:#17130f;outline:0}'
+  +'#fbBusca .fb-im{flex:none;width:66px;height:66px;border-radius:6px;overflow:hidden;background:#0b0b0b;display:flex;align-items:center;justify-content:center}'
+  +'#fbBusca .fb-im img{width:100%;height:100%;object-fit:cover;display:block}'
+  +'#fbBusca .fb-im i{font-style:normal;font-size:20px;opacity:.5}'
+  +'#fbBusca .fb-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}'
+  +'#fbBusca .fb-n{color:#eee;font-family:Barlow,sans-serif;font-size:13.5px;font-weight:600;line-height:1.25}'
+  +'#fbBusca .fb-n b{color:#FF8A3D;font-weight:700}'
+  +'#fbBusca .fb-g{font-family:Barlow,sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.6px;color:#9a9a9a;display:flex;align-items:center;gap:6px;flex-wrap:wrap}'
+  +'#fbBusca .fb-g .fb-pv{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}'
+  +'#fbBusca .fb-g strong{color:#fff;font-weight:700;letter-spacing:.3px;font-size:11.5px}'
+  +'#fbBusca .fb-tag{font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:3px;padding:3px 5px;white-space:nowrap}'
+  +'#fbBusca .fb-tag.m{color:#FF8A3D;background:rgba(232,96,10,.13)}'
+  +'#fbBusca .fb-tag.p{color:#56b4e0;background:rgba(58,156,200,.13)}'
+  +'#fbBusca .fb-ch{flex:none;color:#555;font-size:20px;padding-right:2px}'
+  +'#fbBusca .fb-r:hover .fb-ch{color:#E8600A}'
+  +'#fbBusca .fb-ia{margin-top:14px;border:1px dashed #3a3a3a;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(58,156,200,.06),rgba(232,96,10,.05));cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}'
+  +'#fbBusca .fb-ia:hover{border-color:#E8600A}'
+  +'#fbBusca .fb-ia .ic{flex:none;width:38px;height:38px;border-radius:50%;background:rgba(232,96,10,.12);display:flex;align-items:center;justify-content:center;font-size:17px}'
+  +'#fbBusca .fb-ia .a{color:#fff;font-family:Barlow,sans-serif;font-size:13px;font-weight:700}'
+  +'#fbBusca .fb-ia .b{color:#9a9a9a;font-family:Barlow,sans-serif;font-size:11.5px;line-height:1.4;margin-top:2px}'
+  +'#fbBusca .fb-ia .go{margin-left:auto;flex:none;color:#E8600A;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;white-space:nowrap}'
+  +'#fbBusca [hidden]{display:none!important}'
+  +'#step-0.fb-ativo > .toggle2,#step-0.fb-ativo > .nav-btns{display:none!important}';
+
+  var LUPA='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
+  var el={}, ultimoQ='', fbTmr=null, fbJa={};
+
+  function monta(){
+    var st=document.getElementById('step-0');
+    if(!st||document.getElementById('fbBusca')) return !!st;
+    /* dentro do cabecalho, logo abaixo da frase azul (como no layout aprovado) */
+    var sub=st.querySelector('.sec-sub'); if(!sub) return false;
+    var s=document.createElement('style'); s.id='fbBuscaCss'; s.textContent=CSS; document.head.appendChild(s);
+    var d=document.createElement('div'); d.id='fbBusca';
+    d.innerHTML='<div class="fb-in" style="color:#8a8a8a">'+LUPA
+      +'<input id="fbQ" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">'
+      +'<button type="button" class="fb-x" id="fbX" hidden aria-label="Limpar">\u00d7</button></div>'
+      +'<div class="fb-chips" id="fbChips"></div><div id="fbRes" hidden></div>';
+    sub.parentNode.insertBefore(d,sub.nextSibling);
+    el={box:d,inp:d.querySelector('#fbQ'),x:d.querySelector('#fbX'),ch:d.querySelector('#fbChips'),res:d.querySelector('#fbRes'),cx:d.querySelector('.fb-in'),st:st};
+    el.inp.addEventListener('input',function(){ desenha(); });
+    el.inp.addEventListener('focus',function(){ el.cx.classList.add('on'); el.cx.style.color='#E8600A'; });
+    el.inp.addEventListener('blur',function(){ if(!el.inp.value.trim()){ el.cx.classList.remove('on'); el.cx.style.color='#8a8a8a'; } });
+    el.inp.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){ e.preventDefault(); try{ el.inp.blur(); }catch(x){} }
+      else if(e.key==='Escape'){ limpa(); }
+    });
+    el.x.addEventListener('click',function(){ limpa(); try{ el.inp.focus(); }catch(e){} });
+    d.addEventListener('click',function(e){
+      var c=e.target.closest('.fb-chip'); if(c){ el.inp.value=c.getAttribute('data-q'); desenha(); return; }
+      var r=e.target.closest('.fb-r'); if(r){ abre(r.getAttribute('data-id')); return; }
+      if(e.target.closest('.fb-ia')){ abreIA(); return; }
+      if(e.target.closest('.fb-lp')){ limpa(); }
+    });
+    textos(); desenha();
+    return true;
+  }
+  function textos(){
+    if(!el.inp) return;
+    var t=T().ph;
+    el.inp.setAttribute('placeholder',t); el.inp.setAttribute('aria-label',t);
+    try{ el.inp.__ptph=t; }catch(e){}
+  }
+  function limpa(){ if(!el.inp) return; el.inp.value=''; desenha(); el.cx.classList.remove('on'); el.cx.style.color='#8a8a8a'; }
+  function desenha(){
+    if(!el.inp) return;
+    var lista=todos(), q=el.inp.value, s=q.trim(), t=T();
+    /* sem nenhum produto pronto publicado, a busca nao aparece */
+    el.box.style.display=lista.length?'':'none';
+    el.x.hidden=!s;
+    if(!s||!lista.length){
+      el.st.classList.remove('fb-ativo'); el.res.hidden=true; el.res.innerHTML='';
+      var h=''; CHIPS.forEach(function(c){ if(busca(c,lista).length) h+='<button type="button" class="fb-chip" data-q="'+esc(c)+'">'+esc(c)+'</button>'; });
+      el.ch.innerHTML=h; el.ch.hidden=!h; ultimoQ=''; return;
+    }
+    el.ch.hidden=true;
+    var rs=busca(s,lista);
+    var fr=(rs.length?(rs.length===1?t.um:t.v):t.nada).replace('%n','<b>'+rs.length+'</b>').replace('%q',esc(s));
+    var h='<div class="fb-meta">'+fr+' \u00b7 <span class="fb-lp">'+esc(t.lp)+'</span></div>';
+    rs.forEach(function(o){
+      var it=o.it, f=foto(it);
+      h+='<button type="button" class="fb-r" data-id="'+esc(it.id)+'">'
+        +'<span class="fb-im">'+(f?'<img src="'+esc(f)+'" alt="" loading="lazy" decoding="async">':'<i>\ud83c\udfc1</i>')+'</span>'
+        +'<span class="fb-tx"><span class="fb-n">'+marca(it.n,s)+'</span>'
+        +'<span class="fb-g"><span class="fb-tag '+o.t+'">'+esc(o.t==='m'?t.m:t.p)+'</span>'
+        +'<span class="fb-pv">'+(it.esc?('<span>'+esc(it.esc)+'</span>\u00b7'):'')+'<strong>'+esc(preco(it.p))+'</strong></span></span></span>'
+        +'<span class="fb-ch">\u203a</span></button>';
+    });
+    h+='<button type="button" class="fb-ia"><span class="ic">\u2728</span><span><span class="a" style="display:block">'+esc(t.iaA)+'</span>'
+      +'<span class="b" style="display:block">'+esc(t.iaB)+'</span></span><span class="go">'+esc(t.iaG)+' \u203a</span></button>';
+    el.res.innerHTML=h; el.res.hidden=false; el.st.classList.add('fb-ativo');
+    if(s!==ultimoQ){ ultimoQ=s; evento(s,rs.length); }
+  }
+  function evento(s,n){
+    clearTimeout(fbTmr);
+    if(s.length<3) return;
+    fbTmr=setTimeout(function(){
+      var k=sem(s); if(fbJa[k]) return; fbJa[k]=1;
+      try{ if(typeof _fbEvento==='function') _fbEvento('Search',{search_string:s,content_category:'quadros prontos',num_items:n}); }catch(e){}
+    },1500);
+  }
+  /* mesmo caminho do link de anuncio ?p=p<id>: abre a categoria certa e a ficha */
+  function vai(p){
+    try{
+      var u=new URL(location.href); u.searchParams.set('p',p);
+      history.replaceState(history.state,'',u.pathname+u.search+u.hash);
+    }catch(e){ return; }
+    limpa();
+    try{ _fpAtalhoAnuncio(); }catch(e){}
+    /* o atalho tira o p sozinho quando abre produto; o de "personalize" nao.
+       Se ele ficou esperando o catalogo (produto novo), o p tem de ficar. */
+    try{ if(!_FP_ATALHO_ESPERA) _fpTiraP(); }catch(e){}
+  }
+  function abre(id){ if(id==null||id==='') return; vai('p'+id); }
+  function abreIA(){ vai('ia'); }
+
+  /* catalogo do banco chegou / mudou: os atalhos e o resultado acompanham */
+  function gancho(nome){
+    try{
+      var o=window[nome]; if(typeof o!=='function'||o.__fb) return;
+      var f=function(){ var r=o.apply(this,arguments); try{ desenha(); }catch(e){} return r; };
+      f.__fb=1; window[nome]=f;
+    }catch(e){}
+  }
+  function ganchoLang(){
+    try{
+      if(window.FP && typeof FP.setLang==='function' && !FP.__fbGancho){
+        var o=FP.setLang; FP.__fbGancho=1;
+        FP.setLang=function(){ var r=o.apply(this,arguments); try{ textos(); desenha(); }catch(e){} return r; };
+      }
+    }catch(e){}
+  }
+  function inicia(){ if(monta()){ gancho('renderInclusoBrands'); gancho('_montaProntoVista'); ganchoLang(); textos(); desenha(); } }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicia); else inicia();
+  /* o tradutor (fp_addons) e o catalogo chegam depois deste arquivo */
+  window.addEventListener('load',function(){ ganchoLang(); textos(); desenha(); });
+  window._fbBuscaRedesenha=function(){ textos(); desenha(); };
+})();
