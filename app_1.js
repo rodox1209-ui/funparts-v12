@@ -6554,33 +6554,42 @@ function _smCss(){
   document.head.appendChild(st);
 }
 
-/* BUSCA DE QUADROS PRONTOS (10/10/2026) -- opcao B, escolhida pelo Rodolfo
-   entre tres renderizadas: barra na tela inicial, logo abaixo de "Tipo de
-   quadro". Procura SO nos produtos prontos: quadros com miniatura
-   (INCLUSO_CATALOG) e quadros prontos sem miniatura (PRONTO_VISTA) -- os dois
-   ja chegam pelo /catalogo, entao nada muda no Worker nem no banco.
+/* BUSCA DE QUADROS PRONTOS (10/10/2026)
+   Procura SO nos produtos prontos: quadros com miniatura (INCLUSO_CATALOG) e
+   quadros prontos sem miniatura (PRONTO_VISTA) -- os dois ja chegam pelo
+   /catalogo, entao nada muda no Worker nem no banco.
+   ONDE: faixa de busca logo abaixo do cabecalho, em TODAS as etapas, no celular
+   e no computador (opcao B da busca no cabecalho, escolhida pelo Rodolfo em
+   10/10). Substitui a barra que ficava so na tela inicial (commit 0a61a85).
    - sem acento e sem maiuscula; "le mans" acha "Lemans" (compara tambem sem espaco)
    - procura no nome, na categoria, na escala, na medida e no texto do produto
+   - resultados abrem logo abaixo da faixa (celular: ate o fim da tela;
+     computador: painel centralizado com fundo escurecido)
    - tocar no resultado abre a ficha pelo MESMO caminho do link ?p=p<id>
      (_fpAtalhoAnuncio), que ja trata quadro com miniatura e quadro pronto
-   - enquanto ha busca, os cartoes de tipo saem da tela (classe fb-ativo no
-     #step-0); limpar a busca devolve a tela exatamente como era
+   - no celular a faixa some ao rolar para baixo e volta ao rolar para cima
+   - no computador os paineis do configurador usam --hdr-offset (padrao 108px)
+     para a altura do topo; a faixa soma a altura dela ali
    - textos proprios nos 4 idiomas; o placeholder avisa o tradutor (__ptph)
    - evento Search da Meta, uma vez por termo, depois que o cliente para de digitar */
 (function(){
   var TX={
     pt:{ph:'Buscar quadro pronto',um:'%n quadro para \u201c%q\u201d',v:'%n quadros para \u201c%q\u201d',lp:'limpar',
         nada:'Nenhum quadro pronto para \u201c%q\u201d',m:'Com miniatura',p:'S\u00f3 o quadro',
-        iaA:'N\u00e3o encontrou o seu carro?',iaB:'Fazemos o quadro para a sua miniatura \u2014 veja como fica com IA.',iaG:'Personalizar'},
+        iaA:'N\u00e3o encontrou o seu carro?',iaB:'Fazemos o quadro para a sua miniatura \u2014 veja como fica com IA.',iaG:'Personalizar',
+        phD:'Buscar quadro pronto: marca, carro, cole\u00e7\u00e3o ou escala',phM:'Buscar quadro: '},
     en:{ph:'Search ready-made frames',um:'%n frame for \u201c%q\u201d',v:'%n frames for \u201c%q\u201d',lp:'clear',
         nada:'No ready-made frame for \u201c%q\u201d',m:'With model car',p:'Frame only',
-        iaA:'Can\u2019t find your car?',iaB:'We make the frame for your model car \u2014 preview it with AI.',iaG:'Customize'},
+        iaA:'Can\u2019t find your car?',iaB:'We make the frame for your model car \u2014 preview it with AI.',iaG:'Customize',
+        phD:'Search ready-made frames: brand, car, collection or scale',phM:'Search frames: '},
     es:{ph:'Buscar cuadro listo',um:'%n cuadro para \u201c%q\u201d',v:'%n cuadros para \u201c%q\u201d',lp:'borrar',
         nada:'Ning\u00fan cuadro listo para \u201c%q\u201d',m:'Con miniatura',p:'Solo el cuadro',
-        iaA:'\u00bfNo encuentras tu coche?',iaB:'Hacemos el cuadro para tu miniatura \u2014 m\u00edralo con IA.',iaG:'Personalizar'},
+        iaA:'\u00bfNo encuentras tu coche?',iaB:'Hacemos el cuadro para tu miniatura \u2014 m\u00edralo con IA.',iaG:'Personalizar',
+        phD:'Buscar cuadro listo: marca, coche, colecci\u00f3n o escala',phM:'Buscar cuadro: '},
     fr:{ph:'Rechercher un cadre pr\u00eat',um:'%n cadre pour \u00ab\u00a0%q\u00a0\u00bb',v:'%n cadres pour \u00ab\u00a0%q\u00a0\u00bb',lp:'effacer',
         nada:'Aucun cadre pr\u00eat pour \u00ab\u00a0%q\u00a0\u00bb',m:'Avec miniature',p:'Cadre seul',
-        iaA:'Vous ne trouvez pas votre voiture\u00a0?',iaB:'Nous cr\u00e9ons le cadre pour votre miniature \u2014 visualisez-le avec l\u2019IA.',iaG:'Personnaliser'}
+        iaA:'Vous ne trouvez pas votre voiture\u00a0?',iaB:'Nous cr\u00e9ons le cadre pour votre miniature \u2014 visualisez-le avec l\u2019IA.',iaG:'Personnaliser',
+        phD:'Rechercher un cadre pr\u00eat\u00a0: marque, voiture, collection ou \u00e9chelle',phM:'Rechercher\u00a0: '}
   };
   /* atalhos: so aparece o que tem resultado no catalogo do momento */
   var CHIPS=['Ferrari','Senna','Shell','Le Mans','1:43'];
@@ -6591,6 +6600,7 @@ function _smCss(){
   function semEsp(s){ return sem(s).replace(/\s+/g,''); }
   function preco(v){ try{ return _brl(v); }catch(e){ return String(v); } }
   function foto(it){ try{ return (it.fotos&&it.fotos.length)?_fotoUrl(it.fotos[0]):''; }catch(e){ return ''; } }
+  function celular(){ return (window.innerWidth||1024)<=720; }
 
   function todos(){
     var a=[];
@@ -6629,103 +6639,15 @@ function _smCss(){
     var i=a.indexOf(s); if(i<0) return esc(n);
     return esc(n.slice(0,i))+'<b>'+esc(n.slice(i,i+s.length))+'</b>'+esc(n.slice(i+s.length));
   }
-
-  var CSS=
-   '#fbBusca{margin:14px 0 16px}'
-  +'#fbBusca .fb-in{display:flex;align-items:center;gap:10px;height:48px;background:#141414;border:1px solid #2e2e2e;border-radius:10px;padding:0 6px 0 14px;transition:border-color .15s,box-shadow .15s}'
-  +'#fbBusca .fb-in.on{border-color:#E8600A;box-shadow:0 0 0 3px rgba(232,96,10,.12)}'
-  +'#fbBusca .fb-in svg{flex:none}'
-  +'#fbBusca input{flex:1;min-width:0;height:100%;background:transparent;border:0;outline:0;color:#fff;font-family:Barlow,sans-serif;font-size:16px;font-weight:500;padding:0;-webkit-appearance:none;appearance:none}'
-  +'#fbBusca input::placeholder{color:#6b6b6b;font-weight:400}'
-  +'#fbBusca input::-webkit-search-cancel-button{display:none}'
-  +'#fbBusca .fb-x{flex:none;width:36px;height:36px;border:0;background:transparent;color:#888;font-size:20px;line-height:1;cursor:pointer;border-radius:8px}'
-  +'#fbBusca .fb-x:hover{color:#fff}'
-  +'#fbBusca .fb-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}'
-  +'#fbBusca .fb-chip{font-family:Barlow,sans-serif;font-size:11px;font-weight:600;letter-spacing:.6px;color:#bbb;border:1px solid #2e2e2e;background:#161616;border-radius:999px;padding:6px 11px;white-space:nowrap;cursor:pointer}'
-  +'#fbBusca .fb-chip:hover{border-color:#E8600A;color:#fff}'
-  +'#fbBusca .fb-meta{font-family:"Barlow Condensed",sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.8px;color:#8a8a8a;text-transform:uppercase;margin:14px 2px 10px}'
-  +'#fbBusca .fb-meta b{color:#fff}'
-  +'#fbBusca .fb-meta span{color:#E8600A;cursor:pointer}'
-  +'#fbBusca .fb-r{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px;border-radius:8px;border:1px solid transparent;margin:0 0 4px;background:#121212;cursor:pointer;font:inherit;color:inherit}'
-  +'#fbBusca .fb-r:hover,#fbBusca .fb-r:focus-visible{border-color:#3a2a1a;background:#17130f;outline:0}'
-  +'#fbBusca .fb-im{flex:none;width:66px;height:66px;border-radius:6px;overflow:hidden;background:#0b0b0b;display:flex;align-items:center;justify-content:center}'
-  +'#fbBusca .fb-im img{width:100%;height:100%;object-fit:cover;display:block}'
-  +'#fbBusca .fb-im i{font-style:normal;font-size:20px;opacity:.5}'
-  +'#fbBusca .fb-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}'
-  +'#fbBusca .fb-n{color:#eee;font-family:Barlow,sans-serif;font-size:13.5px;font-weight:600;line-height:1.25}'
-  +'#fbBusca .fb-n b{color:#FF8A3D;font-weight:700}'
-  +'#fbBusca .fb-g{font-family:Barlow,sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.6px;color:#9a9a9a;display:flex;align-items:center;gap:6px;flex-wrap:wrap}'
-  +'#fbBusca .fb-g .fb-pv{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}'
-  +'#fbBusca .fb-g strong{color:#fff;font-weight:700;letter-spacing:.3px;font-size:11.5px}'
-  +'#fbBusca .fb-tag{font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:3px;padding:3px 5px;white-space:nowrap}'
-  +'#fbBusca .fb-tag.m{color:#FF8A3D;background:rgba(232,96,10,.13)}'
-  +'#fbBusca .fb-tag.p{color:#56b4e0;background:rgba(58,156,200,.13)}'
-  +'#fbBusca .fb-ch{flex:none;color:#555;font-size:20px;padding-right:2px}'
-  +'#fbBusca .fb-r:hover .fb-ch{color:#E8600A}'
-  +'#fbBusca .fb-ia{margin-top:14px;border:1px dashed #3a3a3a;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(58,156,200,.06),rgba(232,96,10,.05));cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}'
-  +'#fbBusca .fb-ia:hover{border-color:#E8600A}'
-  +'#fbBusca .fb-ia .ic{flex:none;width:38px;height:38px;border-radius:50%;background:rgba(232,96,10,.12);display:flex;align-items:center;justify-content:center;font-size:17px}'
-  +'#fbBusca .fb-ia .a{color:#fff;font-family:Barlow,sans-serif;font-size:13px;font-weight:700}'
-  +'#fbBusca .fb-ia .b{color:#9a9a9a;font-family:Barlow,sans-serif;font-size:11.5px;line-height:1.4;margin-top:2px}'
-  +'#fbBusca .fb-ia .go{margin-left:auto;flex:none;color:#E8600A;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;white-space:nowrap}'
-  +'#fbBusca [hidden]{display:none!important}'
-  +'#step-0.fb-ativo > .toggle2,#step-0.fb-ativo > .nav-btns{display:none!important}';
-
-  var LUPA='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
-  var el={}, ultimoQ='', fbTmr=null, fbJa={};
-
-  function monta(){
-    var st=document.getElementById('step-0');
-    if(!st||document.getElementById('fbBusca')) return !!st;
-    /* dentro do cabecalho, logo abaixo da frase azul (como no layout aprovado) */
-    var sub=st.querySelector('.sec-sub'); if(!sub) return false;
-    var s=document.createElement('style'); s.id='fbBuscaCss'; s.textContent=CSS; document.head.appendChild(s);
-    var d=document.createElement('div'); d.id='fbBusca';
-    d.innerHTML='<div class="fb-in" style="color:#8a8a8a">'+LUPA
-      +'<input id="fbQ" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">'
-      +'<button type="button" class="fb-x" id="fbX" hidden aria-label="Limpar">\u00d7</button></div>'
-      +'<div class="fb-chips" id="fbChips"></div><div id="fbRes" hidden></div>';
-    sub.parentNode.insertBefore(d,sub.nextSibling);
-    el={box:d,inp:d.querySelector('#fbQ'),x:d.querySelector('#fbX'),ch:d.querySelector('#fbChips'),res:d.querySelector('#fbRes'),cx:d.querySelector('.fb-in'),st:st};
-    el.inp.addEventListener('input',function(){ desenha(); });
-    el.inp.addEventListener('focus',function(){ el.cx.classList.add('on'); el.cx.style.color='#E8600A'; });
-    el.inp.addEventListener('blur',function(){ if(!el.inp.value.trim()){ el.cx.classList.remove('on'); el.cx.style.color='#8a8a8a'; } });
-    el.inp.addEventListener('keydown',function(e){
-      if(e.key==='Enter'){ e.preventDefault(); try{ el.inp.blur(); }catch(x){} }
-      else if(e.key==='Escape'){ limpa(); }
-    });
-    el.x.addEventListener('click',function(){ limpa(); try{ el.inp.focus(); }catch(e){} });
-    d.addEventListener('click',function(e){
-      var c=e.target.closest('.fb-chip'); if(c){ el.inp.value=c.getAttribute('data-q'); desenha(); return; }
-      var r=e.target.closest('.fb-r'); if(r){ abre(r.getAttribute('data-id')); return; }
-      if(e.target.closest('.fb-ia')){ abreIA(); return; }
-      if(e.target.closest('.fb-lp')){ limpa(); }
-    });
-    textos(); desenha();
-    return true;
+  function chipsHtml(lista){
+    var h=''; CHIPS.forEach(function(c){ if(busca(c,lista).length) h+='<button type="button" class="fb-chip" data-q="'+esc(c)+'">'+esc(c)+'</button>'; });
+    return h;
   }
-  function textos(){
-    if(!el.inp) return;
-    var t=T().ph;
-    el.inp.setAttribute('placeholder',t); el.inp.setAttribute('aria-label',t);
-    try{ el.inp.__ptph=t; }catch(e){}
-  }
-  function limpa(){ if(!el.inp) return; el.inp.value=''; desenha(); el.cx.classList.remove('on'); el.cx.style.color='#8a8a8a'; }
-  function desenha(){
-    if(!el.inp) return;
-    var lista=todos(), q=el.inp.value, s=q.trim(), t=T();
-    /* sem nenhum produto pronto publicado, a busca nao aparece */
-    el.box.style.display=lista.length?'':'none';
-    el.x.hidden=!s;
-    if(!s||!lista.length){
-      el.st.classList.remove('fb-ativo'); el.res.hidden=true; el.res.innerHTML='';
-      var h=''; CHIPS.forEach(function(c){ if(busca(c,lista).length) h+='<button type="button" class="fb-chip" data-q="'+esc(c)+'">'+esc(c)+'</button>'; });
-      el.ch.innerHTML=h; el.ch.hidden=!h; ultimoQ=''; return;
-    }
-    el.ch.hidden=true;
-    var rs=busca(s,lista);
+  /* lista de resultados (igual nos dois lugares) */
+  function resultadosHtml(s,lista,limpar){
+    var t=T(), rs=busca(s,lista);
     var fr=(rs.length?(rs.length===1?t.um:t.v):t.nada).replace('%n','<b>'+rs.length+'</b>').replace('%q',esc(s));
-    var h='<div class="fb-meta">'+fr+' \u00b7 <span class="fb-lp">'+esc(t.lp)+'</span></div>';
+    var h='<div class="fb-meta">'+fr+(limpar?(' \u00b7 <span class="fb-lp">'+esc(t.lp)+'</span>'):'')+'</div>';
     rs.forEach(function(o){
       var it=o.it, f=foto(it);
       h+='<button type="button" class="fb-r" data-id="'+esc(it.id)+'">'
@@ -6737,8 +6659,164 @@ function _smCss(){
     });
     h+='<button type="button" class="fb-ia"><span class="ic">\u2728</span><span><span class="a" style="display:block">'+esc(t.iaA)+'</span>'
       +'<span class="b" style="display:block">'+esc(t.iaB)+'</span></span><span class="go">'+esc(t.iaG)+' \u203a</span></button>';
-    el.res.innerHTML=h; el.res.hidden=false; el.st.classList.add('fb-ativo');
-    if(s!==ultimoQ){ ultimoQ=s; evento(s,rs.length); }
+    return {html:h,n:rs.length};
+  }
+
+  /* CSS: tudo debaixo de #fbFaixa e #fbDrop */
+  function R(sel,body){ return sel.split(',').map(function(x){ x=x.trim(); return '#fbFaixa '+x+',#fbDrop '+x; }).join(',')+'{'+body+'}'; }
+  var CSS=
+   '#fbFaixa{position:sticky;top:60px;z-index:99;background:#0e0e0e;border-bottom:1px solid #1f1f1f;padding:9px 16px;transition:transform .22s ease}'
+  +'#fbFaixa .fbf-w{max-width:640px;margin:0 auto}'
+  +'#fbFaixa.fb-esconde{transform:translateY(-100%)}'
+  +'#fbFaixa[hidden]{display:none!important}'
+  +R('.fb-in','display:flex;align-items:center;gap:10px;height:40px;background:#141414;border:1px solid #2e2e2e;border-radius:999px;padding:0 4px 0 14px;transition:border-color .15s,box-shadow .15s;color:#8a8a8a')
+  +R('.fb-in.on','border-color:#E8600A;box-shadow:0 0 0 3px rgba(232,96,10,.12);color:#E8600A')
+  +R('.fb-in svg','flex:none')
+  +R('input','flex:1;min-width:0;height:100%;background:transparent;border:0;outline:0;color:#fff;font-family:Barlow,sans-serif;font-size:16px;font-weight:500;padding:0;margin:0;-webkit-appearance:none;appearance:none;box-shadow:none;text-overflow:ellipsis')
+  +R('input::placeholder','color:#6b6b6b;font-weight:400')
+  +R('input::-webkit-search-cancel-button','display:none')
+  +R('.fb-x','flex:none;width:34px;height:34px;border:0;background:transparent;color:#888;font-size:20px;line-height:1;cursor:pointer;border-radius:50%;padding:0')
+  +R('.fb-x:hover','color:#fff')
+  +R('.fb-chips','display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 2px')
+  +R('.fb-chip','font-family:Barlow,sans-serif;font-size:11px;font-weight:600;letter-spacing:.6px;color:#bbb;border:1px solid #2e2e2e;background:#161616;border-radius:999px;padding:6px 11px;white-space:nowrap;cursor:pointer')
+  +R('.fb-chip:hover','border-color:#E8600A;color:#fff')
+  +R('.fb-meta','font-family:"Barlow Condensed",sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.8px;color:#8a8a8a;text-transform:uppercase;margin:12px 2px 10px')
+  +R('.fb-meta b','color:#fff')
+  +R('.fb-r','display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px;border-radius:8px;border:1px solid transparent;margin:0 0 4px;background:#121212;cursor:pointer;font:inherit;color:inherit')
+  +R('.fb-r:hover,.fb-r:focus-visible','border-color:#3a2a1a;background:#17130f;outline:0')
+  +R('.fb-im','flex:none;width:66px;height:66px;border-radius:6px;overflow:hidden;background:#0b0b0b;display:flex;align-items:center;justify-content:center')
+  +R('.fb-im img','width:100%;height:100%;object-fit:cover;display:block')
+  +R('.fb-im i','font-style:normal;font-size:20px;opacity:.5')
+  +R('.fb-tx','flex:1;min-width:0;display:flex;flex-direction:column;gap:5px')
+  +R('.fb-n','color:#eee;font-family:Barlow,sans-serif;font-size:13.5px;font-weight:600;line-height:1.25')
+  +R('.fb-n b','color:#FF8A3D;font-weight:700')
+  +R('.fb-g','font-family:Barlow,sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.6px;color:#9a9a9a;display:flex;align-items:center;gap:6px;flex-wrap:wrap')
+  +R('.fb-g .fb-pv','display:inline-flex;align-items:center;gap:5px;white-space:nowrap')
+  +R('.fb-g strong','color:#fff;font-weight:700;letter-spacing:.3px;font-size:11.5px')
+  +R('.fb-tag','font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:3px;padding:3px 5px;white-space:nowrap')
+  +R('.fb-tag.m','color:#FF8A3D;background:rgba(232,96,10,.13)')
+  +R('.fb-tag.p','color:#56b4e0;background:rgba(58,156,200,.13)')
+  +R('.fb-ch','flex:none;color:#555;font-size:20px;padding-right:2px')
+  +R('.fb-r:hover .fb-ch','color:#E8600A')
+  +R('.fb-ia','margin-top:12px;border:1px dashed #3a3a3a;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(58,156,200,.06),rgba(232,96,10,.05));cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit')
+  +R('.fb-ia:hover','border-color:#E8600A')
+  +R('.fb-ia .ic','flex:none;width:38px;height:38px;border-radius:50%;background:rgba(232,96,10,.12);display:flex;align-items:center;justify-content:center;font-size:17px')
+  +R('.fb-ia .a','color:#fff;font-family:Barlow,sans-serif;font-size:13px;font-weight:700')
+  +R('.fb-ia .b','color:#9a9a9a;font-family:Barlow,sans-serif;font-size:11.5px;line-height:1.4;margin-top:2px')
+  +R('.fb-ia .go','margin-left:auto;flex:none;color:#E8600A;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;white-space:nowrap')
+  +R('[hidden]','display:none!important')
+  /* resultados: abrem logo abaixo da faixa */
+  +'#fbDrop{position:fixed;left:0;right:0;bottom:0;z-index:9990;background:rgba(0,0,0,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}'
+  +'#fbDrop[hidden]{display:none!important}'
+  +'#fbDrop .fbd-pn{max-width:640px;margin:8px auto 0;background:#0f0f0f;border:1px solid #2a2a2a;border-radius:14px;padding:4px 16px 16px;box-shadow:0 30px 60px -20px #000;overflow:auto;overscroll-behavior:contain}'
+  +'#fbDrop .fbd-pn::-webkit-scrollbar{width:6px}#fbDrop .fbd-pn::-webkit-scrollbar-thumb{background:#333;border-radius:6px}'
+  +'@media(max-width:720px){#fbFaixa{padding:8px 14px}'
+  +'#fbDrop{-webkit-backdrop-filter:none;backdrop-filter:none}'
+  +'#fbDrop .fbd-pn{margin:0;max-width:none;height:100%;max-height:none!important;border:0;border-radius:0;box-shadow:none;background:#0e0e0e;padding:2px 14px calc(18px + env(safe-area-inset-bottom,0px))}}'
+  +'html.fb-trava,html.fb-trava body{overflow:hidden!important}';
+
+  var LUPA='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>';
+  var f={}, ultimoQ='', fbTmr=null, fbJa={}, ultY=0;
+
+  function monta(){
+    var hd=document.querySelector('header');
+    if(!hd||document.getElementById('fbFaixa')) return !!document.getElementById('fbFaixa');
+    var s=document.createElement('style'); s.id='fbBuscaCss'; s.textContent=CSS; document.head.appendChild(s);
+    var fx=document.createElement('div'); fx.id='fbFaixa'; fx.setAttribute('role','search');
+    fx.innerHTML='<div class="fbf-w"><div class="fb-in">'+LUPA
+      +'<input id="fbQ" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">'
+      +'<button type="button" class="fb-x" id="fbX" hidden aria-label="Limpar">\u00d7</button></div></div>';
+    hd.parentNode.insertBefore(fx,hd.nextSibling);
+    var dp=document.createElement('div'); dp.id='fbDrop'; dp.hidden=true;
+    dp.innerHTML='<div class="fbd-pn"><div class="fb-chips" id="fbChips"></div><div id="fbRes"></div></div>';
+    document.body.appendChild(dp);
+    f={fx:fx,dp:dp,pn:dp.querySelector('.fbd-pn'),inp:fx.querySelector('#fbQ'),x:fx.querySelector('#fbX'),cx:fx.querySelector('.fb-in'),
+       ch:dp.querySelector('#fbChips'),res:dp.querySelector('#fbRes')};
+    f.inp.addEventListener('focus',function(){ f.cx.classList.add('on'); mostraFaixa(); abre(); });
+    f.inp.addEventListener('input',function(){ abre(); });
+    f.inp.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){ e.preventDefault(); if(celular()){ try{ f.inp.blur(); }catch(x){} } }
+      else if(e.key==='Escape'){ fecha(true); }
+    });
+    /* com texto, o X limpa; com o campo vazio, fecha os resultados */
+    f.x.addEventListener('click',function(){ if(f.inp.value){ f.inp.value=''; desenha(); try{ f.inp.focus(); }catch(e){} } else fecha(false); });
+    /* tocar no fundo escuro (fora do painel) fecha */
+    dp.addEventListener('click',function(e){
+      if(e.target===dp){ fecha(true); return; }
+      var c=e.target.closest('.fb-chip'); if(c){ f.inp.value=c.getAttribute('data-q'); desenha(); return; }
+      var r=e.target.closest('.fb-r'); if(r){ abreProduto(r.getAttribute('data-id')); return; }
+      if(e.target.closest('.fb-ia')){ vai('ia'); }
+    });
+    window.addEventListener('scroll',rolou,{passive:true});
+    window.addEventListener('resize',function(){ textos(); ajusta(); if(!f.dp.hidden) posicionaDrop(); });
+    return true;
+  }
+  function aberto(){ return f.dp&&!f.dp.hidden; }
+  function abre(){
+    if(!f.dp) return;
+    if(f.dp.hidden){
+      f.dp.hidden=false;
+      if(celular()) document.documentElement.classList.add('fb-trava');
+    }
+    posicionaDrop(); desenha();
+  }
+  function fecha(limpar){
+    if(!f.dp) return;
+    f.dp.hidden=true; document.documentElement.classList.remove('fb-trava');
+    if(limpar) f.inp.value='';
+    f.x.hidden=!f.inp.value;
+    try{ f.inp.blur(); }catch(e){}
+    if(!f.inp.value.trim()) f.cx.classList.remove('on');
+  }
+  function posicionaDrop(){
+    var b=f.fx.getBoundingClientRect().bottom;
+    f.dp.style.top=Math.max(0,Math.round(b))+'px';
+    if(!celular()) f.pn.style.maxHeight=Math.max(200,window.innerHeight-b-24)+'px'; else f.pn.style.maxHeight='';
+  }
+  function desenha(){
+    if(!f.inp) return;
+    var lista=todos(), s=f.inp.value.trim();
+    f.x.hidden=!(s||aberto());
+    if(!s){ f.res.innerHTML=''; var h=chipsHtml(lista); f.ch.innerHTML=h; f.ch.hidden=!h;
+      /* campo vazio e sem atalhos: nao ha o que mostrar */
+      if(!h&&aberto()){ f.dp.hidden=true; document.documentElement.classList.remove('fb-trava'); }
+      ultimoQ=''; return; }
+    f.ch.hidden=true;
+    var r=resultadosHtml(s,lista,false);
+    f.res.innerHTML=r.html;
+    if(s!==ultimoQ){ ultimoQ=s; evento(s,r.n); }
+  }
+  /* no celular a faixa some ao rolar para baixo e volta ao rolar para cima */
+  function mostraFaixa(){ if(f.fx) f.fx.classList.remove('fb-esconde'); }
+  function rolou(){
+    if(!f.fx) return;
+    var y=window.pageYOffset||document.documentElement.scrollTop||0, dy=y-ultY; ultY=y;
+    if(!celular()||aberto()||document.activeElement===f.inp){ mostraFaixa(); return; }
+    if(y<120||dy<-6) mostraFaixa();
+    else if(dy>6) f.fx.classList.add('fb-esconde');
+  }
+  /* a faixa so existe quando ha produto pronto publicado; no computador os
+     paineis do configurador descem a altura dela */
+  function ajusta(){
+    if(!f.fx) return;
+    var tem=todos().length>0;
+    f.fx.hidden=!tem;
+    var hd=document.querySelector('header');
+    if(hd) f.fx.style.top=Math.round(hd.getBoundingClientRect().height||60)+'px';
+    var root=document.documentElement;
+    if(tem&&!celular()) root.style.setProperty('--hdr-offset',(108+f.fx.offsetHeight)+'px');
+    else root.style.removeProperty('--hdr-offset');
+    if(!tem&&aberto()) fecha(true);
+  }
+  function textos(){
+    if(!f.inp) return;
+    var t=T(), ph=t.ph;
+    if(celular()){
+      var ex=[]; var lista=todos(); CHIPS.forEach(function(c){ if(ex.length<3&&busca(c,lista).length) ex.push(c); });
+      if(ex.length) ph=t.phM+ex.join(', ')+'\u2026';
+    } else ph=t.phD;
+    f.inp.setAttribute('placeholder',ph); f.inp.setAttribute('aria-label',t.ph);
+    try{ f.inp.__ptph=ph; }catch(e){}
   }
   function evento(s,n){
     clearTimeout(fbTmr);
@@ -6754,34 +6832,34 @@ function _smCss(){
       var u=new URL(location.href); u.searchParams.set('p',p);
       history.replaceState(history.state,'',u.pathname+u.search+u.hash);
     }catch(e){ return; }
-    limpa();
+    fecha(true);
     try{ _fpAtalhoAnuncio(); }catch(e){}
     /* o atalho tira o p sozinho quando abre produto; o de "personalize" nao.
        Se ele ficou esperando o catalogo (produto novo), o p tem de ficar. */
     try{ if(!_FP_ATALHO_ESPERA) _fpTiraP(); }catch(e){}
   }
-  function abre(id){ if(id==null||id==='') return; vai('p'+id); }
-  function abreIA(){ vai('ia'); }
+  function abreProduto(id){ if(id==null||id==='') return; vai('p'+id); }
 
+  function tudo(){ ajusta(); textos(); if(aberto()) desenha(); }
   /* catalogo do banco chegou / mudou: os atalhos e o resultado acompanham */
   function gancho(nome){
     try{
       var o=window[nome]; if(typeof o!=='function'||o.__fb) return;
-      var f=function(){ var r=o.apply(this,arguments); try{ desenha(); }catch(e){} return r; };
-      f.__fb=1; window[nome]=f;
+      var g=function(){ var r=o.apply(this,arguments); try{ tudo(); }catch(e){} return r; };
+      g.__fb=1; window[nome]=g;
     }catch(e){}
   }
   function ganchoLang(){
     try{
       if(window.FP && typeof FP.setLang==='function' && !FP.__fbGancho){
         var o=FP.setLang; FP.__fbGancho=1;
-        FP.setLang=function(){ var r=o.apply(this,arguments); try{ textos(); desenha(); }catch(e){} return r; };
+        FP.setLang=function(){ var r=o.apply(this,arguments); try{ tudo(); }catch(e){} return r; };
       }
     }catch(e){}
   }
-  function inicia(){ if(monta()){ gancho('renderInclusoBrands'); gancho('_montaProntoVista'); ganchoLang(); textos(); desenha(); } }
+  function inicia(){ if(monta()){ gancho('renderInclusoBrands'); gancho('_montaProntoVista'); ganchoLang(); tudo(); } }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicia); else inicia();
   /* o tradutor (fp_addons) e o catalogo chegam depois deste arquivo */
-  window.addEventListener('load',function(){ ganchoLang(); textos(); desenha(); });
-  window._fbBuscaRedesenha=function(){ textos(); desenha(); };
+  window.addEventListener('load',function(){ ganchoLang(); tudo(); });
+  window._fbBuscaRedesenha=tudo;
 })();
