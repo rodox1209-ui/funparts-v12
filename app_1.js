@@ -6558,6 +6558,8 @@ function _smCss(){
    Procura SO nos produtos prontos: quadros com miniatura (INCLUSO_CATALOG) e
    quadros prontos sem miniatura (PRONTO_VISTA) -- os dois ja chegam pelo
    /catalogo, entao nada muda no Worker nem no banco.
+   REDOMAS PRONTAS entram na busca desde 12/10/2026 (REDOMA_CATALOG, etiqueta
+   verde "Redoma", medida no lugar da escala, abre pelo link ?p=r<id>).
    ONDE: faixa de busca logo abaixo do cabecalho, em TODAS as etapas, no celular
    e no computador (opcao B da busca no cabecalho, escolhida pelo Rodolfo em
    10/10). Substitui a barra que ficava so na tela inicial (commit 0a61a85).
@@ -6574,22 +6576,22 @@ function _smCss(){
    - evento Search da Meta, uma vez por termo, depois que o cliente para de digitar */
 (function(){
   var TX={
-    pt:{ph:'Buscar quadro pronto',um:'%n quadro para \u201c%q\u201d',v:'%n quadros para \u201c%q\u201d',lp:'limpar',
-        nada:'Nenhum quadro pronto para \u201c%q\u201d',m:'Com miniatura',p:'S\u00f3 o quadro',
+    pt:{ph:'Buscar quadro ou redoma',um:'%n resultado para \u201c%q\u201d',v:'%n resultados para \u201c%q\u201d',lp:'limpar',
+        nada:'Nada encontrado para \u201c%q\u201d',m:'Com miniatura',p:'S\u00f3 o quadro',r:'Redoma',
         iaA:'N\u00e3o encontrou o seu carro?',iaB:'Fazemos o quadro para a sua miniatura \u2014 veja como fica com IA.',iaG:'Personalizar',
-        phD:'Buscar quadro pronto: marca, carro, cole\u00e7\u00e3o ou escala',phM:'Buscar quadro: '},
-    en:{ph:'Search ready-made frames',um:'%n frame for \u201c%q\u201d',v:'%n frames for \u201c%q\u201d',lp:'clear',
-        nada:'No ready-made frame for \u201c%q\u201d',m:'With model car',p:'Frame only',
+        phD:'Buscar quadro ou redoma: marca, carro, cole\u00e7\u00e3o ou escala',phM:'Buscar: '},
+    en:{ph:'Search frames and display cases',um:'%n result for \u201c%q\u201d',v:'%n results for \u201c%q\u201d',lp:'clear',
+        nada:'Nothing found for \u201c%q\u201d',m:'With model car',p:'Frame only',r:'Display case',
         iaA:'Can\u2019t find your car?',iaB:'We make the frame for your model car \u2014 preview it with AI.',iaG:'Customize',
-        phD:'Search ready-made frames: brand, car, collection or scale',phM:'Search frames: '},
-    es:{ph:'Buscar cuadro listo',um:'%n cuadro para \u201c%q\u201d',v:'%n cuadros para \u201c%q\u201d',lp:'borrar',
-        nada:'Ning\u00fan cuadro listo para \u201c%q\u201d',m:'Con miniatura',p:'Solo el cuadro',
+        phD:'Search frames and display cases: brand, car, collection or scale',phM:'Search: '},
+    es:{ph:'Buscar cuadro o vitrina',um:'%n resultado para \u201c%q\u201d',v:'%n resultados para \u201c%q\u201d',lp:'borrar',
+        nada:'Nada encontrado para \u201c%q\u201d',m:'Con miniatura',p:'Solo el cuadro',r:'Vitrina',
         iaA:'\u00bfNo encuentras tu coche?',iaB:'Hacemos el cuadro para tu miniatura \u2014 m\u00edralo con IA.',iaG:'Personalizar',
-        phD:'Buscar cuadro listo: marca, coche, colecci\u00f3n o escala',phM:'Buscar cuadro: '},
-    fr:{ph:'Rechercher un cadre pr\u00eat',um:'%n cadre pour \u00ab\u00a0%q\u00a0\u00bb',v:'%n cadres pour \u00ab\u00a0%q\u00a0\u00bb',lp:'effacer',
-        nada:'Aucun cadre pr\u00eat pour \u00ab\u00a0%q\u00a0\u00bb',m:'Avec miniature',p:'Cadre seul',
+        phD:'Buscar cuadro o vitrina: marca, coche, colecci\u00f3n o escala',phM:'Buscar: '},
+    fr:{ph:'Rechercher un cadre ou une vitrine',um:'%n r\u00e9sultat pour \u00ab\u00a0%q\u00a0\u00bb',v:'%n r\u00e9sultats pour \u00ab\u00a0%q\u00a0\u00bb',lp:'effacer',
+        nada:'Aucun r\u00e9sultat pour \u00ab\u00a0%q\u00a0\u00bb',m:'Avec miniature',p:'Cadre seul',r:'Vitrine',
         iaA:'Vous ne trouvez pas votre voiture\u00a0?',iaB:'Nous cr\u00e9ons le cadre pour votre miniature \u2014 visualisez-le avec l\u2019IA.',iaG:'Personnaliser',
-        phD:'Rechercher un cadre pr\u00eat\u00a0: marque, voiture, collection ou \u00e9chelle',phM:'Rechercher\u00a0: '}
+        phD:'Rechercher un cadre ou une vitrine\u00a0: marque, voiture, collection ou \u00e9chelle',phM:'Rechercher\u00a0: '}
   };
   /* atalhos: so aparece o que tem resultado no catalogo do momento */
   var CHIPS=['Ferrari','Senna','Shell','Le Mans','1:43'];
@@ -6610,14 +6612,18 @@ function _smCss(){
           (((cat[b]||{}).itens)||[]).forEach(function(it){
             if(!it||it.id==null||it.id==='') return;
             var tx=''; try{ if(it.tx&&typeof it.tx==='object'){ for(var k in it.tx) tx+=' '+it.tx[k]; } }catch(e){}
-            var h=[it.n,it._cat||b,it.esc,it.dim,tx].join(' ');
-            a.push({it:it,t:t,h:sem(h),hs:semEsp(h),n:sem(it.n)});
+            /* redoma: a medida no lugar da escala, e as palavras que o cliente usa para ela */
+            var md=''; if(t==='r'){ try{ md=_redomaMedida(it); }catch(e){} }
+            var h=[it.n,it._cat||b,it.esc,it.dim,md,(t==='r'?'redoma redomas display vitrine acrilico case':''),tx].join(' ');
+            a.push({it:it,t:t,h:sem(h),hs:semEsp(h),n:sem(it.n),md:md,k:(t==='r'?'r':'p')+it.id});
           });
         });
       }catch(e){}
     }
     poe(typeof INCLUSO_CATALOG!=='undefined'?INCLUSO_CATALOG:null,'m');
     poe(typeof PRONTO_VISTA!=='undefined'?PRONTO_VISTA:null,'p');
+    /* REDOMAS PRONTAS (12/10/2026): pedido do Rodolfo. Mesma tabela do link ?p=r<id> */
+    poe(typeof REDOMA_CATALOG!=='undefined'?REDOMA_CATALOG:null,'r');
     return a;
   }
   function busca(q,lista){
@@ -6650,11 +6656,12 @@ function _smCss(){
     var h='<div class="fb-meta">'+fr+(limpar?(' \u00b7 <span class="fb-lp">'+esc(t.lp)+'</span>'):'')+'</div>';
     rs.forEach(function(o){
       var it=o.it, f=foto(it);
-      h+='<button type="button" class="fb-r" data-id="'+esc(it.id)+'">'
+      var tg=(o.t==='m'?t.m:(o.t==='r'?t.r:t.p)), sub=(o.t==='r'?o.md:it.esc);
+      h+='<button type="button" class="fb-r" data-p="'+esc(o.k)+'">'
         +'<span class="fb-im">'+(f?'<img src="'+esc(f)+'" alt="" loading="lazy" decoding="async">':'<i>\ud83c\udfc1</i>')+'</span>'
         +'<span class="fb-tx"><span class="fb-n">'+marca(it.n,s)+'</span>'
-        +'<span class="fb-g"><span class="fb-tag '+o.t+'">'+esc(o.t==='m'?t.m:t.p)+'</span>'
-        +'<span class="fb-pv">'+(it.esc?('<span>'+esc(it.esc)+'</span>\u00b7'):'')+'<strong>'+esc(preco(it.p))+'</strong></span></span></span>'
+        +'<span class="fb-g"><span class="fb-tag '+o.t+'">'+esc(tg)+'</span>'
+        +'<span class="fb-pv">'+(sub?('<span>'+esc(sub)+'</span>\u00b7'):'')+'<strong>'+esc(preco(it.p))+'</strong></span></span></span>'
         +'<span class="fb-ch">\u203a</span></button>';
     });
     h+='<button type="button" class="fb-ia"><span class="ic">\u2728</span><span><span class="a" style="display:block">'+esc(t.iaA)+'</span>'
@@ -6696,6 +6703,7 @@ function _smCss(){
   +R('.fb-tag','font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:3px;padding:3px 5px;white-space:nowrap')
   +R('.fb-tag.m','color:#FF8A3D;background:rgba(232,96,10,.13)')
   +R('.fb-tag.p','color:#56b4e0;background:rgba(58,156,200,.13)')
+  +R('.fb-tag.r','color:#5fd4a0;background:rgba(95,212,160,.12)')
   +R('.fb-ch','flex:none;color:#555;font-size:20px;padding-right:2px')
   +R('.fb-r:hover .fb-ch','color:#E8600A')
   +R('.fb-ia','margin-top:12px;border:1px dashed #3a3a3a;border-radius:10px;padding:14px;display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,rgba(58,156,200,.06),rgba(232,96,10,.05));cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit')
@@ -6744,7 +6752,7 @@ function _smCss(){
     dp.addEventListener('click',function(e){
       if(e.target===dp){ fecha(true); return; }
       var c=e.target.closest('.fb-chip'); if(c){ f.inp.value=c.getAttribute('data-q'); desenha(); return; }
-      var r=e.target.closest('.fb-r'); if(r){ abreProduto(r.getAttribute('data-id')); return; }
+      var r=e.target.closest('.fb-r'); if(r){ abreProduto(r.getAttribute('data-p')); return; }
       if(e.target.closest('.fb-ia')){ vai('ia'); }
     });
     window.addEventListener('scroll',rolou,{passive:true});
@@ -6823,7 +6831,7 @@ function _smCss(){
     if(s.length<3) return;
     fbTmr=setTimeout(function(){
       var k=sem(s); if(fbJa[k]) return; fbJa[k]=1;
-      try{ if(typeof _fbEvento==='function') _fbEvento('Search',{search_string:s,content_category:'quadros prontos',num_items:n}); }catch(e){}
+      try{ if(typeof _fbEvento==='function') _fbEvento('Search',{search_string:s,content_category:'produtos prontos',num_items:n}); }catch(e){}
     },1500);
   }
   /* mesmo caminho do link de anuncio ?p=p<id>: abre a categoria certa e a ficha */
@@ -6838,7 +6846,8 @@ function _smCss(){
        Se ele ficou esperando o catalogo (produto novo), o p tem de ficar. */
     try{ if(!_FP_ATALHO_ESPERA) _fpTiraP(); }catch(e){}
   }
-  function abreProduto(id){ if(id==null||id==='') return; vai('p'+id); }
+  /* k = p<id> (quadro) ou r<id> (redoma), o mesmo do link de anuncio */
+  function abreProduto(k){ if(!/^[pr]\d+$/.test(String(k||''))) return; vai(k); }
 
   function tudo(){ ajusta(); textos(); if(aberto()) desenha(); }
   /* catalogo do banco chegou / mudou: os atalhos e o resultado acompanham */
