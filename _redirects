@@ -28,3 +28,8 @@
 /checkout/*                    https://loja.funparts.com.br/checkout/:splat                     301
 /cart/*                        https://loja.funparts.com.br/cart/:splat                         301
 /search/*                      https://loja.funparts.com.br/search/:splat                       301
+
+
+# --- QR codes impressos: troque o destino aqui, nunca o QR ---
+/montagem /docs/manual-montagem-redomas.pdf 302
+/montagem/ /docs/manual-montagem-redomas.pdf 302
