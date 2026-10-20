@@ -33,3 +33,6 @@
 # --- QR codes impressos: troque o destino aqui, nunca o QR ---
 /montagem /docs/manual-montagem-redomas.pdf 302
 /montagem/ /docs/manual-montagem-redomas.pdf 302
+
+/instalacao /docs/manual-instalacao-quadros.pdf 302
+/instalacao/ /docs/manual-instalacao-quadros.pdf 302
