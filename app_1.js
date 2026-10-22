@@ -3628,7 +3628,7 @@ function carregarCatalogoDoBanco(){
     fetch('https://funparts-ai-proxy.rodox1209.workers.dev/catalogo',{cache:'no-store'})
       .then(function(r){ return r.ok?r.json():null; })
       .then(function(c){ _FP_CAT_RESPONDEU=true; if(c && !c.erro){ _aplicaCatalogoBanco(c); _catCacheGravar(c); } else _fpAtalhoDeNovo(); })
-      .catch(function(){ _FP_CAT_RESPONDEU=true; _fpAtalhoDeNovo(); }); // falhou: fica com o embutido
+      .catch(function(){ _FP_CAT_RESPONDEU=true; _fpAtalhoDeNovo(); try{ _mostraCardRedoma(); }catch(e){} }); // falhou: fica com o embutido
   }catch(e){}
 }
 (function(){
@@ -3674,8 +3674,11 @@ function _temRedoma(){
 /* o card do passo 1 so aparece quando ha o que vender -- prateleira vazia
    espanta mais do que categoria que ainda nao existe */
 function _mostraCardRedoma(){
+  /* 22/10/2026: o card nasce VISIVEL, junto com Lego e Miniaturas. So some se o
+     servidor ja respondeu e disse que nao ha redoma nenhuma -- antes ele esperava
+     o /catalogo (2 s) para aparecer, e o cliente via a home sem ele. */
   var l=document.getElementById('tipoRedomaLinha');
-  if(l)l.style.display=_temRedoma()?'':'none';
+  if(l)l.style.display=(_temRedoma()||!_FP_CAT_RESPONDEU)?'':'none';
 }
 function renderInclusoBrands(){
   var el=document.getElementById('inclusoBrands'); if(!el)return;
