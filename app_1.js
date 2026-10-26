@@ -107,6 +107,8 @@ const S = {
 // e volta para a etapa TIPO. O carrinho fica salvo no localStorage
 // (funparts_cart_v1) e ÃÂ© recarregado no init, entÃÂ£o os itens sÃÂ£o preservados.
 function iniciarNovaPersonalizacao(){
+  /* 26/10/2026: com o link do produto na barra, recarregar abriria o MESMO produto */
+  try{ _fpUrlVolta(); }catch(e){}
   try{ location.reload(); }
   catch(e){ location.href = location.pathname + location.search; }
 }
@@ -3528,6 +3530,85 @@ function _fpTiraP(){
     history.replaceState(history.state,'',u.pathname+u.search+u.hash);
   }catch(e){}
 }
+/* === LINK DO PRODUTO NA BARRA (26/10/2026, opcao C) ===
+   Produto pronto aberto (redoma, quadro pronto, quadro com miniatura) mostra na
+   barra funparts.com.br/<nome-do-produto>; saiu da ficha, a barra volta para a
+   raiz. O nome sai do cadastro do painel: sem acento, sem "para/da/premium...".
+   So replaceState: o botao Voltar do navegador continua igual. O ?p=r15 antigo
+   continua valendo. */
+var _FP_SLUG_STOP={para:1,de:1,da:1,'do':1,das:1,dos:1,o:1,a:1,e:1,no:1,na:1,com:1,modelo:1,piloto:1,display:1,premium:1,acrilico:1,miniaturas:1};
+var _FP_TITULO0='';
+function _fpSlugBase(n,pre){
+  var s=String(n||'');
+  try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){}
+  var w=s.toLowerCase().split(/[^a-z0-9]+/).filter(function(x){ return x && !_FP_SLUG_STOP[x]; });
+  if(w[0]==='redoma'||w[0]==='quadro'||w[0]==='adesivo') return w.join('-');
+  return [pre].concat(w).join('-');
+}
+function _fpSlugMapa(){
+  var lista=[];
+  function junta(cat,t,pre){
+    try{ Object.keys(cat||{}).forEach(function(b){ (((cat[b]||{}).itens)||[]).forEach(function(it){
+      if(it && it.id!=null && !it.sm) lista.push({k:t+Number(it.id), s:_fpSlugBase(it.n,pre), dim:String(it.dim||'')});
+    }); }); }catch(e){}
+  }
+  junta(REDOMA_CATALOG,'r','redoma'); junta(INCLUSO_CATALOG,'p','quadro'); junta(PRONTO_CATALOG,'p','quadro');
+  var vistos={}, porK={}, porSlug={};
+  lista.forEach(function(x){ if(porK[x.k]) return; porK[x.k]=x; vistos[x.s]=(vistos[x.s]||0)+1; });
+  Object.keys(porK).forEach(function(k){
+    var x=porK[k], s=x.s;
+    if(vistos[s]>1){ var m=/(\d+)\s*[x\u00d7]\s*(\d+)/i.exec(x.dim); s+=m?('-'+m[1]+'x'+m[2]):('-'+k.slice(1)); }
+    if(porSlug[s]) s+='-'+k.slice(1);
+    porK[k]=s; porSlug[s]=k;
+  });
+  return {porK:porK, porSlug:porSlug};
+}
+function _fpSlugDoCaminho(){
+  var c=String(location.pathname||'/').replace(/^\/+|\/+$/g,'').toLowerCase();
+  if(!c || c.indexOf('/')>=0 || c.indexOf('.')>=0) return '';
+  /* so os prefixos que o gerador cria: /trocas-e-devolucoes e outras paginas nunca entram aqui */
+  return /^(redoma|quadro|adesivo)(-[a-z0-9]+)+$/.test(c)?c:'';
+}
+function _fpUrlPoe(caminho){
+  try{
+    var u=new URL(location.href); u.searchParams.delete('p');
+    if(/^#[rp]\d+$/i.test(u.hash)) u.hash='';
+    if(u.pathname!==caminho) history.replaceState(history.state,'',caminho+u.search+u.hash);
+  }catch(e){}
+}
+function _fpUrlVolta(){
+  if(_fpSlugDoCaminho()) _fpUrlPoe('/');
+  try{ if(_FP_TITULO0 && document.title!==_FP_TITULO0) document.title=_FP_TITULO0; }catch(e){}
+}
+/* depois de cada troca de etapa: ficha de produto pronto aberta = link dele */
+function _fpUrlSync(){
+  try{
+    var sec=document.getElementById('inclusoProdutoSection');
+    var it=(typeof S!=='undefined')?S.incProduto:null;
+    var naFicha=!!(sec && sec.style.display!=='none' && it && it.id!=null && !it.sm && S.miniChoice==='incluso');
+    if(naFicha){
+      var at=document.querySelector('.stab.active'); var st=at?parseInt(at.getAttribute('data-step'),10):2;
+      if(!isNaN(st) && st!==2) naFicha=false;
+    }
+    if(!naFicha){ _fpUrlVolta(); return; }
+    var k=(_ehRedoma()?'r':'p')+Number(it.id);
+    var s=_fpSlugMapa().porK[k]; if(!s){ _fpUrlVolta(); return; }
+    if(!_FP_TITULO0) _FP_TITULO0=document.title;
+    _fpUrlPoe('/'+s);
+    document.title=String(it.n||'').replace(/\s+/g,' ').trim()+' \u00b7 Funparts';
+  }catch(e){}
+}
+(function(){
+  /* embrulha o goStep por ULTIMO (o index.html e o fp_addons tambem embrulham) */
+  function liga(){
+    if(typeof window.goStep!=='function' || window.goStep.__fpUrl) return;
+    var o=window.goStep;
+    window.goStep=function(){ var r=o.apply(this,arguments); setTimeout(_fpUrlSync,0); return r; };
+    window.goStep.__fpUrl=1;
+  }
+  if(document.readyState==='complete') setTimeout(liga,0);
+  else window.addEventListener('load',function(){ setTimeout(liga,0); });
+})();
 function _fpAtalhoAnuncio(){
   var p='';
   try{
@@ -3535,6 +3616,16 @@ function _fpAtalhoAnuncio(){
     if(!p) p=String(location.hash||'').replace('#','');
     p=p.toLowerCase().trim();
   }catch(e){}
+  /* 26/10/2026: link com o nome do produto (funparts.com.br/redoma-...) vira o mesmo r<id>/p<id> */
+  if(!p){
+    var _sl=_fpSlugDoCaminho();
+    if(_sl){
+      var _sa=_fpSlugMapa().porSlug[_sl];
+      if(_sa) p=_sa;
+      else if(!_FP_CAT_RESPONDEU){ _FP_ATALHO_ESPERA=true; return; }
+      else { _fpUrlVolta(); p=(_sl.indexOf('redoma-')===0)?'redoma':''; }
+    }
+  }
   var r=_FP_ATALHOS[p];
   var _pm=/^([rp])(\d+)$/.exec(p), _alvo=null;
   if(!r && _pm){
