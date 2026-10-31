@@ -5,11 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Funparts &middot; Quadros para LEGO, miniaturas e redomas de acr&iacute;lico</title>
 <meta name="description" content="Quadros premium para carros LEGO e miniaturas, redomas de acr&iacute;lico prontas e sob medida. Configure o seu, veja o pre&ccedil;o na hora e receba em casa. Fabricado em Barueri, SP.">
-<link rel="canonical" href="https://www.funparts.com.br/">
 <meta property="og:title" content="Funparts &middot; Quadros para LEGO, miniaturas e redomas de acr&iacute;lico">
 <meta property="og:description" content="Configure o seu quadro ou redoma, veja o pre&ccedil;o na hora e receba em casa.">
-<meta property="og:url" content="https://www.funparts.com.br/">
 <meta property="og:image" content="https://www.funparts.com.br/images/img_001.png">
+<script>
+/* 31/10/2026: o MESMO site responde em www.funparts.com.br (Brasil) e www.funparts.be (Europa).
+   - pelo .be, a 1a visita ja abre na regiao Europa, em frances (depois vale a escolha do cliente)
+   - canonical e hreflang de cada endereco: o Google entende que sao o mesmo site, um por pais */
+(function(){
+  try{
+    var be=/(^|\.)funparts\.be$/i.test(location.hostname);
+    if(be){ try{ if(!localStorage.getItem('fp_region')){ localStorage.setItem('fp_region','EU'); localStorage.setItem('fp_lang','fr'); } }catch(e){} }
+    var p=location.pathname||'/', BR='https://www.funparts.com.br'+p, EU='https://www.funparts.be'+p;
+    var h=document.head||document.getElementsByTagName('head')[0];
+    function lk(rel,href,hl){ var l=document.createElement('link'); l.rel=rel; l.href=href; if(hl) l.hreflang=hl; h.appendChild(l); }
+    lk('canonical', be?EU:BR);
+    lk('alternate', BR, 'pt-BR'); lk('alternate', EU, 'fr-BE'); lk('alternate', BR, 'x-default');
+    var m=document.createElement('meta'); m.setAttribute('property','og:url'); m.content=be?EU:BR; h.appendChild(m);
+  }catch(e){}
+})();
+</script>
 <link rel="stylesheet" href="styles_1.css">
 <link rel="stylesheet" href="styles_3.css">
 <!-- Meta Pixel -- Funparts (dataset Funparts-ads / 461439063362049)
