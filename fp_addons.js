@@ -4268,3 +4268,159 @@ function _startOb14(){
     window.open('https://wa.me/5511910646157?text='+encodeURIComponent(m),'_blank');
   };
 })();
+
+/* VIDEO DO PRODUTO (08/11/2026) -- estilo C1 aprovado pelo Rodolfo.
+   A foto continua sendo a primeira imagem. Se o produto tem video no painel
+   (item.vid no /catalogo), aparece a pilula "Video . 0:18" no canto inferior
+   esquerdo da foto principal; o toque abre o video em tela cheia, com som,
+   e o botao verde Comprar leva ao resumo do pedido. O video so e' baixado
+   no toque. Produto sem video: nada muda. Texto novo so com \u (o arquivo
+   e' servido sem charset). */
+(function(){
+  if(typeof window._catGaleriaHTML!=='function')return;
+  var BASE='https://funparts-ai-proxy.rodox1209.workers.dev/vid/';
+  var TX={pt:{v:'V\u00eddeo',c:'Comprar',f:'Fechar',e:'N\u00e3o foi poss\u00edvel reproduzir o v\u00eddeo neste aparelho.'},
+          en:{v:'Video',c:'Buy now',f:'Close',e:'This video cannot be played on this device.'},
+          es:{v:'V\u00eddeo',c:'Comprar',f:'Cerrar',e:'No se pudo reproducir el v\u00eddeo en este dispositivo.'},
+          fr:{v:'Vid\u00e9o',c:'Acheter',f:'Fermer',e:'Impossible de lire la vid\u00e9o sur cet appareil.'}};
+  function lg(){ try{ return (window.FP&&FP.lang)||localStorage.getItem('fp_lang')||'pt'; }catch(e){ return 'pt'; } }
+  function T(){ return TX[lg()]||TX.pt; }
+  /* S e' declarado com let no app_1.js: nao fica em window.S */
+  function item(){ try{ return (typeof S!=='undefined'&&S&&S.incProduto)||null; }catch(e){ return null; } }
+  /* HEVC (padrao do iPhone) so aparece onde o aparelho toca: nos outros a
+     pagina fica como hoje, sem selo -- nunca um video quebrado na tela. */
+  var _hevc=null;
+  function tocaHevc(){
+    if(_hevc!==null)return _hevc;
+    _hevc=false;
+    try{ var v=document.createElement('video');
+      ['hvc1.1.6.L93.B0','hvc1.2.4.L123.B0','hvc1.1.6.L120.90','hev1.1.6.L93.B0'].forEach(function(c){ if(v.canPlayType('video/mp4; codecs="'+c+'"')) _hevc=true; });
+    }catch(e){}
+    return _hevc;
+  }
+  function tem(){ var it=item(); if(!(it&&it.vid&&!it.sm))return false; if(it.vcod==='hevc'&&!tocaHevc())return false; return true; }
+  function tempo(s){ s=Math.max(1,Math.floor(Number(s)||0)); var r=s%60; return Math.floor(s/60)+':'+(r<10?'0':'')+r; }
+  var PLAY='<svg viewBox="0 0 10 12" width="9" height="11" aria-hidden="true"><path d="M1 0.6L9.6 6L1 11.4z" fill="#fff"/></svg>';
+  function css(){
+    if(document.getElementById('fpVidCss'))return;
+    var st=document.createElement('style'); st.id='fpVidCss';
+    st.textContent=
+     '.fp-vpill{position:absolute;left:12px;bottom:12px;z-index:3;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;margin:0;'
+    +'border-radius:999px;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.22);color:#fff;font:600 13px/1 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;'
+    +'letter-spacing:.01em;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 18px rgba(0,0,0,.35);opacity:0;transition:opacity .25s,transform .2s,background .2s;-webkit-tap-highlight-color:transparent}'
+    +'.fp-vpill:hover{background:rgba(8,8,8,.86);transform:translateY(-1px)}'
+    +'.fp-vpill i{width:26px;height:26px;border-radius:50%;background:#e07b00;display:flex;align-items:center;justify-content:center;padding-left:2px;box-sizing:border-box;flex:none}'
+    +'.fp-vpill em{font-style:normal;font-weight:400;color:#bbb}'
+    +'.fp-vmod{position:fixed;inset:0;z-index:2147483000;background:#000;display:none}'
+    +'.fp-vmod.on{display:block}'
+    +'.fp-vmod video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}'
+    +'.fp-vtop{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 30px;background:linear-gradient(rgba(0,0,0,.62),transparent);pointer-events:none}'
+    +'.fp-vtit{flex:1;min-width:0;color:#fff;font:700 12px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 1px 6px #000;padding-top:11px}'
+    +'.fp-vx{pointer-events:auto;flex:none;width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.3);color:#fff;font:400 24px/1 Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 0 2px}'
+    +'.fp-vbuy{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 78px);border:0;border-radius:9px;padding:14px 24px;white-space:nowrap;'
+    +'background:linear-gradient(135deg,#0E8A4F,#1FBE71);color:#fff;font:800 14px/1 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.02em;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.45)}'
+    +'.fp-verr{position:absolute;left:24px;right:24px;top:45%;text-align:center;color:#ddd;font:500 14px/1.5 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;display:none}';
+    (document.head||document.documentElement).appendChild(st);
+  }
+  /* a pilula fica no canto da FOTO pintada (object-fit:contain deixa faixas) */
+  function pos(){
+    var img=document.getElementById('catMainPhoto'), p=document.getElementById('fpVidPill');
+    if(!img||!p||!p.parentNode)return;
+    var box=p.parentNode, r=img.getBoundingClientRect(), b=box.getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    var nw=img.naturalWidth, nh=img.naturalHeight, pw=r.width, ph=r.height;
+    if(nw&&nh){ var s=Math.min(r.width/nw, r.height/nh); pw=nw*s; ph=nh*s; }
+    p.style.left=Math.round((r.left-b.left)+(r.width-pw)/2+12)+'px';
+    p.style.bottom=Math.round((b.bottom-r.bottom)+(r.height-ph)/2+12)+'px';
+    p.style.opacity='1';
+  }
+  function liga(){
+    var img=document.getElementById('catMainPhoto'), p=document.getElementById('fpVidPill');
+    if(!img||!p)return;
+    var box=p.parentNode;
+    try{ if(box&&getComputedStyle(box).position==='static') box.style.position='relative'; }catch(e){}
+    if(!img.__fpVid){ img.__fpVid=1; img.addEventListener('load',pos); }
+    if(img.complete) pos();
+  }
+  var _rt=null;
+  window.addEventListener('resize',function(){ clearTimeout(_rt); _rt=setTimeout(pos,90); });
+
+  var orig=window._catGaleriaHTML;
+  window._catGaleriaHTML=function(soFoto){
+    var h=orig.apply(this,arguments);
+    try{
+      if(soFoto||!tem())return h;
+      var it=item(); css();
+      var pill='<button type="button" id="fpVidPill" class="fp-vpill" onclick="_fpVidAbre()" aria-label="'+T().v+'"><i>'+PLAY+'</i><span>'+T().v+'</span>'
+        +(it.vdur?('<em>\u00b7 '+tempo(it.vdur)+'</em>'):'')+'</button>';
+      var feito=false;
+      h=h.replace(/<img id="catMainPhoto"[^>]*>/,function(m){ feito=true; return m+pill; });
+      if(feito) setTimeout(liga,0);
+    }catch(e){}
+    return h;
+  };
+
+  var _hist=false, _depois=null, _ovf='';
+  function modal(){
+    var m=document.getElementById('fpVidModal'); if(m)return m;
+    css();
+    m=document.createElement('div'); m.id='fpVidModal'; m.className='fp-vmod';
+    m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true');
+    m.innerHTML='<video id="fpVidEl" playsinline webkit-playsinline controls preload="none" controlslist="nodownload"></video>'
+      +'<div class="fp-verr" id="fpVidErr"></div>'
+      +'<div class="fp-vtop"><div class="fp-vtit" id="fpVidTit"></div><button type="button" class="fp-vx" id="fpVidX">\u00d7</button></div>'
+      +'<button type="button" class="fp-vbuy" id="fpVidBuy"></button>';
+    document.body.appendChild(m);
+    document.getElementById('fpVidX').onclick=function(){ fecha(true); };
+    document.getElementById('fpVidBuy').onclick=compra;
+    var v=document.getElementById('fpVidEl');
+    v.addEventListener('error',function(){ if(!v.getAttribute('src'))return; var e=document.getElementById('fpVidErr'); e.textContent=T().e; e.style.display='block'; });
+    v.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+    return m;
+  }
+  window._fpVidAbre=function(){
+    var it=item(); if(!it||!it.vid)return;
+    var m=modal(), v=document.getElementById('fpVidEl');
+    document.getElementById('fpVidTit').textContent=String(it.n||'');
+    var x=document.getElementById('fpVidX'); x.setAttribute('aria-label',T().f); x.title=T().f;
+    var pr=''; try{ if(typeof _brl==='function'&&it.p!=null) pr=_brl(it.p); }catch(e){}
+    document.getElementById('fpVidBuy').textContent=T().c+(pr?(' \u00b7 '+pr):'');
+    document.getElementById('fpVidErr').style.display='none';
+    var f=document.getElementById('catMainPhoto');
+    if(f&&f.src) v.setAttribute('poster',f.src); else v.removeAttribute('poster');
+    v.muted=false;
+    v.setAttribute('src',BASE+encodeURIComponent(it.vid));
+    m.classList.add('on');
+    _ovf=document.documentElement.style.overflow; document.documentElement.style.overflow='hidden';
+    try{ history.pushState({fpVid:1},'',location.href); _hist=true; }catch(e){ _hist=false; }
+    try{ var p=v.play(); if(p&&p.catch) p.catch(function(){ v.muted=true; v.play().catch(function(){}); }); }catch(e){}
+  };
+  function fecha(viaTela){
+    var m=document.getElementById('fpVidModal');
+    if(!m||!m.classList.contains('on'))return false;
+    m.classList.remove('on');
+    var v=document.getElementById('fpVidEl');
+    try{ v.pause(); }catch(e){}
+    v.removeAttribute('src'); try{ v.load(); }catch(e){}
+    document.documentElement.style.overflow=_ovf||'';
+    if(viaTela&&_hist){ _hist=false; try{ history.back(); return true; }catch(e){} }
+    _hist=false; return false;
+  }
+  function segue(){
+    var f=_depois; _depois=null; if(f){ try{ f(); }catch(e){} }
+  }
+  window.addEventListener('popstate',function(){
+    if(_hist){ _hist=false; fecha(false); }
+    if(_depois) setTimeout(segue,0);
+  });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') fecha(true); });
+  function compra(){
+    _depois=function(){
+      if((window.innerWidth||1024)<=720&&typeof window.mobNext==='function') window.mobNext();
+      else if(typeof window.goStep==='function') window.goStep(7);
+    };
+    var esperaVolta=fecha(true);
+    if(esperaVolta) setTimeout(function(){ if(_depois) segue(); },600);
+    else segue();
+  }
+})();
