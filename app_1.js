@@ -6708,7 +6708,7 @@ function _smCss(){
             var tx=''; try{ if(it.tx&&typeof it.tx==='object'){ for(var k in it.tx) tx+=' '+it.tx[k]; } }catch(e){}
             /* redoma: a medida no lugar da escala, e as palavras que o cliente usa para ela */
             var md=''; if(t==='r'){ try{ md=_redomaMedida(it); }catch(e){} }
-            var h=[it.n,it._cat||b,it.esc,it.dim,md,(t==='r'?'redoma redomas display vitrine acrilico case':''),tx].join(' ');
+            var h=[it.n,it._cat||b,it.esc,it.dim,md,(t==='r'?'redoma redomas display vitrine acrilico case':''),tx,(typeof window._fpNomesTodos==='function'?window._fpNomesTodos(it):'')].join(' ');
             a.push({it:it,t:t,h:sem(h),hs:semEsp(h),n:sem(it.n),md:md,k:(t==='r'?'r':'p')+it.id});
           });
         });
@@ -6753,7 +6753,7 @@ function _smCss(){
       var tg=(o.t==='m'?t.m:(o.t==='r'?t.r:t.p)), sub=(o.t==='r'?o.md:it.esc);
       h+='<button type="button" class="fb-r" data-p="'+esc(o.k)+'">'
         +'<span class="fb-im">'+(f?'<img src="'+esc(f)+'" alt="" loading="lazy" decoding="async">':'<i>\ud83c\udfc1</i>')+'</span>'
-        +'<span class="fb-tx"><span class="fb-n">'+marca(it.n,s)+'</span>'
+        +'<span class="fb-tx"><span class="fb-n">'+marca((typeof window._fpNomeTrad==='function'?window._fpNomeTrad(it):it.n),s)+'</span>'
         +'<span class="fb-g"><span class="fb-tag '+o.t+'">'+esc(tg)+'</span>'
         +'<span class="fb-pv">'+(sub?('<span>'+esc(sub)+'</span>\u00b7'):'')+'<strong>'+esc(preco(it.p))+'</strong></span></span></span>'
         +'<span class="fb-ch">\u203a</span></button>';
