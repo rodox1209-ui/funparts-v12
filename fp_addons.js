@@ -4463,31 +4463,47 @@ function _startOb14(){
     return m;
   });
   /* produtos e textos de ajuda: montados a partir do catalogo que o site carregou */
-  var PIDX={}, PSIG='';
+  var PIDX={}, PSIG='', PV=0;
   function resolve(k,campo){
     var p=PROD[k]; if(!p) return null; var v=p[campo]; if(!v) return null;
     if(v.c){ var b=resolve(v.c,campo); if(!b) return null; return b.map(function(t){ v.s.forEach(function(x){ t=t.split(x[0]).join(x[1]); }); return t; }); }
     return v;
   }
+  function tam(v){ if(!v) return 0; try{ var j=JSON.stringify(v), h=0; for(var i=0;i<j.length;i++) h=(h*31+j.charCodeAt(i))|0; return j.length+'.'+h; }catch(e){ return 0; } }
   function prodMonta(){
     var cats=[], sig='';
     try{ if(typeof REDOMA_CATALOG!=='undefined') cats.push(['r',REDOMA_CATALOG]); }catch(e){}
     try{ if(typeof INCLUSO_CATALOG!=='undefined') cats.push(['p',INCLUSO_CATALOG]); }catch(e){}
     try{ if(typeof PRONTO_CATALOG!=='undefined') cats.push(['p',PRONTO_CATALOG]); }catch(e){}
     var itens=[];
-    cats.forEach(function(c){ try{ Object.keys(c[1]||{}).forEach(function(b){ (((c[1][b]||{}).itens)||[]).forEach(function(it){ if(it&&it.id!=null){ itens.push([c[0]+it.id,it]); sig+=c[0]+it.id+':'+String(it.n||'').length+':'+String(it.desc||'').length+';'; } }); }); }catch(e){} });
+    cats.forEach(function(c){ try{ Object.keys(c[1]||{}).forEach(function(b){ (((c[1][b]||{}).itens)||[]).forEach(function(it){ if(it&&it.id!=null){ itens.push([c[0]+it.id,it]); sig+=c[0]+it.id+':'+String(it.n||'').length+':'+String(it.desc||'').length+':'+tam(it.nx)+tam(it.dx)+tam(it.tx)+';'; } }); }); }catch(e){} });
     var inf=null; try{ if(typeof INFOS!=='undefined') inf=INFOS; }catch(e){}
     if(inf) sig+='i'+Object.keys(inf).length;
-    if(sig===PSIG) return; PSIG=sig; PIDX={};
+    var CI=null; try{ CI=(window.__fpCatI18n&&typeof window.__fpCatI18n==='object')?window.__fpCatI18n:null; }catch(e){}
+    if(CI) sig+='c'+tam(CI);
+    if(sig===PSIG) return; PSIG=sig; PV++; PIDX={};
+    /* 11/11/2026: o que foi digitado no painel (nx = nome, dx/tx = descricao, por idioma)
+       vale ANTES da tabela embutida; idioma sem nada no painel cai na tabela e, sem ela, no portugues */
+    function obj(v){ return (v&&typeof v==='object')?v:null; }
+    function entra(pt,a,b,c){
+      var e={pt:pt}, tem=false;
+      ['en','es','fr'].forEach(function(l,i){ var v=(a&&a[l])||(b&&b[l])||(c&&c[i])||null; if(v){ e[l]=v; tem=true; } });
+      if(!tem) return;
+      /* idioma que ficou sem nada: usa a frase do dicionario do site e, sem ela, o portugues
+         (assim, ao trocar de idioma, nao sobra na tela o texto do idioma anterior) */
+      var o=IDX[norm(pt)]||antigos(norm(pt));
+      ['en','es','fr'].forEach(function(l){ if(!e[l]) e[l]=(o&&o[l])||pt; });
+      poe(PIDX,pt,e);
+      ['en','es','fr'].forEach(function(l){ poe(PIDX,e[l],e); if(o&&o[l]) poe(PIDX,o[l],e); });
+    }
     itens.forEach(function(x){
       var k=x[0], it=x[1], n=resolve(k,'n'), d=resolve(k,'d');
-      if(n&&it.n){ var e={pt:it.n,en:n[0],es:n[1],fr:n[2]}; poe(PIDX,it.n,e); n.forEach(function(t){ poe(PIDX,t,e); }); }
-      if(d){
-        var base=it.desc||''; var tx=it.tx&&typeof it.tx==='object'?it.tx:null;
-        if(!base&&tx&&tx.pt) base=tx.pt;
-        if(base){ var e2={pt:base,en:(tx&&tx.en)||d[0],es:(tx&&tx.es)||d[1],fr:(tx&&tx.fr)||d[2]}; poe(PIDX,base,e2); [e2.en,e2.es,e2.fr].forEach(function(t){ poe(PIDX,t,e2); }); }
-      }
+      if(it.n) entra(it.n,obj(it.nx),null,n);
+      var tx=obj(it.tx), base=it.desc||'';
+      if(!base&&tx&&tx.pt) base=tx.pt;
+      if(base) entra(base,obj(it.dx),tx,d);
     });
+    if(CI) Object.keys(CI).forEach(function(nm){ if(nm) entra(nm,obj(CI[nm]),null,null); });
     if(inf) Object.keys(INFO).forEach(function(k){
       var t=inf[k]&&inf[k].texto, d=INFO[k]; if(!t) return;
       var e={pt:t,en:d[0],es:d[1],fr:d[2]}; poe(PIDX,t,e); d.forEach(function(x){ poe(PIDX,x,e); });
@@ -4559,9 +4575,18 @@ function _startOb14(){
     return o.__fp3c>8;                 /* outro bloco insiste em desfazer: nao entra em briga */
   }
   var ATR=['placeholder','title','aria-label','alt'];
+  /* rodape: na regiao Europa quem vende e' a empresa belga (11/11/2026) */
+  var RP_BR=['Funparts LTDA','CNPJ 09.579.820/0001-54','Barueri, SP'], RP_EU=['FUNPARTS EUROPE SRL','TVA BE 1040.041.918','Braine-l\'Alleud, Belgique'];
+  function rodape(){
+    var sp=document.querySelectorAll('footer.site-foot .row:first-child span'); if(sp.length!==3) return;
+    var eu=false; try{ eu=((window.FP&&FP.region)||localStorage.getItem('fp_region'))==='EU'; }catch(e){}
+    var alvo=eu?RP_EU:RP_BR;
+    for(var i=0;i<3;i++){ if(sp[i].textContent!==alvo[i]) sp[i].textContent=alvo[i]; }
+  }
   var JA=false;
   function passa(){
     if(!document.body) return;
+    try{ rodape(); }catch(e){}
     var l=lang();
     /* visita toda em portugues: nada a fazer (so trabalha depois de existir outro idioma na tela) */
     if(l!=='pt') JA=true; else if(!JA) return;
@@ -4569,13 +4594,17 @@ function _startOb14(){
     var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false), n, fila=[];
     while((n=w.nextNode())){
       var cur=n.nodeValue; if(!cur||cur.length<2) continue;
-      if(n.__fp3v===cur&&n.__fp3k===l+PSIG.length) continue;
-      n.__fp3v=cur; n.__fp3k=l+PSIG.length;
+      if(n.__fp3v===cur&&n.__fp3k===l+PV) continue;
+      n.__fp3v=cur; n.__fp3k=l+PV;
       var p=n.parentNode; if(!p) continue; var tg=p.nodeName;
       if(tg==='SCRIPT'||tg==='STYLE'||tg==='TEXTAREA'||tg==='NOSCRIPT') continue;
       if(p.closest&&p.closest('#fpLang')) continue;
       var s=norm(cur); if(!s||!/[A-Za-z\u00c0-\u024f]{2}/.test(s)) continue;
       var r=null; try{ r=tr(s,l,0); }catch(e){ r=null; }
+      /* 11/11/2026: o bloco antigo de "pedacos" as vezes chega antes e troca so um trecho da
+         descricao (ex.: "Impressao UV"); ai a frase nao bate mais. Ele guarda o texto original
+         em __fpP: se o original e' um produto conhecido, traduz a partir dele */
+      if(r==null&&typeof n.__fpP==='string'&&n.__fpP!==cur){ var s0=norm(n.__fpP), e0=PIDX[s0]; if(e0&&e0[l]&&norm(e0[l])!==s) r=e0[l]; }
       if(r==null||r===s||norm(r)===s) continue;
       fila.push([n,cur,r]);
     }
@@ -4590,7 +4619,7 @@ function _startOb14(){
       var el=els[i]; if(el.closest&&el.closest('#fpLang')&&!el.hasAttribute('aria-label')) continue;
       for(var a=0;a<ATR.length;a++){
         var val=el.getAttribute(ATR[a]); if(!val||val.length<3) continue;
-        var ck='__fp3q'+a, cv=l+PSIG.length+val; if(el[ck]===cv) continue; el[ck]=cv;
+        var ck='__fp3q'+a, cv=l+PV+'|'+val; if(el[ck]===cv) continue; el[ck]=cv;
         var s2=norm(val), r2=null; try{ r2=tr(s2,l,0); }catch(e){}
         if(r2==null||r2===s2) continue;
         if(!el.__fp3a) el.__fp3a={}; var c=el.__fp3a; if(c.l!==l){ c.l=l; c.n=0; } if(++c.n>12) continue;

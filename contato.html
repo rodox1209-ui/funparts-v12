@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contato · Funparts</title>
 <meta name="description" content="Fale com a Funparts: WhatsApp (11) 91064-6157, contato@funparts.com.br. Fábrica e showroom em Barueri, SP; Funparts Europe na Bélgica.">
+<script>
+/* 11/11/2026: a pagina segue o idioma e a regiao escolhidos no site (os mesmos fp_lang / fp_region).
+   Pelo funparts.be, a 1a visita abre em frances, regiao Europa. Sem JavaScript: portugues, Brasil. */
+(function(){
+  var l='pt',r='BR',be=/(^|\.)funparts\.be$/i.test(location.hostname);
+  try{
+    var S=window.localStorage;
+    if(be&&!S.getItem('fp_region')){ S.setItem('fp_region','EU'); S.setItem('fp_lang','fr'); }
+    var a=S.getItem('fp_lang'),b=S.getItem('fp_region');
+    if(a==='pt'||a==='en'||a==='es'||a==='fr') l=a;
+    if(b==='EU'||b==='BR') r=b;
+  }catch(e){ if(be){ l='fr'; r='EU'; } }
+  var d=document.documentElement;
+  d.setAttribute('data-fl',l); d.setAttribute('data-fr',r);
+  d.lang={pt:'pt-BR',en:'en',es:'es',fr:'fr'}[l];
+  var T={"pt": "Contato", "en": "Contact", "es": "Contacto", "fr": "Contact"};
+  try{ document.title=T[l]+' \u00b7 Funparts'; }catch(e){}
+})();
+</script>
 <link rel="stylesheet" href="styles_1.css">
 
 <style>
@@ -40,36 +59,131 @@ ul{padding-left:20px;margin:0 0 12px}li{margin-bottom:6px}
 .pf .row{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0;margin-bottom:6px}.pf .row:last-child{margin-bottom:0}
 .pf .row>*{padding:0 9px;border-left:1px solid #333}.pf .row>*:first-child{border-left:none}
 .pf a{color:#bbb;text-decoration:none}.pf a:hover{color:#fff}
+
+/* idiomas (PT/EN/ES/FR) e regiao (Brasil/Europa): so esconde o que nao e' do visitante */
+html[data-fl="pt"] .lx:not(.l-pt),html[data-fl="en"] .lx:not(.l-en),html[data-fl="es"] .lx:not(.l-es),html[data-fl="fr"] .lx:not(.l-fr),html:not([data-fl]) .lx:not(.l-pt),
+html[data-fr="BR"] .rx:not(.r-BR),html[data-fr="EU"] .rx:not(.r-EU),html:not([data-fr]) .rx:not(.r-BR){display:none!important}
 </style>
 </head>
 <body>
 <div class="ph">
   <a href="/" aria-label="Funparts"><img src="images/img_001.png" alt="Funparts"></a>
-  <a class="volta" href="/">&#8592; Voltar ao configurador</a>
+  <a class="volta" href="/"><span class="lx l-pt">&#8592; Voltar ao configurador</span><span class="lx l-en">&#8592; Back to the configurator</span><span class="lx l-es">&#8592; Volver al configurador</span><span class="lx l-fr">&#8592; Retour au configurateur</span></a>
 </div>
 <main class="pg">
+<div class="lx l-pt">
   <div class="crumb"><a href="/">Início</a> &nbsp;/&nbsp; Contato</div>
   <h1>Contato</h1>
   <p class="lead">WhatsApp, e-mail e onde estamos</p>
 
 <div class="grid2">
-  <div class="card"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/5511910646157?text=Ol%C3%A1%2C%20Funparts!">(11) 91064-6157</a></div><div class="s">Atendimento em horário comercial · resposta rápida</div></div>
-  <div class="card"><div class="k">E-mail</div><div class="v"><a href="mailto:contato@funparts.com.br">contato@funparts.com.br</a></div><div class="s">Pedidos, trocas, orçamentos e parcerias</div></div>
-  <div class="card"><div class="k">Fábrica e showroom</div><div class="v">Barueri – SP</div><div class="s">Retirada na fábrica com hora marcada · endereço enviado na confirmação do pedido</div></div>
-  <div class="card"><div class="k">Europa</div><div class="v">Braine-l'Alleud, Bélgica</div><div class="s">Funparts Europe · entregas em toda a União Europeia</div></div>
+  <div class="card rx r-BR"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/5511910646157?text=Ol%C3%A1%2C%20Funparts!">(11) 91064-6157</a></div><div class="s">Atendimento em horário comercial · resposta rápida</div></div>
+  <div class="card rx r-EU"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/32491900007?text=Ol%C3%A1%2C%20Funparts!">+32 491 90 00 07</a></div><div class="s">Atendimento em dias úteis · resposta rápida</div></div>
+  <div class="card rx r-BR"><div class="k">E-mail</div><div class="v"><a href="mailto:contato@funparts.com.br">contato@funparts.com.br</a></div><div class="s">Pedidos, trocas, orçamentos e parcerias</div></div>
+  <div class="card rx r-EU"><div class="k">E-mail</div><div class="v"><a href="mailto:contact@funparts.eu">contact@funparts.eu</a></div><div class="s">Pedidos, devoluções, orçamentos e parcerias</div></div>
+  <div class="card rx r-BR"><div class="k">Fábrica e showroom</div><div class="v">Barueri – SP</div><div class="s">Retirada na fábrica com hora marcada · endereço enviado na confirmação do pedido</div></div>
+  <div class="card rx r-BR"><div class="k">Europa</div><div class="v">Braine-l'Alleud, Bélgica</div><div class="s">Funparts Europe · entregas em toda a União Europeia</div></div>
+  <div class="card rx r-EU"><div class="k">Funparts Europe</div><div class="v">Braine-l'Alleud, Bélgica</div><div class="s">Place Abbé Renard 5, 1420 Braine-l'Alleud · envio e retirada dos pedidos europeus</div></div>
+  <div class="card rx r-EU"><div class="k">Brasil</div><div class="v">Barueri – SP</div><div class="s">Fábrica e showroom da Funparts</div></div>
 </div>
-<p style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/5511910646157?text=Ol%C3%A1%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Falar no WhatsApp</a></p>
+<p class="rx r-BR" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/5511910646157?text=Ol%C3%A1%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Falar no WhatsApp</a></p>
+<p class="rx r-EU" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/32491900007?text=Ol%C3%A1%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Falar no WhatsApp</a></p>
 <h2>Seu pedido</h2>
 <p>Para acompanhar, alterar ou tirar dúvidas sobre um pedido, informe sempre o <b>número do pedido</b> (FP-…) que aparece no e-mail de confirmação. Assim que o pedido é despachado você recebe o código de rastreio por e-mail.</p>
 <h2>Orçamentos e projetos especiais</h2>
-<p>Redomas em medidas fora do configurador, quadros para coleções inteiras, projetos para lojas, concessionárias e escritórios: fale conosco pelo WhatsApp com as medidas e fotos do que você quer expor. Fazemos tudo sob medida, em Barueri.</p>
+<p class="rx r-BR">Redomas em medidas fora do configurador, quadros para coleções inteiras, projetos para lojas, concessionárias e escritórios: fale conosco pelo WhatsApp com as medidas e fotos do que você quer expor. Fazemos tudo sob medida, em Barueri.</p>
+<p class="rx r-EU">Redomas em medidas fora do configurador, quadros para coleções inteiras, projetos para lojas, concessionárias e escritórios: fale conosco pelo WhatsApp com as medidas e fotos do que você quer expor. Fazemos tudo sob medida.</p>
 <h2>Redes</h2>
 <p><a href="https://www.instagram.com/funparts" style="color:#fff">Instagram</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/funparts" style="color:#fff">Facebook</a></p>
+<h2 class="rx r-EU">Dados da empresa</h2>
+<p class="rx r-EU"><b>FUNPARTS EUROPE SRL</b><br>Place Abbé Renard 5, 1420 Braine-l'Alleud, Bélgica<br>Número de empresa e IVA (TVA): BE 1040.041.918<br><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> · +32 491 90 00 07</p>
+</div>
+<div class="lx l-en">
+  <div class="crumb"><a href="/">Home</a> &nbsp;/&nbsp; Contact</div>
+  <h1>Contact</h1>
+  <p class="lead">WhatsApp, email and where we are</p>
 
+<div class="grid2">
+  <div class="card rx r-BR"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/5511910646157?text=Hello%2C%20Funparts!">+55 11 91064-6157</a></div><div class="s">Business hours (Brazil time) · quick reply</div></div>
+  <div class="card rx r-EU"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/32491900007?text=Hello%2C%20Funparts!">+32 491 90 00 07</a></div><div class="s">Monday to Friday · quick reply</div></div>
+  <div class="card rx r-BR"><div class="k">Email</div><div class="v"><a href="mailto:contato@funparts.com.br">contato@funparts.com.br</a></div><div class="s">Orders, exchanges, quotes and partnerships</div></div>
+  <div class="card rx r-EU"><div class="k">Email</div><div class="v"><a href="mailto:contact@funparts.eu">contact@funparts.eu</a></div><div class="s">Orders, returns, quotes and partnerships</div></div>
+  <div class="card rx r-BR"><div class="k">Factory and showroom</div><div class="v">Barueri – SP</div><div class="s">Factory pickup by appointment · address sent with the order confirmation</div></div>
+  <div class="card rx r-BR"><div class="k">Europe</div><div class="v">Braine-l'Alleud, Belgium</div><div class="s">Funparts Europe · delivery throughout the European Union</div></div>
+  <div class="card rx r-EU"><div class="k">Funparts Europe</div><div class="v">Braine-l'Alleud, Belgium</div><div class="s">Place Abbé Renard 5, 1420 Braine-l'Alleud · shipping and pickup of European orders</div></div>
+  <div class="card rx r-EU"><div class="k">Brazil</div><div class="v">Barueri – SP</div><div class="s">Funparts factory and showroom</div></div>
+</div>
+<p class="rx r-BR" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/5511910646157?text=Hello%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Chat on WhatsApp</a></p>
+<p class="rx r-EU" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/32491900007?text=Hello%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Chat on WhatsApp</a></p>
+<h2>Your order</h2>
+<p>To track, change or ask about an order, always give the <b>order number</b> (FP-…) shown in the confirmation email. As soon as the order is dispatched you receive the tracking code by email.</p>
+<h2>Quotes and special projects</h2>
+<p class="rx r-BR">Display cases in sizes beyond the configurator, frames for entire collections, projects for shops, dealerships and offices: message us on WhatsApp with the measurements and photos of what you want to display. Everything is made to measure, in Barueri.</p>
+<p class="rx r-EU">Display cases in sizes beyond the configurator, frames for entire collections, projects for shops, dealerships and offices: message us on WhatsApp with the measurements and photos of what you want to display. Everything is made to measure.</p>
+<h2>Social media</h2>
+<p><a href="https://www.instagram.com/funparts" style="color:#fff">Instagram</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/funparts" style="color:#fff">Facebook</a></p>
+<h2 class="rx r-EU">Company details</h2>
+<p class="rx r-EU"><b>FUNPARTS EUROPE SRL</b><br>Place Abbé Renard 5, 1420 Braine-l'Alleud, Belgium<br>Company and VAT number: BE 1040.041.918<br><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> · +32 491 90 00 07</p>
+</div>
+<div class="lx l-es">
+  <div class="crumb"><a href="/">Inicio</a> &nbsp;/&nbsp; Contacto</div>
+  <h1>Contacto</h1>
+  <p class="lead">WhatsApp, correo electrónico y dónde estamos</p>
+
+<div class="grid2">
+  <div class="card rx r-BR"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/5511910646157?text=%C2%A1Hola%2C%20Funparts!">+55 11 91064-6157</a></div><div class="s">Atención en horario comercial (hora de Brasil) · respuesta rápida</div></div>
+  <div class="card rx r-EU"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/32491900007?text=%C2%A1Hola%2C%20Funparts!">+32 491 90 00 07</a></div><div class="s">De lunes a viernes · respuesta rápida</div></div>
+  <div class="card rx r-BR"><div class="k">Correo electrónico</div><div class="v"><a href="mailto:contato@funparts.com.br">contato@funparts.com.br</a></div><div class="s">Pedidos, cambios, presupuestos y colaboraciones</div></div>
+  <div class="card rx r-EU"><div class="k">Correo electrónico</div><div class="v"><a href="mailto:contact@funparts.eu">contact@funparts.eu</a></div><div class="s">Pedidos, devoluciones, presupuestos y colaboraciones</div></div>
+  <div class="card rx r-BR"><div class="k">Fábrica y showroom</div><div class="v">Barueri – SP</div><div class="s">Recogida en fábrica con cita previa · dirección enviada en la confirmación del pedido</div></div>
+  <div class="card rx r-BR"><div class="k">Europa</div><div class="v">Braine-l'Alleud, Bélgica</div><div class="s">Funparts Europe · entregas en toda la Unión Europea</div></div>
+  <div class="card rx r-EU"><div class="k">Funparts Europe</div><div class="v">Braine-l'Alleud, Bélgica</div><div class="s">Place Abbé Renard 5, 1420 Braine-l'Alleud · envío y recogida de los pedidos europeos</div></div>
+  <div class="card rx r-EU"><div class="k">Brasil</div><div class="v">Barueri – SP</div><div class="s">Fábrica y showroom de Funparts</div></div>
+</div>
+<p class="rx r-BR" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/5511910646157?text=%C2%A1Hola%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Hablar por WhatsApp</a></p>
+<p class="rx r-EU" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/32491900007?text=%C2%A1Hola%2C%20Funparts!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Hablar por WhatsApp</a></p>
+<h2>Tu pedido</h2>
+<p>Para seguir, modificar o consultar un pedido, indica siempre el <b>número de pedido</b> (FP-…) que aparece en el correo de confirmación. En cuanto se envía el pedido recibes el código de seguimiento por correo electrónico.</p>
+<h2>Presupuestos y proyectos especiales</h2>
+<p class="rx r-BR">Vitrinas en medidas que no están en el configurador, cuadros para colecciones completas, proyectos para tiendas, concesionarios y oficinas: escríbenos por WhatsApp con las medidas y fotos de lo que quieres exponer. Lo fabricamos todo a medida, en Barueri.</p>
+<p class="rx r-EU">Vitrinas en medidas que no están en el configurador, cuadros para colecciones completas, proyectos para tiendas, concesionarios y oficinas: escríbenos por WhatsApp con las medidas y fotos de lo que quieres exponer. Lo fabricamos todo a medida.</p>
+<h2>Redes sociales</h2>
+<p><a href="https://www.instagram.com/funparts" style="color:#fff">Instagram</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/funparts" style="color:#fff">Facebook</a></p>
+<h2 class="rx r-EU">Datos de la empresa</h2>
+<p class="rx r-EU"><b>FUNPARTS EUROPE SRL</b><br>Place Abbé Renard 5, 1420 Braine-l'Alleud, Bélgica<br>Número de empresa e IVA (TVA): BE 1040.041.918<br><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> · +32 491 90 00 07</p>
+</div>
+<div class="lx l-fr">
+  <div class="crumb"><a href="/">Accueil</a> &nbsp;/&nbsp; Contact</div>
+  <h1>Contact</h1>
+  <p class="lead">WhatsApp, e-mail et où nous trouver</p>
+
+<div class="grid2">
+  <div class="card rx r-BR"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/5511910646157?text=Bonjour%2C%20Funparts%20!">+55 11 91064-6157</a></div><div class="s">Aux heures de bureau (heure du Brésil) · réponse rapide</div></div>
+  <div class="card rx r-EU"><div class="k">WhatsApp</div><div class="v"><a href="https://wa.me/32491900007?text=Bonjour%2C%20Funparts%20!">+32 491 90 00 07</a></div><div class="s">Du lundi au vendredi · réponse rapide</div></div>
+  <div class="card rx r-BR"><div class="k">E-mail</div><div class="v"><a href="mailto:contato@funparts.com.br">contato@funparts.com.br</a></div><div class="s">Commandes, échanges, devis et partenariats</div></div>
+  <div class="card rx r-EU"><div class="k">E-mail</div><div class="v"><a href="mailto:contact@funparts.eu">contact@funparts.eu</a></div><div class="s">Commandes, retours, devis et partenariats</div></div>
+  <div class="card rx r-BR"><div class="k">Atelier et showroom</div><div class="v">Barueri – SP</div><div class="s">Retrait à l'atelier sur rendez-vous · adresse envoyée avec la confirmation de commande</div></div>
+  <div class="card rx r-BR"><div class="k">Europe</div><div class="v">Braine-l'Alleud, Belgique</div><div class="s">Funparts Europe · livraison dans toute l'Union européenne</div></div>
+  <div class="card rx r-EU"><div class="k">Funparts Europe</div><div class="v">Braine-l'Alleud, Belgique</div><div class="s">Place Abbé Renard 5, 1420 Braine-l'Alleud · expédition et retrait des commandes européennes</div></div>
+  <div class="card rx r-EU"><div class="k">Brésil</div><div class="v">Barueri – SP</div><div class="s">Atelier et showroom Funparts</div></div>
+</div>
+<p class="rx r-BR" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/5511910646157?text=Bonjour%2C%20Funparts%20!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Discuter sur WhatsApp</a></p>
+<p class="rx r-EU" style="margin:22px 0 10px"><a class="btn verde" href="https://wa.me/32491900007?text=Bonjour%2C%20Funparts%20!"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11.9 11.9 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.6a12 12 0 0 0 5.7 1.5c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.4-8.5zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 2.1 12C2.1 6.5 6.5 2 12 2c2.6 0 5.1 1 7 2.9a9.8 9.8 0 0 1 2.9 7c0 5.5-4.5 9.9-9.9 9.9zm5.4-7.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg> Discuter sur WhatsApp</a></p>
+<h2>Votre commande</h2>
+<p>Pour suivre, modifier ou poser une question sur une commande, indiquez toujours le <b>numéro de commande</b> (FP-…) figurant dans l'e-mail de confirmation. Dès l'expédition, vous recevez le numéro de suivi par e-mail.</p>
+<h2>Devis et projets spéciaux</h2>
+<p class="rx r-BR">Vitrines aux dimensions hors configurateur, cadres pour des collections entières, projets pour boutiques, concessions et bureaux : contactez-nous sur WhatsApp avec les dimensions et des photos de ce que vous souhaitez exposer. Tout est fabriqué sur mesure, à Barueri.</p>
+<p class="rx r-EU">Vitrines aux dimensions hors configurateur, cadres pour des collections entières, projets pour boutiques, concessions et bureaux : contactez-nous sur WhatsApp avec les dimensions et des photos de ce que vous souhaitez exposer. Tout est fabriqué sur mesure.</p>
+<h2>Réseaux sociaux</h2>
+<p><a href="https://www.instagram.com/funparts" style="color:#fff">Instagram</a> &nbsp;·&nbsp; <a href="https://www.facebook.com/funparts" style="color:#fff">Facebook</a></p>
+<h2 class="rx r-EU">Informations sur l'entreprise</h2>
+<p class="rx r-EU"><b>FUNPARTS EUROPE SRL</b><br>Place Abbé Renard 5, 1420 Braine-l'Alleud, Belgique<br>Numéro d'entreprise et TVA: BE 1040.041.918<br><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> · +32 491 90 00 07</p>
+</div>
 </main>
 <footer class="pf">
-  <div class="row"><span>Funparts LTDA</span><span>CNPJ 09.579.820/0001-54</span><span>Barueri, SP</span></div>
-  <div class="row"><a href="/contato">Contato</a><a href="/trocas-e-devolucoes">Trocas e devoluções</a><a href="/privacidade">Privacidade</a><a href="https://instagram.com/funparts" target="_blank" rel="noopener">Instagram</a></div>
+  <div class="row rx r-BR"><span>Funparts LTDA</span><span>CNPJ 09.579.820/0001-54</span><span>Barueri, SP</span></div>
+  <div class="row rx r-EU"><span>FUNPARTS EUROPE SRL</span><span>TVA BE 1040.041.918</span><span>Braine-l'Alleud, Belgique</span></div>
+  <div class="row"><a href="/contato"><span class="lx l-pt">Contato</span><span class="lx l-en">Contact</span><span class="lx l-es">Contacto</span><span class="lx l-fr">Contact</span></a><a href="/trocas-e-devolucoes"><span class="lx l-pt">Trocas e devoluções</span><span class="lx l-en">Returns &amp; exchanges</span><span class="lx l-es">Cambios y devoluciones</span><span class="lx l-fr">Retours et échanges</span></a><a href="/privacidade"><span class="lx l-pt">Privacidade</span><span class="lx l-en">Privacy</span><span class="lx l-es">Privacidad</span><span class="lx l-fr">Confidentialité</span></a><a href="https://instagram.com/funparts" target="_blank" rel="noopener">Instagram</a></div>
 </footer>
 </body>
 </html>

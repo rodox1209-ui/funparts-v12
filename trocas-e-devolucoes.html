@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trocas e devoluções · Funparts</title>
 <meta name="description" content="Política de trocas e devoluções da Funparts: arrependimento em 7 dias, defeito de fabricação em 30 dias, avaria no transporte, prazos e reembolso.">
+<script>
+/* 11/11/2026: a pagina segue o idioma e a regiao escolhidos no site (os mesmos fp_lang / fp_region).
+   Pelo funparts.be, a 1a visita abre em frances, regiao Europa. Sem JavaScript: portugues, Brasil. */
+(function(){
+  var l='pt',r='BR',be=/(^|\.)funparts\.be$/i.test(location.hostname);
+  try{
+    var S=window.localStorage;
+    if(be&&!S.getItem('fp_region')){ S.setItem('fp_region','EU'); S.setItem('fp_lang','fr'); }
+    var a=S.getItem('fp_lang'),b=S.getItem('fp_region');
+    if(a==='pt'||a==='en'||a==='es'||a==='fr') l=a;
+    if(b==='EU'||b==='BR') r=b;
+  }catch(e){ if(be){ l='fr'; r='EU'; } }
+  var d=document.documentElement;
+  d.setAttribute('data-fl',l); d.setAttribute('data-fr',r);
+  d.lang={pt:'pt-BR',en:'en',es:'es',fr:'fr'}[l];
+  var T={"pt": "Trocas e devolu\u00e7\u00f5es", "en": "Returns and exchanges", "es": "Cambios y devoluciones", "fr": "Retours et \u00e9changes"};
+  try{ document.title=T[l]+' \u00b7 Funparts'; }catch(e){}
+})();
+</script>
 <link rel="stylesheet" href="styles_1.css">
 
 <style>
@@ -40,92 +59,224 @@ ul{padding-left:20px;margin:0 0 12px}li{margin-bottom:6px}
 .pf .row{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0;margin-bottom:6px}.pf .row:last-child{margin-bottom:0}
 .pf .row>*{padding:0 9px;border-left:1px solid #333}.pf .row>*:first-child{border-left:none}
 .pf a{color:#bbb;text-decoration:none}.pf a:hover{color:#fff}
+
+/* idiomas (PT/EN/ES/FR) e regiao (Brasil/Europa): so esconde o que nao e' do visitante */
+html[data-fl="pt"] .lx:not(.l-pt),html[data-fl="en"] .lx:not(.l-en),html[data-fl="es"] .lx:not(.l-es),html[data-fl="fr"] .lx:not(.l-fr),html:not([data-fl]) .lx:not(.l-pt),
+html[data-fr="BR"] .rx:not(.r-BR),html[data-fr="EU"] .rx:not(.r-EU),html:not([data-fr]) .rx:not(.r-BR){display:none!important}
 </style>
 </head>
 <body>
 <div class="ph">
   <a href="/" aria-label="Funparts"><img src="images/img_001.png" alt="Funparts"></a>
-  <a class="volta" href="/">&#8592; Voltar ao configurador</a>
+  <a class="volta" href="/"><span class="lx l-pt">&#8592; Voltar ao configurador</span><span class="lx l-en">&#8592; Back to the configurator</span><span class="lx l-es">&#8592; Volver al configurador</span><span class="lx l-fr">&#8592; Retour au configurateur</span></a>
 </div>
 <main class="pg">
+<div class="lx l-pt">
   <div class="crumb"><a href="/">Início</a> &nbsp;/&nbsp; Trocas e devoluções</div>
   <h1>Trocas e devoluções</h1>
   <p class="lead">Políticas de devolução, trocas e boas práticas</p>
 
 <p>Na Funparts, prezamos pela qualidade, transparência e satisfação dos nossos clientes. Trabalhamos com produtos de alto padrão produzidos sob demanda e embalados com cuidado especial para garantir que você receba tudo em perfeito estado. A seguir, nossas políticas e orientações de compra, troca e devolução.</p>
-
 <h2>1. O que a Funparts vende</h2>
 <p>A Funparts é fabricante de quadros, redomas e expositores premium para exposição de carros LEGO® e miniaturas. <b>Não vendemos as miniaturas nem os sets LEGO®</b> — apenas o quadro, a redoma e seus componentes. As imagens com miniaturas são usadas somente para demonstração de uso e escala.</p>
-
-<h2>2. Direito de arrependimento (compras online)</h2>
-<p>Conforme o Código de Defesa do Consumidor (CDC), compras realizadas pela internet têm direito de arrependimento em até <b>7 (sete) dias corridos</b> após o recebimento do pedido. Dentro deste prazo, você pode solicitar a devolução do produto e o reembolso.</p>
-<ul class="ok">
-  <li>O produto deve estar sem marcas de uso, em perfeito estado</li>
-  <li>Deve ser devolvido na embalagem original, com todos os acessórios enviados</li>
-  <li>Após o recebimento e análise do produto em nossa fábrica, o reembolso é processado</li>
-</ul>
-
-<h2>3. Troca por defeito de fabricação</h2>
-<p>Se o produto apresentar defeito de fabricação, você pode solicitar a troca em até <b>30 (trinta) dias corridos</b> após o recebimento.</p>
-<ul class="ok">
-  <li>Entre em contato com o atendimento informando o número do pedido</li>
-  <li>Envie fotos e/ou vídeo mostrando o defeito e a embalagem recebida</li>
-  <li>Nossa equipe faz a análise e orienta os próximos passos</li>
-</ul>
-<p>Confirmado o defeito, a Funparts realiza a troca sem custo adicional.</p>
-
+<h2 class="rx r-BR">2. Direito de arrependimento (compras online)</h2>
+<p class="rx r-BR">Conforme o Código de Defesa do Consumidor (CDC), compras realizadas pela internet têm direito de arrependimento em até <b>7 (sete) dias corridos</b> após o recebimento do pedido. Dentro deste prazo, você pode solicitar a devolução do produto e o reembolso.</p>
+<ul class="ok rx r-BR"><li>O produto deve estar sem marcas de uso, em perfeito estado</li><li>Deve ser devolvido na embalagem original, com todos os acessórios enviados</li><li>Após o recebimento e análise do produto em nossa fábrica, o reembolso é processado</li></ul>
+<h2 class="rx r-EU">2. Direito de desistência (14 dias)</h2>
+<p class="rx r-EU">Nas compras feitas pela internet na União Europeia, você pode desistir da compra em até <b>14 (quatorze) dias corridos</b> a contar do recebimento do pedido, sem precisar justificar (Diretiva 2011/83/UE e Livro VI do Código de Direito Econômico belga).</p>
+<ul class="ok rx r-EU"><li>Avise-nos dentro desse prazo pelo e-mail <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>, com uma declaração clara de que deseja desistir — você pode usar o modelo no fim desta página</li><li>Envie o produto de volta em até 14 dias depois de nos avisar, na embalagem original e com todos os acessórios</li><li>O frete de devolução fica por conta do cliente</li><li>O produto deve voltar sem marcas de uso; o manuseio além do necessário para conferir a peça pode reduzir o valor reembolsado</li><li>O reembolso, incluindo o frete padrão pago no pedido, é feito em até 14 dias depois de recebermos o seu aviso; podemos aguardar a chegada do produto ou o comprovante de envio</li></ul>
+<h2 class="rx r-BR">3. Troca por defeito de fabricação</h2>
+<p class="rx r-BR">Se o produto apresentar defeito de fabricação, você pode solicitar a troca em até <b>30 (trinta) dias corridos</b> após o recebimento.</p>
+<h2 class="rx r-EU">3. Garantia legal de 2 anos</h2>
+<p class="rx r-EU">Todos os produtos têm a garantia legal de conformidade de <b>2 (dois) anos</b> a contar da entrega. Se o produto apresentar defeito de fabricação:</p>
+<ul class="ok"><li>Entre em contato com o atendimento informando o número do pedido</li><li>Envie fotos e/ou vídeo mostrando o defeito e a embalagem recebida</li><li>Nossa equipe faz a análise e orienta os próximos passos</li></ul>
+<p class="rx r-BR">Confirmado o defeito, a Funparts realiza a troca sem custo adicional.</p>
+<p class="rx r-EU">Confirmado o defeito, a Funparts conserta ou substitui o produto sem custo para você; se isso não for possível, você tem direito à redução do preço ou ao reembolso.</p>
 <h2>4. Produto avariado no transporte</h2>
 <p>Se a embalagem chegar com sinais de violação, amassado excessivo ou qualquer avaria visível:</p>
-<ul class="ok">
-  <li>Registre fotos ou filmagem no momento do recebimento</li>
-  <li>Recuse o recebimento, quando possível, ou entre em contato imediatamente</li>
-</ul>
+<ul class="ok"><li>Registre fotos ou filmagem no momento do recebimento</li><li>Recuse o recebimento, quando possível, ou entre em contato imediatamente</li></ul>
 <p>Caso o produto chegue com avaria, orientamos o processo de análise e solução o mais rápido possível.</p>
-
 <h2>5. Condições que não caracterizam defeito</h2>
 <p>Por se tratar de produtos em acrílico e com montagem técnica, algumas situações podem ocorrer e não são consideradas defeito:</p>
-<ul class="ok nao">
-  <li>Pequenas variações visuais naturais do processo de fabricação</li>
-  <li>Ajustes simples de alinhamento na instalação ou na montagem por encaixe</li>
-  <li>Marcas superficiais causadas por mau uso ou instalação incorreta</li>
-  <li>Danos por queda, impacto, excesso de peso ou uso fora do recomendado</li>
-</ul>
-
-<h2>6. Produtos personalizados e sob demanda</h2>
-<p>Grande parte dos nossos produtos é produzida sob demanda e pode conter personalizações (medida, fundo, gravação, imagem impressa). Produtos personalizados podem ter regras específicas para troca e devolução, sempre respeitando o CDC e as condições descritas nesta página. Em caso de dúvida antes de comprar, fale conosco — teremos prazer em ajudar.</p>
-
+<ul class="ok nao"><li>Pequenas variações visuais naturais do processo de fabricação</li><li>Ajustes simples de alinhamento na instalação ou na montagem por encaixe</li><li>Marcas superficiais causadas por mau uso ou instalação incorreta</li><li>Danos por queda, impacto, excesso de peso ou uso fora do recomendado</li></ul>
+<h2 class="rx r-BR">6. Produtos personalizados e sob demanda</h2>
+<p class="rx r-BR">Grande parte dos nossos produtos é produzida sob demanda e pode conter personalizações (medida, fundo, gravação, imagem impressa). Produtos personalizados podem ter regras específicas para troca e devolução, sempre respeitando o CDC e as condições descritas nesta página. Em caso de dúvida antes de comprar, fale conosco — teremos prazer em ajudar.</p>
+<h2 class="rx r-EU">6. Produtos sob medida e personalizados</h2>
+<p class="rx r-EU">Redomas em medida especial e peças com gravação, imagem impressa ou arte criada para você são fabricadas segundo as suas especificações. Para esses produtos a lei europeia <b>não prevê o direito de desistência</b> (art. 16, alínea c, da Diretiva 2011/83/UE). A garantia legal de 2 anos e a solução para avaria no transporte continuam valendo normalmente. Em caso de dúvida antes de comprar, fale conosco — teremos prazer em ajudar.</p>
 <h2>7. Boas práticas e recomendações de uso</h2>
-<ul class="ok">
-  <li>Instale em parede firme e use o kit de buchas e parafusos conforme a orientação</li>
-  <li>Use o gabarito de instalação (quando enviado) para facilitar o alinhamento</li>
-  <li>Evite contato do acrílico com materiais abrasivos</li>
-  <li>Para limpeza, use pano macio e seco ou levemente umedecido com água</li>
-</ul>
+<ul class="ok"><li>Instale em parede firme e use o kit de buchas e parafusos conforme a orientação</li><li>Use o gabarito de instalação (quando enviado) para facilitar o alinhamento</li><li>Evite contato do acrílico com materiais abrasivos</li><li>Para limpeza, use pano macio e seco ou levemente umedecido com água</li></ul>
 <ul class="ok nao"><li>Não use álcool, thinner, solventes ou produtos químicos agressivos</li></ul>
-
 <h2>8. Prazos de produção e envio</h2>
-<p><b>Prazo de produção:</b> 7 dias úteis. <b>Prazo de envio:</b> calculado no checkout conforme o CEP. Assim que o pedido é enviado, você recebe o código de rastreio para acompanhar a entrega.</p>
-
+<p class="rx r-BR"><b>Prazo de produção:</b> 7 dias úteis. <b>Prazo de envio:</b> calculado no checkout conforme o CEP. Assim que o pedido é enviado, você recebe o código de rastreio para acompanhar a entrega.</p>
+<p class="rx r-EU"><b>Prazo de produção:</b> 7 dias úteis. <b>Prazo de envio:</b> calculado no checkout conforme o código postal. Assim que o pedido é enviado, você recebe o código de rastreio para acompanhar a entrega.</p>
 <h2>9. Como solicitar troca ou devolução</h2>
-<p>Entre em contato pelos nossos canais oficiais — <a href="https://wa.me/5511910646157" style="color:#fff">WhatsApp (11) 91064-6157</a> ou <a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a> — informando sempre:</p>
-<ul class="ok">
-  <li>Número do pedido</li>
-  <li>Nome completo</li>
-  <li>Motivo da solicitação</li>
-  <li>Fotos e/ou vídeo (quando necessário)</li>
-</ul>
-
+<p>Entre em contato pelos nossos canais oficiais — <span class="rx r-BR"><a href="https://wa.me/5511910646157" style="color:#fff">WhatsApp (11) 91064-6157</a></span><span class="rx r-EU"><a href="https://wa.me/32491900007" style="color:#fff">WhatsApp +32 491 90 00 07</a></span> ou <span class="rx r-BR"><a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a></span><span class="rx r-EU"><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a></span> — informando sempre:</p>
+<ul class="ok"><li>Número do pedido</li><li>Nome completo</li><li>Motivo da solicitação</li><li>Fotos e/ou vídeo (quando necessário)</li></ul>
 <h2>10. Reembolso</h2>
-<p>Após o recebimento do produto devolvido e a análise, o reembolso é feito pelo método de pagamento original:</p>
-<ul class="ok">
-  <li><b>Cartão de crédito:</b> estorno conforme as regras da operadora</li>
-  <li><b>PIX:</b> transferência para a conta do titular da compra</li>
-</ul>
+<p class="rx r-BR">Após o recebimento do produto devolvido e a análise, o reembolso é feito pelo método de pagamento original:</p>
+<ul class="ok rx r-BR"><li><b>Cartão de crédito:</b> estorno conforme as regras da operadora</li><li><b>PIX:</b> transferência para a conta do titular da compra</li></ul>
+<p class="rx r-EU">O reembolso é feito pelo mesmo meio de pagamento usado na compra (cartão ou Bancontact), sem custo para você.</p>
+<h2 class="rx r-EU">11. Modelo de formulário de desistência</h2>
+<p class="rx r-EU">Preencha e envie este texto para <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> somente se quiser desistir da compra:</p>
+<div class="card rx r-EU"><div class="s" style="font-size:14px;line-height:1.8;color:#cfcfcf;margin:0">À atenção de FUNPARTS EUROPE SRL, Place Abbé Renard 5, 1420 Braine-l'Alleud, Bélgica — contact@funparts.eu<br>Comunico que desisto do contrato de compra do(s) seguinte(s) produto(s): ___________<br>Pedido nº FP-________ · recebido em ___/___/______<br>Nome do consumidor: ___________<br>Endereço do consumidor: ___________<br>Data: ___/___/______</div></div>
+<h2 class="rx r-EU">12. Se não chegarmos a um acordo</h2>
+<p class="rx r-EU">Queremos resolver tudo diretamente com você. Se ainda assim não houver acordo, você pode recorrer ao Serviço de Mediação para o Consumidor da Bélgica (<a href="https://www.mediationconsommateur.be" style="color:#fff" target="_blank" rel="noopener">mediationconsommateur.be</a>). Estas condições não limitam os direitos que a lei garante ao consumidor.</p>
+</div>
+<div class="lx l-en">
+  <div class="crumb"><a href="/">Home</a> &nbsp;/&nbsp; Returns and exchanges</div>
+  <h1>Returns and exchanges</h1>
+  <p class="lead">Return and exchange policies and good practice</p>
 
+<p>At Funparts we care about quality, transparency and the satisfaction of our customers. We work with high-end products made to order and packed with special care, so that everything reaches you in perfect condition. Below are our policies and guidelines for purchases, exchanges and returns.</p>
+<h2>1. What Funparts sells</h2>
+<p>Funparts manufactures premium frames, display cases and stands for displaying LEGO® cars and model cars. <b>We do not sell the model cars or the LEGO® sets</b> — only the frame, the display case and their components. Images showing model cars are used solely to demonstrate use and scale.</p>
+<h2 class="rx r-BR">2. Right of withdrawal (online purchases)</h2>
+<p class="rx r-BR">Under Brazil's Consumer Protection Code (CDC), purchases made online can be cancelled within <b>7 (seven) calendar days</b> of receiving the order. Within this period you may ask to return the product and receive a refund.</p>
+<ul class="ok rx r-BR"><li>The product must show no signs of use and be in perfect condition</li><li>It must be returned in its original packaging, with all the accessories supplied</li><li>Once the product has been received and inspected at our factory, the refund is processed</li></ul>
+<h2 class="rx r-EU">2. Right of withdrawal (14 days)</h2>
+<p class="rx r-EU">For online purchases in the European Union, you may withdraw from your purchase within <b>14 (fourteen) calendar days</b> of receiving your order, without giving any reason (Directive 2011/83/EU and Book VI of the Belgian Code of Economic Law).</p>
+<ul class="ok rx r-EU"><li>Tell us within that period by email at <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>, with a clear statement that you wish to withdraw — you can use the model form at the end of this page</li><li>Send the product back within 14 days of notifying us, in its original packaging and with all accessories</li><li>The cost of return shipping is borne by the customer</li><li>The product must come back with no signs of use; handling beyond what is needed to check the piece may reduce the amount refunded</li><li>The refund, including the standard delivery cost paid with the order, is made within 14 days of receiving your notice; we may wait until the product arrives or until you send proof of shipment</li></ul>
+<h2 class="rx r-BR">3. Exchange for manufacturing defects</h2>
+<p class="rx r-BR">If the product has a manufacturing defect, you can request an exchange within <b>30 (thirty) calendar days</b> of receipt.</p>
+<h2 class="rx r-EU">3. 2-year legal guarantee</h2>
+<p class="rx r-EU">All products are covered by the legal guarantee of conformity for <b>2 (two) years</b> from delivery. If the product has a manufacturing defect:</p>
+<ul class="ok"><li>Contact customer service with your order number</li><li>Send photos and/or a video showing the defect and the packaging as received</li><li>Our team reviews the case and guides you through the next steps</li></ul>
+<p class="rx r-BR">Once the defect is confirmed, Funparts replaces the product at no extra cost.</p>
+<p class="rx r-EU">Once the defect is confirmed, Funparts repairs or replaces the product at no cost to you; if that is not possible, you are entitled to a price reduction or a refund.</p>
+<h2>4. Product damaged in transit</h2>
+<p>If the packaging arrives with signs of tampering, heavy crushing or any visible damage:</p>
+<ul class="ok"><li>Take photos or a video at the moment of delivery</li><li>Refuse the delivery when possible, or contact us immediately</li></ul>
+<p>If the product arrives damaged, we guide you through the review and solve it as quickly as possible.</p>
+<h2>5. What is not considered a defect</h2>
+<p>Because these are acrylic products with technical assembly, some situations may occur that are not considered defects:</p>
+<ul class="ok nao"><li>Small visual variations that are natural to the manufacturing process</li><li>Simple alignment adjustments during installation or snap-fit assembly</li><li>Surface marks caused by misuse or incorrect installation</li><li>Damage from drops, impact, excess weight or use outside the recommendations</li></ul>
+<h2 class="rx r-BR">6. Personalised and made-to-order products</h2>
+<p class="rx r-BR">Most of our products are made to order and may include personalisation (size, background, engraving, printed image). Personalised products may have specific rules for exchanges and returns, always in compliance with the CDC and the conditions described on this page. If you have any questions before buying, talk to us — we will be glad to help.</p>
+<h2 class="rx r-EU">6. Made-to-measure and personalised products</h2>
+<p class="rx r-EU">Display cases in custom sizes and pieces with engraving, a printed image or artwork created for you are made to your specifications. For these products European law provides <b>no right of withdrawal</b> (Article 16(c) of Directive 2011/83/EU). The 2-year legal guarantee and the solution for transit damage continue to apply as usual. If you have any questions before buying, talk to us — we will be glad to help.</p>
+<h2>7. Good practice and care</h2>
+<ul class="ok"><li>Install on a solid wall and use the wall-plug and screw kit as instructed</li><li>Use the installation template (when supplied) to make alignment easier</li><li>Keep the acrylic away from abrasive materials</li><li>To clean, use a soft cloth, dry or slightly dampened with water</li></ul>
+<ul class="ok nao"><li>Do not use alcohol, thinner, solvents or harsh chemicals</li></ul>
+<h2>8. Production and shipping times</h2>
+<p><b>Production time:</b> 7 business days. <b>Shipping time:</b> calculated at checkout according to your postal code. As soon as the order ships, you receive the tracking code to follow the delivery.</p>
+<h2>9. How to request an exchange or return</h2>
+<p>Contact us through our official channels — <span class="rx r-BR"><a href="https://wa.me/5511910646157" style="color:#fff">WhatsApp +55 11 91064-6157</a></span><span class="rx r-EU"><a href="https://wa.me/32491900007" style="color:#fff">WhatsApp +32 491 90 00 07</a></span> or <span class="rx r-BR"><a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a></span><span class="rx r-EU"><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a></span> — always stating:</p>
+<ul class="ok"><li>Order number</li><li>Full name</li><li>Reason for the request</li><li>Photos and/or video (when needed)</li></ul>
+<h2>10. Refund</h2>
+<p class="rx r-BR">After the returned product has been received and inspected, the refund is made through the original payment method:</p>
+<ul class="ok rx r-BR"><li><b>Credit card:</b> reversal according to the card issuer's rules</li><li><b>PIX:</b> transfer to the account of the purchaser</li></ul>
+<p class="rx r-EU">Refunds are made to the same means of payment used for the purchase (card or Bancontact), at no cost to you.</p>
+<h2 class="rx r-EU">11. Model withdrawal form</h2>
+<p class="rx r-EU">Complete and send this text to <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> only if you wish to withdraw from your purchase:</p>
+<div class="card rx r-EU"><div class="s" style="font-size:14px;line-height:1.8;color:#cfcfcf;margin:0">To FUNPARTS EUROPE SRL, Place Abbé Renard 5, 1420 Braine-l'Alleud, Belgium — contact@funparts.eu<br>I hereby give notice that I withdraw from my contract of sale of the following product(s): ___________<br>Order no. FP-________ · received on ___/___/______<br>Name of consumer: ___________<br>Address of consumer: ___________<br>Date: ___/___/______</div></div>
+<h2 class="rx r-EU">12. If we cannot reach an agreement</h2>
+<p class="rx r-EU">We want to solve everything directly with you. If we still cannot agree, you may contact the Belgian Consumer Mediation Service (<a href="https://www.mediationconsommateur.be" style="color:#fff" target="_blank" rel="noopener">mediationconsommateur.be</a>). These conditions do not limit the rights the law grants to consumers.</p>
+</div>
+<div class="lx l-es">
+  <div class="crumb"><a href="/">Inicio</a> &nbsp;/&nbsp; Cambios y devoluciones</div>
+  <h1>Cambios y devoluciones</h1>
+  <p class="lead">Políticas de devolución, cambios y buenas prácticas</p>
+
+<p>En Funparts cuidamos la calidad, la transparencia y la satisfacción de nuestros clientes. Trabajamos con productos de alta gama fabricados bajo pedido y embalados con especial cuidado para que todo llegue en perfecto estado. A continuación encontrarás nuestras políticas y recomendaciones de compra, cambio y devolución.</p>
+<h2>1. Qué vende Funparts</h2>
+<p>Funparts fabrica cuadros, vitrinas y expositores premium para exponer coches LEGO® y miniaturas. <b>No vendemos las miniaturas ni los sets LEGO®</b>: solo el cuadro, la vitrina y sus componentes. Las imágenes con miniaturas se usan únicamente para mostrar el uso y la escala.</p>
+<h2 class="rx r-BR">2. Derecho de desistimiento (compras online)</h2>
+<p class="rx r-BR">Según el Código de Defensa del Consumidor de Brasil (CDC), las compras realizadas por internet pueden cancelarse en un plazo de <b>7 (siete) días naturales</b> desde la recepción del pedido. Dentro de ese plazo puedes solicitar la devolución del producto y el reembolso.</p>
+<ul class="ok rx r-BR"><li>El producto debe estar sin señales de uso y en perfecto estado</li><li>Debe devolverse en su embalaje original, con todos los accesorios enviados</li><li>Una vez recibido y revisado el producto en nuestra fábrica, se tramita el reembolso</li></ul>
+<h2 class="rx r-EU">2. Derecho de desistimiento (14 días)</h2>
+<p class="rx r-EU">En las compras por internet dentro de la Unión Europea puedes desistir de la compra en un plazo de <b>14 (catorce) días naturales</b> desde la recepción del pedido, sin necesidad de justificarlo (Directiva 2011/83/UE y Libro VI del Código de Derecho Económico belga).</p>
+<ul class="ok rx r-EU"><li>Avísanos dentro de ese plazo por correo electrónico a <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>, con una declaración clara de que deseas desistir; puedes usar el modelo que aparece al final de esta página</li><li>Envía el producto de vuelta en un plazo de 14 días desde tu aviso, en su embalaje original y con todos los accesorios</li><li>El coste del envío de devolución corre por cuenta del cliente</li><li>El producto debe volver sin señales de uso; una manipulación que vaya más allá de lo necesario para comprobar la pieza puede reducir el importe reembolsado</li><li>El reembolso, incluido el envío estándar pagado en el pedido, se realiza en un plazo de 14 días desde que recibimos tu aviso; podemos esperar a recibir el producto o el justificante de envío</li></ul>
+<h2 class="rx r-BR">3. Cambio por defecto de fabricación</h2>
+<p class="rx r-BR">Si el producto presenta un defecto de fabricación, puedes solicitar el cambio en un plazo de <b>30 (treinta) días naturales</b> desde la recepción.</p>
+<h2 class="rx r-EU">3. Garantía legal de 2 años</h2>
+<p class="rx r-EU">Todos los productos cuentan con la garantía legal de conformidad de <b>2 (dos) años</b> desde la entrega. Si el producto presenta un defecto de fabricación:</p>
+<ul class="ok"><li>Ponte en contacto con atención al cliente indicando el número de pedido</li><li>Envía fotos y/o un vídeo que muestren el defecto y el embalaje recibido</li><li>Nuestro equipo analiza el caso y te indica los siguientes pasos</li></ul>
+<p class="rx r-BR">Confirmado el defecto, Funparts realiza el cambio sin coste adicional.</p>
+<p class="rx r-EU">Confirmado el defecto, Funparts repara o sustituye el producto sin coste para ti; si no fuera posible, tienes derecho a una rebaja del precio o al reembolso.</p>
+<h2>4. Producto dañado en el transporte</h2>
+<p>Si el embalaje llega con señales de manipulación, muy aplastado o con cualquier daño visible:</p>
+<ul class="ok"><li>Haz fotos o graba un vídeo en el momento de la entrega</li><li>Rechaza la entrega cuando sea posible, o ponte en contacto con nosotros de inmediato</li></ul>
+<p>Si el producto llega dañado, te guiamos en la revisión y lo resolvemos lo antes posible.</p>
+<h2>5. Situaciones que no se consideran defecto</h2>
+<p>Al tratarse de productos de acrílico con montaje técnico, pueden darse algunas situaciones que no se consideran defecto:</p>
+<ul class="ok nao"><li>Pequeñas variaciones visuales propias del proceso de fabricación</li><li>Ajustes sencillos de alineación en la instalación o en el montaje por encaje</li><li>Marcas superficiales causadas por un mal uso o una instalación incorrecta</li><li>Daños por caída, impacto, exceso de peso o uso distinto del recomendado</li></ul>
+<h2 class="rx r-BR">6. Productos personalizados y bajo pedido</h2>
+<p class="rx r-BR">Gran parte de nuestros productos se fabrica bajo pedido y puede incluir personalizaciones (medida, fondo, grabado, imagen impresa). Los productos personalizados pueden tener reglas específicas de cambio y devolución, siempre respetando el CDC y las condiciones descritas en esta página. Si tienes dudas antes de comprar, escríbenos: estaremos encantados de ayudarte.</p>
+<h2 class="rx r-EU">6. Productos a medida y personalizados</h2>
+<p class="rx r-EU">Las vitrinas en medidas especiales y las piezas con grabado, imagen impresa o diseño creado para ti se fabrican según tus especificaciones. Para estos productos la legislación europea <b>no prevé el derecho de desistimiento</b> (artículo 16, letra c, de la Directiva 2011/83/UE). La garantía legal de 2 años y la solución por daños en el transporte siguen aplicándose con normalidad. Si tienes dudas antes de comprar, escríbenos: estaremos encantados de ayudarte.</p>
+<h2>7. Buenas prácticas y recomendaciones de uso</h2>
+<ul class="ok"><li>Instálalo en una pared firme y usa el kit de tacos y tornillos según las indicaciones</li><li>Usa la plantilla de instalación (cuando se incluye) para facilitar la alineación</li><li>Evita el contacto del acrílico con materiales abrasivos</li><li>Para limpiarlo, usa un paño suave, seco o ligeramente humedecido con agua</li></ul>
+<ul class="ok nao"><li>No uses alcohol, disolvente ni productos químicos agresivos</li></ul>
+<h2>8. Plazos de producción y envío</h2>
+<p><b>Plazo de producción:</b> 7 días hábiles. <b>Plazo de envío:</b> se calcula en el checkout según tu código postal. En cuanto se envía el pedido, recibes el código de seguimiento para acompañar la entrega.</p>
+<h2>9. Cómo solicitar un cambio o una devolución</h2>
+<p>Ponte en contacto por nuestros canales oficiales — <span class="rx r-BR"><a href="https://wa.me/5511910646157" style="color:#fff">WhatsApp +55 11 91064-6157</a></span><span class="rx r-EU"><a href="https://wa.me/32491900007" style="color:#fff">WhatsApp +32 491 90 00 07</a></span> o <span class="rx r-BR"><a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a></span><span class="rx r-EU"><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a></span> — indicando siempre:</p>
+<ul class="ok"><li>Número de pedido</li><li>Nombre completo</li><li>Motivo de la solicitud</li><li>Fotos y/o vídeo (cuando sea necesario)</li></ul>
+<h2>10. Reembolso</h2>
+<p class="rx r-BR">Una vez recibido y revisado el producto devuelto, el reembolso se realiza por el método de pago original:</p>
+<ul class="ok rx r-BR"><li><b>Tarjeta de crédito:</b> anulación del cargo según las reglas de la entidad emisora</li><li><b>PIX:</b> transferencia a la cuenta del titular de la compra</li></ul>
+<p class="rx r-EU">El reembolso se realiza por el mismo medio de pago utilizado en la compra (tarjeta o Bancontact), sin coste para ti.</p>
+<h2 class="rx r-EU">11. Modelo de formulario de desistimiento</h2>
+<p class="rx r-EU">Rellena y envía este texto a <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> solo si deseas desistir de la compra:</p>
+<div class="card rx r-EU"><div class="s" style="font-size:14px;line-height:1.8;color:#cfcfcf;margin:0">A la atención de FUNPARTS EUROPE SRL, Place Abbé Renard 5, 1420 Braine-l'Alleud, Bélgica — contact@funparts.eu<br>Por la presente comunico que desisto del contrato de venta del siguiente producto o productos: ___________<br>Pedido n.º FP-________ · recibido el ___/___/______<br>Nombre del consumidor: ___________<br>Dirección del consumidor: ___________<br>Fecha: ___/___/______</div></div>
+<h2 class="rx r-EU">12. Si no llegamos a un acuerdo</h2>
+<p class="rx r-EU">Queremos resolverlo todo directamente contigo. Si aun así no hay acuerdo, puedes acudir al Servicio de Mediación para el Consumidor de Bélgica (<a href="https://www.mediationconsommateur.be" style="color:#fff" target="_blank" rel="noopener">mediationconsommateur.be</a>). Estas condiciones no limitan los derechos que la ley reconoce al consumidor.</p>
+</div>
+<div class="lx l-fr">
+  <div class="crumb"><a href="/">Accueil</a> &nbsp;/&nbsp; Retours et échanges</div>
+  <h1>Retours et échanges</h1>
+  <p class="lead">Politiques de retour, d'échange et bonnes pratiques</p>
+
+<p>Chez Funparts, nous attachons une grande importance à la qualité, à la transparence et à la satisfaction de nos clients. Nous travaillons avec des produits haut de gamme, fabriqués à la commande et emballés avec un soin particulier afin que tout vous parvienne en parfait état. Vous trouverez ci-dessous nos politiques et recommandations en matière d'achat, d'échange et de retour.</p>
+<h2>1. Ce que vend Funparts</h2>
+<p>Funparts fabrique des cadres, des vitrines et des présentoirs premium pour exposer des voitures LEGO® et des miniatures. <b>Nous ne vendons ni les miniatures ni les sets LEGO®</b> — uniquement le cadre, la vitrine et leurs composants. Les images montrant des miniatures servent seulement à illustrer l'utilisation et l'échelle.</p>
+<h2 class="rx r-BR">2. Droit de rétractation (achats en ligne)</h2>
+<p class="rx r-BR">Conformément au Code brésilien de défense du consommateur (CDC), les achats effectués sur internet peuvent être annulés dans un délai de <b>7 (sept) jours calendrier</b> à compter de la réception de la commande. Pendant ce délai, vous pouvez demander le retour du produit et son remboursement.</p>
+<ul class="ok rx r-BR"><li>Le produit doit être sans trace d'utilisation et en parfait état</li><li>Il doit être renvoyé dans son emballage d'origine, avec tous les accessoires fournis</li><li>Après réception et contrôle du produit dans notre atelier, le remboursement est effectué</li></ul>
+<h2 class="rx r-EU">2. Droit de rétractation (14 jours)</h2>
+<p class="rx r-EU">Pour les achats en ligne dans l'Union européenne, vous pouvez vous rétracter dans un délai de <b>14 (quatorze) jours calendrier</b> à compter de la réception de votre commande, sans avoir à motiver votre décision (directive 2011/83/UE et livre VI du Code de droit économique belge).</p>
+<ul class="ok rx r-EU"><li>Informez-nous dans ce délai par e-mail à <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>, par une déclaration claire de votre volonté de vous rétracter — vous pouvez utiliser le modèle figurant en bas de cette page</li><li>Renvoyez le produit dans les 14 jours suivant votre notification, dans son emballage d'origine et avec tous les accessoires</li><li>Les frais de renvoi sont à la charge du client</li><li>Le produit doit revenir sans trace d'utilisation ; des manipulations allant au-delà de ce qui est nécessaire pour vérifier la pièce peuvent réduire le montant remboursé</li><li>Le remboursement, frais de livraison standard de la commande compris, est effectué dans les 14 jours suivant la réception de votre notification ; nous pouvons attendre d'avoir reçu le produit ou une preuve d'expédition</li></ul>
+<h2 class="rx r-BR">3. Échange pour défaut de fabrication</h2>
+<p class="rx r-BR">Si le produit présente un défaut de fabrication, vous pouvez demander son échange dans un délai de <b>30 (trente) jours calendrier</b> après réception.</p>
+<h2 class="rx r-EU">3. Garantie légale de 2 ans</h2>
+<p class="rx r-EU">Tous les produits bénéficient de la garantie légale de conformité de <b>2 (deux) ans</b> à compter de la livraison. Si le produit présente un défaut de fabrication :</p>
+<ul class="ok"><li>Contactez notre service client en indiquant le numéro de commande</li><li>Envoyez des photos et/ou une vidéo montrant le défaut et l'emballage reçu</li><li>Notre équipe analyse le dossier et vous indique la marche à suivre</li></ul>
+<p class="rx r-BR">Une fois le défaut confirmé, Funparts procède à l'échange sans frais supplémentaires.</p>
+<p class="rx r-EU">Une fois le défaut confirmé, Funparts répare ou remplace le produit sans frais pour vous ; si cela n'est pas possible, vous avez droit à une réduction du prix ou au remboursement.</p>
+<h2>4. Produit endommagé pendant le transport</h2>
+<p>Si l'emballage arrive avec des traces d'ouverture, fortement écrasé ou avec un dommage visible :</p>
+<ul class="ok"><li>Prenez des photos ou une vidéo au moment de la réception</li><li>Refusez le colis lorsque c'est possible, ou contactez-nous immédiatement</li></ul>
+<p>Si le produit arrive endommagé, nous vous accompagnons dans l'analyse et trouvons une solution le plus rapidement possible.</p>
+<h2>5. Ce qui n'est pas considéré comme un défaut</h2>
+<p>S'agissant de produits en acrylique avec un montage technique, certaines situations peuvent se présenter sans constituer un défaut :</p>
+<ul class="ok nao"><li>De légères variations visuelles propres au procédé de fabrication</li><li>De simples ajustements d'alignement lors de l'installation ou du montage par emboîtement</li><li>Des marques superficielles dues à une mauvaise utilisation ou à une installation incorrecte</li><li>Des dommages causés par une chute, un choc, un poids excessif ou une utilisation non conforme aux recommandations</li></ul>
+<h2 class="rx r-BR">6. Produits personnalisés et fabriqués à la commande</h2>
+<p class="rx r-BR">La plupart de nos produits sont fabriqués à la commande et peuvent comporter des personnalisations (dimensions, fond, gravure, image imprimée). Les produits personnalisés peuvent faire l'objet de règles spécifiques d'échange et de retour, toujours dans le respect du CDC et des conditions décrites sur cette page. En cas de doute avant d'acheter, contactez-nous : nous serons ravis de vous aider.</p>
+<h2 class="rx r-EU">6. Produits sur mesure et personnalisés</h2>
+<p class="rx r-EU">Les vitrines aux dimensions spéciales et les pièces avec gravure, image imprimée ou visuel créé pour vous sont fabriquées selon vos spécifications. Pour ces produits, le droit européen <b>ne prévoit pas de droit de rétractation</b> (article 16, point c, de la directive 2011/83/UE). La garantie légale de 2 ans et la prise en charge des dommages de transport restent pleinement applicables. En cas de doute avant d'acheter, contactez-nous : nous serons ravis de vous aider.</p>
+<h2>7. Bonnes pratiques et conseils d'utilisation</h2>
+<ul class="ok"><li>Installez le produit sur un mur solide et utilisez le kit de chevilles et de vis selon les instructions</li><li>Utilisez le gabarit de pose (lorsqu'il est fourni) pour faciliter l'alignement</li><li>Évitez tout contact de l'acrylique avec des matériaux abrasifs</li><li>Pour le nettoyage, utilisez un chiffon doux, sec ou légèrement humidifié à l'eau</li></ul>
+<ul class="ok nao"><li>N'utilisez pas d'alcool, de diluant, de solvants ni de produits chimiques agressifs</li></ul>
+<h2>8. Délais de fabrication et d'expédition</h2>
+<p><b>Délai de fabrication :</b> 7 jours ouvrables. <b>Délai de livraison :</b> calculé lors du paiement en fonction de votre code postal. Dès l'expédition de la commande, vous recevez le numéro de suivi pour suivre la livraison.</p>
+<h2>9. Comment demander un échange ou un retour</h2>
+<p>Contactez-nous par nos canaux officiels — <span class="rx r-BR"><a href="https://wa.me/5511910646157" style="color:#fff">WhatsApp +55 11 91064-6157</a></span><span class="rx r-EU"><a href="https://wa.me/32491900007" style="color:#fff">WhatsApp +32 491 90 00 07</a></span> ou <span class="rx r-BR"><a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a></span><span class="rx r-EU"><a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a></span> — en indiquant toujours :</p>
+<ul class="ok"><li>Le numéro de commande</li><li>Vos nom et prénom</li><li>Le motif de la demande</li><li>Des photos et/ou une vidéo (si nécessaire)</li></ul>
+<h2>10. Remboursement</h2>
+<p class="rx r-BR">Après réception et contrôle du produit retourné, le remboursement est effectué par le moyen de paiement d'origine :</p>
+<ul class="ok rx r-BR"><li><b>Carte de crédit :</b> annulation du débit selon les règles de l'émetteur de la carte</li><li><b>PIX :</b> virement sur le compte du titulaire de l'achat</li></ul>
+<p class="rx r-EU">Le remboursement est effectué par le même moyen de paiement que celui utilisé pour l'achat (carte ou Bancontact), sans frais pour vous.</p>
+<h2 class="rx r-EU">11. Modèle de formulaire de rétractation</h2>
+<p class="rx r-EU">Complétez et envoyez ce texte à <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a> uniquement si vous souhaitez vous rétracter :</p>
+<div class="card rx r-EU"><div class="s" style="font-size:14px;line-height:1.8;color:#cfcfcf;margin:0">À l'attention de FUNPARTS EUROPE SRL, Place Abbé Renard 5, 1420 Braine-l'Alleud, Belgique — contact@funparts.eu<br>Je vous notifie par la présente ma rétractation du contrat portant sur la vente du ou des produits suivants : ___________<br>Commande n° FP-________ · reçue le ___/___/______<br>Nom du consommateur : ___________<br>Adresse du consommateur : ___________<br>Date : ___/___/______</div></div>
+<h2 class="rx r-EU">12. Si nous ne trouvons pas d'accord</h2>
+<p class="rx r-EU">Nous souhaitons tout régler directement avec vous. Si aucun accord n'est trouvé, vous pouvez vous adresser au Service de Médiation pour le Consommateur (<a href="https://www.mediationconsommateur.be" style="color:#fff" target="_blank" rel="noopener">mediationconsommateur.be</a>). Les présentes conditions ne limitent pas les droits que la loi reconnaît au consommateur.</p>
+</div>
 </main>
 <footer class="pf">
-  <div class="row"><span>Funparts LTDA</span><span>CNPJ 09.579.820/0001-54</span><span>Barueri, SP</span></div>
-  <div class="row"><a href="/contato">Contato</a><a href="/trocas-e-devolucoes">Trocas e devoluções</a><a href="/privacidade">Privacidade</a><a href="https://instagram.com/funparts" target="_blank" rel="noopener">Instagram</a></div>
+  <div class="row rx r-BR"><span>Funparts LTDA</span><span>CNPJ 09.579.820/0001-54</span><span>Barueri, SP</span></div>
+  <div class="row rx r-EU"><span>FUNPARTS EUROPE SRL</span><span>TVA BE 1040.041.918</span><span>Braine-l'Alleud, Belgique</span></div>
+  <div class="row"><a href="/contato"><span class="lx l-pt">Contato</span><span class="lx l-en">Contact</span><span class="lx l-es">Contacto</span><span class="lx l-fr">Contact</span></a><a href="/trocas-e-devolucoes"><span class="lx l-pt">Trocas e devoluções</span><span class="lx l-en">Returns &amp; exchanges</span><span class="lx l-es">Cambios y devoluciones</span><span class="lx l-fr">Retours et échanges</span></a><a href="/privacidade"><span class="lx l-pt">Privacidade</span><span class="lx l-en">Privacy</span><span class="lx l-es">Privacidad</span><span class="lx l-fr">Confidentialité</span></a><a href="https://instagram.com/funparts" target="_blank" rel="noopener">Instagram</a></div>
 </footer>
 </body>
 </html>

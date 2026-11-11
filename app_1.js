@@ -3413,6 +3413,8 @@ function _galMiniAplica(){
 try{ window._galMiniAplica=_galMiniAplica; window._galMiniPara=_galMiniPara; }catch(e){}
 function _aplicaCatalogoBanco(c){
   if(!c) return;
+  /* 11/11/2026: nome de categoria por idioma, digitado no painel */
+  try{ window.__fpCatI18n=(c.i18n_cat&&typeof c.i18n_cat==='object')?c.i18n_cat:null; }catch(e){}
   if(c.lego_logos) LEGO_CAT_ICONE_DB=c.lego_logos;
   if(c.lego && Object.keys(c.lego).length){
     Object.keys(LEGO_CATALOG).forEach(function(k){ delete LEGO_CATALOG[k]; });

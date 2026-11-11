@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Política de privacidade · Funparts</title>
 <meta name="description" content="Política de privacidade da Funparts: quais dados coletamos para produzir e entregar seu pedido, com quem compartilhamos e seus direitos pela LGPD.">
+<script>
+/* 11/11/2026: a pagina segue o idioma e a regiao escolhidos no site (os mesmos fp_lang / fp_region).
+   Pelo funparts.be, a 1a visita abre em frances, regiao Europa. Sem JavaScript: portugues, Brasil. */
+(function(){
+  var l='pt',r='BR',be=/(^|\.)funparts\.be$/i.test(location.hostname);
+  try{
+    var S=window.localStorage;
+    if(be&&!S.getItem('fp_region')){ S.setItem('fp_region','EU'); S.setItem('fp_lang','fr'); }
+    var a=S.getItem('fp_lang'),b=S.getItem('fp_region');
+    if(a==='pt'||a==='en'||a==='es'||a==='fr') l=a;
+    if(b==='EU'||b==='BR') r=b;
+  }catch(e){ if(be){ l='fr'; r='EU'; } }
+  var d=document.documentElement;
+  d.setAttribute('data-fl',l); d.setAttribute('data-fr',r);
+  d.lang={pt:'pt-BR',en:'en',es:'es',fr:'fr'}[l];
+  var T={"pt": "Pol\u00edtica de privacidade", "en": "Privacy policy", "es": "Pol\u00edtica de privacidad", "fr": "Politique de confidentialit\u00e9"};
+  try{ document.title=T[l]+' \u00b7 Funparts'; }catch(e){}
+})();
+</script>
 <link rel="stylesheet" href="styles_1.css">
 
 <style>
@@ -40,58 +59,139 @@ ul{padding-left:20px;margin:0 0 12px}li{margin-bottom:6px}
 .pf .row{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0;margin-bottom:6px}.pf .row:last-child{margin-bottom:0}
 .pf .row>*{padding:0 9px;border-left:1px solid #333}.pf .row>*:first-child{border-left:none}
 .pf a{color:#bbb;text-decoration:none}.pf a:hover{color:#fff}
+
+/* idiomas (PT/EN/ES/FR) e regiao (Brasil/Europa): so esconde o que nao e' do visitante */
+html[data-fl="pt"] .lx:not(.l-pt),html[data-fl="en"] .lx:not(.l-en),html[data-fl="es"] .lx:not(.l-es),html[data-fl="fr"] .lx:not(.l-fr),html:not([data-fl]) .lx:not(.l-pt),
+html[data-fr="BR"] .rx:not(.r-BR),html[data-fr="EU"] .rx:not(.r-EU),html:not([data-fr]) .rx:not(.r-BR){display:none!important}
 </style>
 </head>
 <body>
 <div class="ph">
   <a href="/" aria-label="Funparts"><img src="images/img_001.png" alt="Funparts"></a>
-  <a class="volta" href="/">&#8592; Voltar ao configurador</a>
+  <a class="volta" href="/"><span class="lx l-pt">&#8592; Voltar ao configurador</span><span class="lx l-en">&#8592; Back to the configurator</span><span class="lx l-es">&#8592; Volver al configurador</span><span class="lx l-fr">&#8592; Retour au configurateur</span></a>
 </div>
 <main class="pg">
+<div class="lx l-pt">
   <div class="crumb"><a href="/">Início</a> &nbsp;/&nbsp; Privacidade</div>
   <h1>Política de privacidade</h1>
   <p class="lead">Como cuidamos dos seus dados</p>
 
-<p>Esta política explica quais dados a Funparts LTDA (CNPJ 09.579.820/0001-54) coleta quando você usa este site, para que eles servem e quais são os seus direitos, nos termos da Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018).</p>
-
+<p class="rx r-BR">Esta política explica quais dados a Funparts LTDA (CNPJ 09.579.820/0001-54) coleta quando você usa este site, para que eles servem e quais são os seus direitos, nos termos da Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018).</p>
+<p class="rx r-EU">Esta política explica quais dados a FUNPARTS EUROPE SRL (Place Abbé Renard 5, 1420 Braine-l'Alleud, Bélgica — n.º de empresa e IVA BE 1040.041.918), responsável pelo tratamento nas compras feitas na região Europa, coleta quando você usa este site, para que eles servem e quais são os seus direitos, nos termos do Regulamento Geral sobre a Proteção de Dados (RGPD, Regulamento (UE) 2016/679).</p>
 <h2>1. Dados que coletamos</h2>
-<ul class="ok">
-  <li><b>Para entregar o pedido:</b> nome, CPF (obrigatório para emissão da nota fiscal no Brasil), e-mail, telefone/WhatsApp e endereço de entrega</li>
-  <li><b>Para produzir o pedido:</b> a configuração escolhida (medidas, fundo, gravações) e, quando você envia, a imagem para impressão</li>
-  <li><b>Pagamento:</b> os dados do cartão são digitados e processados diretamente pelas operadoras de pagamento (Pagar.me no Brasil, Stripe na Europa). <b>A Funparts não armazena números de cartão</b></li>
-  <li><b>Navegação:</b> cookies e identificadores de anúncio (Pixel da Meta) para medir o resultado das campanhas e mostrar anúncios relevantes</li>
-</ul>
-
+<ul class="ok"><li class="rx r-BR"><b>Para entregar o pedido:</b> nome, CPF (obrigatório para emissão da nota fiscal no Brasil), e-mail, telefone/WhatsApp e endereço de entrega</li><li class="rx r-EU"><b>Para entregar o pedido:</b> nome, e-mail, telefone/WhatsApp e endereço de entrega</li><li><b>Para produzir o pedido:</b> a configuração escolhida (medidas, fundo, gravações) e, quando você envia, a imagem para impressão</li><li><b>Pagamento:</b> os dados do cartão são digitados e processados diretamente pelas operadoras de pagamento (Pagar.me no Brasil, Stripe na Europa). <b>A Funparts não armazena números de cartão</b></li><li><b>Navegação:</b> cookies e identificadores de anúncio (Pixel da Meta) para medir o resultado das campanhas e mostrar anúncios relevantes</li></ul>
 <h2>2. Para que usamos</h2>
-<ul class="ok">
-  <li>Produzir, embalar, enviar e dar suporte ao seu pedido</li>
-  <li>Enviar os e-mails do pedido (recebido, pago, em produção, enviado) e o código de rastreio</li>
-  <li>Emitir nota fiscal e cumprir obrigações legais</li>
-  <li>Medir e melhorar o site e as campanhas de anúncio</li>
-</ul>
-
+<ul class="ok"><li>Produzir, embalar, enviar e dar suporte ao seu pedido</li><li>Enviar os e-mails do pedido (recebido, pago, em produção, enviado) e o código de rastreio</li><li class="rx r-BR">Emitir nota fiscal e cumprir obrigações legais</li><li class="rx r-EU">Emitir a fatura e cumprir obrigações legais</li><li>Medir e melhorar o site e as campanhas de anúncio</li></ul>
+<p class="rx r-EU">Bases legais: a execução do contrato de compra (pedido, entrega e suporte), o cumprimento de obrigações legais (faturamento e contabilidade) e o nosso interesse legítimo em medir e melhorar o site e as campanhas.</p>
 <h2>3. Com quem compartilhamos</h2>
 <p>Somente com quem precisa deles para o pedido acontecer: transportadoras e plataformas de frete (Correios, transportadoras parceiras, SuperFrete, Melhor Envio, Sendcloud), operadoras de pagamento (Pagar.me, Stripe), o serviço de envio de e-mail (Resend) e a plataforma de anúncios (Meta). Não vendemos nem cedemos seus dados a terceiros para outros fins.</p>
-
+<p class="rx r-EU">A loja europeia funciona na mesma plataforma da Funparts LTDA (Brasil), dona da marca, que presta suporte técnico e de produção e pode acessar os dados do pedido para esse fim. Alguns prestadores ficam fora do Espaço Econômico Europeu (Brasil, Estados Unidos); nesses casos a transferência é feita com as garantias previstas no RGPD (decisão de adequação ou cláusulas contratuais-tipo).</p>
 <h2>4. Por quanto tempo guardamos</h2>
-<p>Os dados do pedido ficam guardados pelo prazo exigido pela legislação fiscal e para atender garantias e trocas. A imagem enviada para impressão é usada apenas na produção do seu pedido.</p>
-
+<p class="rx r-BR">Os dados do pedido ficam guardados pelo prazo exigido pela legislação fiscal e para atender garantias e trocas. A imagem enviada para impressão é usada apenas na produção do seu pedido.</p>
+<p class="rx r-EU">Os dados do pedido ficam guardados pelo prazo exigido pela legislação fiscal e contábil belga e para atender a garantia legal. A imagem enviada para impressão é usada apenas na produção do seu pedido.</p>
 <h2>5. Seus direitos</h2>
-<p>Você pode, a qualquer momento, pedir acesso, correção ou exclusão dos seus dados, ou revogar um consentimento, pelo e-mail <a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a>. Respondemos no prazo previsto em lei.</p>
-
+<p class="rx r-BR">Você pode, a qualquer momento, pedir acesso, correção ou exclusão dos seus dados, ou revogar um consentimento, pelo e-mail <a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a>. Respondemos no prazo previsto em lei.</p>
+<p class="rx r-EU">Você pode, a qualquer momento, pedir acesso, retificação, apagamento, limitação ou portabilidade dos seus dados, ou opor-se a um tratamento, pelo e-mail <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>. Respondemos em até um mês. Você também pode apresentar reclamação à Autoridade de Proteção de Dados da Bélgica (<a href="https://www.autoriteprotectiondonnees.be" style="color:#fff" target="_blank" rel="noopener">autoriteprotectiondonnees.be</a>).</p>
 <h2>6. Cookies</h2>
 <p>Usamos cookies essenciais para o site funcionar (carrinho, idioma, região) e cookies de medição de anúncios. Você pode bloquear cookies no seu navegador; o carrinho e a escolha de idioma podem deixar de ser lembrados.</p>
-
 <h2>7. Segurança</h2>
 <p>O site é servido com criptografia (HTTPS) e os dados ficam em infraestrutura da Cloudflare, com acesso restrito à equipe da Funparts.</p>
-
 <h2>8. Alterações</h2>
-<p>Esta política pode ser atualizada. A versão vigente é sempre a publicada nesta página. Última atualização: setembro de 2026.</p>
+<p class="rx r-BR">Esta política pode ser atualizada. A versão vigente é sempre a publicada nesta página. Última atualização: setembro de 2026.</p>
+<p class="rx r-EU">Esta política pode ser atualizada. A versão vigente é sempre a publicada nesta página. Última atualização: novembro de 2026.</p>
+</div>
+<div class="lx l-en">
+  <div class="crumb"><a href="/">Home</a> &nbsp;/&nbsp; Privacy</div>
+  <h1>Privacy policy</h1>
+  <p class="lead">How we look after your data</p>
 
+<p class="rx r-BR">This policy explains which data Funparts LTDA (CNPJ 09.579.820/0001-54) collects when you use this website, what it is used for and what your rights are, under Brazil's General Data Protection Law (LGPD, Law 13,709/2018).</p>
+<p class="rx r-EU">This policy explains which data FUNPARTS EUROPE SRL (Place Abbé Renard 5, 1420 Braine-l'Alleud, Belgium — company and VAT no. BE 1040.041.918), the data controller for purchases made in the Europe region, collects when you use this website, what it is used for and what your rights are, under the General Data Protection Regulation (GDPR, Regulation (EU) 2016/679).</p>
+<h2>1. Data we collect</h2>
+<ul class="ok"><li class="rx r-BR"><b>To deliver the order:</b> name, CPF (the Brazilian tax number, required to issue the invoice in Brazil), email, phone/WhatsApp and delivery address</li><li class="rx r-EU"><b>To deliver the order:</b> name, email, phone/WhatsApp and delivery address</li><li><b>To produce the order:</b> the configuration you chose (sizes, background, engravings) and, when you send one, the image to be printed</li><li><b>Payment:</b> card details are entered and processed directly by the payment providers (Pagar.me in Brazil, Stripe in Europe). <b>Funparts does not store card numbers</b></li><li><b>Browsing:</b> cookies and advertising identifiers (Meta Pixel) to measure campaign results and show relevant ads</li></ul>
+<h2>2. What we use it for</h2>
+<ul class="ok"><li>To produce, pack, ship and support your order</li><li>To send the order emails (received, paid, in production, shipped) and the tracking code</li><li>To issue the invoice and comply with legal obligations</li><li>To measure and improve the website and the advertising campaigns</li></ul>
+<p class="rx r-EU">Legal bases: performance of the sales contract (order, delivery and support), compliance with legal obligations (invoicing and accounting) and our legitimate interest in measuring and improving the website and the campaigns.</p>
+<h2>3. Who we share it with</h2>
+<p>Only with those who need the data for the order to happen: carriers and shipping platforms (Correios, partner carriers, SuperFrete, Melhor Envio, Sendcloud), payment providers (Pagar.me, Stripe), the email delivery service (Resend) and the advertising platform (Meta). We do not sell or pass your data on to third parties for any other purpose.</p>
+<p class="rx r-EU">The European shop runs on the same platform as Funparts LTDA (Brazil), the owner of the brand, which provides technical and production support and may access order data for that purpose. Some providers are located outside the European Economic Area (Brazil, United States); in those cases the transfer is made with the safeguards required by the GDPR (adequacy decision or standard contractual clauses).</p>
+<h2>4. How long we keep it</h2>
+<p class="rx r-BR">Order data is kept for the period required by tax law and to handle guarantees and exchanges. The image sent for printing is used only to produce your order.</p>
+<p class="rx r-EU">Order data is kept for the period required by Belgian tax and accounting law and to honour the legal guarantee. The image sent for printing is used only to produce your order.</p>
+<h2>5. Your rights</h2>
+<p class="rx r-BR">At any time you may ask to access, correct or delete your data, or withdraw a consent, by writing to <a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a>. We reply within the period set by law.</p>
+<p class="rx r-EU">At any time you may ask for access to, rectification, erasure, restriction or portability of your data, or object to a processing activity, by writing to <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>. We reply within one month. You may also lodge a complaint with the Belgian Data Protection Authority (<a href="https://www.dataprotectionauthority.be" style="color:#fff" target="_blank" rel="noopener">dataprotectionauthority.be</a>).</p>
+<h2>6. Cookies</h2>
+<p>We use essential cookies for the website to work (cart, language, region) and advertising-measurement cookies. You can block cookies in your browser; the cart and your language choice may then no longer be remembered.</p>
+<h2>7. Security</h2>
+<p>The website is served with encryption (HTTPS) and the data is stored on Cloudflare infrastructure, with access restricted to the Funparts team.</p>
+<h2>8. Changes</h2>
+<p class="rx r-BR">This policy may be updated. The version in force is always the one published on this page. Last updated: September 2026.</p>
+<p class="rx r-EU">This policy may be updated. The version in force is always the one published on this page. Last updated: November 2026.</p>
+</div>
+<div class="lx l-es">
+  <div class="crumb"><a href="/">Inicio</a> &nbsp;/&nbsp; Privacidad</div>
+  <h1>Política de privacidad</h1>
+  <p class="lead">Cómo cuidamos tus datos</p>
+
+<p class="rx r-BR">Esta política explica qué datos recoge Funparts LTDA (CNPJ 09.579.820/0001-54) cuando usas este sitio, para qué sirven y cuáles son tus derechos, conforme a la Ley General de Protección de Datos de Brasil (LGPD, Ley 13.709/2018).</p>
+<p class="rx r-EU">Esta política explica qué datos recoge FUNPARTS EUROPE SRL (Place Abbé Renard 5, 1420 Braine-l'Alleud, Bélgica — n.º de empresa e IVA BE 1040.041.918), responsable del tratamiento en las compras realizadas en la región Europa, cuando usas este sitio, para qué sirven y cuáles son tus derechos, conforme al Reglamento General de Protección de Datos (RGPD, Reglamento (UE) 2016/679).</p>
+<h2>1. Datos que recogemos</h2>
+<ul class="ok"><li class="rx r-BR"><b>Para entregar el pedido:</b> nombre, CPF (número fiscal brasileño, obligatorio para emitir la factura en Brasil), correo electrónico, teléfono/WhatsApp y dirección de entrega</li><li class="rx r-EU"><b>Para entregar el pedido:</b> nombre, correo electrónico, teléfono/WhatsApp y dirección de entrega</li><li><b>Para fabricar el pedido:</b> la configuración elegida (medidas, fondo, grabados) y, cuando la envías, la imagen para imprimir</li><li><b>Pago:</b> los datos de la tarjeta se introducen y se procesan directamente en las pasarelas de pago (Pagar.me en Brasil, Stripe en Europa). <b>Funparts no almacena números de tarjeta</b></li><li><b>Navegación:</b> cookies e identificadores publicitarios (Píxel de Meta) para medir el resultado de las campañas y mostrar anuncios relevantes</li></ul>
+<h2>2. Para qué los usamos</h2>
+<ul class="ok"><li>Fabricar, embalar, enviar y dar soporte a tu pedido</li><li>Enviar los correos del pedido (recibido, pagado, en producción, enviado) y el código de seguimiento</li><li>Emitir la factura y cumplir las obligaciones legales</li><li>Medir y mejorar el sitio y las campañas publicitarias</li></ul>
+<p class="rx r-EU">Bases jurídicas: la ejecución del contrato de compra (pedido, entrega y soporte), el cumplimiento de obligaciones legales (facturación y contabilidad) y nuestro interés legítimo en medir y mejorar el sitio y las campañas.</p>
+<h2>3. Con quién los compartimos</h2>
+<p>Solo con quienes los necesitan para que el pedido se lleve a cabo: transportistas y plataformas de envío (Correios, transportistas asociados, SuperFrete, Melhor Envio, Sendcloud), pasarelas de pago (Pagar.me, Stripe), el servicio de envío de correo electrónico (Resend) y la plataforma publicitaria (Meta). No vendemos ni cedemos tus datos a terceros para otros fines.</p>
+<p class="rx r-EU">La tienda europea funciona en la misma plataforma que Funparts LTDA (Brasil), titular de la marca, que presta soporte técnico y de producción y puede acceder a los datos del pedido con ese fin. Algunos proveedores están fuera del Espacio Económico Europeo (Brasil, Estados Unidos); en esos casos la transferencia se realiza con las garantías previstas en el RGPD (decisión de adecuación o cláusulas contractuales tipo).</p>
+<h2>4. Durante cuánto tiempo los conservamos</h2>
+<p class="rx r-BR">Los datos del pedido se conservan durante el plazo exigido por la legislación fiscal y para atender garantías y cambios. La imagen enviada para imprimir se usa únicamente en la fabricación de tu pedido.</p>
+<p class="rx r-EU">Los datos del pedido se conservan durante el plazo exigido por la legislación fiscal y contable belga y para atender la garantía legal. La imagen enviada para imprimir se usa únicamente en la fabricación de tu pedido.</p>
+<h2>5. Tus derechos</h2>
+<p class="rx r-BR">En cualquier momento puedes solicitar el acceso, la corrección o la eliminación de tus datos, o retirar un consentimiento, escribiendo a <a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a>. Respondemos en el plazo previsto por la ley.</p>
+<p class="rx r-EU">En cualquier momento puedes solicitar el acceso, la rectificación, la supresión, la limitación o la portabilidad de tus datos, u oponerte a un tratamiento, escribiendo a <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>. Respondemos en el plazo de un mes. También puedes presentar una reclamación ante la Autoridad de Protección de Datos de Bélgica (<a href="https://www.autoriteprotectiondonnees.be" style="color:#fff" target="_blank" rel="noopener">autoriteprotectiondonnees.be</a>).</p>
+<h2>6. Cookies</h2>
+<p>Usamos cookies esenciales para que el sitio funcione (carrito, idioma, región) y cookies de medición publicitaria. Puedes bloquear las cookies en tu navegador; es posible que el carrito y el idioma elegido dejen de recordarse.</p>
+<h2>7. Seguridad</h2>
+<p>El sitio se sirve con cifrado (HTTPS) y los datos se guardan en la infraestructura de Cloudflare, con acceso restringido al equipo de Funparts.</p>
+<h2>8. Cambios</h2>
+<p class="rx r-BR">Esta política puede actualizarse. La versión vigente es siempre la publicada en esta página. Última actualización: septiembre de 2026.</p>
+<p class="rx r-EU">Esta política puede actualizarse. La versión vigente es siempre la publicada en esta página. Última actualización: noviembre de 2026.</p>
+</div>
+<div class="lx l-fr">
+  <div class="crumb"><a href="/">Accueil</a> &nbsp;/&nbsp; Confidentialité</div>
+  <h1>Politique de confidentialité</h1>
+  <p class="lead">Comment nous prenons soin de vos données</p>
+
+<p class="rx r-BR">Cette politique explique quelles données Funparts LTDA (CNPJ 09.579.820/0001-54) collecte lorsque vous utilisez ce site, à quoi elles servent et quels sont vos droits, conformément à la loi générale brésilienne sur la protection des données (LGPD, loi 13.709/2018).</p>
+<p class="rx r-EU">Cette politique explique quelles données FUNPARTS EUROPE SRL (Place Abbé Renard 5, 1420 Braine-l'Alleud, Belgique — n° d'entreprise et TVA BE 1040.041.918), responsable du traitement pour les achats effectués dans la région Europe, collecte lorsque vous utilisez ce site, à quoi elles servent et quels sont vos droits, conformément au Règlement général sur la protection des données (RGPD, règlement (UE) 2016/679).</p>
+<h2>1. Données que nous collectons</h2>
+<ul class="ok"><li class="rx r-BR"><b>Pour livrer la commande :</b> nom, CPF (numéro fiscal brésilien, obligatoire pour établir la facture au Brésil), e-mail, téléphone/WhatsApp et adresse de livraison</li><li class="rx r-EU"><b>Pour livrer la commande :</b> nom, e-mail, téléphone/WhatsApp et adresse de livraison</li><li><b>Pour fabriquer la commande :</b> la configuration choisie (dimensions, fond, gravures) et, lorsque vous en envoyez une, l'image à imprimer</li><li><b>Paiement :</b> les données de carte sont saisies et traitées directement par les prestataires de paiement (Pagar.me au Brésil, Stripe en Europe). <b>Funparts ne conserve aucun numéro de carte</b></li><li><b>Navigation :</b> cookies et identifiants publicitaires (Pixel Meta) pour mesurer le résultat des campagnes et afficher des annonces pertinentes</li></ul>
+<h2>2. À quoi elles servent</h2>
+<ul class="ok"><li>Fabriquer, emballer, expédier votre commande et en assurer le suivi</li><li>Envoyer les e-mails de la commande (reçue, payée, en fabrication, expédiée) et le numéro de suivi</li><li>Établir la facture et respecter nos obligations légales</li><li>Mesurer et améliorer le site et les campagnes publicitaires</li></ul>
+<p class="rx r-EU">Bases juridiques : l'exécution du contrat de vente (commande, livraison et assistance), le respect d'obligations légales (facturation et comptabilité) et notre intérêt légitime à mesurer et améliorer le site et les campagnes.</p>
+<h2>3. Avec qui nous les partageons</h2>
+<p>Uniquement avec ceux qui en ont besoin pour que la commande aboutisse : transporteurs et plateformes d'expédition (Correios, transporteurs partenaires, SuperFrete, Melhor Envio, Sendcloud), prestataires de paiement (Pagar.me, Stripe), le service d'envoi d'e-mails (Resend) et la plateforme publicitaire (Meta). Nous ne vendons ni ne cédons vos données à des tiers à d'autres fins.</p>
+<p class="rx r-EU">La boutique européenne fonctionne sur la même plateforme que Funparts LTDA (Brésil), titulaire de la marque, qui assure le support technique et de production et peut accéder aux données de commande à cette fin. Certains prestataires sont établis en dehors de l'Espace économique européen (Brésil, États-Unis) ; dans ces cas, le transfert est encadré par les garanties prévues par le RGPD (décision d'adéquation ou clauses contractuelles types).</p>
+<h2>4. Combien de temps nous les conservons</h2>
+<p class="rx r-BR">Les données de commande sont conservées pendant la durée exigée par la législation fiscale et pour traiter les garanties et les échanges. L'image envoyée pour impression sert uniquement à fabriquer votre commande.</p>
+<p class="rx r-EU">Les données de commande sont conservées pendant la durée exigée par la législation fiscale et comptable belge et pour honorer la garantie légale. L'image envoyée pour impression sert uniquement à fabriquer votre commande.</p>
+<h2>5. Vos droits</h2>
+<p class="rx r-BR">Vous pouvez à tout moment demander l'accès à vos données, leur correction ou leur suppression, ou retirer un consentement, en écrivant à <a href="mailto:contato@funparts.com.br" style="color:#fff">contato@funparts.com.br</a>. Nous répondons dans le délai prévu par la loi.</p>
+<p class="rx r-EU">Vous pouvez à tout moment demander l'accès à vos données, leur rectification, leur effacement, la limitation de leur traitement ou leur portabilité, ou vous opposer à un traitement, en écrivant à <a href="mailto:contact@funparts.eu" style="color:#fff">contact@funparts.eu</a>. Nous répondons dans un délai d'un mois. Vous pouvez également introduire une réclamation auprès de l'Autorité de protection des données (<a href="https://www.autoriteprotectiondonnees.be" style="color:#fff" target="_blank" rel="noopener">autoriteprotectiondonnees.be</a>).</p>
+<h2>6. Cookies</h2>
+<p>Nous utilisons des cookies essentiels au fonctionnement du site (panier, langue, région) et des cookies de mesure publicitaire. Vous pouvez bloquer les cookies dans votre navigateur ; le panier et la langue choisie pourraient alors ne plus être mémorisés.</p>
+<h2>7. Sécurité</h2>
+<p>Le site est servi avec chiffrement (HTTPS) et les données sont hébergées sur l'infrastructure de Cloudflare, avec un accès réservé à l'équipe Funparts.</p>
+<h2>8. Modifications</h2>
+<p class="rx r-BR">Cette politique peut être mise à jour. La version en vigueur est toujours celle publiée sur cette page. Dernière mise à jour : septembre 2026.</p>
+<p class="rx r-EU">Cette politique peut être mise à jour. La version en vigueur est toujours celle publiée sur cette page. Dernière mise à jour : novembre 2026.</p>
+</div>
 </main>
 <footer class="pf">
-  <div class="row"><span>Funparts LTDA</span><span>CNPJ 09.579.820/0001-54</span><span>Barueri, SP</span></div>
-  <div class="row"><a href="/contato">Contato</a><a href="/trocas-e-devolucoes">Trocas e devoluções</a><a href="/privacidade">Privacidade</a><a href="https://instagram.com/funparts" target="_blank" rel="noopener">Instagram</a></div>
+  <div class="row rx r-BR"><span>Funparts LTDA</span><span>CNPJ 09.579.820/0001-54</span><span>Barueri, SP</span></div>
+  <div class="row rx r-EU"><span>FUNPARTS EUROPE SRL</span><span>TVA BE 1040.041.918</span><span>Braine-l'Alleud, Belgique</span></div>
+  <div class="row"><a href="/contato"><span class="lx l-pt">Contato</span><span class="lx l-en">Contact</span><span class="lx l-es">Contacto</span><span class="lx l-fr">Contact</span></a><a href="/trocas-e-devolucoes"><span class="lx l-pt">Trocas e devoluções</span><span class="lx l-en">Returns &amp; exchanges</span><span class="lx l-es">Cambios y devoluciones</span><span class="lx l-fr">Retours et échanges</span></a><a href="/privacidade"><span class="lx l-pt">Privacidade</span><span class="lx l-en">Privacy</span><span class="lx l-es">Privacidad</span><span class="lx l-fr">Confidentialité</span></a><a href="https://instagram.com/funparts" target="_blank" rel="noopener">Instagram</a></div>
 </footer>
 </body>
 </html>
