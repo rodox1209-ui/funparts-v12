@@ -851,7 +851,7 @@ window._emojiFix={ran:true,added:added,fullSize:ks.length};
 (function(){
 var _r='BR';
 function _f(n,r){if(r==='EU')return'\u20AC '+n.toFixed(2).replace('.',',');if(r==='US')return'$ '+n.toFixed(2);return'R$ '+n.toFixed(2).replace('.',',');}
-function fix(){var r=(window.FP&&window.FP.region)||'BR';[['ledFioSem',199]].forEach(function(p){var d=document.querySelector('#'+p[0]+' .tdesc');if(!d)return;var t=(d.textContent||'');var n=parseFloat(t.replace(/[^\d,.]/g,'').replace(',','.'))||p[1];if(n>0)d.textContent=_f(n,r);});}
+function fix(){var r=(window.FP&&window.FP.region)||'BR';/* 12/11/2026: o preco do LED agora sai do painel (app_1.js, _precoOpcionais) */[].forEach(function(p){var d=document.querySelector('#'+p[0]+' .tdesc');if(!d)return;var t=(d.textContent||'');var n=parseFloat(t.replace(/[^\d,.]/g,'').replace(',','.'))||p[1];if(n>0)d.textContent=_f(n,r);});}
 function hook(){
 if(!window.FP)return;
 if(window.FP.__ph)return;
@@ -906,7 +906,10 @@ window._priceFix={ran:true};
       var reg=FP.region||'BR';
       if(reg==='BR'){
         // Restaurar preÃÂ§os originais do banco (BR)
-        if(window._origCAT_PRECOS!==undefined) window.CAT_PRECOS=window._origCAT_PRECOS;
+        /* 12/11/2026: esta volta para o real saiu daqui. Numa visita que COMECA na Europa o
+           "original" guardado ja era a tabela em euro, e voltar para o Brasil deixava os
+           numeros do euro com R$ na frente. Quem devolve a tabela do Brasil e' o reaplica(),
+           la embaixo, a partir do catalogo. */
       } else if(CFG[reg]&&CFG[reg].prices){
         // Salvar original apenas uma vez
         if(window._origCAT_PRECOS===undefined) window._origCAT_PRECOS=window.CAT_PRECOS;
@@ -3998,7 +4001,7 @@ function _startOb14(){
 
     var alvo=document.getElementById('cartFoot2')||document.getElementById('cartFoot')
              ||document.getElementById('cartPanel');
-    if(!alvo){ try{ if(typeof textoZap==='function')window.open('https://wa.me/5511910646157?text='+encodeURIComponent((window._fpZap||String)(textoZap())),'_blank'); }catch(e){} return; }
+    if(!alvo){ try{ if(typeof textoZap==='function')window.open('https://wa.me/'+(typeof _fpZapNum==='function'?_fpZapNum():'5511910646157')+'?text='+encodeURIComponent((window._fpZap||String)(textoZap())),'_blank'); }catch(e){} return; }
 
     var velho=document.getElementById('fpPgtoFalha');
     if(velho)velho.remove();
@@ -4028,11 +4031,14 @@ function _startOb14(){
       var txt='';
       try{ if(typeof textoZap==='function')txt=textoZap(); }catch(e){}
       if(!txt){
-        txt='Ol\u00e1! Tentei fechar meu pedido na Funparts e o pagamento n\u00e3o abriu.';
-        if(pedido&&pedido.codigo)txt+='\nPedido: '+pedido.codigo;
-        if(cliente&&cliente.nome)txt+='\nCliente: '+cliente.nome;
+        /* 12/11/2026: no idioma do cliente (na Europa a conversa abre com a unidade da Belgica) */
+        var _zl={pt:['Ol\u00e1! Tentei fechar meu pedido na Funparts e o pagamento n\u00e3o abriu.','Pedido','Cliente'],en:['Hi! I tried to complete my order on Funparts and the payment did not open.','Order','Customer'],es:['\u00a1Hola! Intent\u00e9 cerrar mi pedido en Funparts y el pago no se abri\u00f3.','Pedido','Cliente'],fr:['Bonjour ! J\u2019ai essay\u00e9 de finaliser ma commande sur Funparts et le paiement ne s\u2019est pas ouvert.','Commande','Client']};
+        var _zt=_zl[(window.FP&&FP.lang)||'pt']||_zl.pt;
+        txt=_zt[0];
+        if(pedido&&pedido.codigo)txt+='\n'+_zt[1]+': '+pedido.codigo;
+        if(cliente&&cliente.nome)txt+='\n'+_zt[2]+': '+cliente.nome;
       }
-      try{ window.open('https://wa.me/5511910646157?text='+encodeURIComponent((window._fpZap||String)(txt)),'_blank'); }catch(e){}
+      try{ window.open('https://wa.me/'+(typeof _fpZapNum==='function'?_fpZapNum():'5511910646157')+'?text='+encodeURIComponent((window._fpZap||String)(txt)),'_blank'); }catch(e){}
     });
   };
 })();
@@ -4222,7 +4228,7 @@ function _startOb14(){
     try{
       var p=(typeof S!=='undefined')?S.incProduto:null;
       if(!p||p.sm||p.id==null)return '';
-      return 'https://www.funparts.com.br/?p='+(S.ehRedoma?'r':'p')+p.id;
+      return 'https://www.funparts.'+((window.FP&&FP.region==='EU')?'be':'com.br')+'/?p='+(S.ehRedoma?'r':'p')+p.id;
     }catch(e){ return ''; }
   }
 
@@ -4246,6 +4252,8 @@ function _startOb14(){
         var v=rows[i].querySelector('.sum-val'), k=rows[i].querySelector('.sum-key');
         if(!v||v.id==='sumCat'||v.id==='sumMod')continue;
         var val=txt(v), key=txt(k);
+        /* 12/11/2026: o selo de preco e o X de remover vinham colados no texto ("Fibra de Carbono+R$75 x") */
+        val=val.replace(/[\u00d7\u2715\u2716\u274c]/g,' ').replace(/\s*\+\s*(R\$|\u20ac)\s*([\d.,]+)/g,' (+$1$2)').replace(/\s+/g,' ').replace(/\s+\)/g,')').trim();
         if(vazio(val)||!key)continue;
         if(v.id==='pvSku')key='SKU';
         extra.push((B&&ICO[v.id]?ICO[v.id]+' ':'')+key+': '+val);
@@ -4265,7 +4273,7 @@ function _startOb14(){
     var m='';
     try{ m=montar(); }catch(e){ m=''; }
     if(!m){ try{ if(typeof velho==='function')return velho.apply(this,arguments); }catch(e){} return; }
-    window.open('https://wa.me/5511910646157?text='+encodeURIComponent(m),'_blank');
+    window.open('https://wa.me/'+(typeof _fpZapNum==='function'?_fpZapNum():'5511910646157')+'?text='+encodeURIComponent(m),'_blank');
   };
 })();
 
@@ -4583,10 +4591,23 @@ function _startOb14(){
     var alvo=eu?RP_EU:RP_BR;
     for(var i=0;i<3;i++){ if(sp[i].textContent!==alvo[i]) sp[i].textContent=alvo[i]; }
   }
+  /* selo de entrega do resumo: "Todo o Brasil" so vale no Brasil (12/11/2026) */
+  var TG_BR=['\u2708 Todo o Brasil','\u2708 Across Brazil','\u2708 Todo Brasil','\u2708 Partout au Br\u00e9sil'];
+  var TG_EU=['\u2708 Toda a Uni\u00e3o Europeia','\u2708 Across the EU','\u2708 Toda la Uni\u00f3n Europea','\u2708 Partout dans l\u2019UE'];
+  function seloEntrega(){
+    var els=document.querySelectorAll('.tag'); if(!els.length) return;
+    var eu=false; try{ eu=((window.FP&&FP.region)||localStorage.getItem('fp_region'))==='EU'; }catch(e){}
+    var alvo=(eu?TG_EU:TG_BR)[LI[lang()]||0];
+    for(var i=0;i<els.length;i++){
+      var t=norm(els[i].textContent); if(t===alvo) continue;
+      if(TG_BR.indexOf(t)>=0||TG_EU.indexOf(t)>=0) els[i].textContent=alvo;
+    }
+  }
   var JA=false;
   function passa(){
     if(!document.body) return;
     try{ rodape(); }catch(e){}
+    try{ seloEntrega(); }catch(e){}
     var l=lang();
     /* visita toda em portugues: nada a fazer (so trabalha depois de existir outro idioma na tela) */
     if(l!=='pt') JA=true; else if(!JA) return;

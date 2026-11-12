@@ -2601,12 +2601,12 @@ function selRelColor(pos,dot,color){
 }
 function togRelevoOpt(row,key,label,price){
   // preÃÂ§o do banco tem prioridade sobre o valor fixo do HTML
-  if(/Bandeira/i.test(label)) price=_preco('opt_relevo_bandeira', price);
-  else if(/Piloto/i.test(label)) price=_preco('opt_relevo_piloto', price);
+  /* 12/11/2026: os QUATRO relevos saem do painel (placa e tracado ficavam no valor fixo) */
+  price=_fpRelPreco(key||label, price);
   row.classList.toggle('sel');
   const on=row.classList.contains('sel');
   const badge=row.querySelector('.rbadge');
-  badge.textContent=on?`Ã¢ÂÂ ${label}`:`+ R$ ${price}`;
+  badge.textContent=on?`Ã¢ÂÂ ${label}`:`+ ${_fpValorCurto(price)}`;
   if(on){S.relOpts.push(label);S.relOptsExtra+=price;}
   else{S.relOpts=S.relOpts.filter(r=>r!==label);S.relOptsExtra-=price;}
   setStyle('pilotoInput','display',S.relOpts.includes('Nome do Piloto')?'block':'none');
@@ -2928,6 +2928,8 @@ function _topviewAjuste(nome){
 function _topviewEscala(nome){ return _topviewAjuste(nome).escala; }
 try{ window._topviewEscala=_topviewEscala; window._topviewAjuste=_topviewAjuste; }catch(e){}
 function calcPrice(){
+  /* os selos acompanham a moeda da regiao mesmo quando a conta para mais cedo (redoma, produto pronto) */
+  try{ _precoFundoCartoes(); _precoOpcionais(); }catch(e){}
   /* Navegando nas redomas e ainda sem produto escolhido, o total nao pode
      mostrar o preco de um quadro LEGO -- era o que acontecia, porque o calculo
      caia no caminho do quadro. Enquanto nao ha escolha, nao ha total. */
@@ -2962,6 +2964,7 @@ function calcPrice(){
      medida, de fundo, de regiao e de catalogo passa. O cartao nunca fica
      atrasado em relacao ao total porque os dois saem da mesma passagem. */
   _precoFundoCartoes();
+  _precoOpcionais();
   // 2. Upgrades (preÃÂ§os vindos do banco, com reserva)
   if(S.moldura==='m-fibra')base+=_preco('opt_moldura_fibra',75);
   if(S.led){
@@ -2972,6 +2975,7 @@ function calcPrice(){
   }
   if(S.miniOpt==='buy')base+=_preco('opt_mini_comprar',250);
   if(S.disp==='3d'&&S.miniOpt==='buy')base+=_preco('opt_disp_3d',180);
+  S.relOptsExtra=_fpRelSoma();
   base+=S.relOptsExtra+S.customExtra;
   S._total=base;
   const fmtd=_brl(base);
@@ -3136,6 +3140,56 @@ function _preco(chave, fb){ return (CAT_PRECOS && CAT_PRECOS[chave]!=null) ? CAT
    o outro mudar junto.
    Carbono e Acrilico Brilho dividem o mesmo preco: e' assim que o painel
    mostra a linha ("fibra de carbono / brilho"). So o Fosco tem preco proprio. */
+/* PRECO DOS OPCIONAIS NA MOEDA DA REGIAO (12/11/2026)
+   A equipe da Belgica viu "+ R$ 75,00" na moldura de fibra, "+ R$ 89" nos relevos
+   e "+R$589" no LED com o site em euro. O TOTAL estava certo (ele sempre saiu da
+   tabela do painel); o que estava errado era o SELO de cada opcional, escrito a mao
+   no index.html e no resumo. Pior: o selo do LED nem batia com o total em real
+   (cartao "R$ 199", resumo "+R$589", cobranca pela tabela do painel).
+   Mesma correcao do cartao de fundo: o selo passa a chamar a MESMA conta do total,
+   entao nao ha como um mostrar um valor e o outro cobrar outro. */
+function _fpValorCurto(v){
+  v=Number(v)||0;
+  if(((window.FP&&window.FP.region)||'BR')!=='BR') return _brl(v);
+  return 'R$ '+((Math.round(v)===v)?String(v):v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+}
+function _fpMaisCurto(v){ return '+'+_fpValorCurto(v).replace('R$ ','R$'); }
+function _fpRelChave(t){
+  var s=String(t||'');
+  if(/bandeira|flag|bandera|drapeau/i.test(s)) return 'bandeira';
+  if(/piloto|pilote|driver/i.test(s)) return 'piloto';
+  if(/placa|plaque|plate/i.test(s)) return 'placa';
+  if(/circuito|circuit|tra.ado|trazado|layout/i.test(s)) return 'tracado';
+  return '';
+}
+function _fpRelPreco(t,fb){ var k=_fpRelChave(t); if(fb==null) fb=89; return k?_preco('opt_relevo_'+k,fb):fb; }
+/* a soma dos relevos e' refeita a cada conta: trocar de regiao com um relevo ja
+   marcado deixava o valor da moeda anterior dentro do total */
+function _fpRelSoma(){ var s=0; try{ (S.relOpts||[]).forEach(function(l){ s+=Number(_fpRelPreco(l,89))||0; }); }catch(e){} return s; }
+function _fpLedPreco(){
+  var rgb=(S.ledTipo==='rgb'), sem=(S.ledFio==='sem');
+  var k=rgb?(sem?'opt_led_rgb_sem':'opt_led_rgb_com'):(sem?'opt_led_warm_sem':'opt_led_warm_com');
+  return _preco(k, rgb?(sem?589:489):(sem?489:389));
+}
+function _precoOpcionais(){
+  try{
+    if(typeof S==='undefined' || !S) return;
+    var i, el, t, m;
+    var fb=document.querySelectorAll('.ocard[onclick*="m-fibra"] .rbadge');
+    t='+ '+_brl(_preco('opt_moldura_fibra',75));
+    for(i=0;i<fb.length;i++){ if(fb[i].textContent!==t) fb[i].textContent=t; }
+    var rr=document.querySelectorAll('.rrow[onclick*="togRelevoOpt"]');
+    for(i=0;i<rr.length;i++){
+      if(rr[i].classList.contains('sel')) continue;
+      el=rr[i].querySelector('.rbadge'); if(!el) continue;
+      m=/togRelevoOpt\(this,'([a-z]+)'/.exec(String(rr[i].getAttribute('onclick')||'')); if(!m) continue;
+      t='+ '+_fpValorCurto(_fpRelPreco(m[1],89));
+      if(el.textContent!==t) el.textContent=t;
+    }
+    el=document.querySelector('#ledFioSem .tdesc');
+    if(el){ t=_brl(_preco('opt_led_rgb_sem',589)); if(el.textContent!==t) el.textContent=t; }
+  }catch(e){}
+}
 function _precoFundoCartoes(){
   try{
     if(typeof S==='undefined' || !S) return;
@@ -4047,7 +4101,7 @@ function buildSummary(){
   setEl('sumDim',dim);
   // Moldura Ã¢ÂÂ badge se for upgrade pago; cinza se removido
   if(S.moldura==='m-fibra'){
-    document.getElementById('sumMold').innerHTML=S.molduraLbl+'<span class="sum-badge">+R$75 <button class="sum-rm" onclick="removeSumItem(\'moldura\')">ÃÂ</button></span>';
+    document.getElementById('sumMold').innerHTML=S.molduraLbl+'<span class="sum-badge">'+_fpMaisCurto(_preco('opt_moldura_fibra',75))+' <button class="sum-rm" onclick="removeSumItem(\'moldura\')">ÃÂ</button></span>';
   } else if(_sumRemoved.moldura){
     document.getElementById('sumMold').innerHTML='<span class="sum-val-del">Fibra de Carbono</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'moldura\')">Ã¢ÂÂ© desfazer</button></span>';
   } else { setEl('sumMold',S.molduraLbl); }
@@ -4055,8 +4109,9 @@ function buildSummary(){
   // LED Ã¢ÂÂ badge com preÃÂ§o real; cinza se removido
   if(S.led){
     var _rgb=(S.ledTipo==='rgb'),_sem=(S.ledFio==='sem');
-    var _lp=_rgb?(_sem?589:489):(_sem?489:389);
-    document.getElementById('sumLed').innerHTML='Com iluminaÃÂ§ÃÂ£o LED Ã¢ÂÂ¨<span class="sum-badge">+R$'+_lp+' <button class="sum-rm" onclick="removeSumItem(\'led\')">ÃÂ</button></span>';
+    /* 12/11/2026: o selo mostra o MESMO preco que o total soma (o do painel), na moeda da regiao */
+    var _lp=_fpLedPreco();
+    document.getElementById('sumLed').innerHTML='<span>Com ilumina\u00e7\u00e3o LED</span> \u2728<span class="sum-badge">'+_fpMaisCurto(_lp)+' <button class="sum-rm" onclick="removeSumItem(\'led\')">ÃÂ</button></span>';
   } else if(_sumRemoved.led){
     document.getElementById('sumLed').innerHTML='<span class="sum-val-del">Com iluminaÃÂ§ÃÂ£o LED Ã¢ÂÂ¨</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'led\')">Ã¢ÂÂ© desfazer</button></span>';
   } else { setEl('sumLed','Sem LED'); }
@@ -4072,8 +4127,8 @@ function buildSummary(){
   }
   // Alto-relevo Ã¢ÂÂ ativos com badge; removidos em cinza com Ã¢ÂÂ©
   var _actRel=S.relOpts.map(function(opt){
-    var _k=opt==='Bandeira do PaÃÂ­s'?'bandeira':'piloto';
-    return '<span style="display:block;margin-bottom:2px;">'+opt+'<span class="sum-badge">+R$89 <button class="sum-rm" onclick="removeSumItem(\'rel\',\''+_k+'\',\''+opt.replace(/'/g,"\\'")+'\'  )">ÃÂ</button></span></span>';
+    var _k=_fpRelChave(opt)||'piloto';
+    return '<span style="display:block;margin-bottom:2px;">'+opt+'<span class="sum-badge">'+_fpMaisCurto(_fpRelPreco(opt,89))+' <button class="sum-rm" onclick="removeSumItem(\'rel\',\''+_k+'\',\''+opt.replace(/'/g,"\\'")+'\'  )">ÃÂ</button></span></span>';
   });
   var _remRel=_sumRemoved.rel.map(function(r){
     return '<span style="display:block;margin-bottom:2px;"><span class="sum-val-del">'+r.label+'</span><span class="sum-undo-badge">removido <button class="sum-undo-btn" onclick="restoreSumItem(\'rel\',\''+r.key+'\',\''+r.label.replace(/'/g,"\\'")+'\'  )">Ã¢ÂÂ© desfazer</button></span></span>';
@@ -4114,6 +4169,9 @@ function finalizar(){
   alert('Ã°ÂÂÂ Pedido recebido!\n\nNossa equipe entrarÃÂ¡ em contato via WhatsApp em atÃÂ© 2h para confirmar os detalhes e iniciar a produÃÂ§ÃÂ£o.\n\nÃ°ÂÂÂ¦ Prazo: 7Ã¢ÂÂ12 dias ÃÂºteis\nÃ°ÂÂÂ Embalagem premium inclusa');
 }
 
+/* WHATSAPP DA REGIAO (12/11/2026): quem compra na regiao Europa fala com a unidade da Belgica
+   (+32 491 90 00 07); no Brasil continua o numero de sempre. Um lugar so, para os cinco botoes. */
+function _fpZapNum(){ try{ if(((window.FP&&window.FP.region)||'BR')==='EU') return '32491900007'; }catch(e){} return '5511910646157'; }
 function abrirWpp(){
   const mod=S.tipo==='lego'?(S.legoModel||'Ã¢ÂÂ'):(S.miniBrand+(S.miniModel?' Ã¢ÂÂ '+S.miniModel:''));
   const dim=S.tipo==='lego'?S.legoDim:S.miniDim;
@@ -4127,10 +4185,10 @@ function abrirWpp(){
     'Ã¢ÂÂ¢ LED: '+(S.led?'Sim':'NÃÂ£o')+'\n'+
     'Ã¢ÂÂ¢ Miniatura: '+(S.miniOpt==='own'?'Envio prÃÂ³prio':'Comprar conosco')+'\n'+
     (S.relOpts.length?'Ã¢ÂÂ¢ Relevos extras: '+S.relOpts.join(', ')+'\n':'')+
-    'Ã¢ÂÂ¢ Total estimado: R$ '+S._total.toLocaleString('pt-BR')+'\n\n'+
+    'Ã¢ÂÂ¢ Total estimado: '+_brl(S._total)+'\n\n'+
     'Gostaria de finalizar o pedido!'
   );
-  window.open('https://wa.me/5511910646157?text='+msg,'_blank');
+  window.open('https://wa.me/'+_fpZapNum()+'?text='+msg,'_blank');
 }
 
 // INIT
@@ -4966,7 +5024,7 @@ function fecharPedidoWpp(){
   if(btn){ btn.disabled=true; btn.textContent='EnviandoÃ¢ÂÂ¦'; }
 
   function _abrirZap(txt){
-    var url='https://wa.me/5511910646157?text='+encodeURIComponent((window._fpZap||String)(txt));
+    var url='https://wa.me/'+_fpZapNum()+'?text='+encodeURIComponent((window._fpZap||String)(txt));
     if(aba && !aba.closed){ aba.location.href=url; } else { window.open(url,'_blank'); }
     if(btn){ btn.disabled=false; btn.textContent='Fechar pedido via WhatsApp'; }
   }
@@ -5623,8 +5681,8 @@ function _capturaResumo(){
   function _limpa(t){
     return String(t||'')
       .replace(/[\u00d7\u2715\u2716\u274c]/g,' ')   // x de remover
-      .replace(/\s*\+\s*R\$\s*/g,' (+R$ ')          // preco colado
-      .replace(/\(\+R\$ ([\d.,]+)/g,'(+R$ $1)')
+      .replace(/\s*\+\s*(R\$|\u20ac)\s*/g,' (+$1 ')          // preco colado (real ou euro)
+      .replace(/\(\+(R\$|\u20ac) ([\d.,]+)/g,'(+$1 $2)')
       .replace(/\s+/g,' ')
       .replace(/\s+\)/g,')')
       .trim();
