@@ -4675,7 +4675,7 @@ function _startOb14(){
   else setTimeout(liga,200);
 })();
 
-/* ===================== BLACK FRIDAY 2026 (17/11/2026) =====================
+/* ===================== BLACK FRIDAY 2026 (17/11/2026; brinde em 6 opcoes e total do resumo em 2 linhas) =====================
    18/11 00:00 ate 29/11 23:59 (Brasilia). Liga e desliga sozinha: a hora vem do
    servidor (/bf) e, se ele nao responder, do relogio do aparelho.
    - "De" riscado e "Por" nos precos de produto (listas, busca, cartao do fundo,
@@ -4689,21 +4689,23 @@ function _startOb14(){
   var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
   var INI=Date.UTC(2026,10,18,3,0,0), FIM=Date.UTC(2026,10,30,3,0,0), PCT=10, MIN={BR:499,EU:149};
   var LAYOUT='B';   /* escolha do Rodolfo em 17/11: preco em linha (riscado ao lado do novo) */
-  var st={ativa:false, desvio:0, brindes:{quadro:true,redoma:true}, escolha:null, erro:false};
-  try{ var _e=localStorage.getItem('fp_bf_brinde'); if(_e==='quadro'||_e==='redoma') st.escolha=_e; }catch(e){}
+  var PICK='T';    /* brinde: 6 opcoes (17/11). T = tipo e depois modelo; G = grade 2 x 3 */
+  var MOD=[['f40','Ferrari F40'],['svj','Lamborghini SVJ'],['gt3','Porsche GT3']];
+  var st={ativa:false, desvio:0, brindes:{quadro:true,redoma:true,itens:null}, escolha:null, tipo:null, erro:false};
+  try{ var _e=localStorage.getItem('fp_bf_brinde'); if(/^(quadro|redoma)-(f40|svj|gt3)$/.test(_e||'')){ st.escolha=_e; st.tipo=_e.split('-')[0]; } }catch(e){}
   var T={
     pt:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Faltam {v} para ganhar seu brinde exclusivo', ganhou:'Voc\u00ea ganhou um brinde exclusivo. Escolha o seu:',
         q:'Mini quadro', r:'Mini redoma', sub:'com miniatura exclusiva 1:64', esg:'Brindes esgotados', escolha:'Escolha seu brinde para continuar',
-        cupom:'Cupons n\u00e3o valem na Black Friday. Os 10% j\u00e1 est\u00e3o aplicados.', seu:'Seu brinde', gratis:'gr\u00e1tis'},
+        cupom:'Cupons n\u00e3o valem na Black Friday. Os 10% j\u00e1 est\u00e3o aplicados.', seu:'Seu brinde', gratis:'gr\u00e1tis', modelo:'Escolha o modelo:', esg1:'esgotado', mini:'miniatura 1:64'},
     en:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Add {v} more to get your exclusive gift', ganhou:'You have earned an exclusive gift. Choose yours:',
         q:'Mini frame', r:'Mini display case', sub:'with exclusive 1:64 miniature', esg:'Gifts sold out', escolha:'Choose your gift to continue',
-        cupom:'Coupons do not apply during Black Friday. The 10% is already applied.', seu:'Your gift', gratis:'free'},
+        cupom:'Coupons do not apply during Black Friday. The 10% is already applied.', seu:'Your gift', gratis:'free', modelo:'Choose the model:', esg1:'sold out', mini:'1:64 miniature'},
     es:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Faltan {v} para ganar tu regalo exclusivo', ganhou:'Ganaste un regalo exclusivo. Elige el tuyo:',
         q:'Mini cuadro', r:'Mini vitrina', sub:'con miniatura exclusiva 1:64', esg:'Regalos agotados', escolha:'Elige tu regalo para continuar',
-        cupom:'Los cupones no valen durante el Black Friday. El 10\u00a0% ya est\u00e1 aplicado.', seu:'Tu regalo', gratis:'gratis'},
+        cupom:'Los cupones no valen durante el Black Friday. El 10\u00a0% ya est\u00e1 aplicado.', seu:'Tu regalo', gratis:'gratis', modelo:'Elige el modelo:', esg1:'agotado', mini:'miniatura 1:64'},
     fr:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Plus que {v} pour recevoir votre cadeau exclusif', ganhou:'Vous avez gagn\u00e9 un cadeau exclusif. Choisissez-le\u00a0:',
         q:'Mini cadre', r:'Mini vitrine', sub:'avec miniature exclusive 1:64', esg:'Cadeaux \u00e9puis\u00e9s', escolha:'Choisissez votre cadeau pour continuer',
-        cupom:'Les codes promo ne s\u2019appliquent pas pendant le Black Friday. Les 10\u00a0% sont d\u00e9j\u00e0 appliqu\u00e9s.', seu:'Votre cadeau', gratis:'offert'}
+        cupom:'Les codes promo ne s\u2019appliquent pas pendant le Black Friday. Les 10\u00a0% sont d\u00e9j\u00e0 appliqu\u00e9s.', seu:'Votre cadeau', gratis:'offert', modelo:'Choisissez le mod\u00e8le\u00a0:', esg1:'\u00e9puis\u00e9', mini:'miniature 1:64'}
   };
   function lang(){ var l='pt'; try{ l=(window.FP&&FP.lang)||localStorage.getItem('fp_lang')||'pt'; }catch(e){} return T[l]?l:'pt'; }
   function t(k){ return (T[lang()]||T.pt)[k]||T.pt[k]; }
@@ -4748,7 +4750,18 @@ function _startOb14(){
       '.bf-c-err{display:none;color:#ff9a8a;font-size:12px;margin-top:8px}'+
       '.bf-c.erro .bf-c-err{display:block}.bf-c.erro .bf-op{border-color:#ff9a8a}'+
       '.bf-c.erro{animation:bfShk .35s}@keyframes bfShk{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}'+
-      '.bf-cup{font-size:12px;line-height:1.45;opacity:.75;margin-top:6px}';
+      '.bf-cup{font-size:12px;line-height:1.45;opacity:.75;margin-top:6px}'+
+      '#sumTotal .bf-p{flex-direction:column!important;align-items:flex-end!important;gap:5px}#sumTotal .bf-de{font-size:.5em!important;font-weight:600}.sum-total{flex-wrap:wrap;column-gap:12px;row-gap:6px}.sum-total .tot-lbl{white-space:nowrap}.sum-total #sumTotal{margin-left:auto}'+
+      '.bf-c-m2{font-size:11.5px;opacity:.75;margin-top:11px}'+
+      '.bf-ms{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}'+
+      '.bf-m{display:block;width:100%;background:transparent;color:inherit;border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:8px 6px;font:inherit;font-size:12px;font-weight:600;line-height:1.25;cursor:pointer;text-align:center}'+
+      '.bf-m.on{border-color:#fff;background:rgba(255,255,255,.08);box-shadow:0 0 0 1px #fff inset}'+
+      '.bf-m[disabled]{opacity:.35;cursor:default}.bf-m small{display:block;font-weight:400;font-size:10px;opacity:.8}'+
+      '.bf-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px}'+
+      '.bf-g-col{display:flex;flex-direction:column;gap:6px;min-width:0}'+
+      '.bf-g-h{display:flex;align-items:center;gap:8px;padding:0 2px 3px}.bf-g-h svg{width:26px;height:26px;flex:none;opacity:.85}.bf-g-h b{display:block;font-size:12.5px}.bf-g-h small{display:block;font-size:10.5px;opacity:.6;line-height:1.3}'+
+      '.bf-g .bf-m{text-align:left;padding:8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bf-g .bf-m small{display:none}.bf-g .bf-m[disabled]{text-decoration:line-through}'+
+      '.bf-c.erro .bf-m:not([disabled]){border-color:#ff9a8a}';
     (document.head||document.documentElement).appendChild(s);
   }
   function aplicaLayout(){ try{ var h=document.documentElement; h.classList.toggle('bf-A',LAYOUT==='A'); h.classList.toggle('bf-B',LAYOUT==='B'); }catch(e){} }
@@ -4804,9 +4817,11 @@ function _startOb14(){
     var s=0; (window.CART||[]).forEach(function(i){ s+=porC(i.preco); }); return s/100;
   };
   function minimo(){ return MIN[reg()]||499; }
-  function temAlgum(){ return !!(st.brindes&&(st.brindes.quadro||st.brindes.redoma)); }
+  function temItem(k){ var it=st.brindes&&st.brindes.itens; if(it) return !!it[k]; return !!(st.brindes&&st.brindes[String(k).split('-')[0]]); }
+  function temTipo(tp){ return MOD.some(function(m){ return temItem(tp+'-'+m[0]); }); }
+  function temAlgum(){ return temTipo('quadro')||temTipo('redoma'); }
   function elegivel(){ return st.ativa && (window.CART||[]).length>0 && window._cartTotal()+0.000001>=minimo(); }
-  function escolhaValida(){ return !!(st.escolha&&st.brindes&&st.brindes[st.escolha]); }
+  function escolhaValida(){ return !!(st.escolha&&/-/.test(st.escolha)&&temItem(st.escolha)); }
   function precisaEscolher(){ return elegivel() && temAlgum() && !escolhaValida(); }
   var ICO={
     quadro:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="5" width="24" height="22" rx="1.5"/><rect x="8" y="9" width="16" height="14"/><path d="M10.5 19.5h11M12 19.5l1.6-2.6h4.8l1.6 2.6M12.6 21.2a.9.9 0 1 0 0-.1M19.4 21.2a.9.9 0 1 0 0-.1"/></svg>',
@@ -4822,12 +4837,28 @@ function _startOb14(){
     } else if(!temAlgum()){
       h+='<div class="bf-c-m">\ud83c\udf81 '+esc(t('esg'))+'</div>';
     } else {
-      h+='<div class="bf-c-m">\ud83c\udf81 '+esc(t('ganhou'))+'</div><div class="bf-c-ops">';
-      ['quadro','redoma'].forEach(function(tp){
-        if(!st.brindes[tp]) return;
-        h+='<button type="button" class="bf-op'+(st.escolha===tp?' on':'')+'" data-bf="'+tp+'">'+ICO[tp]+'<span><b>'+esc(t(tp==='quadro'?'q':'r'))+'</b><small>'+esc(t('sub'))+' \u00b7 '+esc(t('gratis'))+'</small></span></button>';
-      });
-      h+='</div><div class="bf-c-err">'+esc(t('escolha'))+'</div>';
+      h+='<div class="bf-c-m">\ud83c\udf81 '+esc(t('ganhou'))+'</div>';
+      var bt=function(k,nome){ var ok=temItem(k); return '<button type="button" class="bf-m'+(st.escolha===k?' on':'')+'" data-bf="'+k+'"'+(ok?'':' disabled')+'>'+esc(nome)+(ok?'':'<small>'+esc(t('esg1'))+'</small>')+'</button>'; };
+      if(PICK==='G'){
+        h+='<div class="bf-g">';
+        ['quadro','redoma'].forEach(function(tp){
+          if(!temTipo(tp)) return;
+          h+='<div class="bf-g-col"><div class="bf-g-h">'+ICO[tp]+'<span><b>'+esc(t(tp==='quadro'?'q':'r'))+'</b><small>'+esc(t('mini'))+' \u00b7 '+esc(t('gratis'))+'</small></span></div>';
+          MOD.forEach(function(m){ h+=bt(tp+'-'+m[0],m[1]); });
+          h+='</div>';
+        });
+        h+='</div>';
+      } else {
+        if(st.tipo&&!temTipo(st.tipo)) st.tipo=null;
+        h+='<div class="bf-c-ops">';
+        ['quadro','redoma'].forEach(function(tp){
+          if(!temTipo(tp)) return;
+          h+='<button type="button" class="bf-op'+(st.tipo===tp?' on':'')+'" data-tp="'+tp+'">'+ICO[tp]+'<span><b>'+esc(t(tp==='quadro'?'q':'r'))+'</b><small>'+esc(t('sub'))+' \u00b7 '+esc(t('gratis'))+'</small></span></button>';
+        });
+        h+='</div>';
+        if(st.tipo){ h+='<div class="bf-c-m2">'+esc(t('modelo'))+'</div><div class="bf-ms">'; MOD.forEach(function(m){ h+=bt(st.tipo+'-'+m[0],m[1]); }); h+='</div>'; }
+      }
+      h+='<div class="bf-c-err">'+esc(t('escolha'))+'</div>';
     }
     return h;
   }
@@ -4838,8 +4869,10 @@ function _startOb14(){
     if(!b){ b=document.createElement('div'); b.id='bfCart'; b.className='bf-c'; var tot=foot.querySelector('.cart-tot'); if(tot) foot.insertBefore(b,tot); else foot.insertBefore(b,foot.firstChild); }
     b.className='bf-c'+(st.erro&&precisaEscolher()?' erro':'');
     b.innerHTML=htmlBloco();
-    var bs=b.querySelectorAll('.bf-op');
-    for(var k=0;k<bs.length;k++){ bs[k].onclick=function(){ st.escolha=this.getAttribute('data-bf'); st.erro=false; try{ localStorage.setItem('fp_bf_brinde',st.escolha); }catch(e){} bloco(); }; }
+    var ts=b.querySelectorAll('[data-tp]');
+    for(var k=0;k<ts.length;k++){ ts[k].onclick=function(){ var tp=this.getAttribute('data-tp'); if(st.tipo!==tp){ st.tipo=tp; if(st.escolha&&st.escolha.split('-')[0]!==tp) st.escolha=null; } bloco(); }; }
+    var bs=b.querySelectorAll('[data-bf]');
+    for(var j=0;j<bs.length;j++){ bs[j].onclick=function(){ if(this.disabled) return; st.escolha=this.getAttribute('data-bf'); st.tipo=st.escolha.split('-')[0]; st.erro=false; try{ localStorage.setItem('fp_bf_brinde',st.escolha); }catch(e){} bloco(); }; }
   }
   function linhas(){
     if(!st.ativa) return;
@@ -4920,7 +4953,7 @@ function _startOb14(){
         if(typeof d.agora==='number') st.desvio=d.agora-Date.now();
         if(typeof d.ini==='number') INI=d.ini; if(typeof d.fim==='number') FIM=d.fim;
         if(d.min){ if(d.min.BRL) MIN.BR=d.min.BRL; if(d.min.EUR) MIN.EU=d.min.EUR; }
-        if(d.brindes) st.brindes={quadro:!!d.brindes.quadro, redoma:!!d.brindes.redoma};
+        if(d.brindes) st.brindes={quadro:!!d.brindes.quadro, redoma:!!d.brindes.redoma, itens:d.brindes.itens||null};
         aplica(); try{ if(typeof _cartRender==='function') _cartRender(); }catch(e){}
       }).catch(function(){});
     }catch(e){}
