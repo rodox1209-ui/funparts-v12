@@ -4761,7 +4761,9 @@ function _startOb14(){
       '.bf-g-col{display:flex;flex-direction:column;gap:6px;min-width:0}'+
       '.bf-g-h{display:flex;align-items:center;gap:8px;padding:0 2px 3px}.bf-g-h svg{width:26px;height:26px;flex:none;opacity:.85}.bf-g-h b{display:block;font-size:12.5px}.bf-g-h small{display:block;font-size:10.5px;opacity:.6;line-height:1.3}'+
       '.bf-g .bf-m{text-align:left;padding:8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bf-g .bf-m small{display:none}.bf-g .bf-m[disabled]{text-decoration:line-through}'+
-      '.bf-c.erro .bf-m:not([disabled]){border-color:#ff9a8a}';
+      '.bf-c.erro .bf-m:not([disabled]){border-color:#ff9a8a}'+
+      /* carrinho em tela baixa (celular): o bloco do brinde nao esmaga mais os produtos; o carrinho inteiro rola (17/11) */
+      '.cart-panel{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.cart-head{position:sticky;top:0;z-index:3;background:#111}#cartBody.cart-body{flex:1 0 auto;overflow:visible}';
     (document.head||document.documentElement).appendChild(s);
   }
   function aplicaLayout(){ try{ var h=document.documentElement; h.classList.toggle('bf-A',LAYOUT==='A'); h.classList.toggle('bf-B',LAYOUT==='B'); }catch(e){} }
