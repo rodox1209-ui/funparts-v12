@@ -4253,7 +4253,9 @@ function _startOb14(){
         if(!v||v.id==='sumCat'||v.id==='sumMod')continue;
         var val=txt(v), key=txt(k);
         /* 12/11/2026: o selo de preco e o X de remover vinham colados no texto ("Fibra de Carbono+R$75 x") */
-        val=val.replace(/[\u00d7\u2715\u2716\u274c]/g,' ').replace(/\s*\+\s*(R\$|\u20ac)\s*([\d.,]+)/g,' (+$1$2)').replace(/\s+/g,' ').replace(/\s+\)/g,')').trim();
+        /* (ajuste) so tira o botao de remover, e nao todo "x": a medida 53x83cm perdia o sinal */
+        try{ if(v.querySelector('.sum-rm,.sum-undo-btn')){ var cv=v.cloneNode(true), bs=cv.querySelectorAll('.sum-rm,.sum-undo-btn'); for(var q=0;q<bs.length;q++){ bs[q].parentNode.removeChild(bs[q]); }
+          val=txt(cv).replace(/\s*\+\s*(R\$|\u20ac)\s*([\d.,]+)/g,' (+$1$2)').replace(/\)\s*(?=\S)/g,') \u00b7 ').replace(/\s+/g,' ').trim(); } }catch(e){}
         if(vazio(val)||!key)continue;
         if(v.id==='pvSku')key='SKU';
         extra.push((B&&ICO[v.id]?ICO[v.id]+' ':'')+key+': '+val);
@@ -4671,4 +4673,260 @@ function _startOb14(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ setTimeout(liga,200); });
   else setTimeout(liga,200);
+})();
+
+/* ===================== BLACK FRIDAY 2026 (17/11/2026) =====================
+   18/11 00:00 ate 29/11 23:59 (Brasilia). Liga e desliga sozinha: a hora vem do
+   servidor (/bf) e, se ele nao responder, do relogio do aparelho.
+   - "De" riscado e "Por" nos precos de produto (listas, busca, cartao do fundo,
+     barra do total, resumo) e no carrinho. O item do carrinho continua com o
+     preco cheio: quem aplica os 10% de verdade e' o servidor, item a item.
+   - cupons nao valem (a recusa e' no servidor; aqui a caixa so avisa).
+   - brinde no carrinho: faixa "faltam" abaixo do minimo; acima dele, escolha
+     obrigatoria (mini quadro x mini redoma) antes de seguir para o frete.
+   Tudo aqui so roda com a campanha ligada; desligada, o site fica como antes. */
+(function(){
+  var API=(typeof API_FUNPARTS!=='undefined')?API_FUNPARTS:'https://funparts-ai-proxy.rodox1209.workers.dev';
+  var INI=Date.UTC(2026,10,18,3,0,0), FIM=Date.UTC(2026,10,30,3,0,0), PCT=10, MIN={BR:499,EU:149};
+  var LAYOUT='B';   /* escolha do Rodolfo em 17/11: preco em linha (riscado ao lado do novo) */
+  var st={ativa:false, desvio:0, brindes:{quadro:true,redoma:true}, escolha:null, erro:false};
+  try{ var _e=localStorage.getItem('fp_bf_brinde'); if(_e==='quadro'||_e==='redoma') st.escolha=_e; }catch(e){}
+  var T={
+    pt:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Faltam {v} para ganhar seu brinde exclusivo', ganhou:'Voc\u00ea ganhou um brinde exclusivo. Escolha o seu:',
+        q:'Mini quadro', r:'Mini redoma', sub:'com miniatura exclusiva 1:64', esg:'Brindes esgotados', escolha:'Escolha seu brinde para continuar',
+        cupom:'Cupons n\u00e3o valem na Black Friday. Os 10% j\u00e1 est\u00e3o aplicados.', seu:'Seu brinde', gratis:'gr\u00e1tis'},
+    en:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Add {v} more to get your exclusive gift', ganhou:'You have earned an exclusive gift. Choose yours:',
+        q:'Mini frame', r:'Mini display case', sub:'with exclusive 1:64 miniature', esg:'Gifts sold out', escolha:'Choose your gift to continue',
+        cupom:'Coupons do not apply during Black Friday. The 10% is already applied.', seu:'Your gift', gratis:'free'},
+    es:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Faltan {v} para ganar tu regalo exclusivo', ganhou:'Ganaste un regalo exclusivo. Elige el tuyo:',
+        q:'Mini cuadro', r:'Mini vitrina', sub:'con miniatura exclusiva 1:64', esg:'Regalos agotados', escolha:'Elige tu regalo para continuar',
+        cupom:'Los cupones no valen durante el Black Friday. El 10\u00a0% ya est\u00e1 aplicado.', seu:'Tu regalo', gratis:'gratis'},
+    fr:{tag:'\u221210%', desc:'Black Friday \u221210%', falta:'Plus que {v} pour recevoir votre cadeau exclusif', ganhou:'Vous avez gagn\u00e9 un cadeau exclusif. Choisissez-le\u00a0:',
+        q:'Mini cadre', r:'Mini vitrine', sub:'avec miniature exclusive 1:64', esg:'Cadeaux \u00e9puis\u00e9s', escolha:'Choisissez votre cadeau pour continuer',
+        cupom:'Les codes promo ne s\u2019appliquent pas pendant le Black Friday. Les 10\u00a0% sont d\u00e9j\u00e0 appliqu\u00e9s.', seu:'Votre cadeau', gratis:'offert'}
+  };
+  function lang(){ var l='pt'; try{ l=(window.FP&&FP.lang)||localStorage.getItem('fp_lang')||'pt'; }catch(e){} return T[l]?l:'pt'; }
+  function t(k){ return (T[lang()]||T.pt)[k]||T.pt[k]; }
+  function reg(){ try{ return (window.FP&&FP.region==='EU')?'EU':'BR'; }catch(e){ return 'BR'; } }
+  function agora(){ return Date.now()+st.desvio; }
+  function calcAtiva(){ var a=agora(); return a>=INI && a<FIM; }
+  function porC(v){ var c=Math.round(Number(v||0)*100); return Math.round(c*(100-PCT)/100); }
+  function fmtP(v){ try{ if(typeof _brl==='function') return _brl(v); }catch(e){} return 'R$ '+Number(v).toFixed(2).replace('.',','); }
+  function fmtC(v){ try{ if(typeof _brlCart==='function') return _brlCart(v); }catch(e){} return fmtP(v); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  window._fpBF=function(){ return {ativa:st.ativa, escolha:st.escolha, brindes:st.brindes}; };
+
+  /* ---------- estilo ---------- */
+  function css(){
+    if(document.getElementById('bfCss')) return;
+    var s=document.createElement('style'); s.id='bfCss';
+    s.textContent=
+      '.bf-p{display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.1;vertical-align:middle}'+
+      '.bf-p .bf-l1{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}'+
+      '.bf-p .bf-de{text-decoration:line-through;text-decoration-thickness:1px;color:#8d8d8d;font-weight:400;font-size:.72em;letter-spacing:0}'+
+      '.bf-p .bf-tag{background:#fff;color:#0a0a0a;font-size:9.5px;font-weight:700;line-height:1;letter-spacing:.04em;padding:3px 5px 2px;border-radius:3px;font-family:inherit}'+
+      '.bf-p .bf-por{white-space:nowrap}'+
+      'html.bf-B .bf-p{flex-direction:row;align-items:baseline;gap:7px}'+
+      'html.bf-B .bf-p .bf-l1 .bf-tag{display:none}'+
+      'html.bf-B .bf-p .bf-de{font-size:.8em}'+
+      '.mrow-g .bf-p,.fb-pv .bf-p{align-items:flex-start}'+
+      '.rbadge .bf-p{flex-direction:row;align-items:baseline;gap:6px}.rbadge .bf-tag{display:none}.rbadge .bf-de{font-size:.85em}'+
+      '.cart-price .bf-p{align-items:flex-end}'+
+      '.bf-c{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px 13px;margin:0 0 12px;background:rgba(255,255,255,.03)}'+
+      '.bf-c-l{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}'+
+      '.bf-c-l b{font-weight:700;letter-spacing:.08em;font-size:11px}'+
+      '.bf-c-l .bf-c-tag{background:#fff;color:#0a0a0a;font-weight:700;font-size:10px;letter-spacing:.08em;padding:3px 6px 2px;border-radius:3px;margin-right:6px}'+
+      '.bf-c-v{font-weight:700;white-space:nowrap}'+
+      '.bf-c-m{font-size:12.5px;line-height:1.45;margin-top:10px;opacity:.92}'+
+      '.bf-c-bar{height:4px;border-radius:4px;background:rgba(255,255,255,.12);margin-top:8px;overflow:hidden}'+
+      '.bf-c-bar i{display:block;height:100%;background:#fff;border-radius:4px}'+
+      '.bf-c-ops{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}'+
+      '.bf-op{display:flex;align-items:center;gap:9px;text-align:left;background:transparent;color:inherit;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:9px 10px;cursor:pointer;font:inherit}'+
+      '.bf-op svg{flex:none;width:30px;height:30px;opacity:.85}'+
+      '.bf-op b{display:block;font-size:12.5px}.bf-op small{display:block;font-size:10.5px;opacity:.6;line-height:1.3}'+
+      '.bf-op.on{border-color:#fff;background:rgba(255,255,255,.08);box-shadow:0 0 0 1px #fff inset}'+
+      '.bf-c-err{display:none;color:#ff9a8a;font-size:12px;margin-top:8px}'+
+      '.bf-c.erro .bf-c-err{display:block}.bf-c.erro .bf-op{border-color:#ff9a8a}'+
+      '.bf-c.erro{animation:bfShk .35s}@keyframes bfShk{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}'+
+      '.bf-cup{font-size:12px;line-height:1.45;opacity:.75;margin-top:6px}';
+    (document.head||document.documentElement).appendChild(s);
+  }
+  function aplicaLayout(){ try{ var h=document.documentElement; h.classList.toggle('bf-A',LAYOUT==='A'); h.classList.toggle('bf-B',LAYOUT==='B'); }catch(e){} }
+
+  /* ---------- precos de produto: "De" riscado + "Por" ---------- */
+  var ALVOS='#pvPrice,#mobBarPrice,#deskBarPrice,#sumTotal,#iSumPrice,#smPreco,.mrow-g b,.fb-pv strong,#step-4 .fundo-cards .rbadge';
+  function valorDe(txt){
+    var s=String(txt||'').replace(/\s+/g,' ').trim();
+    if(!s||s.charAt(0)==='+') return null;
+    if(!/(R\$|\u20ac)/.test(s)) return null;
+    var m=s.match(/(\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?|\d+(?:,\d{1,2})?)/); if(!m) return null;
+    var v=parseFloat(m[1].replace(/\./g,'').replace(',','.'));
+    return (v>0)?v:null;
+  }
+  function marca(de,por){
+    return '<span class="bf-p"><span class="bf-l1"><span class="bf-de">'+esc(de)+'</span><span class="bf-tag">'+t('tag')+'</span></span><span class="bf-por">'+esc(por)+'</span></span>';
+  }
+  var pintando=false;
+  function pinta(){
+    if(pintando) return; pintando=true;
+    try{
+      var els=document.querySelectorAll(ALVOS);
+      for(var k=0;k<els.length;k++){
+        var el=els[k];
+        if(!st.ativa){ if(el.__bfOrig!=null){ if(el.querySelector('.bf-p')) el.textContent=el.__bfOrig; el.__bfOrig=null; } continue; }
+        if(el.querySelector('.bf-p')&&el.__bfSig===el.innerHTML) continue;
+        var txt=el.querySelector('.bf-p')?el.__bfOrig:el.textContent;
+        var v=valorDe(txt); if(v==null) continue;
+        el.__bfOrig=String(txt).trim();
+        el.innerHTML=marca(el.__bfOrig, fmtP(porC(v)/100));
+        el.__bfSig=el.innerHTML;
+      }
+    }catch(e){}
+    pintando=false;
+  }
+  try{ new MutationObserver(function(){ if(!pintando) pinta(); }).observe(document.documentElement,{subtree:true,childList:true,characterData:true}); }catch(e){}
+
+  /* ---------- moeda do carrinho na Europa ----------
+     O bloco do cupom troca o _brlCart e, para valor quebrado, escreve sempre "R$" -- na
+     Europa um EUR 71,10 saia "R$ 71,10". Com os 10% quase todo valor fica quebrado, entao
+     na regiao Europa a moeda volta a ser a do euro, sempre com centavos (como ja era). */
+  var _bc=window._brlCart;
+  window._brlCart=function(v){
+    if(reg()==='EU'){ var n=Number(v||0); return '\u20ac'+n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    return (typeof _bc==='function')?_bc(v):fmtP(v);
+  };
+
+  /* ---------- carrinho: total com os 10%, linhas De/Por, faixa do brinde ---------- */
+  var _ct=window._cartTotal;
+  function brutoCarrinho(){ var s=0; (window.CART||[]).forEach(function(i){ s+=Math.round((Number(i.preco)||0)*100); }); return s/100; }
+  window._cartTotal=function(){
+    if(!st.ativa) return (typeof _ct==='function')?_ct():brutoCarrinho();
+    var s=0; (window.CART||[]).forEach(function(i){ s+=porC(i.preco); }); return s/100;
+  };
+  function minimo(){ return MIN[reg()]||499; }
+  function temAlgum(){ return !!(st.brindes&&(st.brindes.quadro||st.brindes.redoma)); }
+  function elegivel(){ return st.ativa && (window.CART||[]).length>0 && window._cartTotal()+0.000001>=minimo(); }
+  function escolhaValida(){ return !!(st.escolha&&st.brindes&&st.brindes[st.escolha]); }
+  function precisaEscolher(){ return elegivel() && temAlgum() && !escolhaValida(); }
+  var ICO={
+    quadro:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="5" width="24" height="22" rx="1.5"/><rect x="8" y="9" width="16" height="14"/><path d="M10.5 19.5h11M12 19.5l1.6-2.6h4.8l1.6 2.6M12.6 21.2a.9.9 0 1 0 0-.1M19.4 21.2a.9.9 0 1 0 0-.1"/></svg>',
+    redoma:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 24V11h16v13"/><path d="M5 24h22v3H5z"/><path d="M11.5 21.5h9M13 21.5l1.4-2.2h3.2l1.4 2.2"/></svg>'
+  };
+  function htmlBloco(){
+    var desc=Math.round((brutoCarrinho()-window._cartTotal())*100)/100;
+    var h='<div class="bf-c-l"><span><span class="bf-c-tag">BLACK FRIDAY</span>'+esc(t('desc').replace('Black Friday ',''))+'</span><span class="bf-c-v">\u2212 '+esc(fmtC(desc))+'</span></div>';
+    var base=window._cartTotal(), min=minimo();
+    if(base+0.000001<min){
+      var falta=Math.round((min-base)*100)/100, pc=Math.max(4,Math.min(100,Math.round(base/min*100)));
+      h+='<div class="bf-c-m">'+esc(t('falta')).replace('{v}','<b>'+esc(fmtC(falta))+'</b>')+'</div><div class="bf-c-bar"><i style="width:'+pc+'%"></i></div>';
+    } else if(!temAlgum()){
+      h+='<div class="bf-c-m">\ud83c\udf81 '+esc(t('esg'))+'</div>';
+    } else {
+      h+='<div class="bf-c-m">\ud83c\udf81 '+esc(t('ganhou'))+'</div><div class="bf-c-ops">';
+      ['quadro','redoma'].forEach(function(tp){
+        if(!st.brindes[tp]) return;
+        h+='<button type="button" class="bf-op'+(st.escolha===tp?' on':'')+'" data-bf="'+tp+'">'+ICO[tp]+'<span><b>'+esc(t(tp==='quadro'?'q':'r'))+'</b><small>'+esc(t('sub'))+' \u00b7 '+esc(t('gratis'))+'</small></span></button>';
+      });
+      h+='</div><div class="bf-c-err">'+esc(t('escolha'))+'</div>';
+    }
+    return h;
+  }
+  function bloco(){
+    var foot=document.getElementById('cartFoot'); if(!foot) return;
+    var b=document.getElementById('bfCart');
+    if(!st.ativa||!(window.CART||[]).length){ if(b) b.parentNode.removeChild(b); return; }
+    if(!b){ b=document.createElement('div'); b.id='bfCart'; b.className='bf-c'; var tot=foot.querySelector('.cart-tot'); if(tot) foot.insertBefore(b,tot); else foot.insertBefore(b,foot.firstChild); }
+    b.className='bf-c'+(st.erro&&precisaEscolher()?' erro':'');
+    b.innerHTML=htmlBloco();
+    var bs=b.querySelectorAll('.bf-op');
+    for(var k=0;k<bs.length;k++){ bs[k].onclick=function(){ st.escolha=this.getAttribute('data-bf'); st.erro=false; try{ localStorage.setItem('fp_bf_brinde',st.escolha); }catch(e){} bloco(); }; }
+  }
+  function linhas(){
+    if(!st.ativa) return;
+    var grupos=(typeof _cartGrupos==='function')?_cartGrupos():(window.CART||[]).map(function(x){ return {item:x,itens:[x]}; });
+    var its=document.querySelectorAll('#cartBody .cart-item');
+    for(var k=0;k<its.length&&k<grupos.length;k++){
+      var g=grupos[k], q=g.itens.length, p=Number(g.item.preco)||0; if(!(p>0)) continue;
+      var pr=its[k].querySelector('.cart-price');
+      if(pr) pr.innerHTML=marca(fmtC(p*q), fmtC(porC(p)*q/100));
+      var un=its[k].querySelector('.cart-un');
+      if(un) un.textContent=fmtC(porC(p)/100)+' '+String(un.textContent||'').replace(/^.*?\d(?:[\d.,]*)\s*/,'');
+    }
+    var tt=document.getElementById('cartTotal'); if(tt&&typeof _brlCart==='function') tt.textContent=_brlCart(window._cartTotal());
+  }
+  function caixaCupom(){
+    if(!st.ativa) return;
+    var box=document.getElementById('fpCup'); if(!box||box.style.display==='none') return;
+    var h=box.querySelector('.fp-cup-h');
+    box.innerHTML=(h?h.outerHTML:'')+'<div class="bf-cup">'+esc(t('cupom'))+'</div>';
+  }
+  var _cr=window._cartRender;
+  window._cartRender=function(){
+    var r=(typeof _cr==='function')?_cr.apply(this,arguments):undefined;
+    try{ linhas(); caixaCupom(); bloco(); }catch(e){}
+    return r;
+  };
+
+  /* escolha obrigatoria antes de seguir para o frete */
+  var _cp=window.carrinhoPasso;
+  if(typeof _cp==='function'){
+    window.carrinhoPasso=function(n){
+      try{
+        if(n===2&&precisaEscolher()){
+          st.erro=true;
+          var p=document.getElementById('cartPanel');
+          if(!(p&&p.classList.contains('open'))&&typeof abrirCarrinho==='function') abrirCarrinho();
+          else if(typeof _cartRender==='function') _cartRender();
+          var b=document.getElementById('bfCart'); if(b&&b.scrollIntoView) b.scrollIntoView({block:'center',behavior:'smooth'});
+          return;
+        }
+      }catch(e){}
+      return _cp.apply(this,arguments);
+    };
+  }
+
+  /* o pedido leva o brinde escolhido; cupom nao vai junto */
+  var _of=window.fetch;
+  window.fetch=function(input,init){
+    try{
+      var u=(typeof input==='string')?input:((input&&input.url)||'');
+      if(st.ativa&&init&&init.body&&String(init.method||'').toUpperCase()==='POST'&&/\/pedido(\?|$)/.test(u)){
+        var b=JSON.parse(init.body);
+        if(b&&Array.isArray(b.itens)){
+          delete b.cupom;
+          if(elegivel()&&escolhaValida()) b.brinde=st.escolha; else delete b.brinde;
+          init=Object.assign({},init,{body:JSON.stringify(b)});
+        }
+      }
+    }catch(e){}
+    return _of.apply(this,arguments.length>1?[input,init]:[input]);
+  };
+
+  /* ---------- liga / desliga ---------- */
+  function aplica(){
+    var era=st.ativa; st.ativa=calcAtiva();
+    if(st.ativa){ css(); aplicaLayout(); try{ if(window._cupom){ window._cupom=null; localStorage.removeItem('fp_cupom_v1'); } }catch(e){} }
+    if(era!==st.ativa){
+      try{ if(typeof calcPrice==='function') calcPrice(); }catch(e){}
+      try{ if(typeof _cartRender==='function') _cartRender(); }catch(e){}
+      try{ if(typeof window._renderCupomBox==='function') window._renderCupomBox(); }catch(e){}
+    }
+    pinta(); bloco();
+  }
+  function servidor(){
+    try{
+      _of.call(window,API+'/bf',{cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+        if(!d||!d.ok) return;
+        if(typeof d.agora==='number') st.desvio=d.agora-Date.now();
+        if(typeof d.ini==='number') INI=d.ini; if(typeof d.fim==='number') FIM=d.fim;
+        if(d.min){ if(d.min.BRL) MIN.BR=d.min.BRL; if(d.min.EUR) MIN.EU=d.min.EUR; }
+        if(d.brindes) st.brindes={quadro:!!d.brindes.quadro, redoma:!!d.brindes.redoma};
+        aplica(); try{ if(typeof _cartRender==='function') _cartRender(); }catch(e){}
+      }).catch(function(){});
+    }catch(e){}
+  }
+  var _ab=window.abrirCarrinho;
+  if(typeof _ab==='function') window.abrirCarrinho=function(){ var r=_ab.apply(this,arguments); servidor(); return r; };
+  function inicia(){ aplica(); servidor(); setInterval(aplica,15000); setInterval(servidor,300000); }
+  if(document.readyState!=='loading') setTimeout(inicia,300); else document.addEventListener('DOMContentLoaded',function(){ setTimeout(inicia,300); });
 })();
