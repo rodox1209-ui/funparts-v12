@@ -318,6 +318,13 @@ if(typeof window.iniciarNovaPersonalizacao!=='function'){
     US:{lang:'en',currency:'USD',symbol:'$',frete:'sendcloud',gateway:'stripe',flag:'ÃÂ°ÃÂÃÂÃÂºÃÂ°ÃÂÃÂÃÂ¸',reg:{pt:'EUA',en:'USA'},prices:{lego_base_carbono:130,lego_base_fosco:111,mini_base_P:375,mini_base_M:470,mini_base_G:564,opt_moldura_fibra:14,opt_led_rgb_sem:92,opt_led_rgb_com:111,opt_led_warm_sem:73,opt_led_warm_com:92,opt_relevo_bandeira:17,opt_relevo_piloto:17}}
   };
   var EUcc=['PT','ES','FR','DE','IT','BE','NL','LU','IE','AT','FI','GR','CY','MT','EE','LV','LT','SK','SI','HR','PL','CZ','HU','RO','BG','DK','SE','GB','CH','NO','IS'];
+  /* 26/11/2026: cliente no Brasil com IP que parece de fora (VPN, Instagram, operadora)
+   abria o site em dolar/euro, frete internacional e pagamento internacional -- e nao
+   conseguia comprar. O fuso horario do aparelho desempata: fuso do Brasil = Brasil.
+   Pelo endereco .be nada muda (la a Europa e escolha do proprio endereco). */
+  function fpTzBR(){try{var z=(Intl.DateTimeFormat().resolvedOptions().timeZone)||'';return /^(America\/(Sao_Paulo|Fortaleza|Recife|Bahia|Belem|Maceio|Araguaina|Santarem|Manaus|Cuiaba|Campo_Grande|Porto_Velho|Boa_Vista|Rio_Branco|Eirunepe|Noronha)|Brazil\/(East|West|Acre|DeNoronha))$/.test(z);}catch(e){return false;}}
+  function fpHostBE(){try{return /(^|\.)funparts\.be$/i.test(location.hostname);}catch(e){return false;}}
+  function fpAuto(v){try{localStorage.setItem('fp_region_auto',v);}catch(e){}}
   function regiaoDe(cc){cc=(cc||'').toUpperCase();if(cc==='BR')return'BR';if(cc==='US')return'US';if(EUcc.indexOf(cc)>-1)return'EU';return'BR';}
 
   // Bandeiras em SVG (renderizam iguais em qualquer sistema, inclusive Windows)
@@ -950,7 +957,7 @@ window._priceFix={ran:true};
     atualizaFreteLabels();
   }
   FP.setLang=function(l){FP.lang=l;save();aplicar();};
-  FP.setRegion=function(r){if(!CFG[r])return;FP.region=r;FP.lang=CFG[r].lang;if(typeof resetFrete==='function')resetFrete();save();aplicar();};
+  FP.setRegion=function(r){if(!CFG[r])return;fpAuto('0');FP.region=r;FP.lang=CFG[r].lang;if(typeof resetFrete==='function')resetFrete();save();aplicar();};
   window.FP=FP;
 
   function montaSeletor(){
@@ -1034,6 +1041,8 @@ window._priceFix={ran:true};
     var t=FP.t, cepEl=document.getElementById('fpCep'), opts=document.getElementById('fpFreteOpts'); if(!opts||!cepEl)return;
     var v=(cepEl.value||'').replace(/[^0-9A-Za-z]/g,''); var minLen=(FP.region==='BR')?8:4;
     if(v.length<minLen){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.invalid')+'</div>'; FP.frete=null; return; }
+    /* 26/11: CEP brasileiro (8 numeros) fora da regiao Brasil nao vai para o frete internacional */
+    if(FP.region!=='BR'&&/^[0-9]{8}$/.test(v)){ var _mb={pt:'Esse \u00e9 um CEP do Brasil. Toque na bandeira no topo do site e escolha Brasil.',en:'This is a Brazilian postal code (CEP). Tap the flag at the top of the site and choose Brazil.',es:'Este es un CEP de Brasil. Toca la bandera arriba y elige Brasil.',fr:'Ceci est un code postal br\u00e9silien (CEP). Touchez le drapeau en haut et choisissez Br\u00e9sil.'}; opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+(_mb[FP.lang]||_mb.pt)+'</div>'; FP.frete=null; return; }
     var itens=_freteItens();
     if(!itens.length){ opts.innerHTML='<div class="fp-frete-msg" style="color:#d98a82">'+t('frete.emptyCart')+'</div>'; return; }
     var paisEl=document.getElementById('fpFretePaisSel');
@@ -1090,11 +1099,18 @@ window._priceFix={ran:true};
     window.addEventListener('resize',posicionaSeletor);
     setTimeout(posicionaSeletor,300);
     var sl=null,sr=null; try{sl=localStorage.getItem('fp_lang');sr=localStorage.getItem('fp_region');}catch(e){}
-    if(sl&&sr&&CFG[sr]){ FP.lang=sl; FP.region=sr; aplicar(); return; }
+    if(sl&&sr&&CFG[sr]){
+      /* regiao gravada pela deteccao automatica (nao pela bandeira) num aparelho com fuso do
+         Brasil volta para o Brasil -- so com o carrinho vazio, para nao misturar precos */
+      var _au=null,_vz=true; try{_au=localStorage.getItem('fp_region_auto');}catch(e){}
+      try{var _ca=JSON.parse(localStorage.getItem('funparts_cart_v1')||'[]');_vz=!(_ca&&_ca.length);}catch(e){}
+      if(sr!=='BR'&&_au!=='0'&&_vz&&fpTzBR()&&!fpHostBE()){ sr='BR'; sl=CFG.BR.lang; FP.lang=sl; FP.region=sr; save(); fpAuto('1'); aplicar(); return; }
+      FP.lang=sl; FP.region=sr; aplicar(); return;
+    }
     aplicar(); // PT enquanto detecta
     fetch('/cdn-cgi/trace',{cache:'no-store'}).then(function(r){return r.text();}).then(function(txt){
       var cc=(txt.match(/loc=([A-Z]{2})/)||[])[1]; FP.geoCountry=cc||null;
-      var reg=regiaoDe(cc); FP.region=reg; FP.lang=CFG[reg].lang; save(); aplicar();
+      var reg=regiaoDe(cc); if(reg!=='BR'&&fpTzBR()&&!fpHostBE())reg='BR'; FP.region=reg; FP.lang=CFG[reg].lang; save(); fpAuto('1'); aplicar();
     }).catch(function(){});
   }
   if(document.readyState!=='loading')init(); else document.addEventListener('DOMContentLoaded',init);
